@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.svc.chatbot.mapper.ChatbotGroupMapper">
+
+
+    <sql id="listWhere">
+    	<!-- 등록일 조회-->
+    	<if test='searchStartDt != null and searchStartDt !=""'>
+			AND create_date  <![CDATA[>=]]> #{searchStartDt}
+		</if>
+		<if test='searchEndDt != null and searchEndDt !=""'>
+			AND create_date <![CDATA[<=]]> #{searchEndDt}
+		</if>
+		
+		<!-- 그룹 명 조회 -->
+   		<if test='keyword != null and keyword !=""'>
+			AND group_name LIKE CONCAT('%', #{keyword}, '%')
+		</if>		
+		
+    </sql>
+
+	<sql id="Base_Column_list">
+		id
+		,group_name
+		,title
+		,mvno
+		,sup_data
+		,sub_qos
+		,order_no
+		,group_memo
+		,create_date
+		,create_id
+		,modified_date
+		,modified_id
+		,GET_ADMIN_USER_NM(create_id) as createNm
+		,GET_ADMIN_USER_NM(modified_id) as modifiedNm
+
+	</sql>
+	
+
+    <select id="list" parameterType="kr.co.ucomp.web.svc.chatbot.dto.SearchChatbotGroupDTO" resultType="kr.co.ucomp.web.svc.chatbot.entity.ChatbotGroupEntity">
+        SELECT
+            <include refid="Base_Column_list" />
+            ,( 	SELECT COUNT(1) FROM tb_svc_chatbot_group_plan b
+				WHERE b.chatbot_group_id = a.id ) AS reg_cnt
+        FROM
+            tb_svc_chatbot_plan_group a
+        WHERE 1=1
+        <include refid="listWhere"/>
+        order by order_no
+        
+        LIMIT #{offset}, #{recordSize}
+    </select>
+    
+    
+    <select id="listCount" parameterType="kr.co.ucomp.web.svc.chatbot.dto.SearchChatbotGroupDTO" resultType="Long">
+        SELECT count(1)
+        FROM
+            tb_svc_chatbot_plan_group a
+        WHERE 1=1
+        <include refid="listWhere"/>
+    </select>
+
+    <select id="getDetail" parameterType="Long" resultType="kr.co.ucomp.web.svc.chatbot.entity.ChatbotGroupEntity">
+        SELECT
+             <include refid="Base_Column_list" />
+        FROM
+            tb_svc_chatbot_plan_group a
+        WHERE id = #{id}
+    </select>
+
+    <insert id="create" parameterType="kr.co.ucomp.web.svc.chatbot.entity.ChatbotGroupEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_svc_chatbot_plan_group (
+			group_name
+			,title
+			,mvno
+			,sup_data
+			,sub_qos
+			,order_no
+			,group_memo
+			,create_id
+			,modified_id
+        ) VALUES (
+            #{groupName}
+            , #{title}
+            , #{mvno}
+            , #{supData}
+            , #{subQos}
+            , #{orderNo} 
+            , #{groupMemo}
+            , #{createId}
+            , #{modifiedId}
+        )
+    </insert>
+
+    <update id="update" parameterType="kr.co.ucomp.web.svc.chatbot.entity.ChatbotGroupEntity">
+             UPDATE tb_svc_chatbot_plan_group
+	        SET
+	            group_name = #{groupName},
+	            title = #{title},
+	            mvno = #{mvno}, 
+	            sup_data = #{supData},
+	            sub_qos = #{subQos}, 
+	            order_no = #{orderNo}, 
+	            group_memo = #{groupMemo},
+	            order_no = #{orderNo},  
+	            modified_date = NOW(), 
+	            modified_id = #{modifiedId}
+	        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="Long">
+        DELETE FROM tb_svc_chatbot_plan_group
+        WHERE id = #{id}
+    </delete>
+
+
+</mapper>

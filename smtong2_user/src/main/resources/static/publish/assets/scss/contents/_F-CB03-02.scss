@@ -1,0 +1,58 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 데이터 서칭
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 데이터 서칭 페이지
+.F-CB03-05-page {
+	// s: 모통봇 소개 섹션
+	.cb-intro-sec {
+		@include cb-intro-sec;
+	}
+	// e: 모통봇 소개 섹션
+
+	// s: 검색중 섹션
+	.cb-searching-sec {
+		padding-top: 90rem;
+		padding-bottom: 90rem;
+
+		.searching-data {
+			display: flex;
+			position: relative;
+			justify-content: center;
+			.searching {
+				position: relative;
+				width: 130rem;
+				height: 130rem;
+				> div {
+					display: flex;
+					position: absolute;
+					left: 0;
+					top: 0;
+					z-index: 1;
+					width: 100%;
+					height: 100%;
+					img {
+						width: 100%;
+						height: 100%;
+					}
+					&.img-zoom {
+						z-index: 2;
+						transform: translate(0, 0) rotate(0deg) translateX(10px) rotate(0deg);
+						animation: circle-motion 2.5s linear infinite;
+						@keyframes circle-motion {
+							0% {
+								transform: translate(0, 0) rotate(0deg) translateX(10px) rotate(0deg);
+							}
+							100% {
+								transform: translate(0, 0) rotate(360deg) translateX(10px) rotate(-360deg);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	// e: 검색중 섹션
+}
+// e: 데이터 서칭 페이지

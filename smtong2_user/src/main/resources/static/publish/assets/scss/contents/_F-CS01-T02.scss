@@ -1,0 +1,128 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 나의 고객 문의 내역 탭
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+@import './F-CS01';
+
+// s: 나의 고객 문의 내역 탭 페이지
+.F-CS01-T02-page {
+	// s: 문의내역 섹션
+	.inq-list-sec {
+		// 문의내역
+		.inq-accordion {
+			@include inq-accordion;
+		}
+
+		// 피드백안내
+		.feedback-msg {
+			margin-top: 20rem;
+			border-top:1px solid #EFF0F0;
+			padding-top: 30rem;
+			text-align: center;
+
+			.tit {
+				font-weight: 500;
+				font-size: 14rem;
+				color: #36383A;
+			}
+
+			.txt {
+				margin-top: 6rem;
+				font-weight: 500;
+				font-size: 12rem;
+				color: #5A5D60;
+			}
+
+			.ui-btn {
+				margin-top: 18rem;
+				font-weight: 600;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #63666A;
+				text-decoration: underline;
+				text-underline-position: underline;
+			}
+		}
+	}
+	// e: 문의내역 섹션
+
+	// s: 노데이터 섹션
+	.nodata-sec {
+		@include nodata-sec;
+
+		.nodata {
+			@include nodata;
+		}
+	}
+	// e: 노데이터 섹션
+}
+// e: 나의 고객 문의 내역 탭 페이지
+
+// s: 의견보내기 팝업 페이지
+.F-CS01-T02-page {
+	.modal-title {
+		text-align: center;
+	}
+
+	// s: 평가하기 섹션
+	.reg-sat-sec {
+		margin-top: 2rem;
+
+		.reg-sat-msg {
+			text-align: center;
+			.tit {
+				font-weight: 600;
+				font-size: 16rem;
+				color: #000;
+			}
+			.txt {
+				margin-top: 16rem;
+				font-weight: 500;
+				font-size: 14rem;
+				color: #5A5D60;
+			}
+
+		}
+
+		.reg-sat-frm {
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+			gap: 10rem;
+			margin-top: 30rem;
+			.reg-sat-rdo {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				flex: 1 1 auto;
+				padding: 16rem 12rem;
+				border:1px solid transparent;
+				border-radius: 6rem;
+				text-align: center;
+				background-color: #F4F4F4;
+				&.is-selected {
+					border-color: #A692ED;
+					background-color: #fff;
+				}
+				.ui-icn {
+					margin-bottom: 6rem;
+				}
+				.ui-rdo {
+					margin: 0;
+				}
+			}
+		}
+	}
+	// e: 평가하기 섹션
+
+	// s: 문의 등록 섹션
+	.inq-frm-sec {
+		margin-top: 32rem;
+
+		.basic-frm {
+			@include basic-frm;
+		}
+	}
+	// e: 문의 등록 섹션
+}
+// e: 의견보내기 팝업 페이지

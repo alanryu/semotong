@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	 xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	 layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='04',menuId =${'03' + siteSp}">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script id="searchListTmpl" type="text/x-jquery-tmpl">
+		<tr style="cursor: pointer;">
+		    <td>${id}</td>
+		    <td>{{html getStateNm(useYn)}}</td>
+			<td>${internetMno}</td>
+			<td><a href="javascript:void(0)" onclick="goDetail('${id}')">${prodName}</a></td>
+			{{if channelCount == 0}}
+				<td> - </td>
+			{{else}}
+				<td>${channelCount} 채널</td>
+			{{/if}}
+			<td>{{html getSpeedNm(internetSpeed) }}</td>
+		    <td>{{html getPriceStr(normalPrice) }}</td>
+			<td>{{html getPriceStr(combinationPrice) }}</td>
+			<td>{{html getPriceStr(combinationFreeblePrice) }}</td>
+			<td>${modifiedDate}</td>
+		</tr>
+	</script>
+	<script type="text/javascript">
+		function goDetail(id) {
+			var siteSp = "[[${siteSp}]]";
+			window.location.href = "/pmb/internetplan/edit/"+siteSp+"?searchId=" + id;
+		}
+
+		document.addEventListener('DOMContentLoaded', () => {
+			searchList();
+
+		});
+		function changeCombo(){
+			currentPage = 1;
+			searchList()
+		}
+
+		function getStateNm(sp) {
+			if(sp =="Y") {
+				return "노출";
+			} else {
+				return "비노출";
+			}
+		}
+
+
+		function getSpeedNm(val) {
+			if(val =="1000") {
+				return "1Gbps";
+			} else {
+				return val + "Mbps";
+			}
+		}
+
+
+		function renderPage(page) {
+			currentPage = page;
+			searchList();
+		}
+
+		function searchListInit() {
+			currentPage = 1;
+			searchList();
+		}
+
+		function searchList() {
+			var page = currentPage;
+			if(page ==null|| page == "") page =1;
+	  		var pageSize = $("#pageSizse").val();
+
+			var params = {
+				 searchType : $("#searchType").val(),
+				 keyword : $("#keyword").val(),
+				 searchStartDt : $("#searchStartDt").val(),
+				 searchEndDt : $("#searchEndDt").val(),
+				 searchUseYn : $("input[name='searchUseYn']:checked").val(),
+				 searchInternetSpeed : getCheckedCompanies("searchInternetSpeed"),
+				 searchInternetMno : getCheckedCompanies("searchInternetMno"),
+				 searchSiteSp : "[[${siteSp}]]",
+				 page : page,
+				 recordSize : pageSize
+			    }
+
+				$.ajax({
+				   url : '/pmb/internetplan/ajaxList',
+				  type : 'POST',
+				  dataType : "json",
+				  contentType:"application/json",
+				   data : JSON.stringify(params),
+				   success: function (data) {
+					   $('#searchList').empty();
+
+						$('#totla_count').html("총 "+data.totalCnt+"건");
+						if(data.totalCnt > 0) {
+							$('#searchListTmpl').tmpl(data.data).appendTo('#searchList');
+						}
+
+						renderPagination(page,data.totalCnt,pageSize);
+				    },
+					error : function(request, status, error){
+					  showAlert(request);
+				   },
+				   complete:function(){
+					 // $('#loading').addClass('display-none');
+				   }
+				});
+		}
+
+
+		function selMno(id) {
+			if(id=="") {
+				$("input[id^='searchInternetMno']").prop("checked", false);
+				$("#searchInternetMnoAll").prop("checked", true);
+			} else {
+				$("#searchInternetMnoAll").prop("checked", false);
+			}
+
+		}
+
+
+		function selspeed(id) {
+
+			if(id=="") {
+				$("input[id^='searchInternetSpeed']").prop("checked", false);
+				$("#searchInternetSpeedAll").prop("checked", true);
+			} else {
+				$("#searchInternetSpeedAll").prop("checked", false);
+			}
+
+		}
+
+
+		function toggleSearchInit(){
+			$("#keyword").val('');
+			$("#searchUseYn01").prop('checked', true); // 상태
+			$('.period-button[value="180"]').trigger("click");
+
+			/* 통신사 초기화 */
+			$('input[name=searchInternetMno]').prop('checked', false);
+			$('#searchInternetMnoAll').prop('checked', true);
+
+			/* 인터넷 초기화 */
+			$('input[name=searchInternetSpeed').prop('checked', false);
+			$('#searchInternetSpeedAll').prop('checked', true);
+			currentPage = 1;
+		}
+
+
+		//02.03 - sancho
+		function downloadExcel() {
+			//페이징 기본(필수)
+			var page = currentPage;
+			if(page =="" || page == null) page =1;
+			//var _recordSize =  parseInt($("#recordSize").val());
+			var _recordSize =  999;
+			if( !_isDateForm($("#searchStartDt").val()) ){
+				alert("올바른 날짜를 넣어주세요");
+				$("#searchStartDt").focus();
+				return;
+			}
+			if( !_isDateForm($("#searchEndDt").val()) ){
+				alert("올바른 날짜를 넣어주세요");
+				$("#searchEndDt").focus();
+				return;
+			}
+			var params = {
+					searchType : $("#searchType").val(),
+					keyword : $("#keyword").val(),
+					searchStartDt : $("#searchStartDt").val(),
+					searchEndDt : $("#searchEndDt").val(),
+					searchUseYn : $("input[name='searchUseYn']:checked").val(),
+					searchInternetSpeed : getCheckedCompanies("searchInternetSpeed"),
+					searchInternetMno : getCheckedCompanies("searchInternetMno"),
+					searchSiteSp : "[[${siteSp}]]",
+					 page : page,
+					 recordSize : _recordSize
+			}
+
+
+
+			var _url = '/pmb/internetplan/exceldown';
+
+			downloadExcelProc(params,_url,"InternetPlanList");
+
+		}
+
+
+
+
+
+	</script>
+</th:block>
+
+<div class="main-content">
+	   <div class="container-fluid">
+		   <!-- 로케이션 & 제목 영역 추가 -->
+		  <div class="page-header mb-4">
+			 <div class="location mb-2">
+				<small class="text-secondary">
+				    <i class="fas fa-home me-1"></i>
+				    <a href="/mbm/adminuser/list">홈</a> > <a href="/pbm/plan/list">상품관리</a> > <a th:href="@{/pmb/internetplan/list/{siteSp}(siteSp=${siteSp})}">인터넷</a>
+				</small>
+			 </div>
+			 <h2 class="page-title fs-4 mb-4">인터넷 상품 노출 관리
+			 	<th:block th:if="${siteSp eq '01'}">(세모통)</th:block>
+			 	<th:block th:if="${siteSp eq '02'}">(오늘에통신)</th:block>
+			 </h2>
+		  </div>
+
+		  <div class="search-section">
+			 <!-- 검색어 -->
+			 <div class="col-12 mb-2">
+				<div class="form-row full-width">
+				    <div class="form-label mb-0">검색어</div>
+				    <div class="position-relative col-9">
+					   <i class="fas fa-search position-absolute" style="left: 16px; top: 15.5px; color: #94a3b8;"></i>
+					   <input type="text" class="form-control ps-5" placeholder="검색어를 입력하세요" id="keyword" name="keyword">
+				    </div>
+				</div>
+			 </div>
+			 <div class="row align-items-center mb-3">
+				<div class="col-12">
+				    <div class="d-flex align-items-center gap-3">
+					   <div class="form-label mb-0">상태</div>
+					   <div class="radio-group">
+						  <div class="form-check form-check-inline">
+							 <input class="form-check-input" type="radio" name="searchUseYn" id="searchUseYn01" value="" checked>
+							 <label class="form-check-label" for="searchUseYn01">전체</label>
+						  </div>
+						  <div class="form-check form-check-inline">
+							 <input class="form-check-input" type="radio" name="searchUseYn" id="searchUseYn02" value="Y">
+							 <label class="form-check-label" for="searchUseYn02">노출</label>
+						  </div>
+						  <div class="form-check form-check-inline">
+							 <input class="form-check-input" type="radio" name="searchUseYn" id="searchUseYn03" value="N">
+							 <label class="form-check-label" for="searchUseYn03">비노출</label>
+						  </div>
+					   </div>
+				    </div>
+				</div>
+			 </div>
+				<div class="row align-items-center mb-2">
+				<div class="form-row full-width">
+				    <div class="d-flex align-items-center gap-3">
+					   <div class="form-label mb-0">신청일</div>
+					   <div class="d-flex align-items-center gap-2">
+						  <input type="date" class="form-control" style="width: 150px" id="searchStartDt">
+						  <span class="text-secondary">-</span>
+						  <input type="date" class="form-control" style="width: 150px" id="searchEndDt">
+					   </div>
+					   <div class="d-flex gap-2">
+						  <button class="period-button" value="0">오늘</button>
+						  <button class="period-button" value="7">1주일</button>
+						  <button class="period-button" value="30">1개월</button>
+						  <button class="period-button" value="90">3개월</button>
+						  <button class="period-button" value="180">6개월</button>
+						  <button class="period-button" value="365">1년</button>
+					   </div>
+				    </div>
+				</div>
+			 </div>
+
+
+			  <div id="detailSearchArea" class="col-12" style="display: none;">
+				  <!-- 통신사 -->
+				   <div class="form-row mb-3">
+					  <div class="form-label mb-0">통신사</div>
+					  <div class="form-control-wrap">
+						 <div class="form-check-group">
+							<div class="form-check form-check-inline">
+							    <input class="form-check-input" type="checkbox" id="searchInternetMnoAll" name="searchInternetMno"  value="" onclick="selMno('');"  checked>
+							    <label class="form-check-label" for="searchInternetMnoAll">전체</label>
+							</div>
+						 	<th:block th:each="item,index : ${compnyList}" th:if="${item.id != 0}">
+
+							 	<th:block th:if="${siteSp == '01'}">
+									 <div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" name="searchInternetMno" th:id="${'searchInternetMno' + index.index}"  th:value="${item.id}" th:onclick="|selMno(${item.id});|">
+										<label class="form-check-label" th:for="${'searchInternetMno' + index.index}" th:text="${item.name}">KG모바일</label>
+									 </div>
+								 </th:block>
+								 <th:block th:if="${siteSp == '02' and (item.id == 1 or item.id == 2 or item.id == 3)}">
+									 <div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" name="searchInternetMno" th:id="${'searchInternetMno' + index.index}"  th:value="${item.id}" th:onclick="|selMno(${item.id});|">
+										<label class="form-check-label" th:for="${'searchInternetMno' + index.index}" th:text="${item.name}">KG모바일</label>
+									 </div>
+								 </th:block>
+							</th:block>
+						 </div>
+					  </div>
+				   </div>
+
+				  <!-- 인터넷 -->
+				   <div class="form-row mb-3">
+					  <div class="form-label mb-0">인터넷</div>
+					  <div class="form-control-wrap">
+						 <div class="form-check-group">
+							<div class="form-check form-check-inline">
+							    <input class="form-check-input" type="checkbox" id="searchInternetSpeedAll" value="" onclick="selspeed('');" checked>
+							    <label class="form-check-label" for="searchInternetSpeedAll">전체</label>
+							</div>
+							 <div class="form-check form-check-inline">
+								<input class="form-check-input" type="checkbox" name="searchInternetSpeed" id="searchInternetSpeed01" value="S100" onclick="selspeed('100')">
+								<label class="form-check-label" for="searchInternetSpeed01">100Mbps</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="checkbox" name="searchInternetSpeed" id="searchInternetSpeed02" value="S160" onclick="selspeed('160')">
+								<label class="form-check-label" for="searchInternetSpeed02">160Mbps</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="checkbox" name="searchInternetSpeed" id="searchInternetSpeed03" value="S200" onclick="selspeed('200')">
+								<label class="form-check-label" for="searchInternetSpeed03">200Mbps</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="checkbox" name="searchInternetSpeed" id="searchInternetSpeed04" value="S500" onclick="selspeed('500')">
+								<label class="form-check-label" for="searchInternetSpeed04">500Mbps</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="checkbox" name="searchInternetSpeed" id="searchInternetSpeed05" value="S1000" onclick="selspeed('1000')">
+								<label class="form-check-label" for="searchInternetSpeed05">1Gbps</label>
+							</div>
+						 </div>
+					  </div>
+				   </div>
+			   </div>
+
+			 <div class="row">
+				<div class="col-12 text-end mt-2">
+				    <button class="btn btn-light me-2 btn-sm" onclick="toggleSearchInit()">
+					   <i class="fas fa-redo"></i>
+					   초기화
+				    </button>
+				    <button class="btn btn-primary btn-sm me-2" onclick="toggleDetailSearch()">
+					   <i class="fas fa-chevron-down"></i>
+					   상세검색
+				    </button>
+				    <button class="btn btn-primary btn-sm" onclick="searchListInit();">
+					   <i class="fas fa-search"></i>
+					   검색
+				    </button>
+				</div>
+			 </div>
+		  </div>
+
+		  <div class="table-section">
+			 <div class="d-flex justify-content-between align-items-center mb-4">
+				<div class="d-flex align-items-center gap-3">
+				    <div class="stats-badge">
+					   <i class="fas fa-calculator me-1"></i>
+					   <span id="totla_count">총 450건</span>
+				    </div>
+				    <select class="form-select" style="width: 100px" id="pageSizse" onchange="changeCombo()">
+					   <option value= "10">10개씩</option>
+					   <option value= "20">20개씩</option>
+					   <option value= "30">30개씩</option>
+					   <option value= "40">40개씩</option>
+					   <option value= "50">50개씩</option>
+				    </select>
+				</div>
+				<div class="header-actions">
+				    <button class="btn btn-light btn-sm">
+					   <i class="fas fa-download"></i>
+					   다운로드
+				    </button>
+				    <button class="btn btn-primary btn-sm" onclick="goDetail('')">
+					   <i class="fas fa-plus"></i>
+					   신규등록
+				    </button>
+				</div>
+			 </div>
+
+			 <table class="table custom-table">
+				<thead>
+				    <tr>
+					   <th>번호</th>
+					   <th>상태</th>
+					   <th>통신사</th>
+					   <th>상품명</th>
+					   <th>TV</th>
+					   <th>인터넷</th>
+					   <th>미결합금액</th>
+					   <th>결합금액</th>
+					   <th>사은품</th>
+					   <th>최근 수정일</th>
+				    </tr>
+				</thead>
+				<tbody id="searchList">
+
+				</tbody>
+			 </table>
+
+			 <div class="d-flex justify-content-left mt-4">
+				<ul class="pagination">
+
+				</ul>
+			 </div>
+		 </div>
+	</div>
+</DIV>

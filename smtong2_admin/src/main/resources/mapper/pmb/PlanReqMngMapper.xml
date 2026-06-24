@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.pmb.mapper.PlanReqMngMapper">
+
+	<sql id="listWhere">
+		<if test='keyword != null and keyword !=""'>
+			AND (
+				a.req_nm LIKE CONCAT('%', #{keyword}, '%')
+				OR a.req_phon_num LIKE CONCAT('%', #{keyword}, '%')
+				OR b.plan_name LIKE CONCAT('%', #{keyword}, '%')
+			)
+		</if>
+		
+		<!-- 게시기간 조회-->
+        <if test='searchStartDt != null and searchStartDt !=""'>
+            AND a.create_date  <![CDATA[>=]]> #{searchStartDt}
+        </if>
+        <if test='searchEndDt != null and searchEndDt !=""'>
+            AND a.create_date <![CDATA[<=]]> #{searchEndDt}
+        </if>
+        
+        <!-- 유입구분 -->
+        <if test='searchreqSp != null and searchreqSp !=""'>
+            AND a.req_sp = #{searchreqSp}
+        </if>
+        
+        <!-- 사업자-->
+    	<if test='searchCompanyList != null and searchCompanyList !=""'>
+    		AND b.host IN
+	        <foreach item="company" index="index" collection="_parameter.searchCompanyList.split(',')" open="(" separator="," close=")">
+	            #{company}
+	        </foreach>
+    	</if>
+    	<!-- MNO-->
+	   	<if test='searchMno != null and searchMno !=""'>
+	   		AND b.mno IN
+	        <foreach item="mno" index="index" collection="_parameter.searchMno.split(',')" open="(" separator="," close=")">
+	            #{mno}
+	        </foreach>
+	   	</if>
+	   	
+	   	  <!-- 영업상품 링크 관리번호-->
+        <if test='searchSalePlanId != null and searchSalePlanId !=""'>
+            AND a.sale_plan_id = #{searchSalePlanId}
+        </if>
+	   	
+	</sql>
+	
+	<sql id="Base_Column_list">
+		a.id
+		,a.req_nm
+		,a.req_phon_num
+		,a.req_prod
+		,b.plan_name as reqProdNm
+		,GET_COMPANY_NM(b.host) AS planCompanyNm
+		,b.mno planMno
+		,a.req_date
+		,a.req_sp
+		,a.create_date
+		,a.create_id
+		,GET_WEB_USER_NM(a.create_id) as createNm
+		,a.modified_date
+		,a.modified_id
+		,GET_ADMIN_USER_NM(a.modified_id) as modifiedNm 
+		,b.normal_price
+		,b.sale_price
+		,b.after_price		
+		,b.promotion_period	
+		,b.link_url
+		,b.url_smt
+		,a.sale_plan_id	
+	</sql>
+	
+	<select id="getList" parameterType="kr.co.ucomp.web.pmb.dto.PlanReqSearchDto" resultType="kr.co.ucomp.web.pmb.entity.PlanReqMngEntity">
+		  SELECT
+	            <include refid="Base_Column_list" />
+	        FROM tb_pmb_plan_req_mng a LEFT OUTER JOIN tb_pmb_plan_list b
+			ON a.req_prod = b.id
+			WHERE 1=1
+	        <include refid="listWhere" />
+	        ORDER BY a.create_date DESC
+	        LIMIT #{offset}, #{recordSize}
+
+	</select>
+	
+	<select id="getListWithOutLimit" parameterType="kr.co.ucomp.web.pmb.dto.PlanReqSearchDto" resultType="kr.co.ucomp.web.pmb.entity.PlanReqMngEntity">
+		  SELECT
+	            <include refid="Base_Column_list" />
+	        FROM tb_pmb_plan_req_mng a LEFT OUTER JOIN tb_pmb_plan_list b
+			ON a.req_prod = b.id
+			WHERE 1=1
+	        <include refid="listWhere" />
+	        ORDER BY a.create_date DESC
+	</select>
+
+	<select id="getListCount" parameterType="kr.co.ucomp.web.pmb.dto.PlanReqSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+	        FROM tb_pmb_plan_req_mng a LEFT OUTER JOIN tb_pmb_plan_list b
+			ON a.req_prod = b.id
+			WHERE 1=1
+	        <include refid="listWhere" />
+	</select>
+	
+	
+	<select id="getDetail" parameterType="Int" resultType="kr.co.ucomp.web.pmb.entity.PlanReqMngEntity">
+		SELECT
+	            <include refid="Base_Column_list" />
+	        FROM tb_pmb_plan_req_mng a LEFT OUTER JOIN tb_pmb_plan_list b
+			ON a.req_prod = b.id
+	        WHERE a.id=#{id}
+	</select>
+	
+	<update id="update"  parameterType="kr.co.ucomp.web.pmb.entity.PlanReqMngEntity" >
+	UPDATE tb_pmb_plan_req_mng SET req_nm=#{reqNm}, 
+				req_phone_num=#{reqPhoneNum}, 
+				req_prod=#{reqProd}, 
+				req_date=#{reqDate}, 
+				modified_id=#{modifiedId},
+				modified_date=NOW()
+	WHERE id=#{id};
+	
+	</update>
+	
+	<delete id="delete" parameterType="Long">
+		DELETE FROM tb_pmb_plan_req_mng
+	    WHERE id=#{id}
+	</delete>
+</mapper>

@@ -1,0 +1,104 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : S캐쉬 전환하기
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: S캐쉬 전환하기
+.F-SC02-page {
+	&.content {
+		// 페이시 여백
+		padding-top: 56rem;
+		@include bottom-spacer;
+	}
+
+	// s: 내 S캐쉬
+	.sCash-sec {
+		@include sec-basic;
+		.sCash-box {
+			@include box-shadow-10;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 16rem;
+
+			.sCash-tit {
+				font-weight: 500;
+				font-size: 12rem;
+				line-height: 16rem;
+				color: #2801B5;
+			}
+			.sCash-val {
+				font-weight: 700;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #63666A;
+			}
+		}
+
+		.sCash-frm {
+			margin-top: 32rem;
+			.sCash-frm-field + .sCash-frm-field {
+				margin-top: 20rem;
+			}
+			.tab-pane {
+				margin-top: 8rem;
+			}
+
+			.basic-frm {
+				@include basic-frm;
+				.frm-group .btn-more {
+					margin-left: auto;
+				}
+			}
+			.rdo-style1 .rdo > span {
+				letter-spacing: -0.6rem;
+			}
+		}
+
+		.sChash-guide {
+			margin-top: 40rem;
+			border-radius: 4rem;
+			padding: 16rem;
+			background-color: #F4F5F8;
+			li {
+				font-weight: 500;
+				font-size: 12rem;
+				line-height: 16rem;
+				color: #63666A;
+			}
+		}
+	}
+	// e: 내 S캐쉬
+
+	// s: 완료 섹션
+	.complete-sec {
+		@include complete-sec;
+
+		.sCash-box {
+			width: 100%;
+			margin-top: 30rem;
+			margin-bottom: 10rem;
+			@include box-shadow-10;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 16rem;
+
+			.sCash-tit {
+				font-weight: 500;
+				font-size: 12rem;
+				line-height: 16rem;
+				color: #2801B5;
+			}
+			.sCash-val {
+				font-weight: 700;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #63666A;
+			}
+		}
+	}
+	// e: 완료 섹션
+
+}
+// e: S캐쉬 전환하기

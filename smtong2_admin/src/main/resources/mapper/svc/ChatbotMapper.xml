@@ -1,0 +1,98 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.svc.chatbot.mapper.ChatbotMapper">
+
+    <sql id="base_column">
+        id,
+        plan,
+        plan_memo,
+        order_seq,
+        create_date,
+        create_id,
+        modified_date,
+        modified_id
+    </sql>
+
+
+    <!-- 전체 조회 -->
+    <select id="getChatbotPlanList"  parameterType="kr.co.ucomp.web.svc.chatbot.dto.searchChatbotGroupPlanDTO" resultType="kr.co.ucomp.web.svc.chatbot.entity.ChatbotGroupPlanEntity">
+        SELECT <include refid="base_column"/>
+        FROM tb_svc_chatbot_group_plan
+        WHERE 1=1
+        <if test='chatbotGroupId != null and chatbotGroupId !=""'>
+    		AND chatbot_group_id = #{chatbotGroupId}
+    	</if>
+        ORDER BY order_seq ASC
+    </select>
+
+    <!-- ID로 단일 조회 -->
+    <select id="getChatbotPlanListById" parameterType="Long" resultType="kr.co.ucomp.web.svc.chatbot.entity.ChatbotGroupPlanEntity">
+        SELECT <include refid="base_column"/>
+        FROM tb_svc_chatbot_group_plan
+        WHERE id = #{id}
+    </select>
+
+    <!-- 데이터 등록 -->
+    <insert id="insertChatbotPlan" parameterType="kr.co.ucomp.web.svc.chatbot.entity.ChatbotGroupPlanEntity" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO tb_svc_chatbot_group_plan
+        (
+            chatbot_group_id,
+            plan,
+            plan_memo,
+            recom_yn,
+            low_price_yn,
+            max_benefit_yn,
+            order_seq,
+            create_date,
+            create_id
+        )
+        VALUES
+        (
+            #{chatbotGroupId},
+            #{plan},
+            #{planMemo},
+            #{recomYn},
+            #{lowPriceYn},
+            #{maxBenefitYn},
+            #{orderSeq},
+            NOW(),
+            #{createId}
+        )
+    </insert>
+    
+    
+    <!-- 데이터 수정 -->
+    <update id="updateChatbotPlan" parameterType="kr.co.ucomp.web.svc.chatbot.entity.ChatbotGroupPlanEntity" useGeneratedKeys="true" keyProperty="id">
+        UPDATE tb_svc_chatbot_group_plan
+        SET  modified_id = #{modifiedId},
+	        <if test="chatbotGroupId != null">chatbot_group_id = #{chatbotGroupId},</if>
+	        <if test="plan != null">plan = #{plan},</if>
+            <if test="planMemo != null">plan_memo = #{planMemo},</if>
+            <if test="recomYn != null">recom_yn = #{recomYn},</if>
+            <if test="lowPriceYn != null">low_price_yn = #{lowPriceYn},</if>
+            <if test="maxBenefitYn != null">max_benefit_yn = #{maxBenefitYn},</if>
+            modified_date = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 순서 업데이트 -->
+    <update id="updateChatbotPlanOrder" useGeneratedKeys="true" keyProperty="id">
+        UPDATE tb_svc_chatbot_group_plan
+        SET order_seq = #{orderSeq},
+            modified_date = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 데이터 삭제 -->
+    <delete id="deleteChatbotPlan" parameterType="int">
+        DELETE FROM tb_svc_chatbot_group_plan
+        WHERE id = #{id}
+    </delete>
+    
+        <!-- 데이터 삭제 -->
+    <delete id="deleteChatbotPlanAllByGroupId" parameterType="int">
+        DELETE FROM tb_svc_chatbot_group_plan
+        WHERE chatbot_group_id = #{groupId}
+    </delete>
+</mapper>

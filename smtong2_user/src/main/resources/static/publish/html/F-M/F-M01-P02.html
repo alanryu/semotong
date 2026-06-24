@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>Pages | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<!-- Swiper Librarys -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.0.0/swiper-bundle.min.css" />
+	<script src="https://cdn.jsdelivr.net/npm/swiper@7.0.0/swiper-bundle.min.js"></script>
+
+	<!-- 페이지 스크립트 영역 -->
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			// 모달 바로 볼 수 있도록 호출
+			var eventModalEl = document.getElementById('eventModal');
+			var eventModal = new bootstrap.Modal(eventModalEl);
+			eventModal.show();
+
+			// 모달이 완전히 표시된 후 실행
+			eventModalEl.addEventListener('shown.bs.modal', function () {
+				// 이 안에서 스와이프 실행
+				const eventLayerSwiper = new Swiper('.event-layer-bnr .swiper', {
+					loop: true,
+					navigation: {
+						nextEl: '.swiper-button-next',
+						prevEl: '.swiper-button-prev',
+					},
+					pagination: {
+						el: '.event-layer-bnr .swiper-pagination',
+						type: 'fraction'
+					},
+				});
+			});
+		});
+	</script>
+</head>
+
+<body>
+	<div class="wrapper">
+		<div style="padding: 30rem;">
+			<!-- 트리거로 모달 띄우기 -->
+			<button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#eventModal">
+				MODAL OPEN
+			</button>
+		</div>
+	</div>
+
+	<!--
+		[모달 가이드]
+		모달 효과 : fade (공통)
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+		// 1차 수정 : fade-pc 사용안함, fade 공통으로 사용
+	-->
+	<!-- modal default -->
+	<div class="modal fade modal-basic" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<!-- 2025-05-20 조찬기 : 메인 레이어팝업 신규 -->
+			<div class="modal-content F-M01-P02-page">
+				<div class="modal-body mar-b0">
+					<!-- 컨텐츠 섹션 -->
+					<section class="event-layer-sec">
+						<div class="event-layer-bnr">
+							<div class="swiper">
+								<div class="swiper-wrapper">
+									<div class="swiper-slide">
+										<a href="#">
+											<img src="../../assets/images/upload/@bnr-main-modal.png" alt="" class="only-mo">
+											<img src="../../assets/images/upload/@bnr-main-modal-pc.png" alt="" class="only-pc">
+										</a>
+									</div>
+									<div class="swiper-slide">
+										<a href="#">
+											<img src="../../assets/images/upload/@bnr-main-modal.png" alt="" class="only-mo">
+											<img src="../../assets/images/upload/@bnr-main-modal-pc.png" alt="" class="only-pc">
+										</a>
+									</div>
+									<div class="swiper-slide">
+										<a href="#">
+											<img src="../../assets/images/upload/@bnr-main-modal.png" alt="" class="only-mo">
+											<img src="../../assets/images/upload/@bnr-main-modal-pc.png" alt="" class="only-pc">
+										</a>
+									</div>
+								</div>
+							</div>
+							<div class="swiper-pagination"></div>
+						</div>
+						<div class="event-layer-close">
+							<label class="ui-chk chk-style1">
+								<input type="checkbox" name="sCheck1" id="sCheck11">
+								<span class="chk"><span>오늘 하루 보지 않기</span></span>
+							</label>
+							<button type="button" data-bs-dismiss="modal" aria-label="Close">
+								<i class="ui-icn icn-24-close-bk" aria-hidden="true"></i>
+								<span class="blind">닫기</span>
+							</button>
+						</div>
+					</section>
+					<!-- // 컨텐츠 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal default -->
+</body>
+
+</html>

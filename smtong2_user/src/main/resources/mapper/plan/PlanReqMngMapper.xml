@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.plan.mapper.PlanReqMngMapper">
+
+	<sql id="listWhereInfo">
+		<where>
+			<if test='reqNm != null and reqNm !=""'>
+				AND req_nm = #{reqNm}
+			</if>
+			<if test='reqPhonNum != null and reqPhonNum !=""'>
+				AND req_phon_num = #{reqPhonNum}
+			</if>
+			<if test='searchId != null and searchId !=""'>
+				AND create_id = #{searchId}
+			</if>
+		</where>
+	</sql>
+	<sql id="Base_Column_list">
+		 id
+		,req_nm
+		,req_phon_num
+		,req_prod
+		,req_date
+		,create_date
+		,create_id
+		,modified_date
+		,modified_id
+	</sql>
+	
+	<select id="getList" parameterType="kr.co.ucomp.web.plan.dto.PlanReqMngDto" resultType="kr.co.ucomp.web.plan.entity.PlanReqMngEntity">
+		  SELECT
+	            <include refid="Base_Column_list" />
+	        FROM
+	            tb_pmb_plan_req_mng
+	        <include refid="listWhereInfo" />
+	        ORDER BY id DESC
+	        LIMIT #{offset}, #{recordSize}
+	</select>
+
+	<select id="getListCount" parameterType="kr.co.ucomp.web.plan.dto.PlanReqMngDto" resultType="java.lang.Long">
+		  SELECT
+	            count(1)
+	        FROM
+	            tb_pmb_plan_req_mng
+	        <include refid="listWhereInfo" />
+	</select>
+	
+	<select id="getDetail" parameterType="Integer" resultType="kr.co.ucomp.web.plan.entity.PlanReqMngEntity">
+		SELECT
+	            <include refid="Base_Column_list" />
+	        FROM
+	            tb_pmb_plan_req_mng
+	        WHERE id = #{id}
+	</select>
+	
+	<insert id="create"  parameterType="kr.co.ucomp.web.plan.entity.PlanReqMngEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+		INSERT INTO tb_pmb_plan_req_mng (req_nm,req_phon_num,req_prod,req_sp, sale_plan_id, req_date,create_id,modified_id) 
+		VALUES(	#{reqNm},
+				#{reqPhonNum},
+				#{reqProd},
+				#{reqSp},
+				#{salePlanId},
+				NOW(),
+				#{createId},
+				#{modifiedId}
+		)
+	</insert>
+	
+	<update id="update"  parameterType="kr.co.ucomp.web.plan.entity.PlanReqMngEntity" >
+		UPDATE tb_pmb_plan_req_mng SET req_nm=#{reqNm}, 
+			req_phon_num=#{reqPhonNum}, 
+			req_prod=#{reqProd},
+			req_sp=#{reqSp},  
+			sale_plan_id=#{salePlanId},
+			req_date=#{reqDate}, 
+			modified_id=#{modifiedId},
+			modified_date=NOW()
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="Integer">
+		DELETE FROM tb_pmb_plan_req_mng
+		WHERE id = #{id}
+	</delete>
+	
+	<select id="getListCountDistinct" parameterType="kr.co.ucomp.web.plan.dto.PlanReqMngDto" resultType="java.lang.Long">
+		  SELECT
+	            count(1)
+	        FROM
+	            tb_pmb_plan_online_open
+	        <include refid="listWhereInfo" />
+	</select>
+</mapper>

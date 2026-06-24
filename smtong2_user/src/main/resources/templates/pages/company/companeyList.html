@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='세모통 파트너사', layoutSubTitleYN='Y', layoutFooterYn='Y'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ <!--    <script th:src="@{/js/page/home.js}"></script>-->
+ <script id="companyListTmpl" type="text/x-jquery-tmpl">
+	<li class="partner-item">
+		<button type="button" class="partner-link" onclick="navigateTo('/mbm/company/companeyInfo?searchId=${id}');">
+			<img src="${logoImg}" alt="${name}" />
+		</button>
+	</li>
+ </script>
+ 
+ <script>
+	
+	function goDetailPage(id,nm) {
+		window.location="/mbm/company/companeyInfo?id="+id+"&companyNm="+nm;
+	}
+	
+	$( document ).ready(function() {
+		
+	   var params = {
+	     keyword : "",
+	     useYn : "1",
+		 recordSize : 100
+	    }
+			  
+		$.ajax({
+		   url : '/mbm/company/list',
+	       type : 'POST',
+	       dataType : "json",
+	       contentType:"application/json",
+		   data : JSON.stringify(params),
+		   beforeSend: function(xhr){
+		       xhr.setRequestHeader(header,token);
+		    },
+			success: function (data) {
+				$('#companyListTmpl').tmpl(data.data).appendTo('#partnerList');
+		    },
+			error : function(request, status, error){
+				alertModalShow(error);
+	        },
+	        complete:function(){
+	           // $('#loading').addClass('display-none');
+	        }
+		});
+	});
+ </script>
+</th:block>
+
+<!-- Container -->
+<main role="main" class="container">
+	<!-- content -->
+	<div class="content F-M04-page">
+		<!-- 접근성 숨김처리 전역클래스 -->
+		<h1 class="blind">전체 파트너사</h1>
+
+		<!-- 파트너사 섹션 -->
+		<section class="partner-sec">
+			<div class="sec-inner">
+				<div class="sec-header">
+					<h2 class="sec-tit">세모통의 파트너사를 소개합니다.</h2>
+				</div>
+				<div class="sec-body">
+					<!-- 목록 -->
+					<div class="partner-list-wrap">
+						<!-- 검색된 상태: is-srched -->
+						<ul class="partner-list" id="partnerList">
+							
+						</ul>
+					</div>
+					<!-- // 목록 -->
+				</div>
+			</div>
+		</section>
+		<!-- // 파트너사 섹션 -->
+	</div>
+	<!-- // content -->
+</main>
+<!-- // Container -->

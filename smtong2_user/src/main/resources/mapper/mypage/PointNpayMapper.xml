@@ -1,0 +1,88 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.mypage.mapper.PointNpayMapper">
+	
+	<sql id="Point_Column_list">
+			 n.id
+			,p.user_id
+			,n.point_id
+			,n.npay_api_type
+			,GET_CODE_NAME('npay_api_type', n.npay_api_type) AS npayApiTypeName
+			,n.req_amount
+			,n.user_key
+			,n.partner_tx_no
+			,n.tx_no
+			,n.memo
+			,n.daou_code
+			,n.daou_message
+			,n.create_date
+			,n.create_id
+			,n.modified_date
+			,n.modified_id 
+	</sql>
+	<sql id="PointWhereInfo">
+		<where>
+			<if test='searchUserId != null and searchUserId !=""'>
+			AND u.id = #{searchUserId}
+			</if>
+		</where>
+	</sql>
+	
+	
+	<select id="getMyPointNpay" parameterType="kr.co.ucomp.web.mypage.dto.PointNpayDTO" resultType="kr.co.ucomp.web.mypage.entity.PointNpayEntity">
+		SELECT
+		<include refid="Point_Column_list" />
+		FROM tb_mbm_user u
+		LEFT JOIN tb_mbm_point 			p ON u.id = p.user_id
+		LEFT JOIN tb_mbm_point_npay 	n ON p.id = n.point_id
+		<include refid="PointWhereInfo" />
+		ORDER BY n.id DESC
+	</select>
+	
+	<select id="getMyPointNpayById" parameterType="kr.co.ucomp.web.mypage.dto.PointNpayDTO" resultType="kr.co.ucomp.web.mypage.entity.PointNpayEntity">
+		SELECT
+		<include refid="Point_Column_list" />
+		FROM tb_mbm_user u
+		LEFT JOIN tb_mbm_point 			p ON u.id = p.user_id
+		LEFT JOIN tb_mbm_point_npay 	n ON p.id = n.point_id
+		WHERE n.id = #{searchNpayId}
+	</select>
+	
+	<insert id="insertNpay" parameterType="kr.co.ucomp.web.mypage.entity.PointNpayEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+	INSERT INTO tb_mbm_point_npay(
+			 point_id
+			,npay_api_type
+			,req_amount
+			
+			,user_key
+			,partner_tx_no
+			,tx_no
+			
+			,memo
+			,daou_code
+			,daou_message
+			
+			,create_date
+			,create_id
+	)VALUES (
+			 #{pointId			}
+			,#{npayApiType		}
+			,#{reqAmount		}
+			
+			,#{userKey			}
+			,#{partnerTxNo		}
+			,#{txNo				}
+			
+			,#{memo				}
+			,#{daouCode			}
+			,#{daouMessage		}
+			
+			,NOW()
+			,#{createId			}
+		)
+	</insert>
+
+
+
+</mapper>

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.cmm.mapper.CommCodeMngMapper">
+
+	<sql id="listWhere">
+			<if test='userYn != null and userYn !=""'>
+				AND use_yn = #{userYn}
+			</if>
+			
+			<if test='codeGroup != null and codeGroup !=""'>
+				AND code_group = #{codeGroup}
+			</if>
+			<if test='code != null and code !=""'>
+				AND code = #{code}
+			</if>
+	</sql>
+	
+	<!--  ========================================= code group manage ============================================================ -->
+	<sql id="Base_Column_list_Group">
+		code_group
+		,code_group_name
+		,code_group_desc
+		,use_yn
+		,create_date
+		,create_id
+		,GET_ADMIN_USER_NM(create_id) as createNm
+		,modified_date
+		,modified_id
+		,GET_ADMIN_USER_NM(modified_id) as modifiedNm
+				
+	</sql>
+	
+	<select id="getListCodeGroup" parameterType="kr.co.ucomp.web.cmm.dto.CommCodeSearchDto" resultType="kr.co.ucomp.web.cmm.entity.CodeGroupEntity">
+		  SELECT
+	            <include refid="Base_Column_list_Group" />
+	        FROM
+	            tb_cmm_code_group
+	        WHERE 1=1
+	        <include refid="listWhere" />
+	        ORDER BY code_group
+	        LIMIT #{offset}, #{recordSize}
+
+	</select>
+
+	<select id="getListCodeGroupCount" parameterType="kr.co.ucomp.web.cmm.dto.CommCodeSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+	        FROM
+	            tb_cmm_code_group
+	        WHERE 1=1
+	        <include refid="listWhere" />
+	</select>
+	
+	
+	<select id="getCodeGroup" parameterType="map" resultType="kr.co.ucomp.web.cmm.entity.CodeGroupEntity">
+		SELECT
+	            <include refid="Base_Column_list_Group" />
+	        FROM
+	            tb_cmm_code_group
+	        WHERE code_group=#{codeGroup}
+	</select>
+
+	
+	<insert id="createCodeGroup"  parameterType="kr.co.ucomp.web.cmm.dto.CodeGroupDto">
+	
+	INSERT INTO tb_cmm_code_group (code_group, code_group_name, code_group_desc, use_yn, create_id, modified_id) 
+	VALUES(	#{codeGroup},
+			#{codeGroupName},
+			#{codeGroupDesc},
+			'Y',
+			#{createId},
+			#{modifiedId}
+	);
+	
+	
+	</insert>
+	
+	<update id="updateCodeGroup"  parameterType="kr.co.ucomp.web.cmm.dto.CodeGroupDto" >
+	UPDATE tb_cmm_code_group SET 
+				code_group = #{codeGroup}, 
+				code_group_name = #{codeGroupName}, 
+				code_group_desc =#{codeGroupDesc} , 
+				use_yn = #{useYn}, 
+				modified_id=#{modifiedId},
+				modified_date=NOW()
+	WHERE code_group=#{codeGroup};
+	
+	</update>
+	
+	<delete id="delCodeGroup" parameterType="map">
+		DELETE FROM tb_cmm_code_group
+	    WHERE code_group = #{codeGroup}
+	</delete>
+	
+	
+	
+	<!--  ========================================= code manage ============================================================ -->
+	
+	<sql id="Base_Column_list_Code">
+		code_group
+		,code
+		,code_name
+		,code_desc
+		,order_no
+		,etc1
+		,etc2
+		,etc3
+		,etc4
+		,etc5
+		,use_yn
+		,create_date
+		,create_id
+		,GET_ADMIN_USER_NM(create_id) as createNm
+		,modified_date
+		,modified_id
+		,GET_ADMIN_USER_NM(modified_id) as modifiedNm
+	</sql>
+	
+	<select id="getListCode" parameterType="kr.co.ucomp.web.cmm.dto.CommCodeSearchDto" resultType="kr.co.ucomp.web.cmm.entity.CodeEntity">
+		  SELECT
+	            <include refid="Base_Column_list_Code" />
+	        FROM
+	            tb_cmm_code
+	        WHERE 1=1
+	        <include refid="listWhere" />
+	        ORDER BY code_group, order_no
+	        LIMIT #{offset}, #{recordSize}
+
+	</select>
+
+	<select id="getListCodeCount" parameterType="kr.co.ucomp.web.cmm.dto.CommCodeSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+	        FROM
+	            tb_cmm_code
+	        WHERE 1=1
+	        <include refid="listWhere" />
+	</select>
+	
+	
+	<select id="getCode" parameterType="map" resultType="kr.co.ucomp.web.cmm.entity.CodeEntity">
+		SELECT
+	            <include refid="Base_Column_list_Code" />
+	        FROM
+	            tb_cmm_code
+	        WHERE code_group=#{codeGroup}
+	        AND code=#{code}
+	</select>
+	
+	
+	
+	<select id="getCodeInfo" parameterType="kr.co.ucomp.web.cmm.dto.CommCodeSearchDto" resultType="kr.co.ucomp.web.cmm.entity.CodeEntity">
+		SELECT
+	            <include refid="Base_Column_list_Code" />
+	        FROM
+	            tb_cmm_code
+	        WHERE code_group=#{codeGroup}
+			<if test='userYn != null and userYn !=""'>
+				AND use_yn = #{userYn}
+			</if>
+			
+			<if test='code != null and code !=""'>
+				AND code = #{code}
+			</if>
+			
+			<if test='etc1 != null and etc1 !=""'>
+				AND etc1 = #{etc1}
+			</if>
+			
+			<if test='etc2 != null and etc2 !=""'>
+				AND etc2 = #{etc2}
+			</if>
+			
+			<if test='etc3 != null and etc3 !=""'>
+				AND etc3 = #{etc3}
+			</if>
+			
+			<if test='etc4 != null and etc4 !=""'>
+				AND etc4 = #{etc4}
+			</if>
+	</select>
+		
+
+	
+	<insert id="createCode"  parameterType="kr.co.ucomp.web.cmm.dto.CommCodeDto">
+	
+	INSERT INTO tb_cmm_code (code_group, code, code_name, code_desc, order_no, etc1, etc2, etc3, etc4, etc5, use_yn,  create_id,  modified_id) 
+	VALUES(	#{codeGroup},
+			#{code},
+			#{codeName},
+			#{codeDesc},
+			#{orderNo},
+			#{etc1},
+			#{etc2},
+			#{etc3},
+			#{etc4},
+			#{etc5},
+			#{useYn},
+			#{createId},
+			#{modifiedId}
+	);
+	
+	
+	</insert>
+	
+	<update id="updateCode"  parameterType="kr.co.ucomp.web.cmm.dto.CommCodeDto" >
+	UPDATE tb_cmm_code SET 
+				modified_id=#{modifiedId},
+				<if test='codeName != null and codeName !=""'>
+					code_name = #{codeName},
+				</if>
+				<if test='codeDesc != null and codeDesc !=""'>
+					code_desc = #{codeDesc},
+				</if>
+				<if test='orderNo != null and orderNo !=""'>
+					order_no = #{orderNo},
+				</if>				
+				<if test='etc1 != null and etc1 !=""'>
+					etc1 = #{etc1},
+				</if>				
+				<if test='etc2 != null and etc2 !=""'>
+					etc2 = #{etc2},
+				</if>				
+				<if test='etc3 != null and etc3 !=""'>
+					etc3 = #{etc3},
+				</if>				
+				<if test='etc4 != null and etc4 !=""'>
+					etc4 = #{etc4},
+				</if>				
+				<if test='etc5 != null and etc5 !=""'>
+					etc5 = #{etc5},
+				</if>				
+				<if test='useYn != null and useYn !=""'>
+					use_yn = #{useYn},
+				</if>		
+				
+				modified_date=NOW()
+	WHERE code_group=#{codeGroup}
+	AND code=#{code}
+	
+	</update>
+	
+	<delete id="delCode" parameterType="map">
+		DELETE FROM tb_cmm_code
+	    WHERE code_group = #{codeGroup}
+	    AND code = #{code}
+	</delete>
+	
+	
+	
+	
+</mapper>

@@ -1,0 +1,193 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 추천 요금제
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 추천 요금제 페이지
+.F-M02-01-T01-page {
+
+	// 페이지별 섹션 여백 설정
+	--sec-outer-margin: 50rem;
+	@include bottom-spacer;
+
+	// s: 카드형 요금제 섹션
+	.ratePlanB-sec {
+		padding-left: 0;
+		padding-right: 0;
+		// 선택 요금제
+		.ratePlanB-card {
+			@include ratePlanB-card;
+			padding-left: 24rem;
+			padding-right: 24rem;
+			border-radius: 0;
+		}
+	}
+	// e: 카드형 요금제 섹션
+
+	// s: 키워드 섹션
+	// .keyword-sec {
+	// 	overflow: hidden;
+	// 	margin-top: 30rem;
+
+	// 	.keyword-list {
+	// 		display: flex;
+	// 		flex-wrap: wrap;
+	// 		gap: 8rem;
+	// 	}
+
+	// 	.keyword-swiper {
+	// 		overflow: visible;
+	// 		.swiper-wrapper {
+	// 			.swiper-slide {
+	// 				width: auto;
+	// 			}
+	// 		}
+	// 		@include media-tablet-xs {
+	// 			overflow: hidden;
+	// 		}
+	// 	}
+
+	// 	.keyword-btn {
+	// 		display: flex;
+	// 		justify-content: center;
+	// 		align-items: center;
+	// 		height: 36rem;
+	// 		padding: 0 9rem;
+	// 		font-weight: 500;
+	// 		font-size: 14rem;
+	// 		color: #36383A;
+	// 		border-radius: 6rem;
+	// 		border:1px solid transparent;
+	// 		background-color: #EFF0F0;
+	// 		&.is-selected {
+	// 			border-color: $color-primary;
+	// 			background-color: #EAE6FB;
+	// 			color: $color-primary;
+	// 		}
+	// 	}
+	// }
+	// e: 키워드 섹션
+
+	// 예외케이스
+	.ratePlanB-sec + .ratePlanC-sec { /* 7차 수정 : 추천요금제인 경우 여백수정 추가 */
+		margin-top: 30rem;
+		.sec-inner {
+			padding-top: 0;
+			border-top: 0;
+		}
+	}
+
+	// s: 상품리스트 섹션
+	.ratePlanC-sec {
+		@include sec-basic;
+
+		@include media-tablet-xs {
+			margin-top: 16rem;
+			padding-top: 0;
+			border-top: 0;
+
+			.sec-inner {
+				padding-top: 16rem;
+				border-top: 1px solid #EFF0F0;
+			}
+		}
+
+		// 요금제 상품 툴바
+		.ratePlanC-toolbar { /* 1차 수정: 툴바 전체 수정(셀렉트 말줄임 적용) */
+			display: flex;
+			align-items: center;
+			gap: 8rem;
+			.opt {
+				display: flex;
+				align-items: center;
+				flex: none;
+				gap: 4rem;
+				p {
+					font-weight: 500;
+					font-size: 12rem;
+					line-height: 16rem;
+					color: #63666A;
+				}
+			}
+			.sort {
+				display: flex;
+				margin-left: auto;
+				overflow: hidden;
+				.ui-btn {
+					font-weight: 600;
+					font-size: 12rem;
+					line-height: 16rem;
+					color: #36383A;
+					gap: 4rem;
+					width: 100%;
+					> span {
+						@include ellipsis1;
+					}
+				}
+			}
+			+ .ratePlanC-toolbar { /* 4차 수정 : 요금제 개수 추가 */
+				margin-top: 20rem;
+			}
+		}
+
+
+		// 요금제 상품 리스트 공통
+		.ratePlanC-list {
+			@include ratePlanC-list;
+
+			// 요금제 상품 리스트 카드 공통
+			.ratePlanC-card {
+				@include ratePlanC-card;
+			}
+		}
+
+		// nodata 공통
+		.nodata {
+			@include nodata;
+		}
+
+	}
+	// e: 상품리스트 섹션
+
+	// s: 상품추천 섹션
+	.recom-bnr-sec {
+		margin-top: var(--sec-outer-margin);
+		@include sec-basic;
+
+		.recom-swiper { /* 7차 수정 : 추천배너 스와이프로 변경 */
+			@include event-swiper;
+		}
+		.recom-bnr { /* 7차 수정 : 추천배너 스와이프로 변경 */
+			@include event-bnr;
+		}
+
+	}
+	// e: 상품추천 섹션
+
+	// s: 자주묻는 질문 섹션
+	.faq-sec {
+		margin-top: var(--sec-outer-margin);
+		@include sec-basic;
+
+		// 자주묻는 질문 아코디언
+		.faq-accordion {
+			@include faq-accordion;
+		}
+		// 자주묻는 질문 아코디언
+	}
+	// e: 자주묻는 질문 섹션
+
+	// s: 알뜰폰 개통 방법
+	.account-sol-sec {
+		margin-top: var(--sec-outer-margin);
+		@include account-sol-sec;
+		.sec-tit {
+			font-size: 20rem;
+			line-height: 28rem;
+			text-align: left;
+		}
+	}
+	// e: 알뜰폰 개통 방법
+
+}
+// e: 추천 요금제 페이지

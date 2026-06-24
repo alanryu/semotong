@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.plan.mapper.RecomPlanMngMapper">
+
+	<sql id="listWhereInfo">
+		<where>
+			<if test='keyword != null and keyword !=""'>
+				AND (title LIKE CONCAT('%', #{keyword}, '%') OR sub_title_pc LIKE CONCAT('%', #{keyword}, '%') OR sub_title_mo LIKE CONCAT('%', #{keyword}, '%'))
+			</if>
+			<if test='useYn != null and useYn !=-1'>
+				AND use_yn = #{useYn}
+			</if>
+			
+			<if test='searchStartDt != null and searchStartDt !=""'>
+				AND create_date  <![CDATA[>=]]> #{searchStartDt}
+			</if>
+			<if test='searchEndDt != null and searchEndDt !=""'>
+				AND create_date <![CDATA[<=]]> #{searchEndDt}
+			</if>
+			
+		</where>
+	</sql>
+
+	<sql id="Base_Column_list_Info">
+		a.id
+		,a.title
+		,a.sub_title_pc
+		,a.sub_title_mo
+		,a.icon_image
+		,a.descript1
+		,a.descript2
+		,a.descript3
+		,a.descript4
+		,a.descript5
+		,a.use_yn
+		,a.order_no
+		,a.create_date
+		,a.create_id
+		,GET_ADMIN_USER_NM(a.create_id) as createNm		
+		,a.modified_date
+		,a.modified_id
+		,GET_ADMIN_USER_NM(a.modified_id) as modifiedNm
+		,(SELECT COUNT(1) FROM tb_pmb_recomplan_planlist WHERE mng_id = a.id) planLisCnt
+		, b.lowPrice AS lowestPrice
+	</sql>
+
+   	<select id="infolist" parameterType="kr.co.ucomp.web.plan.dto.RecomPlanMngSearchDto" resultType="kr.co.ucomp.web.plan.entity.RecomPlanEntity">
+		  SELECT
+	            <include refid="Base_Column_list_Info" />
+			FROM  tb_pmb_recomplan_mng a ,
+			(
+			SELECT a.mng_id, MIN(b.sale_price) lowPrice
+			from tb_pmb_recomplan_planlist a, tb_pmb_plan_list b 
+			WHERE a.plan_id= b.id
+			GROUP BY a.mng_id
+			) b
+			WHERE a.id = b.mng_id
+			AND a.use_yn = 1
+	        ORDER BY  a.order_no , a.id  desc
+
+	</select>
+
+	<select id="infolistCount" parameterType="kr.co.ucomp.web.plan.dto.RecomPlanMngSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+			FROM  tb_pmb_recomplan_mng a ,
+			(
+			SELECT a.mng_id, MIN(b.sale_price) lowPrice
+			from tb_pmb_recomplan_planlist a, tb_pmb_plan_list b 
+			WHERE a.plan_id= b.id
+			GROUP BY a.mng_id
+			) b
+			WHERE a.id = b.mng_id
+			AND a.use_yn = 1
+	</select>
+
+	<select id="infoDetail" parameterType="int" resultType="kr.co.ucomp.web.plan.entity.RecomPlanEntity">
+		SELECT
+	            <include refid="Base_Column_list_Info" />
+	        FROM  tb_pmb_recomplan_mng a ,
+			(
+			SELECT a.mng_id, MIN(b.sale_price) lowPrice
+			from tb_pmb_recomplan_planlist a, tb_pmb_plan_list b 
+			WHERE a.plan_id= b.id
+			GROUP BY a.mng_id
+			) b
+			WHERE a.id = b.mng_id
+			AND a.use_yn = 1
+	        AND a.id=#{id}
+	</select>
+
+
+</mapper>

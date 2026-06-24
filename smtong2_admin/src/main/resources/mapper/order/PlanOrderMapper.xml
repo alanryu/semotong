@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.order.mapper.PlanOrderMapper">
+
+	<sql id="listWhere">
+		<where>
+			<!-- 입점사 id -->
+			<if test='companyId != null and companyId !=""'>
+				AND a.company_id = #{companyId}
+			</if>
+			
+			<!-- 주문자 id -->
+			<if test='orderUserId != null and orderUserId !=""'>
+				AND a.entr_user_id = #{orderSeq}
+			</if>
+			
+			
+			<!-- 주문번호 -->
+			<if test='orderSeq != null and orderSeq !=""'>
+				AND a.order_seq = #{orderSeq}
+			</if>
+			
+			
+			<!-- 포인트 요금제 구분 -->
+			<if test='searchPointPlanYn != null and searchPointPlanYn !=""'>
+				AND a.point_plan_yn = #{searchPointPlanYn}
+			</if>
+					
+					
+			<!-- MNO -->
+			<if test='searchMno != null and searchMno !=""'>
+				AND a.telecom_cd = #{searchMno}
+			</if>	
+			
+	
+			
+			<!-- 가입 구분 -->
+			<if test='searchEntrType != null and searchEntrType !=""'>
+				AND a.entr_type = #{searchEntrType}
+			</if>						
+									
+	    	<!-- 주문 저장일 조회-->
+	    	<if test='searchStartDt != null and searchStartDt !=""'>
+				AND a.order_dttm  <![CDATA[>=]]> DATE_FORMAT(#{searchStartDt}, '%Y%m%d%H%i%s')
+			</if>
+			<if test='searchEndDt != null and searchEndDt !=""'>
+				AND a.order_dttm <![CDATA[<=]]> DATE_FORMAT(#{searchEndDt}, '%Y%m%d%H%i%s')
+			</if>	
+		    	
+		    	
+			<!-- 검색어 조회 -->
+	   		<if test='keyword != null and keyword !=""'>
+				AND (
+ 					AES_DECRYPT(FROM_BASE64(a.order_nm), 'tb_pmb_plan_online_open')  LIKE CONCAT('%', #{keyword}, '%') OR
+				 	 AES_DECRYPT(FROM_BASE64(a.order_phone), 'tb_pmb_plan_online_open') LIKE CONCAT('%', #{keyword}, '%') OR
+				 	 a.plan_nm LIKE CONCAT('%', #{keyword}, '%') 
+				    )
+			</if>		
+			
+			
+				<!-- 추천인 구분 -->
+			<if test='searchRecomSp != null and searchRecomSp !=""'>
+				AND a.recom_sp IN
+		        <foreach item="itm" index="index" collection="_parameter.searchRecomSp.split(',')" open="(" separator="," close=")">
+		            #{itm}
+		        </foreach>
+			</if>		
+			
+			
+			<!-- 주문상태 -->
+	    	<if test='searchOrderState != null and searchOrderState !=""'>
+	    		AND a.order_state IN
+		        <foreach item="state" index="index" collection="_parameter.searchOrderState.split(',')" open="(" separator="," close=")">
+		            #{state}
+		        </foreach>
+	    	</if>
+			
+	    	<!-- 사업자-->
+	    	<if test='searchCompanyList != null and searchCompanyList !=""'>
+	    		AND a.company_id IN
+		        <foreach item="company" index="index" collection="_parameter.searchCompanyList.split(',')" open="(" separator="," close=")">
+		            #{company}
+		        </foreach>
+	    	</if>
+	    	
+	    	<if test="searchBizPlanMngId != null and searchBizPlanMngId != ''">
+	    		AND a.biz_plan_mngId = #{searchBizPlanMngId}
+	    	</if>
+
+			<!-- LTE, 3G, 5G -->
+			<if test='searchModelDivList != null and searchModelDivList !=""'>
+				AND a.model_div IN
+				<foreach item="model" index="index" collection="_parameter.searchModelDivList.split(',')" open="(" separator="," close=")">
+					#{model}
+				</foreach>
+			</if>
+			
+		</where>
+	</sql>
+	
+	<sql id="Base_Column_list">
+		 a.id
+		,a.company_id
+		,a.order_seq
+		,a.order_id_host
+		,a.order_dttm
+		,a.telecom_cd
+		,a.prod_dv
+		,a.plan_id
+		,a.plan_cd
+		,a.plan_nm
+		,a.settle_div
+		,a.entr_type
+		,a.customer_type
+		,a.charge_reduct_type
+		,a.new_phone_num1
+		,a.new_phone_num2
+		,a.pre_telecom_cd
+		,a.pre_mvno_cd
+		,AES_DECRYPT(FROM_BASE64(a.pre_phone_num), 'tb_pmb_plan_online_open') prePhoneNum
+		,a.num_mov_cert_method
+		,a.num_mov_cert_val
+		,a.usim_pay_type
+		,a.usim_model_nm
+		,a.usim_serial_num
+		,a.usim_type
+		,a.usim_buy
+		,a.esim_model
+		,a.esim_memory
+		,a.esim_number
+		,a.esim_imei1
+		,a.esim_imei2
+		,a.esim_eid				
+		,AES_DECRYPT(FROM_BASE64(a.order_nm), 'tb_pmb_plan_online_open') orderNm
+		,AES_DECRYPT(FROM_BASE64(a.user_ssn), 'tb_pmb_plan_online_open') userSsn
+		,a.guard_nm
+		,a.guard_ssn
+		,a.guard_rel
+		,a.user_country
+		,a.identity_method
+		,a.identity_ci
+		,a.simple_cert_sp
+		,AES_DECRYPT(FROM_BASE64(a.order_phone), 'tb_pmb_plan_online_open') orderPhone
+		,AES_DECRYPT(FROM_BASE64(a.order_tel), 'tb_pmb_plan_online_open') orderTel
+		,AES_DECRYPT(FROM_BASE64(a.order_email), 'tb_pmb_plan_online_open') orderEmail
+		,AES_DECRYPT(FROM_BASE64(a.order_zip_cd), 'tb_pmb_plan_online_open') orderZipCd
+		,AES_DECRYPT(FROM_BASE64(a.order_addr), 'tb_pmb_plan_online_open') orderAddr
+		,AES_DECRYPT(FROM_BASE64(a.order_addr1), 'tb_pmb_plan_online_open') orderAddr1
+		,AES_DECRYPT(FROM_BASE64(a.order_addr2), 'tb_pmb_plan_online_open') orderAddr2
+		,a.advance_bank_cd
+		,a.advance_bank_acct
+		,a.advance_amt
+		,a.bill_cd
+		,AES_DECRYPT(FROM_BASE64(a.bill_zip_cd), 'tb_pmb_plan_online_open') billZipCd
+		,AES_DECRYPT(FROM_BASE64(a.bill_addr1), 'tb_pmb_plan_online_open') billAddr1
+		,AES_DECRYPT(FROM_BASE64(a.bill_addr2), 'tb_pmb_plan_online_open') billAddr2
+		,AES_DECRYPT(FROM_BASE64(a.bill_addr), 'tb_pmb_plan_online_open') billAddr
+		,AES_DECRYPT(FROM_BASE64(a.recv_nm), 'tb_pmb_plan_online_open') recvNm
+		,AES_DECRYPT(FROM_BASE64(a.recv_phone), 'tb_pmb_plan_online_open') recvPhone
+		,AES_DECRYPT(FROM_BASE64(a.recv_tel), 'tb_pmb_plan_online_open') recvTel
+		,AES_DECRYPT(FROM_BASE64(a.recv_zip_cd), 'tb_pmb_plan_online_open') recvZipCd
+		,AES_DECRYPT(FROM_BASE64(a.recv_addr), 'tb_pmb_plan_online_open') recvAddr
+		,AES_DECRYPT(FROM_BASE64(a.recv_addr1), 'tb_pmb_plan_online_open') recvAddr1
+		,AES_DECRYPT(FROM_BASE64(a.recv_addr2), 'tb_pmb_plan_online_open') recvAddr2
+		,a.tran_req_cont
+		,a.mobile_nm
+		,a.model_nm
+		,a.used_yn
+		,a.memory_size
+		,a.mobile_color_cd
+		,a.mobile_price
+		,a.mobile_suprt_price
+		,a.mobile_add_suprt_price
+		,a.instmnt_org_price
+		,a.mobile_suprt_chrg_fee
+		,a.instmnt_mm_cnt
+		,a.instmnt_chrg_price
+		,a.mobile_mm_pay_price
+		,a.contract_mm_cnt
+		,a.model_div
+		,a.basic_price
+		,a.event_disc_price
+		,a.after_price
+		,a.promotion_period		
+		,a.contract_disc_price
+		,a.month_pay_price
+		,a.entr_price
+		,a.entr_price_disc
+		,a.usim_price
+		,a.usim_disc_price
+		,a.num_mov_fee
+		,a.settle_method
+		,AES_DECRYPT(FROM_BASE64(a.owner_nm), 'tb_pmb_plan_online_open') ownerNm
+		,a.bank_cd
+		,a.bank_acct_no
+		,a.card_cd
+		,a.card_num
+		,a.card_valid_dt
+		,a.gifts_nm
+		,a.order_state
+		,a.order_state_dttm
+		,a.order_state_sub
+		,a.cancel_request_state
+		,a.upd_id
+		,a.order_call_cont
+		,a.lock_app_cd
+		,a.dis_auth_join_div
+		,a.driver_number
+		,a.auth_org_dt
+		,a.driver_secure_num
+		,a.customer_ip
+		,a.agree_title
+		,a.agree_yn
+		,a.etc_req_cont
+		,a.guard_img1
+		,a.guard_img2
+		,a.tran_comp_cd
+		,a.tran_no
+		,a.tran_link_url
+		,a.entr_user_id
+		,a.point_plan_yn
+		,a.biz_plan_mngId
+		,a.recom_sp
+		,a.recom_user_id
+		,GET_ADMIN_USER_ID(a.recom_user_id) AS recom_user_admin
+		,GET_WEB_USER_NM(a.recom_user_id) AS recom_user
+		,a.order_send_yn
+		,a.order_send_dttm
+		,a.create_date
+		,a.create_id
+		,a.modified_date
+		,a.modified_id	
+		,b.username entrUserNm
+		,c.name AS companyNm
+		,a.open_comp_dttm
+		,a.account_num
+		,AES_DECRYPT(FROM_BASE64(a.open_tel_num), 'tb_pmb_plan_online_open') openTelNum
+		,GET_CODE_NAME('order_state',a.order_state) orderStateNm
+		,GET_CODE_NAME('pre_mvno_cd',a.pre_mvno_cd) preMvnoNm
+		,GET_CODE_NAME('bank_co_cd',a.bank_cd) bankNm
+		,GET_CODE_NAME('card_co_cd',a.card_cd) cardNm
+		,GET_ADMIN_USER_ID(a.recom_user_id) as recomUserAdminId
+		,GET_WEB_USER_ID(a.recom_user_id) as recomUserWEBId
+		,d.plan_name_smt_sub planNm2
+		,b.kakao_user_id
+	</sql>
+	
+	<select id="getList" parameterType="kr.co.ucomp.web.order.dto.PlanOrderSearchDto" resultType="kr.co.ucomp.web.order.entity.PlanOrderEntity">
+		  SELECT *  FROM (
+			  SELECT
+		            <include refid="Base_Column_list" />
+				FROM tb_pmb_plan_online_open a LEFT join tb_mbm_user b 
+				ON a.create_id = b.id
+				LEFT join tb_mbm_company_list c 
+				ON a.company_id = c.id
+				LEFT join tb_pmb_plan_list d
+				ON a.plan_id = d.id
+		        <include refid="listWhere" />
+	      ) tb
+		  ORDER BY id DESC
+		LIMIT #{offset}, #{recordSize}
+	</select>
+	
+	<!-- Limit 없는거 미리 생성 -->
+	<select id="getListWithoutLimit" parameterType="kr.co.ucomp.web.order.dto.PlanOrderSearchDto" resultType="kr.co.ucomp.web.order.entity.PlanOrderEntity">
+		  SELECT *  FROM (
+			  SELECT
+		            <include refid="Base_Column_list" />
+				FROM tb_pmb_plan_online_open a LEFT join tb_mbm_user b 
+				ON a.create_id = b.id
+				LEFT join tb_mbm_company_list c 
+				ON a.company_id = c.id
+				LEFT join tb_pmb_plan_list d
+				ON a.plan_id = d.id
+		        <include refid="listWhere" />
+	      ) tb
+		  ORDER BY id DESC
+	</select>
+
+	<select id="getListCount" parameterType="kr.co.ucomp.web.order.dto.PlanOrderSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+			FROM tb_pmb_plan_online_open a LEFT join tb_mbm_user b 
+			ON a.create_id = b.id
+			LEFT join tb_mbm_company_list c 
+			ON a.company_id = c.id
+			LEFT join tb_pmb_plan_list d
+			ON a.plan_id = d.id
+	        <include refid="listWhere" />
+	</select>
+	
+	
+	<select id="getDetail" parameterType="int" resultType="kr.co.ucomp.web.order.entity.PlanOrderEntity">
+		SELECT
+	            <include refid="Base_Column_list" />
+			FROM tb_pmb_plan_online_open a LEFT join tb_mbm_user b 
+			ON a.create_id = b.id
+			LEFT join tb_mbm_company_list c 
+			ON a.company_id = c.id
+			LEFT join tb_pmb_plan_list d
+			ON a.plan_id = d.id
+	        WHERE a.id=#{id}
+	</select>
+	
+	
+	
+    
+	<update id="update"  parameterType="kr.co.ucomp.web.order.entity.PlanOrderEntity" >
+		UPDATE tb_pmb_plan_online_open SET 
+					modified_id=#{modifiedId},
+					<!-- 주문 전송여부 -->
+					<if test='orderSendYn != null and orderSendYn !=""'>
+						order_send_yn  = #{orderSendYn},
+					</if>
+					<!-- 주문 전송일시 -->
+					<if test='orderSendDttm != null and orderSendDttm !=""'>
+						order_send_dttm  = #{orderSendDttm},
+					</if>
+					<!-- 주문 전송 상태코드 -->
+					<if test='orderSendState != null and orderSendState !=""'>
+						order_send_state  = #{orderSendState},
+					</if>
+					
+					<!-- 주문 진행 상태 -->
+					<if test='orderState != null and orderState !=""'>
+						order_state  = #{orderState},
+					</if>
+					<!-- 주문 상태 변경일시 -->
+					<if test='orderStateDttm != null and orderStateDttm !=""'>
+						order_state_dttm  = #{orderStateDttm},
+					</if>
+
+					<!-- 택배사 -->
+					<if test='tranCompCd != null and tranCompCd !=""'>
+						tran_comp_cd  = #{tranCompCd},
+					</if>
+					<!-- 택배송장번호 -->
+					<if test='tranNo != null and tranNo !=""'>
+						tran_no  = #{tranNo},
+					</if>
+					<!-- 택배 배송정보 URL -->
+					<if test='tranLinkUrl != null and tranLinkUrl !=""'>
+						tran_link_url  = #{tranLinkUrl},
+					</if>
+					
+					<!-- 입점사 주문상태코드 -->
+					<if test='orderStateHost != null and orderStateHost !=""'>
+						order_state_host  = #{orderStateHost},
+					</if>
+					
+					<!-- 입점사 주문번호 -->
+					<if test='orderIdHost != null and orderIdHost !=""'>
+						order_id_host  = #{orderIdHost},
+					</if>
+					
+					<!-- 개통완료 일시 -->
+					<if test='openCompDttm != null and openCompDttm !=""'>
+						open_comp_dttm  = #{openCompDttm},
+					</if>
+					
+					<!-- 개통 서비스번호 -->
+					<if test='accountNum != null and accountNum !=""'>
+						account_num  = #{accountNum},
+					</if>
+					
+					<!-- 개통번호 일시 -->
+					<if test='openTelNum != null and openTelNum !=""'>
+						open_tel_num  = TO_BASE64(AES_ENCRYPT(#{openTelNum},'tb_pmb_plan_online_open')),
+					</if>
+							
+					<!-- 본인 인증 ci 값 -->
+					<if test='identityCi != null and identityCi !=""'>
+						identity_ci  = #{identityCi},
+					</if>				
+					
+					modified_date=NOW()
+		WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		UPDATE tb_pmb_plan_online_open SET sale_status = 0
+	    WHERE id=#{id}
+	</delete>
+	
+	 <insert id="createOrderState" parameterType="kr.co.ucomp.web.order.entity.OrderStateEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+	INSERT INTO tb_pmb_plan_order_state (
+		order_id
+		,order_state		
+		<if test='orderMemo != null and orderMemo !=""'>
+		,order_memo
+		</if>
+		,account_num
+		<if test='openCompDttm != null and openCompDttm !=""'>
+		,open_comp_dttm
+		</if>
+		<if test='openTelNum != null and openTelNum !=""'>
+		,open_tel_num
+		</if>
+		,order_state_host
+	) VALUES (
+		#{orderId},
+		#{orderState},		
+		<if test='orderMemo != null and orderMemo !=""'>
+		#{orderMemo},
+		</if>
+		#{accountNum},
+		<if test='openCompDttm != null and openCompDttm !=""'>
+		#{openCompDttm},
+		</if>
+		<if test='openTelNum != null and openTelNum !=""'>
+		#{openTelNum},
+		</if>
+		#{orderStateHost}
+	)
+	</insert>
+	
+		<select id="getListState" parameterType="kr.co.ucomp.web.order.dto.PlanOrderSearchDto" resultType="kr.co.ucomp.web.order.entity.OrderStateEntity">
+		   SELECT
+		     id
+			,order_id
+			,order_state
+			,order_state_host
+			,order_memo
+			,account_num
+			,open_comp_dttm
+			,open_tel_num
+			,create_date
+			,GET_CODE_NAME('order_state',order_state) orderStateNm
+	 	  FROM tb_pmb_plan_order_state 
+	 	  WHERE 1=1
+	 	  <!-- 주문번호 -->
+		<if test='orderId != null and orderId !=""'>
+			AND order_id = #{orderId}
+		</if> 
+ 	    ORDER BY id DESC
+
+	</select>
+		
+</mapper>

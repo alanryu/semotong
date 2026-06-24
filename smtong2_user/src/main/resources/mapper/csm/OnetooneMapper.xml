@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.csm.onetoone.mapper.OnetooneMapper">
+  	<sql id="searchCondition">
+		<where>
+			<if test='reqNm != null and reqNm !=""'>
+				AND req_nm = #{reqNm}
+			</if>
+			<if test='reqPhonNum != null and reqPhonNum !=""'>
+				AND req_phon_num = #{reqPhonNum}
+			</if>
+			<if test='searchId != null and searchId !=""'>
+				AND create_id = #{searchId}
+			</if>
+		</where>
+	</sql>
+
+    <select id="oneToOneList" resultType="kr.co.ucomp.web.csm.onetoone.entity.OnetooneEntity">
+        SELECT
+            id,
+            request_user,
+            status,
+            category_id,
+            GET_CODE_NAME('onetoone_cate', category_id) AS categoryName,
+            inquery_title,
+            inquery_content,
+            response_user,
+            response_content,
+            response_date,
+            response_inquery,
+            score,
+            create_date,
+            create_id,
+            modified_date,
+            modified_id
+        FROM
+            tb_csm_one_to_one_inquiry
+        WHERE 1=1 
+        AND display_yn = 'Y'
+        AND request_user = #{requestUser}
+        ORDER BY create_date DESC
+    </select>
+
+    <select id="oneToOne" parameterType="kr.co.ucomp.web.csm.onetoone.dto.OnetooneDto" resultType="kr.co.ucomp.web.csm.onetoone.entity.OnetooneEntity">
+        SELECT
+            id,
+            request_user,
+            status,
+            category_id,
+            GET_CODE_NAME('onetoone_cate', category_id) AS categoryName,
+            inquery_title,
+            inquery_content,
+            response_user,
+            response_content,
+            response_date,
+            response_inquery,
+            score,
+            create_date,
+            create_id,
+            modified_date,
+            modified_id
+        FROM
+            tb_csm_one_to_one_inquiry
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insertOneToOne" parameterType="kr.co.ucomp.web.csm.onetoone.entity.OnetooneEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+        INSERT INTO tb_csm_one_to_one_inquiry (
+            request_user		, status		, category_id		, inquery_title
+            ,inquery_content	, response_user	, response_content
+            ,response_inquery	, score
+            ,create_id
+        ) VALUES (
+             #{requestUser}		, #{status}			, #{categoryId}			, #{inqueryTitle}
+             ,#{inqueryContent}	, #{responseUser}	, #{responseContent}
+             ,#{responseInquery}, #{score}
+             ,#{createId}
+         )
+    </insert>
+
+    <update id="updateOneToOne" parameterType="kr.co.ucomp.web.csm.onetoone.entity.OnetooneEntity">
+        UPDATE tb_csm_one_to_one_inquiry
+        SET
+            request_user     = COALESCE(#{requestUser}        , request_user),
+            status           = COALESCE(#{status}             , status),
+            category_id      = COALESCE(#{categoryId}         , category_id),
+            inquery_title    = COALESCE(#{inqueryTitle}       , inquery_title),
+            inquery_content  = COALESCE(#{inqueryContent}     , inquery_content),
+            response_user    = COALESCE(#{responseUser}       , response_user),
+            response_content = COALESCE(#{responseContent}    , response_content),
+            response_inquery = COALESCE(#{responseInquery}    , response_inquery),
+            score            = COALESCE(#{score}              , score),
+            modified_id      = COALESCE(#{modifiedId}         , modified_id)
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteOneToOne" parameterType="long">
+        DELETE FROM tb_csm_one_to_one_inquiry
+        WHERE id = #{id}
+    </delete>
+
+</mapper>

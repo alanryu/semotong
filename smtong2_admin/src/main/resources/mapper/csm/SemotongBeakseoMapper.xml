@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.csm.mapper.SemotongBaekseoMapper">
+
+	<sql id="Base_Column_list">
+		 a.id
+		,a.content_sp
+		,GET_CODE_NAME('baekseo_content_sp', a.content_sp) AS contentSpNm
+		,a.display_sp
+		,a.display_start_dttm
+		,a.display_end_dttm
+		,a.image
+		,a.title
+		,a.content
+		,a.create_date
+		,a.create_id
+		,b.user_name
+		,a.modified_date
+		,a.modified_id
+	</sql>
+	
+	<sql id="listWhereInfo">
+		<where>
+			<if test=" searchKeywordType != null and searchKeywordType != '' and searchKeywordType !='ALL' ">
+				AND a.content_sp = #{searchKeywordType}
+			</if>
+			<if test=" searchKeyword != null and !searchKeyword.equals('') ">
+				AND a.title LIKE CONCAT('%', #{searchKeyword}, '%')
+			</if>
+			
+			<if test=" !searchKeywordType.equals('01') and searchPeriodType.equals('CREATE')">
+				AND a.create_date        BETWEEN #{searchStartDate} AND CONCAT(#{searchEndDate}, ' 23:59:59')
+			</if>
+			<if test=" !searchKeywordType.equals('01') and searchPeriodType.equals('START')">
+				AND a.display_start_dttm BETWEEN #{searchStartDate} AND CONCAT(#{searchEndDate}, ' 23:59:59')
+			</if>
+			<if test=" !searchKeywordType.equals('01') and searchPeriodType.equals('END')">
+				AND a.display_end_dttm   BETWEEN #{searchStartDate} AND CONCAT(#{searchEndDate}, ' 23:59:59')
+			</if>
+			
+		</where>
+	</sql>
+
+
+	<select id="getListBaekseo" parameterType="kr.co.ucomp.web.csm.dto.SemotongBaekseoDto" resultType="kr.co.ucomp.web.csm.entity.SemotongBaekseoEntity">
+		SELECT
+		<include refid="Base_Column_list" />
+		FROM
+		tb_csm_semotong_baekseo a
+		LEFT JOIN tb_mbm_admin_user b ON a.create_id = b.id
+		<include refid="listWhereInfo" />
+		ORDER BY id DESC 
+		LIMIT #{offset}, #{recordSize}
+	</select>
+	<select id="getListBaekseoCount" parameterType="kr.co.ucomp.web.csm.dto.SemotongBaekseoDto" resultType="java.lang.Long">
+		SELECT
+		count(1)
+		FROM
+		tb_csm_semotong_baekseo a
+		LEFT JOIN tb_mbm_admin_user b ON a.create_id = b.id
+		<include refid="listWhereInfo" />
+	</select>
+	
+	
+	
+	<select id="getBaekseo" parameterType="kr.co.ucomp.web.csm.dto.SemotongBaekseoDto" resultType="kr.co.ucomp.web.csm.entity.SemotongBaekseoEntity">
+		SELECT
+		<include refid="Base_Column_list" />
+		FROM
+		tb_csm_semotong_baekseo a
+		LEFT JOIN tb_mbm_admin_user b ON a.create_id = b.id
+		WHERE a.id=#{id}
+    </select>
+
+    <insert id="insertBaekseo" parameterType="kr.co.ucomp.web.csm.entity.SemotongBaekseoEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+        INSERT INTO tb_csm_semotong_baekseo (content_sp, display_sp, display_start_dttm, display_end_dttm, image, title, content, create_date, create_id)
+        VALUES(
+            #{contentSp},
+            #{displaySp},
+            #{displayStartDttm},
+            #{displayEndDttm},
+            #{image},
+            #{title},
+            #{content},
+            NOW(),
+            #{createId}
+        )
+    </insert>
+
+    <update id="updateBaekseo" parameterType="kr.co.ucomp.web.csm.entity.SemotongBaekseoEntity">
+        UPDATE tb_csm_semotong_baekseo 
+        SET
+           content_sp           =#{contentSp},
+           display_sp           =#{displaySp},
+           display_start_dttm   =#{displayStartDttm},
+           display_end_dttm     =#{displayEndDttm},
+           image                =#{image},
+           title                =#{title},
+           content              =#{content},
+           modified_date        =NOW(),
+           modified_id          =#{modifiedId}
+        WHERE id = #{id};
+    </update>
+
+    <delete id="deleteBaekseo" parameterType="kr.co.ucomp.web.csm.entity.SemotongBaekseoEntity">
+        DELETE FROM tb_csm_semotong_baekseo
+        WHERE id = #{id}
+    </delete>
+	
+	<update id="updateDisplaySp"  parameterType="kr.co.ucomp.web.csm.entity.SemotongBaekseoEntity" >
+		UPDATE tb_csm_semotong_baekseo 
+		SET    display_sp =#{displaySp}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

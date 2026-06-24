@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.svc.event.mapper.EvtWinnerMapper">
+	
+	<sql id="Base_Column_list">
+		 id						
+		,title				
+		,content				
+		,disable				
+		
+		,create_date			
+		,create_id			
+		,modified_date		
+		,modified_id
+	</sql>
+	
+	<select id="evtList" parameterType="kr.co.ucomp.web.svc.event.dto.EvtWinnerSearchDTO" resultType="kr.co.ucomp.web.svc.event.entity.EvtWinnerEntity">
+		SELECT
+		<include refid="Base_Column_list" />
+		FROM tb_evt_event_winner
+		WHERE 1 = 1
+		<if test=" searchTitle != null and !searchTitle.equals('') ">
+			AND title like concat('%',  #{searchTitle}, '%')
+		</if>
+		
+		ORDER BY id DESC
+		LIMIT #{offset}, #{recordSize}
+	</select>
+	
+	<select id="evtCount" parameterType="kr.co.ucomp.web.svc.event.dto.EvtWinnerSearchDTO" resultType="java.lang.Long">
+		SELECT COUNT(1)
+		FROM tb_evt_event_winner
+		WHERE 1 = 1
+		<if test=" searchTitle != null and !searchTitle.equals('') ">
+			AND title like concat('%',  #{searchTitle}, '%')
+		</if>	
+	</select>
+	
+	
+	<select id="evtById" parameterType="kr.co.ucomp.web.svc.event.dto.EvtWinnerSearchDTO" resultType="kr.co.ucomp.web.svc.event.entity.EvtWinnerEntity">
+		SELECT
+		<include refid="Base_Column_list" />
+		FROM tb_evt_event_winner
+		WHERE id = #{searchId}
+	</select>
+	
+	
+	<insert id="create"  parameterType="kr.co.ucomp.web.svc.event.entity.EvtWinnerEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+		INSERT INTO tb_evt_event_winner ( title, content, disable,  create_id, modified_date) 
+		VALUES(	
+				 #{title}
+				,#{content}
+				,#{disable}
+				,#{createId}
+				,NULL
+		);
+	</insert>
+	
+	<update id="update"  parameterType="kr.co.ucomp.web.svc.event.entity.EvtWinnerEntity" >
+		UPDATE tb_evt_event_winner 
+		SET		 title			=#{title}
+				,content		=#{content}
+				,disable		=#{disable}
+				,modified_date	=now()
+				,modified_id	=#{modifiedId}
+		WHERE id = #{id}
+	
+	</update>
+	
+	<delete id="delete" parameterType="kr.co.ucomp.web.svc.event.entity.EvtWinnerEntity">
+		DELETE FROM tb_evt_event_winner
+		WHERE id = #{id}
+	</delete>
+	
+</mapper>

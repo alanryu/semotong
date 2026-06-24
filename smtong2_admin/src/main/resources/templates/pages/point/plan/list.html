@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='09',menuId ='04'">
+	  
+<th:block layout:fragment="css">
+</th:block>
+
+<th:block layout:fragment="script">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script> 
+
+<script id="searchlistTmpl" type="text/x-jquery-tmpl">
+	<tr>
+		<!-- 번호 -->
+		<td>${id}</td>
+		<td>${orderStateNm}</td>
+		<td>{{if entrType =='01'}} 신규가입 {{else}} 번호이동{{/if}}</td>
+		<td><a href="/point/plan/detail?orderId=${id}">{{html maskName(orderNm)}}</a> </td>
+		<td>{{html maskPhoneNumber(orderPhone)}}</td>
+		<td>${telecomCd}</td>
+		<td>${companyNm}</td>
+		<td><a href="/point/plan/detail?orderId=${id}">${planNm}</a></td>
+
+		<td>{{if orderState =='06'}} Y {{else}} N{{/if}}</td>
+		<td>${orderDttm}</td>
+		<td>${openCompDttm}</td>
+	</tr>
+</script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		//$("#defaultWeek").trigger("click");
+		$("#keyword").focus();
+		//페이징 기본(필수)
+		currentPage = 1;
+		searchList();
+	})
+	
+
+	
+	function renderPage(page) {
+		currentPage = page;
+		searchList();
+	}
+	//10개씩 보기
+	function changeCombo(){
+		currentPage = 1;
+		searchList()
+	}
+	
+
+	
+	
+	function toggleSearchInit(){
+		$("#keyword").val('');
+
+		$("#searchEntrTypeAll").prop('checked', true); 		// 가입 유형 : 신규, 번호이동
+		$('#searchOrderStateALL').prop('checked', true);	// 개통유지 구분
+		
+		selCompany("");
+		selNetrok("");
+		
+		$('.period-button[value="180"]').trigger("click");
+		currentPage = 1;
+	}
+	
+	function searchList() {
+
+		//model_div	요금제 통신규격	varchar(2)					요금제 통신규격. 가능한 값: - 01: 2G - 02: 3G - 03: LTE - 04: 5G
+		
+		//페이징 기본(필수)
+		var page = currentPage;
+		if(page =="" || page == null) page =1;
+		var _recordSize =  parseInt($("#recordSize").val());
+		
+		var params = {
+
+				searchPointPlanYn	: "1",
+				keyword 			: $("#keyword").val(),
+				searchEntrType 		: $("input[name='searchEntrType']:checked").val(),		//신규, 번호이동
+				
+				searchOrderState 	: $("input[name='searchOrderState']:checked").val(),	//개통유지 구분
+				searchStartDt 		: $("#searchStartDt").val(),
+				searchEndDt 		: $("#searchEndDt").val(),
+				searchModelDivList 	: getCheckedCompanies("searchNetrok"),
+				searchCompanyList 	: getCheckedCompanies("searchCompanyList"),
+				page : page,
+				recordSize : _recordSize
+		}
+		
+		$.ajax({
+				url : '/pbm/order/ajaxList'
+				,type : 'POST'
+				,dataType : "json"
+				,contentType:"application/json"
+				,data : JSON.stringify(params)
+				,success: function (data) {
+					console.log(data);					
+					$('#searchList').empty();
+					var totalCnt = data.totalCnt;
+					
+					if(totalCnt > 0) {
+						$('#searchlistTmpl').tmpl(data.data).appendTo('#searchList');
+						renderPagination(page, totalCnt, _recordSize)
+					}
+					$('#totla_count').html("총 "+totalCnt+"건");
+				},
+				error : function(request, status, error){
+					alert(error);
+				},
+				complete:function(){
+					// $('#loading').addClass('display-none');
+				}
+		});
+	}
+	
+	
+	function selCompany(id) {
+
+		if(id=="") {
+			$("input[id^='searchCompanyList']").prop("checked", false);
+			$("#searchCompanyListALL").prop("checked", true);
+		} else {
+			$("#searchCompanyListALL").prop("checked", false);
+		}
+	}
+	
+	function selNetrok(id) {
+
+		if(id=="") {
+			$("input[id^='searchNetrok']").prop("checked", false);
+			$("#searchNetrokAll").prop("checked", true);
+		} else {
+			$("#searchNetrokAll").prop("checked", false);
+		}
+	}
+	
+	
+	
+	function downloadExcel() {
+		//페이징 기본(필수)
+		var page = currentPage;
+		if(page =="" || page == null) page =1;
+		var _recordSize =  999;
+				
+		var params = {
+				searchPointPlanYn	: "1",
+				keyword 			: $("#keyword").val(),
+				searchEntrType 		: $("input[name='searchEntrType']:checked").val(),		//신규, 번호이동
+				
+				searchOrderState 	: $("input[name='searchOrderState']:checked").val(),	//개통유지 구분
+				searchStartDt 		: $("#searchStartDt").val(),
+				searchEndDt 		: $("#searchEndDt").val(),
+				searchModelDivList 	: getCheckedCompanies("searchNetrok"),
+				searchCompanyList 	: getCheckedCompanies("searchCompanyList"),
+		 		page : page,
+		 		recordSize : _recordSize
+		}
+		var _url = '/point/plan/excelDown';
+		
+		downloadExcelProc(params,_url,"PointPlanList");
+		
+	}
+	
+	
+
+</script>
+
+
+</th:block>
+
+<div class="main-content">
+	
+	<div class="container-fluid">
+		<!-- 로케이션 & 제목 영역 추가 -->
+		<div class="page-header mb-4">
+			<div class="location mb-2">
+				<small class="text-secondary">
+					<i class="fas fa-home me-1"></i>
+					<a href="/mbm/adminuser/list">홈</a> > <a href="/point/plan/list">포인트관리</a> > <a href="/point/plan/list">포인트요금제 신청내역</a>
+				</small>
+			</div>
+			<h2 class="page-title fs-4 mb-4">
+				포인트요금제 신청내역
+			</h2>
+		</div>
+		
+		<!-- 검색 구간 -->
+		<div class="search-section">
+			
+			<div class="col-12 mb-2">
+				<div class="form-row full-width">
+					<div class="form-label mb-0">검색어</div>
+					<div class="position-relative col-9">
+						<i class="fas fa-search position-absolute" style="left: 16px; top: 15.5px; color: #94a3b8;"></i>
+						<input type="text" class="form-control ps-5" placeholder="검색어를 입력하세요" id="keyword" name="keyword">
+					</div>
+				</div>
+			</div>
+			
+			
+								
+			<!-- 가입 유형 -->
+			<div class="form-row full-width mb-3">
+				<div class="form-label mb-0">가입 유형</div>
+				<div class="form-control-wrap">
+					<div class="form-check-group">
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="searchEntrType" id="searchEntrTypeAll" value="" checked>
+							<label class="form-check-label" for="searchEntrTypeAll">전체</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="searchEntrType" id="searchEntrType01" value="01">
+							<label class="form-check-label" for="searchEntrType01">신규가입</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="searchEntrType" id="searchEntrType02" value="02">
+							<label class="form-check-label" for="searchEntrType02">번호이동</label>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<!-- 개통유지 구분 -->
+			<div class="form-row full-width mb-3">
+				<div class="form-label mb-0">개통유지 구분</div>
+				<div class="form-control-wrap">
+					<div class="form-check-group">
+						<div class="radio-group">
+							<input class="form-check-input" type="radio" name="searchOrderState" id="searchOrderStateALL" value="" checked >
+							<label class="form-check-label" for="searchOrderStateALL">전체</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="searchOrderState" id="searchOrderState01" value="06" >
+							<label class="form-check-label" for="searchOrderState01">Y</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="searchOrderState" id="searchOrderState02" value="01,02,03,04,98,99" >
+							<label class="form-check-label" for="searchOrderState02">N</label>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row align-items-center mb-2">
+				<div class="form-row">
+					<div class="form-label mb-0">개통완료일</div>
+					<div class="d-flex align-items-center gap-3">
+						<div class="d-flex align-items-center gap-2">
+							<input type="date" class="form-control" style="width: 150px" id="searchStartDt">
+							<span class="text-secondary">-</span>
+							<input type="date" class="form-control" style="width: 150px" id="searchEndDt">
+						</div>
+						<div class="d-flex gap-2">
+							<button class="period-button" value="0">오늘</button>
+							<button class="period-button" value="7" id="defaultWeek">1주일</button>
+							<button class="period-button" value="30">1개월</button>
+							<button class="period-button" value="90">3개월</button>
+							<button class="period-button" value="180">6개월</button>
+							<button class="period-button" value="365">1년</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 검색 구간 -->
+
+
+			<div id="detailSearchArea" class="col-12" style="display: none;">
+				
+				<!-- 네트워크 -->
+				<div class="form-row mb-3">
+					<div class="form-label mb-0">네트워크</div>
+					<div class="form-control-wrap">
+						<div class="form-check-group">
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="checkbox" id="searchNetrokAll" value="" checked onclick="selNetrok('');"><!-- 요금제 통신규격. 가능한 값: - 01: 2G - 02: 3G - 03: LTE - 04: 5G -->
+								<label class="form-check-label" for="searchNetrokAll">전체</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="checkbox" id="searchNetrok01" name="searchNetrok" value="LTE" onclick="selNetrok('LTE');">
+								<label class="form-check-label" for="searchNetrok01">LTE</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="checkbox" id="searchNetrok02" name="searchNetrok" value="3G" onclick="selNetrok('3G');">
+								<label class="form-check-label" for="searchNetrok02">3G</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="checkbox" id="searchNetrok03"  name="searchNetrok" value="5G" onclick="selNetrok('5G');">
+								<label class="form-check-label" for="searchNetrok03">5G</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<!-- 사업자 -->
+				<div class="form-row mb-3" id="searchDvCompay">
+					<div class="form-label mb-0">사업자</div>
+					<div class="form-control-wrap">
+						<div class="form-check-group">
+							<!-- 관리자 권한 사용자 -->
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="checkbox" id="searchCompanyListALL" value="" onclick="selCompany('');" checked>
+								<label class="form-check-label" for="searchCompanyListALL">전체</label>
+							</div>
+							<th:block th:each="item,index : ${compnyList}">	
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="checkbox" name="searchCompanyList" th:id="${'searchCompanyList' + index.index}"  th:value="${item.id}" th:onclick="|selCompany(${item.id});|">
+									<label class="form-check-label" th:for="${'searchCompanyList' + index.index}" th:text="${item.name}">KG모바일</label>
+								</div>
+							</th:block>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-12 text-end mt-2">
+					
+					<button class="btn btn-primary btn-sm" onclick="searchList();">
+						<i class="fas fa-search"></i>
+						검색
+					</button>
+					<button class="btn btn-primary btn-sm me-2" onclick="toggleDetailSearch()">
+						<i class="fas fa-chevron-down"></i>
+						상세검색
+					</button>
+					<button class="btn btn-light me-2 btn-sm" onclick="toggleSearchInit()">
+						<i class="fas fa-redo"></i>
+						초기화
+					</button>
+				</div>
+			</div>
+		</div>
+		
+		
+		
+		
+		<!-- contents 영역 -->
+		<div class="table-section">
+			<div class="d-flex justify-content-between align-items-center mb-4">
+				<div class="d-flex align-items-center gap-3">
+					<div class="stats-badge">
+						<i class="fas fa-calculator me-1"></i>
+						<span id="totla_count">총 450건</span>
+					</div>
+					<select class="form-select" style="width: 100px" id="recordSize" onchange="changeCombo()">
+						<option value="10">10개씩</option>
+						<option value="20">20개씩</option>
+						<option value="30">30개씩</option>
+						<option value="40">40개씩</option>
+						<option value="50">50개씩</option>
+					</select>
+				</div>
+								
+				<div class="header-actions">
+					<button class="btn btn-light btn-sm">
+						<i class="fas fa-download"></i>
+						다운로드
+					</button>
+					
+				</div>
+			</div>
+			
+			<table class="table custom-table">
+				<thead>
+					<tr>
+					
+						<th>No</th>
+						<th>상태</th>
+						<th>가입유형</th>
+						<th>신청자</th>
+						<th>연락처</th>
+						<th>MNO</th>
+						<th>사업자</th>
+						<th>요금제</th>
+						<th>개통유지</th>
+						<th>신청일</th>
+						<th>개통완료일</th>
+					</tr>
+				</thead>
+				<tbody id="searchList">
+				</tbody>
+			</table>
+			
+			<div class="d-flex justify-content-left mt-4">
+				<ul class="pagination">
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,66 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 이벤트 상세
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 이벤트 상세 페이지
+.F-E01-03-page {
+
+	// 페이시 여백
+	@include bottom-spacer;
+
+	// s: 공지사항 상세 섹션
+	.event-detail-sec {
+		.event-detail {
+
+			border-top: 1px solid #2A2B2D;
+			.detail-header {
+				display: flex;
+				flex-wrap: wrap;
+				padding: 20rem 8rem;
+				border-bottom: 1px solid #EFF0F0;
+				.tit {
+					width: 100%;
+					margin-bottom: 8rem;
+					font-weight: 600;
+					font-size: 16rem;
+					line-height: 22rem;
+					color: #2A2B2D;
+				}
+				.date {
+					margin-right: auto;
+					font-weight: 500;
+					font-size: 14rem;
+					line-height: 20rem;
+					color: #96989B;
+				}
+			}
+			.detail-body {
+				padding: 32rem 8rem;
+				border-bottom: 1px solid #EFF0F0;
+
+				.data-view {
+					font-weight: 400;
+					font-size: 14rem;
+					line-height: 20rem;
+					color: #46484B;
+					p + p {
+						margin-top: 8rem;
+					}
+				}
+
+				.ratePlanC-list {
+					margin-top: 24rem;
+					@include ratePlanC-list;
+
+				}
+				.ratePlanC-card {
+					@include ratePlanC-card;
+				}
+			}
+		}
+	}
+	// e: 공지사항 상세 섹션
+
+}
+// e: 이벤트 상세 페이지

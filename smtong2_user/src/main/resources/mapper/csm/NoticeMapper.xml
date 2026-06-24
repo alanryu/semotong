@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.csm.notice.mapper.NoticeMapper">
+	
+	<sql id="listWhere">
+		<if test="keyword != null and keyword != ''">
+			AND (title LIKE CONCAT('%', #{keyword}, '%')
+			OR content LIKE CONCAT('%', #{keyword}, '%'))
+		</if>
+	</sql>
+	
+	<sql id="Base_Column_list">
+		id
+		,title
+		,content
+		,top_yn
+		,display_yn
+		,create_date
+		,create_id
+		,modified_date
+		,modified_id
+		,GET_ADMIN_USER_NM(create_id) as createNm
+		,GET_ADMIN_USER_NM(modified_id) as modifiedNm				
+	</sql>
+	
+	<select id="getListNotice" parameterType="kr.co.ucomp.web.csm.notice.dto.NoticeSearchDto" resultType="kr.co.ucomp.web.csm.notice.entity.NoticeEntity">
+    SELECT
+        <include refid="Base_Column_list" />
+    FROM
+        tb_csm_notice
+    WHERE 1=1
+    AND display_yn = 1
+    <include refid="listWhere" />
+    ORDER BY top_yn DESC, id DESC
+    LIMIT #{offset}, #{recordSize}
+</select>
+
+
+	<select id="getListNoticeCount" parameterType="kr.co.ucomp.web.csm.notice.dto.NoticeSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+	        FROM
+				tb_csm_notice
+	        WHERE 1=1
+	        AND display_yn = 1
+	        <include refid="listWhere" />
+	</select>
+	
+	
+	<select id="getNotice" parameterType="java.lang.Long" resultType="kr.co.ucomp.web.csm.notice.entity.NoticeEntity">
+		SELECT
+	            <include refid="Base_Column_list" />
+	        FROM
+	            tb_csm_notice
+	        WHERE id=#{id}
+	</select>
+	
+</mapper>

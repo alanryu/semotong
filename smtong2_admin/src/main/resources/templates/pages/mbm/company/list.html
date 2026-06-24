@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='03',menuId ='01'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+
+	 <script id="companyListTmpl" type="text/x-jquery-tmpl">
+		<tr>
+		    <td>
+		        <input type="checkbox" class="form-check-input">
+		    </td>
+		    <td>${id}</td>
+		    <td>
+		        <div class="d-flex gap-2">
+		            <button class="action-btn btn-sm" onclick="location.href='/mbm/company/edit?searchId=${id}'">
+		                <i class="fas fa-edit me-1"></i>
+		                수정
+		            </button>
+		            <button class="action-btn btn-sm" onclick="deleteRow('${id}');">
+		                <i class="fas fa-trash me-1"></i>
+		                삭제
+		            </button>
+		        </div>
+		    </td>
+		    <td>${name}</td>
+		    <td>${companyNm}</td>
+		    <td>${companyCode}</td>
+		    <td>${companyMno}</td>
+			<td>{{if allyPartnetYn == 1 }} Y {{else}} N {{/if}}</td>
+			<td>{{if simpleOpenYn == 1 }} Y {{else}} N {{/if}}</td>
+		    <td>{{html getDateStr(createDate)}}</td>
+		</tr>
+	</script>
+	<script type="text/javascript">
+		document.addEventListener('DOMContentLoaded', function () {
+			currentPage =1;
+			searchList();
+		});
+		
+		function changeCombo(){
+			currentPage = 1;
+			searchList()
+		}
+		
+		function searchListBtn() {
+			currentPage = 1;
+			searchList();
+		}
+		
+		function renderPage(page) {
+			currentPage = page;
+			searchList();
+		}
+		
+		function deleteRow(delId) {
+			 showConfirm( '삭제하시겠습니까?', () => {
+             	 deleteDb(delId);
+              },
+              () => {
+                  // 취소 시 실행할 로직
+              },'계정 삭제')
+		}
+
+		
+		function deleteDb(delId) {
+			$.ajax({
+				   url : '/mbm/company/delete',
+			       type : 'DELETE',
+				   data : {id : delId},
+					success: function (data) {
+						searchList();
+				    },
+					error : function(request, status, error){
+			            alert(error);
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+			});
+		}
+		
+		function searchList() {
+			
+			var page = currentPage;
+			if(page =="" || page == null) page =1;
+			var _recordSize =  parseInt($("#recordSize").val());
+			
+			var allyPartnetYn = $("input[name='allyPartnetYn']:checked").val()
+	  		var simpleOpenYn = $("input[name='simpleOpenYn']:checked").val()
+			
+			var params = {
+			     searchType : $("#searchType").val(),
+				 keyword : $("#keyword").val(),
+				 searchStartDt : $("#searchStartDt").val(),
+				 searchEndDt : $("#searchEndDt").val(),
+				 allyPartnetYn : allyPartnetYn,
+				 simpleOpenYn : simpleOpenYn,
+				 page : page,
+				 recordSize : _recordSize
+			}
+			
+			$.ajax({
+					   url : '/mbm/company/ajaxList',
+				       type : 'POST',
+				       dataType : "json",
+				       contentType:"application/json",
+					   data : JSON.stringify(params),
+						success: function (data) {
+							$('#searchList').empty();
+							if(data.totalCnt > 0) {
+								$('#listCount').html("총 " + data.totalCnt +"건" );
+								$('#companyListTmpl').tmpl(data.data).appendTo('#searchList');
+								renderPagination(page,data.totalCnt,_recordSize);
+							}
+					    },
+						error : function(request, status, error){
+				            alert(error);
+				        },
+				        complete:function(){
+				           // $('#loading').addClass('display-none');
+				        }
+					});
+		}
+		
+		function toggleSearchInit(){
+			$("#searchType").val("").prop('selected', true);
+			
+			$("#keyword").val('');
+			//$('.period-button[value="7"]').trigger("click");
+			
+			$('#simpleOpenYn01').prop('checked', true);
+			$('#allyPartnetYn01').prop('checked', true);
+			periodButtonInit();
+			currentPage = 1;
+		}
+		
+		
+		function downloadExcel() {
+			var page = 1;
+			var _recordSize = 999;
+			
+			var params = {
+				     searchType : $("#searchType").val(),
+					 keyword : $("#keyword").val(),
+					 searchStartDt : $("#searchStartDt").val(),
+					 searchEndDt : $("#searchEndDt").val(),
+					 page : page,
+					 recordSize : _recordSize
+			}
+			
+			var _url = '/mbm/company/exceldown';
+			
+			downloadExcelProc(params,_url,"companyList");
+			
+		}
+		
+	</script>
+</th:block>
+
+<div class="main-content">
+            <div class="container-fluid">
+                 <!-- 로케이션 & 제목 영역 추가 -->
+                <div class="page-header mb-4">
+                    <div class="location mb-2">
+                        <small class="text-secondary">
+                            <i class="fas fa-home me-1"></i>
+                            <a href="#">홈</a> > <a href="/mbm/company/list">입점사관리</a> > <a href="/mbm/company/list">사업자목록</a>
+                        </small>
+                    </div>
+                    <h2 class="page-title fs-4 mb-4">사업자목록</h2>
+                </div>
+                
+                <div class="search-section">
+                    <!-- 검색어 -->
+                    <div class="col-12 mb-2">
+                        <div class="form-row full-width">
+                            <div class="form-label mb-0">검색조건</div>
+                            <div class="form-control-wrap flex-grow-1">
+                                <select class="form-select" id="searchType">
+                                    <option value="">전체</option>
+                                    <option value="NAME">사업자</option>
+                                    <option value="COMPANY">회사명</option>
+                                </select>
+                            </div>
+                            <div class="position-relative col-9">
+                                <i class="fas fa-search position-absolute" style="left: 16px; top: 15.5px; color: #94a3b8;"></i>
+                                <input type="text" class="form-control ps-5" placeholder="검색어를 입력하세요" id="keyword">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-2">
+                        <div class="form-row full-width">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="form-label mb-0">검색기간</div>
+                                <select class="form-select" style="width: 120px">
+                                    <option>등록일자</option>
+                                </select>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="date" class="form-control" style="width: 150px" id="searchStartDt">
+                                    <span class="text-secondary">-</span>
+                                    <input type="date" class="form-control" style="width: 150px" id="searchEndDt">
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="period-button" value="0">오늘</button>
+                                    <button class="period-button" value="7">1주일</button>
+                                    <button class="period-button" value="30">1개월</button>
+                                    <button class="period-button" value="90">3개월</button>
+                                    <button class="period-button" value="180">6개월</button>
+                                    <button class="period-button" value="365">1년</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-3">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="form-label mb-0">제휴사 구분</div>
+                                <div class="radio-group">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="allyPartnetYn" id="allyPartnetYn01" value="" checked>
+                                        <label class="form-check-label" for="allyPartnetYn01">전체</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="allyPartnetYn" id="allyPartnetYn02" value="1">
+                                        <label class="form-check-label" for="allyPartnetYn02">Y</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="allyPartnetYn" id="allyPartnetYn03" value="0">
+                                        <label class="form-check-label" for="allyPartnetYn03">N</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-3">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="form-label mb-0">간편개통 구분</div>
+                                <div class="radio-group">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="simpleOpenYn" id="simpleOpenYn01" value="" checked>
+                                        <label class="form-check-label" for="simpleOpenYn01">전체</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="simpleOpenYn" id="simpleOpenYn02" value="1">
+                                        <label class="form-check-label" for="simpleOpenYn02">Y</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="simpleOpenYn" id="simpleOpenYn03" value="0">
+                                        <label class="form-check-label" for="simpleOpenYn03">N</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 text-end mt-2">
+                            <button class="btn btn-light me-2 btn-sm" onclick="toggleSearchInit()">
+								<i class="fas fa-redo"></i>
+								초기화
+							</button>
+                            <button class="btn btn-primary btn-sm" onclick="searchListBtn();">
+                                <i class="fas fa-search"></i>
+                                검색
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="stats-badge">
+                                <i class="fas fa-calculator me-1"></i>
+                                <span id="listCount"></span>
+                            </div>
+                            <select class="form-select" style="width: 100px" id="recordSize" onchange="changeCombo()">
+                                <option value="10">10개씩</option>
+								<option value="20">20개씩</option>
+								<option value="30">30개씩</option>
+								<option value="40">40개씩</option>
+								<option value="50">50개씩</option>
+                            </select>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-light btn-sm">
+                                <i class="fas fa-download"></i>
+                                다운로드
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="location.href='/mbm/company/edit'">
+                                <i class="fas fa-plus"></i>
+                                신규등록
+                            </button>
+                        </div>
+                    </div>
+
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" class="form-check-input">
+                                </th>
+                                <th>번호</th>
+                                <th>편집</th>
+                                <th>사업자명</th>
+                                <th>회사</th>
+                                <th>사업자등록번호</th>
+                                <th>통신사구분</th>
+                                <th>제휴사 구분</th>
+                                <th>간편개통 구분</th>
+                                <th>등록일</th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchList">
+                            
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-left mt-4">
+                        <ul class="pagination">
+                            
+                        </ul>
+                    </div>
+                </div>
+            </div>
+</DIV>

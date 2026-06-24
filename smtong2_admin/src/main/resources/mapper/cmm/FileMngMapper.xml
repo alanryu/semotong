@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.cmm.mapper.FileMngMapper">
+
+
+	<sql id="ColumnList">
+	job_type, job_seq, org_file_nm, sys_file_nm, file_url, file_info, etc1, etc2, etc3, create_date
+	</sql>
+	<sql id="WhereInfo">
+		<where>
+			<if test='searchId != null and searchId !=""'>
+			AND id = #{searchId}
+			</if>
+			<if test='jobType != null and jobType !=""'>
+			AND job_type = #{jobType}
+			</if>
+			<if test='keyword != null and keyword !=""'>
+			AND org_file_nm LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+		</where>
+	</sql>
+	<select id="selectFileInfo" parameterType="kr.co.ucomp.web.cmm.dto.FileMngDto" resultType="kr.co.ucomp.web.cmm.entity.FileMngEntity">
+		SELECT 
+		<include refid="ColumnList" />
+		FROM tb_cmm_file_mng
+		<include refid="WhereInfo" />
+		ORDER BY id DESC
+		LIMIT 1
+	</select>
+	<select id="selectFileInfoList" parameterType="kr.co.ucomp.web.cmm.dto.FileMngDto" resultType="kr.co.ucomp.web.cmm.entity.FileMngEntity">
+		SELECT 
+		<include refid="ColumnList" />
+		FROM tb_cmm_file_mng
+		<include refid="WhereInfo" />
+	</select>
+
+	<insert id="insertFileInfo"  parameterType="kr.co.ucomp.web.cmm.entity.FileMngEntity"  useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+		INSERT 
+		INTO tb_cmm_file_mng (job_type, job_seq, org_file_nm, sys_file_nm, file_url, file_info, etc1, etc2, etc3, create_date)
+		VALUES(	
+			#{jobType},
+			#{jobSeq},
+			#{orgFileNm},
+			#{sysFileNm},
+			#{fileUrl},
+			#{fileInfo},
+			#{etc1},
+			#{etc2},
+			#{etc3},
+			Now()
+		);
+	</insert>
+		
+	<update id="deleteFileInfo" parameterType="kr.co.ucomp.web.cmm.entity.FileMngEntity">
+		DELETE 
+		FROM tb_cmm_file_mng 
+		WHERE id = #{id};
+	</update>	
+	
+</mapper>

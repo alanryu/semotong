@@ -1,0 +1,777 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 메인
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 메인 페이지
+.F-M01-page {
+	// 페이지별 섹션 여백 설정
+	padding-top: 0 !important;
+	--sec-outer-margin: 50rem;
+	--sec-inner-padding: 40rem;
+
+	// Type2 Bg
+	// &.type2 section {
+	// 	width: 100%;
+	// 	max-width: 1020rem;
+	// 	margin-right: auto;
+	// 	margin-left: auto;
+	// }
+
+	// TypeA Bg
+	// &.typeA {
+	// 	.sec-outer {
+	// 		width: 100%;
+	// 		max-width: 1020rem;
+	// 		margin-right: auto;
+	// 		margin-left: auto;
+	// 	}
+	// 	.visual-sec {
+	// 		padding: 0;
+	// 		background: #F2F5FB;
+	// 		.sec-outer {
+	// 			@include out-sec;
+	// 			padding-top: var(--sec-inner-padding);
+	// 			background: linear-gradient(314.82deg, #3C239A 4.99%, #7B56FF 95.96%);
+	// 			background-color: #3C239A;
+	// 		}
+	// 	}
+	// 	.deal-sec {
+	// 		padding: 0;
+	// 		background: #F2F5FB;
+	// 		.sec-outer {
+	// 			@include out-sec;
+	// 			background-color: #CDC2F5;
+	// 			padding-top: var(--sec-inner-padding);
+	// 			padding-bottom: var(--sec-inner-padding);
+	// 		}
+	// 	}
+	// }
+
+	// TypeB Bg
+	// &.typeB {
+	// 	.visual-sec {
+	// 		// padding: 0;
+	// 		padding-top: var(--sec-inner-padding);
+	// 	}
+	// }
+	.sec-outer { /* 3차 수정 : 메인 레이아웃 변경 추가 */
+		width: 100%;
+		max-width: 1020rem;
+		margin-right: auto;
+		margin-left: auto;
+	}
+
+	// s: 비주얼 섹션
+	.visual-sec {
+		position: relative;
+		z-index: 10;
+		padding-left: 0;
+		padding-right: 0;
+		margin-top: calc(-1 * #{$mobile-height-header});
+		.visual-swiper {
+			.swiper-slide {
+				display: flex;
+				justify-content: center;
+				box-sizing: border-box;
+			}
+			.swiper-controler {
+				display: block;
+				position: absolute;
+				z-index: 20;
+				top: auto;
+				left: 0;
+				width: 100%;
+				bottom: calc((100vw / 360) * 23);
+				@include out-sec;
+
+				.in-sec {
+					display: flex;
+					justify-content: flex-end;
+				}
+
+				.swiper-controler-group {
+					display: inline-flex;
+					align-items: center;
+					justify-content: flex-end;
+					gap: 2rem;
+					padding: calc((100vw / 360) * 2) calc((100vw / 360) * 4) calc((100vw / 360) * 2) calc((100vw / 360) * 8);
+					border-radius: calc((100vw / 360) * 50);
+					background-color: rgba(255, 255, 255, 0.1);
+				}
+				.swiper-pagination {
+					position: static;
+					display: flex;
+					justify-content: flex-start;
+					gap: 8rem;
+					width: auto;
+					// 번호타입
+					&-fraction {
+						gap: calc((100vw / 360) * 4);
+						color: #fff;
+						font-weight: 500;
+						font-size: calc((100vw / 360) * 10);
+					}
+					// 블릿타입
+					.swiper-pagination-bullet {
+						width: 10rem;
+						height: 10rem;
+						mask: center center / 10rem;
+						margin: 0;
+						background-color: #fff;
+						opacity: 0.25;
+						border-radius: 0;
+						transition: all 0.15s ease;
+						&-active {
+							opacity: 1;
+						}
+						&:nth-child(1) {
+							mask-image: url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 10L5 0L10 10H0Z' fill='white'/%3E%3C/svg%3E%0A");
+						}
+						&:nth-child(2) {
+							mask-image: url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect opacity='1' width='10' height='10' fill='white'/%3E%3C/svg%3E%0A");
+						}
+						&:nth-child(3) {
+							mask-image: url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle opacity='1' cx='5' cy='5' r='5' fill='white'/%3E%3C/svg%3E%0A");
+						}
+						&:nth-child(4) {
+							mask-image: url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath opacity='1' d='M0.548557 1.37139C0.285811 0.714527 0.769568 0 1.47703 0H8.52297C9.23043 0 9.71419 0.714526 9.45144 1.37139L8.14856 4.62861C8.05319 4.86702 8.05319 5.13298 8.14856 5.37139L9.45144 8.62861C9.71419 9.28547 9.23043 10 8.52297 10H1.47703C0.769568 10 0.285811 9.28547 0.548556 8.62861L1.85144 5.37139C1.94681 5.13298 1.94681 4.86702 1.85144 4.62861L0.548557 1.37139Z' fill='white'/%3E%3C/svg%3E%0A");
+						}
+						&:nth-child(5) {
+							mask-image: url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath opacity='1' d='M0 5L5 0L10 5L5 10L0 5Z' fill='white'/%3E%3C/svg%3E%0A");
+						}
+					}
+				}
+				.swiper-autoplay {
+					display: flex;
+					align-items: center;
+					.ui-btn {
+						width: calc((100vw / 360) * 16);
+						height: calc((100vw / 360) * 16);
+						border-radius: 50%;
+						mask: no-repeat center center / 100% auto;
+						background-color: #fff;
+					}
+					.is-playing {
+						mask-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='9' y='4' width='2' height='8' fill='white'/%3E%3Crect x='5' y='4' width='2' height='8' fill='white'/%3E%3C/svg%3E%0A");
+					}
+					.is-paused {
+						mask-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 8L6 4V12L12 8Z' fill='white'/%3E%3C/svg%3E%0A");
+					}
+				}
+
+				&.is-black {
+					.swiper-controler-group {
+						background-color: rgba(0, 0, 0, 0.1);
+					}
+					.swiper-pagination {
+						&-fraction {
+							color: #000;
+						}
+						.swiper-pagination-bullet {
+							background-color: #000;
+						}
+					}
+					.swiper-autoplay {
+						.ui-btn {
+							background-color: #000;
+						}
+					}
+				}
+			}
+			.visual {
+				width: 100%;
+			}
+			.visual-link {
+				display: block;
+				position: relative;
+				height: auto;
+				width: 100%;
+				@include in-sec;
+
+				img {
+					width: 100%;
+				}
+			}
+
+		}
+		@include media-tablet-xs {
+			margin-top: 0;
+
+			.visual-swiper {
+				.swiper-controler {
+					top: auto;
+					bottom: 84rem;
+
+					.in-sec {
+						justify-content: flex-start;
+					}
+
+					.swiper-controler-group {
+						gap: 12rem;
+						justify-content: flex-start;
+						max-width: $pc-inner-content;
+						background-color: transparent !important;
+						padding: 0;
+					}
+
+					.swiper-autoplay {
+						.ui-btn {
+							width: 16rem;
+							height: 16rem;
+							border-radius: 50%;
+							background: no-repeat center center / 100% auto;
+							mask: none;
+						}
+
+						.is-playing {
+							background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='8' cy='8' r='8' fill='white'/%3E%3Crect x='9' y='5' width='2' height='6' fill='black'/%3E%3Crect x='5' y='5' width='2' height='6' fill='black'/%3E%3C/svg%3E%0A");
+						}
+						.is-paused {
+							background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='8' cy='8' r='8' fill='white'/%3E%3Cpath d='M12 8L6 4V12L12 8Z' fill='black'/%3E%3C/svg%3E%0A");
+						}
+					}
+
+					&.is-black {
+						.swiper-autoplay {
+							.ui-btn {
+								background-color: transparent;
+							}
+							.is-playing {
+								background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='8' cy='8' r='8' fill='black'/%3E%3Crect x='9' y='5' width='2' height='6' fill='white'/%3E%3Crect x='5' y='5' width='2' height='6' fill='white'/%3E%3C/svg%3E%0A");
+							}
+							.is-paused {
+								background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='8' cy='8' r='8' fill='black'/%3E%3Cpath d='M12 8L6 4V12L12 8Z' fill='white'/%3E%3C/svg%3E%0A");
+							}
+						}
+					}
+				}
+				.visual {
+					@include out-sec;
+				}
+				.visual-link {
+					height: 394rem;
+				}
+			}
+		}
+	}
+	// e: 비주얼 섹션
+
+	// s: 추천딜 섹션
+	.deal-sec {
+		position: relative;
+		z-index: 20;
+		// overflow: hidden;
+		padding-top: var(--sec-inner-padding);
+		padding-bottom: var(--sec-inner-padding);
+		padding: 0; /* 3차 수정 : 메인 레이아웃 변경 추가 */
+		background: #F2F5FB; /* 3차 수정 : 메인 레이아웃 변경 추가 */
+		/* background-color: #CDC2F5; 3차 수정 : 메인 레이아웃 변경 삭제 */
+		@include sec-basic;
+		.sec-outer { /* 3차 수정 : 메인 레이아웃 변경 추가 */
+			@include out-sec;
+			background-color: #CDC2F5;
+			padding-top: var(--sec-inner-padding);
+			padding-bottom: var(--sec-inner-padding);
+		}
+		.sec-header {
+			display: flex;
+			.sec-tit {
+				color: #000000;
+				.ui-icn {
+					margin-left: 4rem;
+				}
+			}
+			.btn-more {
+				color: $color-primary;
+				font-weight: 600;
+			}
+		}
+
+		.sec-body {
+			position: relative;
+		}
+
+		.deal-timer {
+			.timer-txt {
+				margin-bottom: 10rem;
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 16rem;
+				color: $color-primary;
+			}
+			.timer-labels {
+				display: flex;
+				align-items: center;
+				margin-bottom: 30rem;
+				gap: 6rem;
+				.label-num {
+					position: relative;
+					width: 32rem;
+					height: 42rem;
+					overflow: hidden;
+					border:1px solid $color-primary;
+					border-radius: 6px;
+					background-color: #fff;
+					font-weight: 700;
+					font-size: 26rem;
+					line-height: 30rem;
+					color: #000;
+					&::before {
+						content:'';
+						display: block;
+						width: 100%;
+						height: 21rem;
+						background: linear-gradient(180deg, rgba(244, 245, 248, 1) 47.83%, rgba(205, 197, 241, 1) 100%);
+						border-bottom: 1px solid rgba(172, 159, 233, 0.4);
+					}
+					> span {
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						position: absolute;
+						left: 0;
+						top: 0;
+						width: 100%;
+						height: 100%;
+					}
+				}
+				.label-split {
+					display: flex;
+					flex-direction: column;
+					width: 4rem;
+					height: 14rem;
+					justify-content: space-between;
+					margin: 0 1rem;
+					&::before,
+					&::after {
+						content:'';
+						display: block;
+						width: 4rem;
+						height: 4rem;
+						background-color: #fff;
+						border-radius: 50%;
+					}
+				}
+			}
+		}
+		.deal-swiper { /* 8차 수정 : 추천딜 스와이프 버튼 추가(여기부터) */
+			overflow: visible;
+			width: 100%;
+			.swiper-slide {
+				width: 248rem;
+				opacity: 0.5;
+				transition: opacity 0.2s ease;
+				&-active {
+					opacity: 1;
+				}
+			}
+			&.no-scroll {
+				.swiper-slide {
+					opacity: 1;
+				}
+			}
+			@include media-tablet-xs {
+				overflow: hidden;
+				.swiper-slide {
+					opacity: 1;
+					width: 233rem;
+				}
+			}
+		}
+		.deal-button-prev,
+		.deal-button-next {
+			position: absolute;
+			bottom: 71rem;
+			right: 0;
+			z-index: 10;
+			transform: translate(50%, 50%);
+			width: 28rem;
+			height: 28rem;
+		}
+		.deal-button-prev {
+			right: auto;
+			left: 0;
+			transform: translate(-50%, 50%) rotate(180deg);
+		}
+		.swiper-button-disabled { /* 8차 수정 : 추천딜 스와이프 버튼 추가(여기까지) */
+			display: none;
+		}
+
+		.deal-card {
+			position: relative;
+			width: 100%;
+			padding: 16rem;
+			padding-top: 20rem;
+			box-sizing: border-box;
+			background-color: #fff;
+			.card-body {
+				border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+				padding-bottom: 6rem;
+
+				.card-label {
+					position: absolute;
+					top: 0;
+					right: 16rem;
+					em {
+						display: inline-flex;
+						padding: 4rem 8rem;
+						border-radius: 0 0 10rem 10rem;
+						background-color: $color-primary;
+						font-weight: 600;
+						font-size: 12rem;
+						line-height: 14rem;
+						color: #fff;
+					}
+				}
+				.card-info {
+					font-weight: 500;
+					font-size: 12rem;
+					line-height: 14rem;
+					color: #63666A;
+					@include ellipsis1;
+				}
+				.card-tit {
+					margin-top: 4rem;
+					font-weight: 700;
+					font-size: 16rem;
+					line-height: 20rem;
+					color: #000;
+					height: 40rem;
+					white-space: pre-line;
+					@include ellipsis2;
+				}
+			}
+			.card-footer {
+				display: flex;
+				align-items: flex-end;
+				justify-content: space-between;
+				padding-top: 17rem;
+				padding-bottom: 0rem;
+
+				.card-partner {
+					display: flex;
+					position: relative;
+					flex:1 1 auto;
+					width: 100%;
+					// height: 14rem;
+					// padding-right: 4rem;
+					max-height: 18rem;
+					max-width: 70rem;
+					padding: 1rem 0;
+					img {
+						max-width: 100%;
+						// height: 100%;
+					}
+				}
+				.card-charge-wrap {
+					flex: none;
+				}
+				.card-charge {
+					font-weight: 700;
+					font-size: 20rem;
+					line-height: 24rem;
+					color: $color-primary;
+					text-align: right;
+				}
+				.card-point {
+					width: 100%;
+					text-align: right;
+					font-weight: 700;
+					font-size: 15rem;
+					line-height: 18rem;
+					color: $color-point;
+					letter-spacing: -0.1em;
+					.tit {
+						display: block;
+						text-align: right;
+						// margin-right: 4rem;
+						font-size: 12rem;
+					}
+				}
+
+				&.has-point {
+					align-items: flex-end;
+					padding-top: 5rem;
+					padding-bottom: 0;
+					.card-charge {
+						display: none;
+						font-size: 12rem;
+						line-height: 18rem;
+					}
+				}
+			}
+		}
+
+		@include media-tablet-xs {
+			.sec-outer {
+				margin-top: -40rem;
+			}
+		}
+	}
+	// e: 추천딜 섹션
+
+	// s: 추천딜 섹션 (오픈전 추가)
+	.deal-sec { /* 추천딜 섹션 (오픈전 추가) */
+		position: relative;
+
+		.deal-before,
+		.deal-before .sec-inner,
+		.deal-before .sec-inner .sec-body {
+			@include flex-fill-height;
+		}
+
+		.deal-before {
+			position: absolute;
+			left: 50%;
+			top: 0;
+			height: 100%;
+			z-index: 20;
+			transform: translate(-50%, 0%);
+			background-color: rgba(54, 56, 58, 0.8);
+			backdrop-filter: blur(10px);
+
+			.sec-header {
+				display: block;
+				margin-bottom: 12rem;
+				.sec-tit {
+					color: #fff;
+				}
+				.sec-explain {
+					margin-top: 0;
+					color: #CDC2F5;
+					font-size: 20rem;
+					line-height: 28rem;
+					font-weight: 700;
+				}
+			}
+
+			// 타이머 스킨변경
+			.deal-timer {
+				margin-bottom: 0;
+				.timer-labels {
+					flex-wrap: wrap;
+					.label-num {
+						border: 0;
+						color: $color-primary;
+						&::before {
+							display: none;
+						}
+					}
+					.label-text {
+						font-weight: 600;
+						font-size: 20rem;
+						line-height: 40rem;
+						color: #fff;
+					}
+				}
+			}
+
+			// 공유하기
+			.deal-share {
+				position: absolute;
+				left: 0;
+				bottom: 0;
+				width: 100%;
+				margin-top: 0;
+				padding-top: 88rem;
+				.deal-share-char {
+					position: absolute;
+					right: 0;
+					top: 0;
+					width: 80rem;
+					height: 80rem;
+					img {
+						width: 100%;
+						height: 100%;
+					}
+				}
+				.deal-share-box {
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					padding: 10rem 16rem;
+					background-color: #F4F5F8;
+					border-radius: 2rem;
+					.tit {
+						font-weight: 600;
+						font-size: 12rem;
+						line-height: 16rem;
+						color: #000;
+						em {
+							color: $color-primary;
+						}
+					}
+				}
+			}
+		}
+	}
+	// s: 추천딜 섹션 (오픈전 추가)
+
+	// s: 나에게 맞는 요금제 섹션
+	.ratePlanA-sec {
+		@include sec-basic;
+		padding-top: var(--sec-inner-padding);
+		padding-bottom: var(--sec-inner-padding);
+		background-color: #F2F5FB;
+		.sec-body {
+			position: relative;
+		}
+		.ratePlanA-list {
+			@include ratePlanA-list;
+		}
+
+		@include ratePlanA-swiper;
+
+		.ratePlanA-card {
+			@include ratePlanA-card;
+			box-shadow: none;
+		}
+	}
+	// e: 나에게 맞는 요금제 섹션
+
+	// s: 요금제 추천 섹션
+	.recom-sec {
+		@include sec-basic;
+		margin-top: var(--sec-outer-margin);
+
+		.recom-list {
+			@include recom-list;
+
+			.recom-bnr {
+				@include recom-bnr;
+			}
+		}
+	}
+	// e: 요금제 추천 섹션
+
+	// e: 특별한 이벤트 섹션
+	.special-event-sec {
+		@include sec-basic;
+		margin-top: var(--sec-outer-margin);
+
+		.special-event-list {
+			@include event-list;
+
+			.special-event-bnr {
+				@include event-bnr;
+			}
+		}
+	}
+	// e: 특별한 이벤트 섹션
+
+	// s: 서비스 리뷰 섹션
+	.review-sec {
+		@include sec-basic;
+		margin-top: var(--sec-outer-margin);
+
+		.review-swiper {
+			.swiper-slide {
+				width: 270rem;
+			}
+			@include media-tablet-xs {
+				overflow: hidden;
+			}
+		}
+
+		.review-card {
+			display: flex;
+			flex-wrap: wrap;
+			padding: 20rem;
+			border-radius: 2rem;
+			border:1px solid #EFF0F0;
+
+			.card-telecom {
+				display: flex;
+				align-items: center;
+				height: 28rem;
+				margin-right: 12rem;
+			}
+			.card-rating {
+				display: flex;
+				align-items: center;
+
+				.val {
+					margin-left: 7rem;
+					padding-top: 1rem;
+					font-weight: 700;
+					font-size: 24rem;
+					line-height: 26rem;
+				}
+			}
+
+			.card-name {
+				margin-left: auto;
+				padding: 5rem 0;
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 18rem;
+				color: #828588;
+			}
+
+			.card-cont {
+				width: 100%;
+				margin-top: 10rem;
+				height: 60rem; /* 2025-02-03 조찬기 : 리뷰 높이값 3줄 고정 */
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				@include ellipsis3;
+			}
+		}
+	}
+	// e: 서비스 리뷰 섹션
+
+	// s: 이벤트 섹션
+	.event-sec {
+		margin-top: var(--sec-outer-margin);
+
+		.event-list { /* 7차 수정 : 이벤트 목록 구조 적용 */
+			@include event-list;
+		}
+		.event-bnr {
+			@include event-bnr;
+		}
+	}
+	// e: 이벤트 섹션
+
+	// s: 파트너사 섹션
+	.partner-sec {
+		overflow: hidden;
+		@include sec-basic;
+		margin-top: var(--sec-outer-margin);
+		padding-top: var(--sec-inner-padding);
+		padding-bottom: var(--sec-inner-padding);
+		background-color: #F2F5FB;
+
+		.partner-swiper {
+			overflow: visible;
+			.swiper-wrapper {
+				transition-timing-function: linear !important;
+			}
+			.swiper-slide {
+				width: 88rem;
+			}
+		}
+		.partner-link {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 88rem;
+			height: 88rem;
+			border-radius: 50%;
+			background-color: #fff;
+			img {
+				max-height: 32rem;
+				max-width: 80rem;
+			}
+		}
+		@include media-tablet-xs {
+			.sec-inner {
+				overflow: hidden;
+			}
+		}
+	}
+	// e: 파트너사 섹션
+}
+// e: 메인 페이지

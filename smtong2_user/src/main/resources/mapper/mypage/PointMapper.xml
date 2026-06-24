@@ -1,0 +1,43 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.mypage.mapper.PointMapper">
+	
+	<sql id="Point_Column_list">
+			 p.id
+			,p.user_id
+			,p.balance
+			,p.status
+			,p.comment
+			,p.last_history_id
+			,p.last_history_date
+			,p.last_npay_id
+			,p.last_npay_date
+			,p.last_cash_id
+			,p.last_cash_date
+			,p.create_date
+			,p.create_id
+			,p.modified_date
+			,p.modified_id
+	</sql>
+	<sql id="PointWhereInfo">
+		<where>
+			<if test='searchUserId != null and searchUserId !=""'>
+			AND u.id = #{searchUserId}
+			</if>
+		</where>
+	</sql>
+	
+	
+	<select id="getMyPoint" parameterType="kr.co.ucomp.web.mypage.dto.PointDTO" resultType="kr.co.ucomp.web.mypage.entity.PointEntity">
+		SELECT
+		<include refid="Point_Column_list" />
+		FROM tb_mbm_user u
+		LEFT JOIN tb_mbm_point p ON u.id = p.user_id
+		<include refid="PointWhereInfo" />
+	</select>
+
+
+
+
+</mapper>

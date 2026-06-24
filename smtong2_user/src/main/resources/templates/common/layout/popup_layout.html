@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lagn="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	
+	<title>알뜰폰 요금제 비교 | 최저가 추천 및 번호이동 | 세모통</title>
+
+	<meta name="keywords" content="알뜰폰, 알뜰폰 요금제, 최저가 요금제, 인터넷 결합, 번호이동, USIM, 통신비 절약, MVNO, 세모통" />
+	<meta name="description" content="통신호갱 없는 세상, 세모통에서 알뜰폰 요금제를 비교하고 최저가 추천을 받아보세요. USIM 신규가입 및 번호 이동을 쉽고 빠르게 할 수 있습니다!" />
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/semotong.css}" />
+	<script th:src="@{/js/libs/jquery.min.js}"></script>
+	<script th:src="@{/js/libs/librurys.min.js}"></script>
+	<script th:src="@{/js/libs/jquery.tmpl.min.js}"></script>
+	<script th:src="@{/js/ui/ui.common.js}"></script>
+	<script th:src="@{/js/ui/commonUtil.js}"></script>
+	<!-- 페이지 스크립트 영역 -->
+	<!-- Swiper Librarys -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.0.0/swiper-bundle.min.css" />
+	<th:block th:if="${swiper == '07'}">
+		<script src="https://cdn.jsdelivr.net/npm/swiper@7.0.0/swiper-bundle.min.js"></script>
+	</th:block>
+	<th:block th:if="${swiper != '07'}">
+		<script src="https://cdn.jsdelivr.net/npm/swiper@11.0.0/swiper-bundle.min.js"></script>
+	</th:block>
+	<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+
+	<script>
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+
+		
+	</script>
+	<th:block layout:fragment="css"></th:block>
+    <!-- content script -->
+    <th:block layout:fragment="script"></th:block>
+</head>
+<body>
+	
+
+	<div class="wrapper only-container">
+		
+		<!-- content fragment 사용 -->
+		<th:block layout:fragment="Content"></th:block>
+		
+		
+	</div>
+	
+	
+	<!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+	-->
+	<!-- Modal Alert -->
+	<div class="modal modal-alert fade" id="alertModal" tabindex="-1" role="alertdialog" data-bs-backdrop="static" aria-labelledby="alertModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title blind" id="alertModalLabel">Alert Message</h3>
+				</div>
+				<div class="modal-body">
+					<section class="msg-sec">
+						<h4 class="sec-tit">Alert 제목 텍스트가 들어가는 영역입니다.</h4>
+						<p class="sec-txt"><span class="txt-primary"></span></p>
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal primary" data-bs-dismiss="modal" id="alertModalCloseId">
+						<span>확인</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
+	<!-- Modal Confirm -->
+	<div class="modal modal-confirm fade" id="confirmModal" tabindex="-1" role="alertdialog" data-bs-backdrop="static" aria-labelledby="confirmModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title blind" id="confirmModalLabel">Confirm Message</h3>
+				</div>
+				<div class="modal-body">
+					<section class="msg-sec">
+						<h4 class="sec-tit" id="confirmModal_Title">Confirm 제목 텍스트가 들어가는 영역입니다.</h4>
+						<p class="sec-txt" id="commonConfirmMessage"></p>
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal"  id="confirmModalCancelBtn">
+						<span>아니요</span>
+					</button>
+					<button type="button" class="ui-btn btn-modal primary" data-bs-dismiss="modal" id="confirmModalConfirmBtn">
+						<span>예</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // Modal Confirm -->
+	
+</body>
+</html>

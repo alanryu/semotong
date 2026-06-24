@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='1:1 문의', layoutSubTitleYN='Y', layoutFooterYn='Y', menuId='05'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+<script>
+
+	function cateCallBack(obj){
+		//console.log(obj.getAttribute("data-name"));
+		$("#hCate").val(obj.getAttribute("data-name"));
+	}
+	
+	//의견달기 누를 때 현재 문의 id를 남긴다.
+	function setStatus(idStr){
+		//console.log(obj.getAttribute("data-name"));
+		$("#hiddenId").val(idStr);
+	}
+	
+	
+	function goApplay(){
+
+		var inputCate 				= $('#hCate').val();
+		var inputTitle 				= $('#frmTitle').val();
+		var inputContent 			= $('#frmTextareaA').val();
+		
+		if(inputCate == null || inputCate == '' || inputCate.length < 1){
+			alertModalShow("문의 유형을 선택해주세요.");
+			return;
+		}
+		if(inputTitle == null || inputTitle == '' || inputTitle.length < 1){
+			alertModalShow("제목을 입력해 주세요.");
+			$('#frmTitle').focus();
+			return;
+		}
+		if(inputContent == null || inputContent == '' || inputContent.length < 1){
+			alertModalShow("문의하실 내용을 알려주세요.");
+			$('#frmTextareaA').focus();
+			return;
+		}
+		
+		var params = {
+						 requestUser 	: '[[${session.userInfo.id		}]]'
+						,createId 		: '[[${session.userInfo.id		}]]'
+						,categoryId 	: inputCate
+						,inqueryTitle 	: inputTitle
+						,inqueryContent : inputContent
+						,status			: '01'			//01:문의 , 02:담당자답변완료, 03: 고객 의견 완료
+					}
+		
+		$.ajax({
+			url : '/csm/onetoone/create'
+			,type : 'POST'
+			,dataType : "json"
+			,contentType:"application/json"
+			,data : JSON.stringify(params)
+			,beforeSend: function(xhr){
+				xhr.setRequestHeader(header,token);
+			}
+			,success: function (data) {
+				sanchoAlertModalShow("빠르게 답변 드릴게요!","");
+			}
+			,error : function(request, status, error){
+				
+			}
+			,complete:function(){
+				
+			}
+		});
+	}// End goApplayA()
+	
+	//tit:굵은글씨 제목, 조금얇은글씨 내용
+	function sanchoAlertModalShow(tit, txt){ 
+		$("#sanchoAlertModal .sec-tit").text(tit);
+		$("#sanchoAlertModal .sec-txt").text(txt);
+		var sanchoAlertModal = new bootstrap.Modal(document.getElementById('sanchoAlertModal'));
+			
+		sanchoAlertModal.show();
+	}
+	
+	//닫히는 modal에 focus가 있으면, Block 어쩌구 에러 발생. 그래서 아래처럼 포커스 빼준다.
+	function sanchoAlertModalCloseClick(){
+		location.href = "/csm/onetoone/onetoone";
+	}
+
+	
+	
+	
+	//<input type="radio" name="frmSatRadio1" checked  onchange="setRadioSelected('frmSatRadio1', '.reg-sat-rdo')">
+	function goApplayB(){
+		
+		var nowScore = $("input:radio[name='frmSatRadio1']:checked"). val();
+		
+		var inputId					= $("#hiddenId").val();
+		var inputScore				= nowScore;
+		var inputResInq 			= $('#frmTextareaB').val();
+		
+		var params = {
+						
+						 id				: inputId
+						,requestUser 	: '[[${session.userInfo.id		}]]'
+						,modifiedId		: '[[${session.userInfo.id		}]]'
+						,responseInquery: inputResInq
+						,score			: inputScore
+						,status			: '03'			//01:문의 , 02:담당자답변완료, 03: 고객 의견 완료
+					}
+		
+		$.ajax({
+			url : '/csm/onetoone/update'
+			,type : 'POST'
+			,dataType : "json"
+			,contentType:"application/json"
+			,data : JSON.stringify(params)
+			,beforeSend: function(xhr){
+				xhr.setRequestHeader(header,token);
+			}
+			,success: function (data) {
+			}
+			,error : function(request, status, error){
+			}
+			,complete:function(){
+				location.href = "/csm/onetoone/onetoone";
+			}
+		});
+	}// End goApplayB()
+	
+	
+	
+	
+	
+	
+	
+
+	document.addEventListener("DOMContentLoaded", function() {
+		/* document.getElementById("frmTextareaA").addEventListener("keyup", function(event) {
+			inputLimitByteChecked(event.target, "applyButtonA", "countA", 1000);
+		}); */
+		/* document.getElementById("frmTextareaB").addEventListener("keyup", function(event) {
+			inputLimitByteChecked(event.target, "applyButtonB", "countB", 40);
+		}); */
+		
+		document.getElementById("frmTextareaA").addEventListener("keyup", function(event) {
+			inputLimitLengthChecked(event.target, "applyButtonA", "countA", 1000);
+		});
+		document.getElementById("frmTextareaB").addEventListener("keyup", function(event) {
+			inputLimitLengthChecked(event.target, "applyButtonB", "countB", 40);
+		});
+		
+	});
+	
+	// 길이 단위
+	function inputLimitLengthChecked( obj , btnId, countId, maxLen) {
+		var calLength = {
+				
+				getLength : function( string ) {
+					if( string == null || string.length == 0 ) {
+						return 0;
+					}
+					return string.length;
+				}
+		};
+		if( calLength.getLength( obj.value ) > maxLen ) {
+			var str = obj.value.slice(0, maxLen);
+			obj.value = str;
+		} else {
+			
+			if ( btnId == 'applyButtonB' ) {
+				
+			} else {
+				$("[id = "+countId+"]").text(calLength.getLength( obj.value ));
+				//if( calLength.getLength( obj.value ) > 0 && $("[id = "+btnId+"]").is(":disabled") ){
+				if( calLength.getLength( obj.value ) > 0 ){
+					$("[id = "+btnId+"]").attr("disabled", false);
+				}else{
+					$("[id = "+btnId+"]").attr("disabled", true);
+				}
+			}
+		}
+	}
+	
+	// 설정된 바이트의 크기를 넘어서지 못하게 체크하는 함수
+	function inputLimitByteChecked( obj , btnId, countId) {
+		var calByte = {
+				getByteLength : function( string ) {
+					if( string == null || string.length == 0 ) {
+						return 0;
+					}
+					let size = 0;
+					for( let num = 0; num < string.length; num++ ) {
+						size += this.charByteSize( string.charAt( num ) );
+					}
+					return size;
+				}
+				, cutByteLength : function( string, length ) {
+					if( string == null || string.length == 0 ) {
+						return 0;
+					}
+					let size = 0;
+					let rIndex = string.length;
+					
+					for( let num = 0; num < string.length; num++ ) {
+						size += this.charByteSize( string.charAt( num ) );
+						if( size == length ) {
+							rIndex = num + 1;
+							break;
+						} else if( size > length ) {
+							rIndex = num;
+							break;
+						}
+					}
+					return string.substring( 0, rIndex );
+				}
+				, charByteSize : function( ch ) {
+					if( ch == null || ch.length == 0 ) {
+						return 0;
+					}
+					let charCode = ch.charCodeAt( 0 );
+					if( charCode <= 0x00007F ) {
+						return 1;
+					} else if( charCode <= 0x0007FF ) {
+						return 2;
+					} else if( charCode <= 0x00FFFF ) {
+						return 3;
+					} else {
+						return 4;
+					}
+				}
+		};
+		if( calByte.getByteLength( obj.value ) > obj.dataset.byte ) {
+			alertModalShow("작성할 수 있는 글자 범위를 초과하였습니다.");
+			obj.value = calByte.cutByteLength( obj.value, obj.dataset.byte );
+		} else {
+			//document.getElementsByClassName( "count" )[0].innerText = calByte.getByteLength( obj.value );
+			//document.getElementsByClassName( "count" )[0].innerText = calByte.getByteLength( obj.value );
+			
+			$("[id = "+countId+"]").text(calByte.getByteLength( obj.value ));
+			if( calByte.getByteLength( obj.value ) > 0 && $("[id = "+btnId+"]").is(":disabled") ){
+				$("[id = "+btnId+"]").attr("disabled", false);
+			}
+		}
+	}
+	
+</script>
+
+</th:block>
+	<!-- Container -->
+	<main role="main" class="container">
+		<!-- sancho -->
+		<input type="hidden" name="hCate"		id="hCate" 			value="">
+		<input type="hidden" name="hiddenId"	id="hiddenId" 		value="">
+		
+		
+		<!-- content -->
+		<div class="content F-CS01-page">
+			<!-- 모통봇 소개 섹션 -->
+			<section class="motongcb-intro-sec">
+				<div class="sec-inner">
+					<div class="sec-header">
+						<h2 class="sec-tit">
+							<i class="ui-icn icn-62-motong" aria-hidden="true"></i>
+							안녕하세요! <br>모통봇입니다.
+						</h2>
+					</div>
+					<div class="sec-body">
+						<div class="motongcb-intro-box">
+							<dl>
+								<dt>알뜰폰에 대한 오해와 궁금증이 있으신가요?<br>모통봇이 속 시원하게 해결해드릴게요!</dt>
+								<dd>문의가 많은 경우 답변이 지연될 수 있지만 최대한 빠르게 답변 드리려 노력할게요.</dd>
+								<dd>답변 가능 시간은 평일 오전 9시부터 오후 6시까지입니다. 조금만 기다려주세요!</dd>
+							</dl>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- // 모통봇 소개 섹션 -->
+
+			<!-- 탭 목록 -->
+			<div class="ui-tab tab-style1">
+				<ul class="tab-list" role="tablist">
+					<li class="tab-item" role="presentation">
+						<button class="tab-link active" id="tab-11" data-bs-toggle="tab" data-bs-target="#tab-11-pane" type="button" role="tab" aria-controls="tab-11-pane" aria-selected="true">1:1 문의</button>
+					</li>
+					<li class="tab-item" role="presentation">
+						<button class="tab-link" id="tab-12" data-bs-toggle="tab" data-bs-target="#tab-12-pane" type="button" role="tab" aria-controls="tab-12-pane" aria-selected="false">나의 고객 문의 내역</button>
+					</li>
+				</ul>
+			</div>
+			<!-- // 탭 목록 -->
+
+			<!-- 탭 패널 -->
+			<div class="tab-content">
+				<!-- F-CS01-T01-page -->																													<!-- TAB 1 -->
+				<div class="F-CS01-T01-page tab-pane fade show active" id="tab-11-pane" role="tabpanel" aria-labelledby="tab-11" tabindex="0">
+					<!-- 등록폼 섹션 -->
+					<section class="inq-frm-sec">
+						<div class="sec-inner">
+							<!-- 등록폼 -->
+							<div class="basic-frm">
+								<!-- 문의유형 선택 -->
+								<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label class="tit" for="frmType">문의 유형을 선택해주세요.</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-sel">
+											<!-- 선택전 is-placeholder, (선택후 삭제) -->
+											<button type="button" id="frmType" class="sel is-placeholder" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#selectModal">
+												<span>문의유형 선택</span>
+												<i class="ui-icn icn-20-select-arw" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+								<!-- // 문의유형 선택 -->
+
+								<!-- 제목 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmTitle" class="tit">제목을 입력해 주세요.</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="text" name="" id="frmTitle" value="" placeholder="제목을 입력해 주세요." title="" class="inp" maxlength="100" />
+										</div>
+									</div>
+								</div>
+								<!-- // 제목 입력 -->
+
+								<!-- 내용 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmTextareaA" class="tit">문의하실 내용을 알려주세요.</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-textarea">
+											<textarea name="" placeholder="문의하실 내용을 입력해 주세요." id="frmTextareaA" cols="50" rows="2" class="textarea" maxlength="1000" data-byte="1000"></textarea>
+											<p class="bytes"><em class="count" id="countA">0</em>/1,000</p>
+										</div>
+									</div>
+								</div>
+								<!-- // 내용 입력 -->
+							</div>
+							<!-- // 등록폼 -->
+						</div>
+					</section>
+					<!-- // 등록폼 섹션 -->
+
+					<!-- 플로팅 섹션 -->
+					<section class="floating-sec">
+						<div class="sec-inner">
+							<button type="button" class="ui-btn btn-action primary" id="applyButtonA" onclick="javascript:goApplay();" disabled>
+								<span>문의 등록하기</span>
+							</button>
+						</div>
+					</section>
+					<!-- // 페이지 섹션 -->
+				</div>
+				<!-- // F-CS01-T01-page -->
+				
+				
+				
+				
+				<!-- F-CS01-T02-page -->																									<!-- TAB 2 -->
+				<div class="F-CS01-T02-page tab-pane fade" id="tab-12-pane" role="tabpanel" aria-labelledby="tab-12" tabindex="0">
+					<!-- 문의내역 섹션 -->
+					<section class="inq-list-sec">
+						<div class="sec-inner">
+							<!-- inq 아코디언 -->
+							<div class="inq-accordion" id="accoFaq">
+								
+								<th:block  th:each="itm:${onetooneList}">
+								<div class="acco-item">
+									<div class="acco-header">
+										<p class="acco-tit"><strong th:text="${itm.inqueryTitle}">알뜰폰 요금제 신청 문의 알뜰폰 요금제 신청 문의</strong></p>
+										<p class="acco-date" th:text="${#dates.format(itm.createDate, 'yyyy-MM-dd HH:mm:ss')}"></p>
+										<div class="acco-con"  th:utext="${itm.inqueryContent}"></div>
+										<div class="acco-info">
+											
+											<!-- 접수완료: is-received, 답변완료: is-answered -->
+											<em th:if="${itm.status} == '01'" class="state is-received">접수완료</em>
+											<em th:unless="${itm.status} == '01'" class="state is-answered">답변완료</em>
+											
+											<span class="split" aria-hidden="true"></span>
+											<span class="category" th:text="${itm.categoryName}">카테고리</span>
+										</div>
+										<button class="acco-button" type="button" data-bs-toggle="collapse" th:data-bs-target="|#accoFaq${itm.id}|" aria-expanded="false" th:aria-controls="|accoFaq${itm.id}|">
+											<i class="ui-icn icn-20-acco-arw" aria-label="Toggle"></i>
+										</button>
+									</div>
+									<div th:id="|accoFaq${itm.id}|" class="acco-collapse collapse" data-bs-parent="#accoFaq">
+										<div class="acco-body">
+											<!-- 답변 내용 -->
+											<div th:if="${itm.status} == '01'" class="acco-answer" >담당자 지정 중 입니다.</div>
+											<div th:unless="${itm.status} == '01'" class="acco-answer" th:utext="${itm.responseContent}"></div>
+											
+											<div class="feedback-msg" th:if="${itm.status} == '02'">
+												<p class="tit"><strong>답변은 어떠셨나요?</strong></p>
+												<p class="txt">소중한 의견을 주시면 더 나은 세모통이 될 수 있도록 참고할게요.</p>
+												<button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#FCS01T02Modal" th:onclick="|javascript:setStatus('${itm.id}');|">
+													<span>의견 보내기</span>
+												</button>
+											</div>
+											<!-- // 피드백 안내 -->
+										</div>
+									</div>
+								</div>
+								</th:block>
+								
+							</div>
+							<!-- // inq 아코디언 -->
+						</div>
+					</section>
+					<!-- // 문의내역 섹션 -->
+				</div>
+				<!-- // F-CS01-T02-page -->
+				
+				
+				
+			</div>
+
+		</div>
+		<!-- // content -->
+	</main>
+	<!-- // Container -->
+	
+	
+	
+	<!-- ----------------------------------------------------------------------------------------------------------------- 문의 유형 선택 모달 -->
+	<!--
+		[모달 가이드]
+		모달 효과 : fade (공통)
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+		// 1차 수정 : fade-pc 사용안함, fade 공통으로 사용
+	-->
+	<!-- modal select -->
+	<div class="modal modal-select fade" id="selectModal" tabindex="-1" role="dialog" aria-labelledby="selectModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="selectModalLabel">문의유형 선택</h3>
+					<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 콤보박스 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<!-- modal-select 공통 -->
+							<ul class="select-listbox" role="listbox">
+								<!-- setSelectValued 는 퍼블 확인용입니다. -->
+								<!-- 이미 선택목록이 있는 경우 class="is-selected" 추가 -->
+								<th:block  th:each="codeItm:${codeList}">
+								
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmType', this, null, cateCallBack(this))" th:data-name="${codeItm.code}" th:text="${codeItm.codeName}">문의유형 1</li>
+									<!-- private String codeGroup;
+									private String code;
+									private String codeName; -->
+	
+								<!-- 
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmType', this)">문의유형 1</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmType', this)">문의유형 2</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmType', this)">문의유형 3</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmType', this)">문의유형 4</li>
+								-->
+								</th:block>
+							</ul>
+						</div>
+					</section>
+					<!-- // 콤보박스 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal select -->
+	
+	
+	
+	<!-- ----------------------------------------------------------------------------------------------------------------- 답변만족도 선택 모달 -->
+	<!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+	-->
+	<!-- modal default -->
+	<div class="modal modal-basic fade" id="FCS01T02Modal" tabindex="-1" role="dialog" aria-labelledby="FCS01T02ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-CS01-T02-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FCS01T02ModalLabel">세모통을 이용해주셔서 감사합니다.</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 평가하기 섹션 -->
+					<section class="reg-sat-sec">
+						<div class="sec-inner">
+							<div class="reg-sat-msg">
+								<p class="tit">
+									<strong>답변이 도움이 되셨을까요?</strong>
+								</p>
+								<p class="txt">
+									고객님의 소중한 의견을 주시면 <br>
+									더 나은 서비스를 드릴 수 있도록 노력하겠습니다. <br>
+									감사합니다.
+								</p>
+							</div>
+
+							<div class="reg-sat-frm">
+								<!-- 체크된 항목의 라벨에 is-selected 클래스 추가 -->
+								<label class="reg-sat-rdo is-selected">
+									<i class="ui-icn icn-50-sat-good" aria-hidden="true"></i>
+									<span class="ui-rdo">
+										<input type="radio" name="frmSatRadio1"  onchange="setRadioSelected('frmSatRadio1', '.reg-sat-rdo')" value="1" checked>
+										<span class="rdo"><span>매우 만족</span></span>
+									</span>
+								</label>
+								<label class="reg-sat-rdo" role="radio">
+									<i class="ui-icn icn-50-sat-soso" aria-hidden="true"></i>
+									<span class="ui-rdo">
+										<input type="radio" name="frmSatRadio1" onchange="setRadioSelected('frmSatRadio1', '.reg-sat-rdo')" value="2">
+										<span class="rdo"><span>보통</span></span>
+									</span>
+								</label>
+								<label class="reg-sat-rdo" role="radio">
+									<i class="ui-icn icn-50-sat-bad" aria-hidden="true"></i>
+									<span class="ui-rdo">
+										<input type="radio" name="frmSatRadio1" onchange="setRadioSelected('frmSatRadio1', '.reg-sat-rdo')" value="3">
+										<span class="rdo"><span>불만족</span></span>
+									</span>
+								</label>
+							</div>
+						</div>
+					</section>
+					<!-- //평가하기 섹션 -->
+					<!-- 등록폼 섹션 -->
+					<section class="inq-frm-sec">
+						<div class="sec-inner">
+							<!-- 등록폼 -->
+							<div class="basic-frm">
+								<!-- 고 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmTextareaB" class="tit">고객의견</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-textarea">
+											<textarea name="" id="frmTextareaB" cols="50" rows="2" class="textarea" maxlength="40" data-byte="40" placeholder="기타 전달하고 싶은 의견이 있으시다면 40자 이내로 메모 부탁드립니다."></textarea>
+											<p class="bytes"><em class="count" id="countB">0</em>/40</p>
+										</div>
+									</div>
+								</div>
+								<!-- // 내용 입력 -->
+							</div>
+							<!-- // 등록폼 -->
+						</div>
+					</section>
+					<!-- // 등록폼 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary" id="applyButtonB" onclick="javascript:goApplayB();">
+						<span>확인</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal default -->
+	
+	
+	
+	<!-- Modal Alert -->
+		<div class="modal modal-alert fade" id="sanchoAlertModal" tabindex="-1" role="alertdialog" data-bs-backdrop="static" aria-labelledby="sanchoAlertModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title blind" id="sanchoAlertModalLabel">Alert Message</h3>
+					</div>
+					<div class="modal-body">
+						<section class="msg-sec">
+							<h4 class="sec-tit">Alert 제목 텍스트가 들어가는 영역입니다.</h4>
+							<p class="sec-txt"><span class="txt-primary"></span></p>
+						</section>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="ui-btn btn-modal primary" data-bs-dismiss="modal" onclick="sanchoAlertModalCloseClick()" id="sanchoAertModalCloseId">
+							<span>확인</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		
+	
+	
+</html>	

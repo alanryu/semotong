@@ -1,0 +1,327 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 탭 메뉴
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------
+	@@ 유형
+-------------------------------------------------------------------*/
+.chk-style1 {
+	position: relative;
+	display: block;
+	padding: 4rem 0;
+	min-width: 150rem;
+	cursor: pointer;
+	&:last-child {
+		margin-bottom: auto;
+	}
+	input {
+		position: absolute;
+		top: 4rem;
+		left: 0;
+		z-index: 1;
+		width: 20rem;
+		height: 20rem;
+		outline: none;
+	}
+	.chk {
+		display: block;
+		position: relative;
+		padding-left: 20rem;
+		z-index: 2;
+		&::before,
+		&::after {
+			content:'';
+			display: block;
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 20rem;
+			height: 20rem;
+			background: no-repeat center center;
+		}
+		&::before {
+			opacity: 1;
+			background-image:url('../images/common/icn-20-chk-nor.svg');
+		}
+		&::after {
+			opacity: 0;
+			background-image:url('../images/common/icn-20-chk-sel.svg');
+		}
+		> span {
+			display: block;
+			padding-left: 10rem;
+			font-weight: 500;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: #5A5D60;
+		}
+
+	}
+	input:checked + .chk {
+		> span {
+			font-weight: 600;
+
+		}
+		&::before {
+			opacity: 0;
+		}
+		&::after {
+			opacity: 1;
+		}
+	}
+
+	&.xl {
+		input {
+			top: 2rem;
+			width: 24rem;
+			height: 24rem;
+		}
+		.chk {
+			padding-left: 24rem;
+			&::before,
+			&::after {
+				width: 24rem;
+				height: 24rem;
+				background-size: 24rem;
+			}
+			> span {
+				font-size: 16rem;
+				line-height: 24rem;
+			}
+		}
+	}
+}
+
+.rdo-style1 {
+	position: relative;
+	display: block;
+	padding: 4rem 0;
+	min-width: 150rem;
+	cursor: pointer;
+	&:last-child {
+		margin-bottom: auto;
+	}
+	input {
+		position: absolute;
+		top: 4rem;
+		left: 0;
+		z-index: 1;
+		width: 20rem;
+		height: 20rem;
+		outline: none;
+	}
+	.rdo {
+		display: block;
+		position: relative;
+		padding-left: 20rem;
+		text-align: left;
+		z-index: 2;
+		&::before,
+		&::after {
+			content:'';
+			display: block;
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 20rem;
+			height: 20rem;
+			background: no-repeat center center;
+		}
+		&::before {
+			opacity: 1;
+			background-image:url('../images/common/icn-20-rdo-basic-nor.svg');
+		}
+		&::after {
+			opacity: 0;
+			background-image:url('../images/common/icn-20-rdo-basic-sel.svg');
+		}
+		> span {
+			display: block;
+			padding-left: 10rem;
+			font-weight: 500;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: #5A5D60;
+		}
+	}
+	input:checked + .rdo {
+		> span {
+			font-weight: 600;
+			color: $color-primary;
+		}
+		&::before {
+			opacity: 0;
+		}
+		&::after {
+			opacity: 1;
+		}
+	}
+
+	&.type-block {
+		padding: 11rem;
+		border:1px solid transparent;
+		border-radius: 4rem;
+		background-color: #F4F4F4;
+		&.is-selected {
+			border-color: #A692ED;
+			background-color: #fff;
+		}
+	}
+	&.has-icn {
+		[class*=icn-26] {
+			top: -3rem;
+			margin-right: 8rem;
+		}
+	}
+}
+
+.rdo-style2 {
+	display: flex;
+	width: 100%;
+	.rdo::before,
+	.rdo::after,
+	input {
+		display: none;
+	}
+
+	.rdo {
+		display: block;
+		width: 100%;
+		padding: 15rem 19rem;
+		border:1px solid #EFF0F0;
+		border-radius: 4rem;
+		span {
+			display: block;
+			padding-left: 0;
+			font-weight: 500;
+			font-size: 16rem;
+			line-height: 22rem;
+			color: #46484B;
+			text-align: center;
+		}
+		small {
+			display: block;
+			padding-left: 0;
+			font-weight: 500;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: #5A5D60;
+		}
+
+		&.type-icn {
+			text-align: left;
+			> span {
+				display: flex;
+				align-items: center;
+				font-weight: 700;
+			}
+			[class*=icn-h20] {
+				margin-right: 4rem;
+			}
+			[class*=icn-50] {
+				margin-right: 16rem;
+			}
+		}
+	}
+	input:checked + .rdo {
+		border-color: $color-primary;
+		background-color: #EAE6FB;
+		span {
+			color: $color-primary
+		}
+	}
+	input:disabled + .rdo {
+		border-color: #EFF0F0;
+		background-color: #EFF0F0;
+		span {
+			color: #96989B;
+		}
+	}
+}
+/*-------------------------------------------------------------------
+	@@ Swich
+-------------------------------------------------------------------*/
+/* 스타일 */
+.ui-switch {
+	display: inline-flex;
+	position: relative;
+	vertical-align: top;
+	label {
+		display: inline-flex;
+		width: 44rem;
+		&::before,
+		&::after {
+			content: '';
+		}
+
+		&::before {
+			display: inline-block;
+			width: 100%;
+			height: 24rem;
+			background-color: #aaa;
+			border-radius: 15px;
+			vertical-align: top;
+		}
+	}
+
+
+	input,
+	label:after {
+		position: absolute;
+		left: 4px;
+		top: 50%;
+		z-index: 1;
+		width: 16rem;
+		height: 16rem;
+		line-height: 16px;
+		text-align: center;
+		border-radius: 50%;
+		overflow: hidden;
+		background-color: #fff;
+		color: #555;
+		font-size: 12px;
+		transform: translateY(-50%);
+		transition: all 0.3s;
+	}
+
+	input {
+		z-index: 0;
+		border: 0;
+		&:checked+label::before {
+			background-color: $color-primary;
+		}
+
+		&:checked,
+		&:checked+label:after {
+			left: calc(100% - 20px);
+		}
+
+		&[disabled]+label:before {
+			background-color: #ddd;
+		}
+	}
+
+
+	&.xs {
+		label {
+			width: 26rem;
+			&::before {
+				height: 16rem;
+			}
+		}
+		input,
+		label::after {
+			width: 12rem;
+			height: 12rem;
+			left: 2rem;
+		}
+		input:checked,
+		input:checked+label::after {
+			left: calc(100% - 14rem);
+		}
+	}
+}
+
+
+

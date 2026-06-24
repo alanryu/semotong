@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	 xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	 layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='04',menuId ='01'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+	<style>
+		#popTagList2 {
+			display: grid;
+		    grid-template-columns: repeat(4, 1fr); /* 한 줄에 4개의 열 */
+		    gap: 10px; /* 요소 간의 간격 */
+		    padding: 10px 0; /* 위아래 여백 */
+		}
+
+	#popTagList2 input[type="text"] {
+			padding: 8px;
+		    font-size: 12px;
+		    border: 1px solid #e2e8f0;
+		    border-radius: 4px;
+		    box-sizing: border-box; /* 패딩 포함한 너비 계산 */
+			min-width : 100px;
+			background-color : #f8f9fa;
+		}
+	</style>
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script id="searchListTmpl" type="text/x-jquery-tmpl">
+		<tr>
+		    <td><input type="checkbox"  value="${cateCode}" name="chkDel" class="rowCheckbox"></td>
+			<td>{{html getCateSpNm(cateSp) }}</td>			
+			<td><a href="javascript:void(0)" onclick="selRow('${cateCode}','${cateName}','${cateSp}')">${cateName}</a></td>
+			{{if tagCount > 1}}
+				<td>${tagName} 외 ${tagCount -1}</td>
+			{{else}}
+				<td>${tagName}</td>
+			{{/if}}
+		    
+			<td><a href="javascript:void(0)" onclick="CateTaglist('${cateCode}','${cateName}')">${planCnt}</a></td>
+			<td>
+				<div class="form-check form-switch mb-3">
+					{{if useYn == 'Y' }}
+				    	<input class="form-check-input form-check-switch" type="checkbox" role="switch" id="flexSwitchCheckLarge" style="transform: scale(1.5);" value="${cateCode}" checked>
+					{{else}}
+						<input class="form-check-input form-check-switch" type="checkbox" role="switch" id="flexSwitchCheckLarge" style="transform: scale(1.5);" value="${cateCode}">
+					{{/if}}
+				</div>
+			</td>
+			<!-- 순서 -->
+			<td class="order-item"  name="orderTd">
+				{{if arrow == 'd'}}
+				<button class="btn btn-dark order-set" data-arrow="down">▼</button>
+				{{else arrow == 'u'}}
+				<button class="btn btn-dark order-set" data-arrow="up">▲</button>
+				{{else}}
+				<button class="btn btn-dark order-set" data-arrow="up">▲</button>
+				<button class="btn btn-dark order-set" data-arrow="down">▼</button>
+				{{/if}}
+			</td>
+		</tr>
+	</script>
+	
+	<script id="popTagListTmpl" type="text/x-jquery-tmpl">
+		<div class="form-check form-check-inline">
+			{{if isselect == true}}
+				<input class="form-check-input" type="checkbox" name="popCateCode" id="popTagCode${code}" value="${code}" checked>
+			{{else}}
+				<input class="form-check-input" type="checkbox" name="popCateCode" id="popTagCode${code}" value="${code}">
+			{{/if}}
+		 	<label class="form-check-label" for="popTagCode${code}">${codeName}</label>
+		</div>		
+	</script>
+	
+	
+	<script id="popTagListTmpl2" type="text/x-jquery-tmpl">
+		<input type="text" id="txtTagInfo${code}" class="tag-input" data-code="${code}"  data-useYn="${useYn}"  data-ordNo="${orderNo}" data-orgvalue="${codeName}" value="${codeName}">		
+	</script>	
+	
+	
+	
+	<script id="planListTmpl" type="text/x-jquery-tmpl">
+			<tr>
+			     <td>{{if dispYn}} 노출 {{else}} 비노출{{/if}}</td>
+			     <td>{{if saleStatus}} 판매중 {{else}} 판매정지{{/if}}</td>
+				 <td>${mno}</td>
+			     <td>${hostNm}</td>
+			     <td>
+			         <a href="/pbm/plan/edit?searchId=${id}" target="_blank"}>{{html getPlanNm(planName, planNameSmt)}}</a>
+			     </td>
+				 <td>{{html getTagName(planTag1Name,planTag2Name,planTag3Name,planTag4Name,planTag5Name)}}  </td>
+			     <td>{{html getPriceStr(normalPrice)}}</td>
+			     <td>{{html getPriceStr(salePrice)}}</td>
+			     <td>${promotionPeriod}</td>
+			     <td>{{html getDataStr(supDataVal)}}</td>
+			     <td>{{html getQosStr(supQos)}}</td>
+			     
+			 </tr>
+	</script>
+	
+	<script type="text/javascript">
+		function getTagName(tag1,tag2,tag3,tag4,tag5) {
+			var res =""; 
+			
+			if(tag1 !=null && tag1 !="") {
+				res = tag1;
+			} 
+			
+			if(tag2 !=null && tag2 !="") {
+				if(res =="" ) {
+					res = tag2;	
+				} else {
+					res = res + "," + tag2;
+				}
+			} 
+			
+			if(tag3 !=null && tag3 !="") {
+				if(res =="" ) {
+					res = tag3;	
+				} else {
+					res = res + "," + tag3;
+				}
+			} 
+			 
+			if(tag4 !=null && tag4 !="") {
+				if(res =="" ) {
+					res = tag4;	
+				} else {
+					res = res + "," + tag4;
+				}
+			}
+			
+			if(tag5 !=null && tag5 !="") {
+				if(res =="" ) {
+					res = tag5;	
+				} else {
+					res = res + "," + tag5;
+				}
+			}
+					
+			return res;	
+		}
+		
+		function goDetail(id) {
+			var siteSp = "[[${siteSp}]]";
+			window.location.href = "/pmb/internetplan/edit/"+siteSp+"?searchId=" + id;
+		}
+	
+		document.addEventListener('DOMContentLoaded', () => {
+			searchList();
+			
+			$(document).on('click', '.order-set', function(){
+				
+				var arrow = $(this).data('arrow');
+				
+				var row = $(this).parent().parent();
+				var num = row.index();
+				
+				var max = $('#searchList').find('tr').length;
+				
+				if ( arrow == 'down' ) {
+					
+					if ( num >= max ) {
+						return false;
+					} else {
+						row.next().after(row);
+					}
+				} else if ( arrow == 'up' ) {
+					
+					if(num == 0) { 
+						return false;
+					} else {
+						row.prev().before(row);
+					}
+				}
+				
+				/* 전체 화살표 방향 다시 설정 및 정렬데이터 setting */
+
+				$('#searchList').find('tr').each(function(idx){
+					var html = '';
+					if ( idx == 0 ) {
+						html += '<button class="btn btn-dark order-set" data-arrow="down">▼</button>';
+						$(this).find('td').last().html(html);
+					} else if ( idx === max - 1 ) {
+						html += '<button class="btn btn-dark order-set" data-arrow="up">▲</button>';
+						$(this).find('td').last().html(html);
+					} else {
+						html += '<button class="btn btn-dark order-set" data-arrow="up">▲</button>';
+						html += '<button class="btn btn-dark order-set" data-arrow="down" style="margin-left:5px">▼</button>';
+						$(this).find('td').last().html(html);
+					}
+					
+					
+					var _code = $(this).find('input[name="chkDel"]').val();
+					var params = {
+						orderNo : idx +1,
+						code : _code,
+						codeGroup : "plan_tag_code_group"
+					}
+					
+					$.ajax({
+						url 		: '/pmb/plan_cate/update',
+						type : 'POST',
+						dataType : "json",
+						contentType:"application/json",
+						data : JSON.stringify(params),
+						success 	: function (data) {
+							
+						},
+						error 		: function(request, status, error){
+							showAlert(error);
+						},
+						complete 	: function(){
+						}
+					});
+					
+				});
+				
+			});
+			
+			
+		});
+		function changeCombo(){
+			currentPage = 1;
+			searchList()
+		}
+		
+		function getCateSpNm(sp) {
+			if(sp =="0") {
+				return "공통";
+			} else if(sp =="1") {
+				return "알뜰";
+			} else {
+				return "통신3사";
+			}
+		}
+		
+		function renderPage(page) {
+			currentPage = page;
+			searchList();
+		}
+
+		function searchListInit() {
+			currentPage = 1;
+			searchList();
+		}
+	
+		function searchList() {
+			var page = currentPage;
+			if(page ==null|| page == "") page =1;
+	  		var pageSize = $("#pageSizse").val();
+	  		var dispSp = $("input[name='searchCateGroupSp']:checked").val();
+			var params = {
+				 searchCateGroupSp : dispSp, //노출위치
+				 page : page,
+				 recordSize : pageSize
+			}
+					  
+			$.ajax({
+			   url : '/pmb/plan_cate/catelist',
+			  type : 'POST',
+			  dataType : "json",
+			  contentType:"application/json",
+			   data : JSON.stringify(params),
+			   success: function (data) {
+				   $('#searchList').empty();
+				   
+					$('#totla_count').html("총 "+data.totalCnt+"건");
+					
+					if(data.totalCnt > 0) {
+						var totalCnt = data.totalCnt;
+						
+						$.each(data.data, function(idx, obj){
+							var rIdx = totalCnt - ((params.page - 1) * params.recordSize + idx);
+							obj.rIdx = rIdx;
+							
+							/* 순서 방향 설정 */
+							if ( idx == 0 ) obj.arrow = 'd'
+							else if ( idx == totalCnt-1 || rIdx == 1 ) obj.arrow = 'u'
+							else obj.arrow = 'b';
+						});
+										
+										
+						$('#searchListTmpl').tmpl(data.data).appendTo('#searchList');
+						
+						handleSwichCheckboxSelect();
+						
+						if(dispSp == "0") {
+							document.getElementsByName('orderTd').forEach(element => {
+							    element.style.display = 'none';
+							});	
+						} else {
+							document.getElementsByName('orderTd').forEach(element => {
+							    element.style.display = 'block';
+							});
+						}
+						
+					}
+					
+					//renderPagination(page,data.totalCnt,pageSize);
+			    },
+				error : function(request, status, error){
+				  showAlert(request);
+			   },
+			   complete:function(){
+				 // $('#loading').addClass('display-none');
+			   }
+			});
+		}
+		
+		
+		function toggleSearchInit(){
+			
+			
+			/* 인터넷 초기화 */
+			$('input[name=searchInternetSpeed').prop('checked', false);
+			$('#searchInternetSpeedAll').prop('checked', true);
+			currentPage = 1;
+		}
+
+
+		function searchTagList(cateCode) {
+
+			var categoryTag = [];
+			var paramsTag = {
+				searchCateCode : cateCode
+			}
+			
+			$.ajax({
+				   url : '/pmb/plan_cate/taglist',
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(paramsTag),
+				   async :false,
+				   success: function (data) {
+						if(data.totalCnt > 0) {
+							$.each(data.data, function(idx, obj){
+								categoryTag.push(obj);
+							});
+						}
+				   },
+				   error : function(request, status, error){
+			           alert(error);
+			       },
+			       complete:function(){
+			          // $('#loading').addClass('display-none');
+			       }
+			});
+			
+			
+			var params = {
+				codeGroup : "plan_tag_code",
+				userYn : "Y",
+				page : 1,
+				recordSize : 999
+			}
+			
+			$.ajax({
+			   url : '/cmm/cmmcode/code/list',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+				success: function (data) {
+					
+					$('#popTagList').empty();
+					if(data.totalCnt > 0) {
+						
+						$.each(data.data, function(idx, obj){
+							obj.isselect = false;
+						});
+						
+						if (categoryTag.length > 0) {
+							$.each(data.data, function(idx, obj){
+								for (let i = 0; i < categoryTag.length; i++) {
+									if(obj.code == categoryTag[i].code) {
+										obj.isselect = true;	
+									}	
+								}
+							});									
+						}
+						
+						
+						$('#popTagListTmpl').tmpl(data.data).appendTo('#popTagList');
+					}
+					
+					
+					var myModal = new bootstrap.Modal(document.getElementById('regEditCateModal'));
+					myModal.show();
+			    },
+				error : function(request, status, error){
+		            alert(error);
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+			});
+			
+		}
+		
+		function selRow(cateCode,cateName,cateSp) {			
+			$("#popCateName").val(cateName);
+			$('input[name="popCateGroupSp"][value="'+cateSp+'"]').prop('checked', true);
+			$("#btnRegUpdCate").html("수정");
+			$("#popCateCode").val(cateCode);
+			
+			searchTagList(cateCode);
+		}
+		
+		function newCreate() {
+			$("#popCateName").val("");
+			$('input[name="popCateGroupSp"][value="1"]').prop('checked', true);
+			$("#btnRegUpdCate").html("등록");
+			$("#popCateCode").val("");
+			searchTagList("");
+		}
+		
+		
+		function createUpdCate() {
+			var cateName  = $("#popCateName").val().trim()
+			
+			if(cateName.length==0) {
+				showAlert("카테고리명을 입력해주세요."); // 공백 또는 값이 없을 때 알림
+				return;
+			}
+			
+			const checkedTags = document.querySelectorAll('input[name="popCateCode"]:checked');
+			const count = checkedTags.length; // 체크된 체크박스의 개수
+			if(count ==0) {
+				showAlert("tag 를 선택하세요.");
+				return;
+			}
+									
+			var params = {
+				codeGroup : "plan_tag_code_group",
+				codeName : $("#popCateName").val(),
+				codeDesc : $("#popCateName").val(),
+				etc1 : $("input[name='popCateGroupSp']:checked").val(), //노출위치
+			}
+			var _url = "/pmb/plan_cate/create";
+			
+			
+			if($("#popCateCode").val() == "") {
+				
+				params.orderNo = "99";
+				params.useYn = "Y";
+				_url = "/pmb/plan_cate/create";
+			} else {
+				params.code = $("#popCateCode").val();
+				_url = "/pmb/plan_cate/update";
+			}
+			
+			$.ajax({
+				   url : _url,
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+					success: function (data) {
+						createCateTagMap(data.data.code);
+				    },
+					error : function(request, status, error){
+			            alert(error);
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+			});
+		}
+		
+		
+		
+		
+		
+		function createCateTagMap(cateCode) {
+			
+			const checkedTags = document.querySelectorAll('input[name="popCateCode"]:checked');
+			
+			var params = Array.from(checkedTags).map((checkbox) => {
+			        return {
+			            cateCode: cateCode,
+			            tagCode: checkbox.value
+			        };
+			 });
+			 
+			
+			$.ajax({
+				   url : '/pmb/plan_cate/cateTagMap',
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+					success: function (data) {
+						showAlert("저장되었습니다.", initPop);
+				    },
+					error : function(request, status, error){
+			            alert(error);
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+			});
+		}
+
+		function initPop() {
+			$("#popCateName").val("");
+			$("#btClosePop").click();
+			searchList();
+		}
+		
+		// 카테고리 삭제
+		function deleteCate() {
+			
+			const checkboxes = document.querySelectorAll('#searchList .rowCheckbox:checked');
+			const count = checkboxes.length; // 체크된 체크박스의 개수
+			if(count ==0) {
+				showAlert("삭제할 카테고리를 선택하세요.");
+			}
+			
+			checkboxes.forEach((checkbox,index) => {
+
+		       var catecode = checkbox.value;
+			   var params = {
+   					codeGroup : "plan_tag_code_group",
+   					code : catecode
+   				}
+				
+   				
+   				$.ajax({
+   					   url : '/pmb/plan_cate/delete',
+   				       type : 'POST',
+   				       dataType : "json",
+   				       contentType:"application/json",
+   					   data : JSON.stringify(params),
+					   async : false,
+   						success: function (data) {
+							if((index+1) ==count) {
+								showAlert("삭제되었습니다.", searchList);
+							}
+   					    },
+   						error : function(request, status, error){
+   				            alert(error);
+   				        },
+   				        complete:function(){
+   				           // $('#loading').addClass('display-none');
+   				        }
+   				});		
+		    });
+			
+		}
+		
+		
+		function handleSwichCheckboxSelect() {
+					  
+			const bodyCheckboxes = document.querySelectorAll('tbody .form-check-switch');
+			 
+			bodyCheckboxes.forEach(check => {
+		      check.addEventListener('change', function() {
+		          var cateCode = $(this).val();
+		          var useYn = "" ;
+		          if($(this).prop("checked")) {
+		        	  useYn = "Y" ;  
+		          } else {
+		        	  useYn = "N" ;
+		          }
+		          updateDisplay(cateCode,useYn);
+		      });
+		    });
+		}
+			
+		function updateDisplay(cateCode,displayYn) {
+			
+			var params = {
+				codeGroup : "plan_tag_code_group",
+				code : cateCode,
+				useYn : displayYn
+			}
+						
+			$.ajax({
+				   url : "/pmb/plan_cate/update",
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+					success: function (data) {
+						
+				    },
+					error : function(request, status, error){
+			            alert(error);
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+			});
+		}	
+		
+		
+		
+		
+		
+		
+		function searchTagList2() {			
+			
+			var params = {
+				codeGroup : "plan_tag_code",
+				userYn : "Y",
+				page : 1,
+				recordSize : 999
+			}
+			
+			$.ajax({
+			   url : '/cmm/cmmcode/code/list',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+				success: function (data) {
+					
+					$('#popTagList2').empty();
+					if(data.totalCnt > 0) {
+						var listdata = data.data;
+						// 신규 입력 란 추가
+						var newItem = {
+						    "codeGroup": "plan_tag_code",
+						    "code": "",
+						    "codeName": "",
+						    "codeDesc": "",
+						    "orderNo": listdata.length +1,
+						    "etc1": "",
+						    "useYn": "Y"
+						};
+						listdata.push(newItem);
+						$('#popTagListTmpl2').tmpl(data.data).appendTo('#popTagList2');
+					}
+					
+					var myModal = new bootstrap.Modal(document.getElementById('regEditTagModal'));
+					myModal.show();
+			    },
+				error : function(request, status, error){
+		            alert(error);
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+			});
+			
+		}
+				
+		
+		function tagMngProc() {
+			const inputs = document.querySelectorAll('#popTagList2 .tag-input');
+			var validYn = "Y";					
+			inputs.forEach((input) => {
+				var tagCode = input.dataset.code.trimEnd();
+				var tagNmeNew = input.value.trimEnd();
+				var tagNmeOrg =  input.dataset.orgvalue.trimEnd();
+				
+				if(tagCode !="" && tagNmeNew =="") {
+					validYn = "N";
+					input.value = tagNmeOrg; 
+				}
+			});	
+							
+			if(validYn == "N") {
+				showAlert("태그 삭제는 개발팀에 문의해주세요.");
+				return;
+			}
+						
+			var isUpdateYn = "N"; 
+					
+			inputs.forEach((input) => {
+				var tagCode = input.dataset.code;
+				var tagNmeNew = input.value.trimEnd();
+				var tagNmeOrg =  input.dataset.orgvalue.trimEnd();
+				var ordNo = input.dataset.ordno;
+				if(tagCode =="" || tagNmeNew !=tagNmeOrg) {
+					if(tagNmeNew !="") {
+						createUpdTag(tagCode,tagNmeNew,ordNo);
+						isUpdateYn = "Y";
+					}
+				}
+			});
+			
+			if(isUpdateYn =="N")  showAlert("수정된 내용이 없습니다.");
+			
+		}
+		
+		function createUpdTag(tagCode,tagNme,ordNo) {
+			
+			var params = {
+				codeGroup : "plan_tag_code",
+				code : tagCode,
+				codeName : tagNme,
+				codeDesc : tagNme,
+			}
+			var _url = "/pmb/plan_cate/create";
+			
+			if(tagCode == "") {
+				params.orderNo = ordNo;
+				params.useYn = "Y";
+				params.etc1 = "";
+				_url = "/pmb/plan_cate/create";
+			} else {
+				_url = "/pmb/plan_cate/update";
+			}
+			
+			$.ajax({
+				   url : _url,
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+					success: function (data) {
+						showAlert("tag가 저장되었습니다.");
+						$("#btClosePopTag").click();
+				    },
+					error : function(request, status, error){
+			            alert(error);
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+			});
+		}
+		
+		
+		
+		function CateTaglist(cateCode,cateName) {
+			
+			var params = {
+				searchCateCode : cateCode
+			}
+			
+			$("#popCatePlanCateNm").html(cateName);
+						
+			$.ajax({
+					   url : _url = "/pmb/plan_cate/taglist",
+				       type : 'POST',
+				       dataType : "json",
+				       contentType:"application/json",
+					   data : JSON.stringify(params),
+						success: function (data) {
+							console.log(data);
+							dataList = data.data;
+							const codeNames = dataList.map(item => item.codeName).join(", ");
+							$("#popCatePlanCateTag").html(codeNames);
+							getPlanList(cateCode);
+					    },
+						error : function(request, status, error){
+				            alert(error);
+				        },
+				        complete:function(){
+				           // $('#loading').addClass('display-none');
+				        }
+				});
+		}
+		
+		/* 카테고리가 적용된 요금제 */
+		function getPlanList(cateCode) {
+			
+			var params = {
+				searchPlanTag : cateCode,
+				page : 1,
+				recordSize : 999
+			}
+			$.ajax({
+				url : '/pbm/plan/ajaxList',
+				type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+				success 	: function (data) {
+					
+					$('#searchCatePlanList').empty();
+					
+					$.each(data.data, function(idx, obj){
+						obj.catecode = cateCode
+					});
+							
+					$('#planListTmpl').tmpl(data.data).appendTo('#searchCatePlanList');
+					
+					var myModal = new bootstrap.Modal(document.getElementById('planListModal'));
+					myModal.show();
+				},
+				error 		: function(request, status, error){
+					showAlert(error);
+				},
+				complete 	: function(){
+				}
+			});
+		}
+
+		
+	</script>
+</th:block>
+
+<div class="main-content">
+	   <div class="container-fluid">
+		   <!-- 로케이션 & 제목 영역 추가 -->
+		  <div class="page-header mb-4">
+			 <div class="location mb-2">
+				<small class="text-secondary">
+				    <i class="fas fa-home me-1"></i>
+				    <a href="/mbm/adminuser/list">홈</a> > <a href="/pbm/plan/list">상품관리</a> > <a href="/pbm/plan/list">요금제</a> >  <a href="/pmb/plan_cate/list">카테고리 관리</a> 
+				</small>
+			 </div>
+			 <h2 class="page-title fs-4 mb-4">카테고리 관리</h2>
+		  </div>
+		  	
+		  <div class="search-section">
+			 <div class="row align-items-center mb-3">
+				<div class="col-12">
+				    <div class="d-flex align-items-center gap-3">
+					   <div class="form-label mb-0">노출 위치</div>
+					   <div class="radio-group">
+						  <div class="form-check form-check-inline">
+							 <input class="form-check-input" type="radio" name="searchCateGroupSp" id="searchCateGroupSp01" value="1" checked onclick="searchList();">
+							 <label class="form-check-label" for="searchCateGroupSp01">알뜰</label>
+						  </div>
+						  <div class="form-check form-check-inline">
+							 <input class="form-check-input" type="radio" name="searchCateGroupSp" id="searchCateGroupSp02" value="2" onclick="searchList();">
+							 <label class="form-check-label" for="searchCateGroupSp02">MNO</label>
+						  </div>
+					   </div>
+				    </div>
+				</div>
+			 </div>
+		
+			 <div class="row">
+				<div class="col-12 text-end mt-2">
+				    <button class="btn btn-light me-2 btn-sm" onclick="toggleSearchInit()">
+					   <i class="fas fa-redo"></i>
+					   초기화
+				    </button>
+				    <button class="btn btn-primary btn-sm me-2" onclick="toggleDetailSearch()">
+					   <i class="fas fa-chevron-down"></i>
+					   상세검색
+				    </button>
+				    <button class="btn btn-primary btn-sm" onclick="searchListInit();">
+					   <i class="fas fa-search"></i>
+					   검색
+				    </button>
+				</div>
+			 </div>
+		  </div>
+
+		  <div class="table-section">
+			 <div class="d-flex justify-content-between align-items-center mb-4">
+				<div class="d-flex align-items-center gap-3">
+				    <div class="stats-badge">
+					   <i class="fas fa-calculator me-1"></i>
+					   <span id="totla_count">총 450건</span>
+				    </div>
+				    <select class="form-select" style="width: 100px" id="pageSizse" onchange="changeCombo()">
+					   <option value= "10">10개씩</option>
+					   <option value= "20">20개씩</option>
+					   <option value= "30">30개씩</option>
+					   <option value= "40">40개씩</option>
+					   <option value= "50">50개씩</option>
+				    </select>
+				</div>
+				<div class="header-actions">
+				    <button class="btn btn-light btn-sm" onclick="deleteCate();">
+					   <i class="fas fa-minus-circle"></i>
+					   선택삭제
+				    </button>
+				    <button class="btn btn-primary btn-sm" onclick="newCreate();">
+					   <i class="fas fa-plus"></i>
+					   등록
+				    </button>
+					<button class="btn btn-light btn-sm" onclick="searchTagList2();">
+					   <i class="fas fa-file-clipboard"></i>
+					   tag 관리
+					</button>					
+				</div>
+			 </div>
+
+			 <table class="table custom-table">
+				<thead>
+				    <tr>
+					   <th><input type="checkbox" id="checkall"></th>
+					   <th>위치</th>
+					   <th>카테고리명</th>
+					   <th>요금제tag</th>
+					   <th>노출요금제수</th>
+					   <th>사용</th>
+					   <th name="orderTd">순서</th>
+				    </tr>
+				</thead>
+				<tbody id="searchList">
+				   
+				</tbody>
+			 </table>
+
+			 <div class="d-flex justify-content-left mt-4">
+				<ul class="pagination">
+				    
+				</ul>
+			 </div>
+		 </div>
+	</div>
+</div>
+
+<!-- 카테고리 관리 -->
+<div class="modal fade" id="regEditCateModal" tabindex="-1" aria-labelledby="regEditCateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="min-width:700px;">
+            <div class="modal-header border-0 pb-0 mb-4">
+                <h5 class="modal-title fs-6 fw-bold" id="regEditModalTitle">카테고리 등록</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btClosePop"></button>
+            </div>
+            <div class="bnf-select__table__outer otherH mb-3">
+              <table class="bnf-select__table">
+                <colgroup>
+                  <col style="width: 20%">
+                  <col style="width: 80%">
+                </colgroup>
+                <tr style="height:40px">
+                    <td class="bnf-select__th">노출 위치*</td>
+                    <td class="bnf-select__td">
+						<div class="radio-group">
+						  <div class="form-check form-check-inline">
+							 <input class="form-check-input" type="radio" name="popCateGroupSp" id="popCateGroupSp01" value="1" checked>
+							 <label class="form-check-label" for="popCateGroupSp01">알뜰</label>
+						  </div>
+						  <div class="form-check form-check-inline">
+							 <input class="form-check-input" type="radio" name="popCateGroupSp" id="popCateGroupSp02" value="2">
+							 <label class="form-check-label" for="popCateGroupSp02">MNO</label>
+						  </div>
+					   </div>
+					</td>
+                </tr>
+                <tr style="height:40px">
+                    <td class="bnf-select__th">카테고리명*</td>
+                    <td class="bnf-select__td">
+						<input type="hidden" id="popCateCode">
+                       <input type="text" class="bnf-select__input" placeholder="카테고리명을 입력해주세요." style="width:500px" id="popCateName">
+                    </td>
+                </tr>
+                <tr>
+                  <td class="bnf-select__th">tag*</td>
+                  <td class="bnf-select__td" id="popTagList">
+					
+				  </td>
+                </tr>
+              </table>
+            </div>
+			<div class="modal-footer border-0 pt-0 justify-content-center">
+				<button type="button" class="btn btn-dark px-4 btm-sm" onclick="createUpdCate()" id="btnRegUpdCate">등록</button>
+                <button type="button" class="btn btn-secondary px-4 btn-sm" data-bs-dismiss="modal">취소</button>
+            </div>
+        </div>
+    </div>
+</div>	
+
+
+
+
+
+<!-- tag 관리 -->
+<div class="modal fade" id="regEditTagModal" tabindex="-1" aria-labelledby="regEditTagModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="min-width:700px;">
+            <div class="modal-header border-0 pb-0 mb-4">
+                <h5 class="modal-title fs-6 fw-bold" id="regEditModalTitle">요금제 태그 관리</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btClosePopTag"></button>
+            </div>
+            <div class="bnf-select__table__outer otherH mb-3">
+              <table class="bnf-select__table">
+                <colgroup>
+                  <col style="width: 10%">
+                  <col style="width: 90%">
+                </colgroup>
+                <tr>
+                  <td class="bnf-select__th">tag*</td>
+                  <td class="bnf-select__td">
+					<div class="tag-container" id="popTagList2">
+					</div>
+				  </td>
+                </tr>
+              </table>
+            </div>
+			<div class="modal-footer border-0 pt-0 justify-content-center">
+				<button type="button" class="btn btn-dark px-4 btm-sm" onclick="tagMngProc()" id="btnRegUpdTag">등록</button>
+                <button type="button" class="btn btn-secondary px-4 btn-sm" data-bs-dismiss="modal">취소</button>
+            </div>
+        </div>
+    </div>
+</div>	
+
+
+<!-- 틍록된 요금제 리스트 팝업 -->
+<div class="modal fade" id="planListModal" tabindex="-1" aria-labelledby="planListModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl" style="max-width: 90%;">
+        <div class="modal-content">
+         	<div class="modal-header border-0 pb-0 mb-4">
+                <h5 class="modal-title fs-6 fw-bold" id="planListTitle">요금제 리스트 </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+			
+			<div class="bnf-select__table__outer otherH mb-3">
+                <table class="bnf-select__table">
+                  <colgroup>
+                    <col style="width: 20%">
+                    <col style="width: 80%">
+                  </colgroup>
+                  <tbody>
+				  <tr>
+                      <td class="bnf-select__th">카테고리명</td>
+                      <td class="bnf-select__td" id="popCatePlanCateNm"></td>
+                  </tr>
+                  <tr>
+                    <td class="bnf-select__th">요금제 Tag</td>
+                    <td class="bnf-select__td" id="popCatePlanCateTag"> </td>
+                  </tr>
+                </tbody>
+				</table>
+              </div>
+							  			
+            <div class="gift-select__table__outer">
+	            <table class="bnf-select__table">
+		            <thead>
+		                <tr>
+			                <th class="bnf-select__th" style="width:90px">노출여부</th>
+							<th class="bnf-select__th" style="width:90px">상태</th>
+							<th class="bnf-select__th" style="width:90px">통신망</th>
+							<th class="bnf-select__th" style="width:90px">통신사</th>
+							<th class="bnf-select__th">요금제명</th>
+							<th class="bnf-select__th" style="width:300px">Tag</th>
+							<th class="bnf-select__th" style="width:90px">기본료</th>
+							<th class="bnf-select__th" style="width:90px">할인금액</th>
+							<th class="bnf-select__th" style="width:90px">할인기간</th>
+			                <th class="bnf-select__th" style="width:90px">데이터</th>
+			                <th class="bnf-select__th" style="width:90px">QOS</th>
+		                </tr>
+		            </thead>
+		            <tbody id="searchCatePlanList">
+		                
+		
+		            </tbody>
+		        </table>
+	        </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal" id="btn-close-memo-modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>

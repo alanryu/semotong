@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>세모통</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+        <link href="../../css/design.css" rel="stylesheet">
+    </head>
+    <body>
+        <a href="javascript:;" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#excelUploadModal">
+            <span class="log-status__text">엑셀 업로드</span>
+        </a>
+
+        <div class="modal fade" id="excelUploadModal" tabindex="-1" aria-labelledby="excelUploadModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title fs-6 fw-bold" id="excelUploadModalLabel">엑셀 업로드</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <p class="mb-2">
+                                <i class="fas fa-exclamation-circle text-danger"></i>
+                                파일 업로드 전 확인하세요!
+                            </p>
+                            <p class="mb-2">각 항목별 코드값을 정확히 입력해야 합니다.</p>
+                            <p class="mb-3">
+                                코드값 규칙은 <a href="#" class="text-primary text-decoration-underline">코드 가이드 다운로드</a>에서 확인하세요.
+                            </p>
+                        </div>
+
+                        <input type="file" id="fileInput" accept=".xls,.xlsx" style="display: none;">
+                        <div class="file-input-wrapper mb-4">
+                            <span class="file-name">파일첨부</span>
+                            <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">첨부하기</button>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-dark px-4">취소</button>
+                            <button type="button" class="btn btn-secondary px-4">업로드</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script src="../../js/script.js"></script>
+    </body>
+</html>

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.pmb.mapper.PlanFreebieMapper">
+
+	<sql id="listWhereInfo">
+		<where>
+			
+			<if test='keyword != null and keyword !=""'>
+				AND content LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+			
+			<if test='displayYn != null and displayYn !=""'>
+				AND display_yn = #{displayYn}
+			</if>
+						
+			<if test='planId != null and planId !=""'>
+				AND id NOT IN (SELECT plan_freebie_id from tb_pmb_plan_freebie_list WHERE plan_list_id = #{planId})
+			</if>
+			
+		</where>
+	</sql>
+	
+	
+	<!--  ========================================= freebie manage ============================================================ -->
+	<sql id="Base_Column_list_Info">
+		id
+		,title
+		,content
+		,display_yn
+		,create_date
+		,create_id
+		,GET_ADMIN_USER_NM(create_id) as createNm
+		,modified_date
+		,modified_id
+		,GET_ADMIN_USER_NM(modified_id) as modifiedNm
+				
+	</sql>
+
+   	<select id="infolist" parameterType="kr.co.ucomp.web.pmb.dto.PlanFreebieSearchDto" resultType="kr.co.ucomp.web.pmb.entity.PlanFreebieEntity">
+		  SELECT
+	            <include refid="Base_Column_list_Info" />
+	        FROM
+	            tb_pmb_plan_freebie
+	        <include refid="listWhereInfo" />
+	        ORDER BY display_yn desc, create_date  desc
+	        LIMIT #{offset}, #{recordSize}
+
+	</select>
+
+	<select id="infolistCount" parameterType="kr.co.ucomp.web.pmb.dto.PlanFreebieSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+	        FROM
+	            tb_pmb_plan_freebie
+	        <include refid="listWhereInfo" />
+	</select>
+	
+	<select id="infoDetail" parameterType="int" resultType="kr.co.ucomp.web.pmb.entity.PlanFreebieEntity">
+		SELECT
+	            <include refid="Base_Column_list_Info" />
+	        FROM
+	            tb_pmb_plan_freebie
+	        WHERE id=#{id}
+	</select>	
+	
+    <insert id="createInfo" parameterType="kr.co.ucomp.web.pmb.entity.PlanFreebieEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_pmb_plan_freebie (title, content, display_yn, create_id, modified_id)
+        VALUES (
+        	#{title},
+	        #{content}, 
+	        #{displayYn}, 
+	        #{createId}, 
+	        #{modifiedId}
+        )
+    </insert>
+
+    <update id="updateInfo" parameterType="kr.co.ucomp.web.pmb.entity.PlanFreebieEntity">
+        UPDATE tb_pmb_plan_freebie SET
+        	title = #{title},
+            content = #{content}, 
+            display_yn = #{displayYn}, 
+            modified_date = NOW(), 
+            modified_id = #{modifiedId}
+        WHERE id=#{id}
+    </update>
+
+    <delete id="deleteInfo" parameterType="int">
+        DELETE FROM tb_pmb_plan_freebie
+        WHERE id=#{id}
+    </delete>
+
+
+	<!--  ========================================= freebie mapping manage ============================================================ -->
+
+		<sql id="listWhereMap">
+		<if test='keyword != null and keyword !=""'>
+			AND c.content LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		
+		<if test='displayYn != null and displayYn !=""'>
+			AND c.display_yn = #{displayYn}
+		</if>
+		
+		<if test='planId != null and planId !=""'>
+			AND a.plan_list_id = #{planId}
+		</if>
+				
+	</sql>
+	
+	<sql id="Base_Column_list_map">
+		a.id
+		,a.plan_list_id
+		,b.plan_name as planName
+		,a.plan_freebie_id
+		,a.order_no
+		,c.title as freebieTitle
+		,c.content as freebieContent
+		,a.create_date
+		,a.create_id
+		,GET_ADMIN_USER_NM(a.create_id) as createNm
+		,a.modified_date
+		,a.modified_id
+		,GET_ADMIN_USER_NM(a.modified_id) as modifiedNm
+				
+	</sql>
+
+   	<select id="maplist" parameterType="kr.co.ucomp.web.pmb.dto.PlanFreebieSearchDto" resultType="kr.co.ucomp.web.pmb.entity.PlanFreebieMappingEntity">
+		  SELECT
+	            <include refid="Base_Column_list_map" />
+	        FROM
+	            tb_pmb_plan_freebie_list a,  tb_pmb_plan_list b, tb_pmb_plan_freebie c
+			WHERE a.plan_list_id = b.id
+			AND a.plan_freebie_id = c.id 
+	        <include refid="listWhereMap" />
+			ORDER BY a.create_id, a.order_no
+	        LIMIT #{offset}, #{recordSize}
+
+	</select>
+
+	<select id="maplistCount" parameterType="kr.co.ucomp.web.pmb.dto.PlanFreebieSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+	        FROM
+	            tb_pmb_plan_freebie_list a,  tb_pmb_plan_list b, tb_pmb_plan_freebie c
+			WHERE a.plan_list_id = b.id
+			AND a.plan_freebie_id = c.id
+	        <include refid="listWhereMap" />
+	</select>
+	
+	<select id="mapDetail" parameterType="int" resultType="kr.co.ucomp.web.pmb.entity.PlanFreebieMappingEntity">
+		SELECT
+	            <include refid="Base_Column_list_map" />
+	        FROM
+	            tb_pmb_plan_freebie_list a,  tb_pmb_plan_list b, tb_pmb_plan_freebie c
+			WHERE a.plan_list_id = b.id
+			AND a.plan_freebie_id = c.id
+	        AND a.id=#{id}
+	</select>	
+	
+    <insert id="createmap" parameterType="kr.co.ucomp.web.pmb.entity.PlanFreebieMappingEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_pmb_plan_freebie_list (plan_list_id, plan_freebie_id,order_no,create_id, modified_id)
+        VALUES (
+	        #{planListId},
+	        #{planfreebieId}, 
+	        #{orderNo},
+	        #{createId}, 
+	        #{modifiedId}
+        )
+    </insert>
+
+    <update id="updatemap" parameterType="kr.co.ucomp.web.pmb.entity.PlanFreebieMappingEntity">
+        UPDATE tb_pmb_plan_freebie_list SET
+            plan_list_id = #{planListId}, 
+            plan_freebie_id = #{planfreebieId},
+            order_no = #{orderNo}, 
+            modified_date = NOW(), 
+            modified_id = #{modifiedId}
+        WHERE id=#{id}
+    </update>
+    
+    <update id="updatemapOrder" parameterType="kr.co.ucomp.web.pmb.entity.PlanFreebieMappingEntity">
+        UPDATE tb_pmb_plan_freebie_list SET
+            order_no = #{orderNo}, 
+            modified_date = NOW(), 
+            modified_id = #{modifiedId}
+        WHERE id=#{id}
+    </update> 
+    
+
+    <delete id="deletemap" parameterType="int">
+        DELETE FROM tb_pmb_plan_freebie_list
+        WHERE id=#{id}
+    </delete>
+
+
+
+   	<select id="maplistAll" parameterType="kr.co.ucomp.web.pmb.dto.PlanFreebieSearchDto" resultType="kr.co.ucomp.web.pmb.entity.PlanFreebieMappingEntity">
+		  SELECT
+	            <include refid="Base_Column_list_map" />
+	        FROM
+	            tb_pmb_plan_freebie_list a,  tb_pmb_plan_list b, tb_pmb_plan_freebie c
+			WHERE a.plan_list_id = b.id
+			AND a.plan_freebie_id = c.id 
+	        <include refid="listWhereMap" />
+	        ORDER BY id
+
+	</select>
+	<!--  ========================================= benefit mapping manage ============================================================ -->
+
+
+</mapper>

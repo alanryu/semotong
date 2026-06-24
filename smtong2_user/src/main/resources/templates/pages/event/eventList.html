@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layout/default_layout}"
+  layout:fragment="Content"
+  th:with="subPageTitle ='이벤트 목록', layoutFooterYn='Y', menuId='04'"
+>
+  <!-- index.html 고유 CSS 추가 -->
+  <th:block layout:fragment="css"> </th:block>
+  <!-- index.html 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+    <script>
+      window.addEventListener(
+        "pageshow",
+        function (event) {
+          if (event.persisted) {
+            location.reload();
+            return;
+          }
+
+          // 뒤로가기/앞으로가기 감지
+          const navigationEntry = performance.getEntriesByType("navigation")[0];
+          console.log(navigationEntry.type);
+          if (navigationEntry && navigationEntry.type === "back_forward") {
+            location.reload();
+          }
+        },
+        false
+      );
+
+      // DOMContentLoaded
+      $(document).ready(function () {
+        console.log("ready");
+        //-상세에서 목록으로 가기  눌렀을 때 탭 동작
+        // URLSearchParams 객체
+        //const searchParams = new URLSearchParams(location.search);
+        //for (const param of searchParams) {
+        //console.log(param);
+        //}
+
+        const urlParams = new URL(location.href).searchParams;
+
+        //console.log('urlParams:' + urlParams);
+
+        if (urlParams != undefined && urlParams != null && urlParams != "") {
+          const name = urlParams.get("gbn");
+          if (name == "ING") {
+            $("#tab-11").trigger("click");
+          } else if (name == "TER") {
+            $("#tab-12").trigger("click");
+          }
+        } else {
+          getEventList();
+        }
+      });
+
+      //opt - NEW, END
+      function changeOrderBy(opt) {
+        //changeOrderBy(this)
+        $("#nowpage").val(1);
+        $("#eventList").empty();
+
+        $("#hOrderType").val(opt);
+        getEventList();
+      }
+
+      function tabClick(opt) {
+        $("#nowpage").val(1);
+        $("#hSearchRunYn").val(opt); //ING, TER
+
+        $("#eventList").empty();
+        $("#terEventList").empty();
+
+        getEventList();
+      }
+
+      function goDetail(id, gbn) {
+        if (gbn == "ING") {
+          $(location).attr("href", "/event/eventDetailING/" + id);
+        } else if (gbn == "TER") {
+          $(location).attr("href", "/event/eventDetailTER/" + id);
+        } else {
+          $(location).attr("href", "/event/eventDetail/" + id);
+        }
+      }
+
+      function readMore() {
+        var nowpage = $("#nowpage").val();
+        var newpage = Number(nowpage) + 1;
+        $("#nowpage").val(newpage);
+
+        getEventList();
+      }
+
+      function getEventList() {
+        var nowpage = $("#nowpage").val();
+        var nowCategory = $("#hCate").val();
+        var searchOrderType = $("#hOrderType").val(); //  END(마감임박) 기본 NEW(신규)
+
+        var searchRunYn = $("#hSearchRunYn").val(); //	Y, N ING,TER
+        //N 일 경우 종료 이벤트 조회, hOrderType은 않거드리고 END, NEW 아닌 아무거나 딴거 보낸다.
+        if (searchRunYn == "TER") {
+          searchOrderType = "TER"; //END, NEW 만 아니면 된다.
+          nowCategory = "";
+        }
+
+        var params = {
+          page: nowpage,
+          searchOrderType: searchOrderType,
+          searchRunYn: searchRunYn,
+          searchCategory: nowCategory,
+        };
+        $.ajax({
+          url: "/event/getEventList",
+          type: "POST",
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(params),
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader(header, token);
+          },
+          success: function (data) {
+            //console.log(data);
+            //console.log(data.data);		//ok - 10개
+            //signup, recom - css 두가지만 있다.
+            var html = "";
+            if (searchRunYn == "ING") {
+              $.each(data.data, function (idx, obj) {
+                html += '<li class="eventIng-item">                                 ';
+                html +=
+                  '	<div role="link" class="eventIng-card" tabindex="0" onclick="javascript:goDetail(' +
+                  obj.id +
+                  ", 'ING')\">    ";
+                html += '		<div class="card-thumb">                            ';
+                html += '			<img src="' + obj.eventThumbnail + '" alt="" />          ';
+                html += "		</div>                                              ";
+                html += '		<div class="card-cont">                             ';
+                html += '			<p class="card-tit">                            ';
+                if (obj.eventCategory == "JOIN") {
+                  html += '				<span class="label signup">가입</span>  ';
+                } else if (obj.eventCategory == "COMBINE") {
+                  html += '				<span class="label signup">결합</span>  ';
+                } else if (obj.eventCategory == "RECOM") {
+                  html += '				<span class="label recom">추천</span>   ';
+                }
+
+                html += '				<span class="tit">' + obj.title + "</span></p>       ";
+                html += '			<p class="card-date">' + obj.strStart + "~" + obj.strEnd + "</p>";
+                html += "		</div>                                              ";
+                html += "	</div>                                                  ";
+                html += "</li>                                                      ";
+              });
+              $("#eventList").append(html);
+
+              var cnt = data.totalCnt;
+              const np = cnt.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+              $("#totCntText").text("총 " + np + "개");
+
+              if (cnt != null && cnt != 0) {
+                $("#nodataDiv").hide();
+              } else {
+                $("#nodataDiv").show();
+              }
+            } else {
+              $.each(data.data, function (idx, obj) {
+                html += '<li class="eventEnd-item"  onclick="javascript:goDetail(' + obj.id + ", 'TER')\">    ";
+                html += '	<a href="#" class="eventEnd-post">                                              ';
+                html += '		<span class="eventEnd-cont">                                                ';
+                html += '			<strong class="tit">' + obj.title + "</strong>  ";
+                html += '			<span class="date">' + obj.strStart + " ~ " + obj.strEnd + "</span>                         ";
+                html += "		</span>                                                                     ";
+                html += '		<i class="ui-icn icn-24-more-gr" aria-label="상세보기"></i>                 ';
+                html += "	</a>                                                                            ";
+                html += "</li>                                                                              ";
+              });
+              $("#terEventList").append(html);
+            }
+
+            var tCnt = data.totalCnt;
+            if (nowpage * 10 >= tCnt) {
+              $("#ingReadMoreBtn").hide();
+              $("#terReadMoreBtn").hide();
+            } else {
+              $("#ingReadMoreBtn").show();
+              $("#terReadMoreBtn").show();
+            }
+          },
+          error: function (request, status, error) {
+            alertModalShow(error, "");
+          },
+          complete: function () {},
+        });
+      }
+
+      function choiceCategory(obj) {
+        const btnContainer = obj.closest(".keyword-list"); //현재 버튼의 부모
+        const btns = btnContainer.querySelectorAll(".keyword-list .keyword-btn");
+        //const btns 	= allBtns.querySelectorAll('.keyword-btn .is-selected');
+
+        btns.forEach((btn, index) => {
+          btn.classList.remove("is-selected");
+          btn.setAttribute("aria-selected", "false");
+        });
+        obj.classList.add("is-selected");
+        obj.setAttribute("aria-selected", "true");
+
+        $("#nowpage").val(1);
+        $("#hCate").val($(obj).val());
+
+        $("#eventList").empty();
+
+        getEventList();
+      }
+    </script>
+  </th:block>
+
+  <!-- Container -->
+  <main role="main" class="container">
+    <!-- read more 대비 기본 1부터 시작 조회 할 때 마다 ++1 -->
+    <input type="hidden" name="nowpage" id="nowpage" value="1" />
+    <input type="hidden" name="hCate" id="hCate" value="ALL" />
+    <input type="hidden" name="hOrderType" id="hOrderType" value="END" />
+    <input type="hidden" name="hSearchRunYn" id="hSearchRunYn" value="ING" />
+
+    <!-- content -->
+    <div class="content">
+      <div class="ui-tab tab-style1">
+        <ul class="tab-list" role="tablist">
+          <li class="tab-item" role="presentation">
+            <button
+              class="tab-link active"
+              id="tab-11"
+              data-bs-toggle="tab"
+              data-bs-target="#tab-11-pane"
+              type="button"
+              role="tab"
+              aria-controls="tab-11-pane"
+              aria-selected="true"
+              onclick="javascript:tabClick('ING');"
+            >
+              진행중 이벤트
+            </button>
+          </li>
+          <li class="tab-item" role="presentation">
+            <button
+              class="tab-link"
+              id="tab-12"
+              data-bs-toggle="tab"
+              data-bs-target="#tab-12-pane"
+              type="button"
+              role="tab"
+              aria-controls="tab-12-pane"
+              aria-selected="false"
+              onclick="javascript:tabClick('TER');"
+            >
+              종료 이벤트
+            </button>
+          </li>
+        </ul>
+      </div>
+      <div class="tab-content">
+        <!-- 이벤트 진행중 탭 -->
+        <div
+          class="F-E01-01-page tab-pane fade show active"
+          id="tab-11-pane"
+          role="tabpanel"
+          aria-labelledby="tab-11"
+          tabindex="0"
+        >
+          <!-- 이벤트 진행중 섹션 -->
+          <section class="eventIng-sec">
+            <div class="sec-inner">
+              <!-- 분류 스와이퍼 -->
+              <div class="keyword-list">
+                <!-- 선택됨:  is-selected 클래스, aria-selected="true" -->
+                <button
+                  type="button"
+                  class="keyword-btn is-selected"
+                  aria-selected="true"
+                  value="ALL"
+                  onclick="choiceCategory(this)"
+                >
+                  <span>전체 이벤트</span>
+                </button>
+                <button
+                  type="button"
+                  class="keyword-btn"
+                  aria-selected="false"
+                  value="JOIN"
+                  onclick="choiceCategory(this)"
+                >
+                  <span>가입 이벤트</span>
+                </button>
+                <button
+                  type="button"
+                  class="keyword-btn"
+                  aria-selected="false"
+                  value="COMBINE"
+                  onclick="choiceCategory(this)"
+                >
+                  <span>결합 이벤트</span>
+                </button>
+              </div>
+              <!-- // 분류 스와이퍼 -->
+
+              <div class="eventIng-wrap">
+                <!-- 이벤트 툴바 -->
+                <div class="eventIng-toolbar">
+                  <p class="count" id="totCntText"></p>
+                  <div class="sort">
+                    <!-- 2차 수정 : 모든화면 추천순제외 -->
+                    <!-- 2차 수정 : 드롭다운 띄어쓰기 정리 -->
+                    <button
+                      type="button"
+                      class="ui-btn"
+                      id="frmSort"
+                      role="combobox"
+                      aria-haspopup="listbox"
+                      data-bs-toggle="modal"
+                      data-bs-target="#selectSortModal"
+                    >
+                      <i class="ui-icn icn-16-sort-gr" aria-hidden="true"></i>
+                      <span onchange="changeOrderBy(this);">마감 임박 순</span>
+                      <i class="ui-icn icn-16-select-arw" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- // 이벤트 툴바 -->
+
+                <!-- ----------------------------없을 때---------------------------- -->
+
+                <!-- Case 검색결과 없음 -->
+                <div class="nodata" id="nodataDiv" style="display: none">
+                  <i class="ui-icn icn-110-nodata-cry" aria-hidden="true"></i>
+                  <p class="nodata-tit"><strong>진행중인 이벤트가 없네요.</strong></p>
+                </div>
+                <!-- // Case 검색결과 없음 -->
+
+                <!-- ----------------------------있을 때---------------------------- -->
+
+                <!-- 이벤트 리스트 -->
+                <ul class="eventIng-list" id="eventList"></ul>
+                <!-- // 이벤트 리스트 -->
+
+                <!-- Case 목록이 많은 경우 더보기 -->
+                <button type="button" class="ui-btn btn-more-list" onclick="javascript:readMore();" id="ingReadMoreBtn">
+                  <i class="ui-icn icn-16-more-list-gr" aria-hidden="true"></i>
+                  <span>더보기</span>
+                </button>
+              </div>
+            </div>
+          </section>
+          <!-- // 이벤트 진행중 섹션 -->
+        </div>
+        <!-- // 이벤트 진행중 탭 -->
+
+        <!-- 이벤트 종료 탭 -->
+        <div class="F-E02-01-page tab-pane fade" id="tab-12-pane" role="tabpanel" aria-labelledby="tab-12" tabindex="0">
+          <!-- 이벤트 종료 섹션 -->
+          <section class="eventEnd-sec">
+            <div class="sec-inner">
+              <!-- 이벤트 목록 -->
+              <div class="eventEnd-list-wrap">
+                <ul class="eventEnd-list" id="terEventList"></ul>
+
+                <!-- Case 목록이 많은 경우 더보기 -->
+                <button type="button" class="ui-btn btn-more-list" onclick="javascript:readMore();" id="terReadMoreBtn">
+                  <i class="ui-icn icn-16-more-list-gr" aria-hidden="true"></i>
+                  <span>더보기</span>
+                </button>
+              </div>
+              <!-- // 이벤트 목록 -->
+            </div>
+          </section>
+          <!-- // 이벤트 종료 섹션 -->
+        </div>
+        <!-- // 이벤트 종료 탭 -->
+      </div>
+    </div>
+    <!-- // content -->
+  </main>
+  <!-- // Container -->
+
+  <!-- 정렬 modal select -->
+  <div
+    class="modal modal-select fade"
+    id="selectSortModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="selectSortModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="selectSortModalLabel">정렬기준 선택</h3>
+          <!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+          <button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- 콤보박스 섹션 -->
+          <section class="select-sec">
+            <div class="sec-inner">
+              <!-- modal-select 공통 -->
+              <ul class="select-listbox" role="listbox">
+                <!-- setSelectValued 는 퍼블 확인용입니다. -->
+                <!-- 이미 선택목록이 있는 경우 class="is-selected" 추가 -->
+                <!-- <li class="is-selected" role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this)">추천순</li> 2차 수정 : 모든화면 추천순제외 -->
+                <li
+                  class="is-selected"
+                  role="option"
+                  tabindex="0"
+                  data-bs-dismiss="modal"
+                  onclick="setSelectValued('#frmSort', this, null, changeOrderBy('END'))"
+                >
+                  마감 임박 순
+                </li>
+                <!-- 2차 수정 : 드롭다운 띄어쓰기 정리 -->
+                <li
+                  role="option"
+                  tabindex="0"
+                  data-bs-dismiss="modal"
+                  onclick="setSelectValued('#frmSort', this, null, changeOrderBy('NEW'))"
+                >
+                  최신순
+                </li>
+              </ul>
+            </div>
+          </section>
+          <!-- // 콤보박스 섹션 -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- // 정렬 modal select -->
+</html>

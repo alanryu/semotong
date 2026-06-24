@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>간편개통 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+</head>
+
+<body>
+	<!-- 레이아웃이 없는 경우  -->
+	<div class="wrapper only-container">
+		<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-QU-page F-QU01-08-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">요금제를 사용할 <br>휴대폰 정보를 입력해 주세요.</h2>
+						</div>
+						<div class="sec-body">
+							<!-- 등록폼 -->
+							<div class="basic-frm">
+								<!-- 모델명 선택 -->
+								<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label class="tit" for="frmName">모델명</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-sel">
+											<!-- 선택전 is-placeholder, (선택후 삭제) -->
+											<button type="button" id="frmType" class="sel is-placeholder" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#selectModal">
+												<span>휴대폰 기종 선택</span>
+												<i class="ui-icn icn-20-select-arw" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+								<!-- // 모델명 선택 -->
+
+								<!-- 용량 선택 -->
+								<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label class="tit" for="frmName">용량</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-sel">
+											<!-- 선택전 is-placeholder, (선택후 삭제) -->
+											<button type="button" id="frmType" class="sel is-placeholder" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#selectModal">
+												<span>선택</span>
+												<i class="ui-icn icn-20-select-arw" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+								<!-- // 용량 선택 -->
+
+								<!-- 일련번호 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmNo" class="tit">일련번호</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="text" name="" id="frmNo" value="" placeholder="예) F1W7LQ9A2V" title="" class="inp" />
+										</div>
+									</div>
+								</div>
+								<!-- // 일련번호 입력 -->
+
+								<!-- EID 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmEID" class="tit">EID</label>
+									</div>
+									<div class="frm-content">
+										<!-- 실패시: is-errored -->
+										<div class="ui-inp is-errored">
+											<input type="tel" name="" id="frmEID" value="12345678912345678912345678912345" placeholder="EID" title="" class="inp" oninput="setRegularNumber(this)"/>
+										</div>
+									</div>
+									<!-- 실패시: is-errored, 노출시: is-show -->
+									<div class="frm-alert is-errored is-show">
+										<p>EID 번호를 확인 후 다시 입력해 주세요.</p>
+									</div>
+								</div>
+								<!-- // EID 입력 -->
+
+								<!-- IMEI 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmIMEI" class="tit">IMEI</label>
+									</div>
+									<div class="frm-content">
+										<!-- 실패시: is-errored -->
+										<div class="ui-inp is-errored">
+											<input type="tel" name="" id="frmIMEI" value="12345678912345678912345678912345" placeholder="IMEI" title="" class="inp" oninput="setRegularNumber(this)"/>
+										</div>
+									</div>
+									<!-- 실패시: is-errored, 노출시: is-show -->
+									<div class="frm-alert is-errored is-show">
+										<p>IMEI 번호를 확인 후 다시 입력해 주세요.</p>
+									</div>
+								</div>
+								<!-- // IMEI 입력 -->
+
+								<!-- IMEI2 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmIMEI2" class="tit">IMEI2</label>
+									</div>
+									<div class="frm-content">
+										<!-- 실패시: is-errored -->
+										<div class="ui-inp is-errored">
+											<input type="tel" name="" id="frmIMEI2" value="12345678912345678912345678912345" placeholder="IMEI2" title="" class="inp" oninput="setRegularNumber(this)"/>
+										</div>
+									</div>
+									<!-- 실패시: is-errored, 노출시: is-show -->
+									<div class="frm-alert is-errored is-show">
+										<p>IMEI2 번호를 확인 후 다시 입력해 주세요.</p>
+									</div>
+								</div>
+								<!-- // IMEI2 입력 -->
+							</div>
+							<!-- // 등록폼 -->
+
+							<!-- 휴대폰정보 안내 -->
+							<div class="ui-accordion accordion-help" id="accordionFQU0108">
+								<div class="accordion-item">
+									<h3 class="accordion-header">
+										<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#FQU0108-01-acco"
+											aria-expanded="false" aria-controls="FQU0108-01-acco">
+											<i class="ui-icn icn-16-info-gr" aria-hidden="true"></i>
+											<span>휴대폰 정보를 어디서 확인하나요?</span>
+											<i class="ui-icn icn-16-acco-gr" aria-hidden="true"></i>
+										</button>
+									</h3>
+									<div id="FQU0108-01-acco" class="accordion-collapse collapse" data-bs-parent="#accordionFQU0108">
+										<div class="accordion-body">
+											<!-- 탭 영역 -->
+											<div class="ui-tab tab-style3">
+												<ul class="tab-list" id="FQU0108Tab" role="tablist">
+													<li class="tab-item" role="presentation">
+														<button class="tab-link active" id="FQU0108-01-tab" data-bs-toggle="tab" data-bs-target="#FQU0108-01-pane" type="button" role="tab" aria-controls="FQU0108-01-pane" aria-selected="true">아이폰</button>
+													</li>
+													<li class="tab-item" role="presentation">
+														<button class="tab-link" id="FQU0108-02-tab" data-bs-toggle="tab" data-bs-target="#FQU0108-02-pane" type="button" role="tab" aria-controls="FQU0108-02-pane" aria-selected="false">삼성</button>
+													</li>
+												</ul>
+											</div>
+											<div class="tab-content" id="FQU0108TabContent">
+												<!-- 아이폰 패널 -->
+												<div class="tab-pane fade show active" id="FQU0108-01-pane" role="tabpanel" aria-labelledby="FQU0108-01-tab" tabindex="0">
+													<div class="set-device">
+														<p class="set-device-desc">
+															<i class="ui-icn icn-20-set-ios" aria-hidden="true"></i><em>설정</em>&nbsp;&gt;&nbsp;<em>일반</em>&nbsp;&gt;&nbsp;<em>정보</em>에서&nbsp;<em>3가지 정보 모두 확인할 수 있어요.</em>
+														</p>
+														<figure class="set-device-img">
+															<img src="../../assets/images/common/img-set-ios.png" alt="IOS 설정화면" />
+														</figure>
+													</div>
+												</div>
+												<!-- //아이폰 패널 -->
+												 <!-- 삼성 패널 -->
+												<div class="tab-pane fade" id="FQU0108-02-pane" role="tabpanel" aria-labelledby="FQU0108-02-tab" tabindex="0">
+													<div class="set-device">
+														<p class="set-device-desc">
+															<i class="ui-icn icn-20-set-aos" aria-hidden="true"></i>
+															<em>설정</em>&nbsp;&gt;&nbsp;<em>휴대전화 정보</em>&nbsp;&gt;&nbsp;<em>규제 정보</em>에서 확인할 수 있어요.</em>
+														</p>
+														<figure class="set-device-img">
+															<img src="../../assets/images/common/img-set-aos.png" alt="AOS 설정화면" />
+														</figure>
+													</div>
+												</div>
+												<!-- //삼성 패널 -->
+											</div>
+											<!-- //탭 영역 -->
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- //휴대폰정보 안내 -->
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" disabled>
+							<span>다음</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 플로팅 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+	</div>
+</body>
+
+</html>

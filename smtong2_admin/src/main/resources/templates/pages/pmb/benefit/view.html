@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/popup_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='04',menuId ='01'">
+
+<!-- index.html 고유 CSS 추가 -->
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+
+
+<script id="benefitListTmpl" type="text/x-jquery-tmpl">
+<li class="bnf-select__row">
+     <p>${benefitTitle}</p>
+     <p>${benefitContent}</p>
+ </li>
+</script>
+
+
+
+<script id="freebieListTmpl" type="text/x-jquery-tmpl">
+<li class="gift-select__row">
+    <p>${freebieTitle} </p>
+	<p>${freebieContent} </p>
+</li>
+</script>
+
+
+
+
+
+<script type="text/javascript">
+	
+	$(document).ready(function(){
+		
+		
+	})
+	
+	
+	
+		// 화면 로드 시
+	document.addEventListener('DOMContentLoaded', function () {
+		getPlanBenefitList();
+		getPlanFreebieList();
+		
+		
+	});
+	
+	
+	
+	
+	function closePop() {
+		window.close();
+		self.close();
+	}
+
+	  
+	// =============================== 혜택 정보 관리
+	
+
+	// 현재 요금제에 설정된 혜택 정보 조회
+	function getPlanBenefitList() {
+		var params = {
+				displayYn : "Y",
+				planId : "[[${record.id}]]",
+				page : 1,
+				recordSize : 100
+		}
+		$.ajax({
+			   url : '/pbm/planbenefit/map/list',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+				success: function (data) {
+					
+
+					if(data.code ==200 && data.totalCnt > 0) {
+						var res= data.data;
+						console.log("getPlanBenefitList >>>>>>>>>>>>>>");
+						$('#benefitListTmpl').tmpl(res).appendTo('#benefitDataList');
+					}
+			    },
+				error : function(request, status, error){
+		            alert(error);
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+		});
+		
+	}
+	
+	
+	// =============================== 사은품 정보 관리
+		
+	// 현재 요금제에 설정된 사은품 정보 조회
+	function getPlanFreebieList() {
+		var params = {
+				displayYn : "Y",
+				planId : "[[${record.id}]]",
+				page : 1,
+				recordSize : 100
+		}
+		$.ajax({
+			   url : '/pbm/planfreebie/map/list',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+				success: function (data) {
+					console.log("getPlanFreebieList >>>>>>>>>>>>>>");
+					console.log(data);
+					
+					if(data.code ==200 && data.totalCnt > 0) {
+						var res= data.data;
+						$('#freebieListTmpl').tmpl(res).appendTo('#freebieList');
+					}
+			    },
+				error : function(request, status, error){
+		            alert(error);
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+		});
+	}
+	
+
+		
+	
+</script>
+
+</th:block>
+
+ <div class="main-content-pop">
+            <div class="container-fluid">
+                <!-- 로케이션 & 제목 영역 추가 -->
+                <div class="page-header mb-4">
+                    <h2 class="page-title fs-4 mb-4">
+                        요금제 상세
+                    </h2>
+                </div>
+                
+                
+	             <div class="search-section detail">
+                    <div class="form-row">
+                        <div class="form-label">최초 생성일</div>
+                        <div class="form-control-wrap">
+                            [[${#temporals.format(record.createDate, 'yyyy-MM-dd HH:mm:ss')}]] 
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">최근 수정일</div>
+                        <div class="form-control-wrap">
+                            [[${#temporals.format(record.modifiedDate, 'yyyy-MM-dd HH:mm:ss')}]]
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">노출 여부</div>
+                        <div class="form-check-group">
+                            <div class="form-check" th:if="${record.dispYn}">노출</div>
+                            <div class="form-check" th:unless="${record.dispYn}">미노출</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                    	<div class="form-label">포인트 요금제 구분</div>
+                        <div class="form-check-group">
+                            <div class="form-check" th:if="${record.pointPlanYn eq '1'}"> Y </div>
+                            <div class="form-check" th:unless="${record.pointPlanYn eq '1'}"> N </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="form-row">
+                        <div class="form-label">판매상태</div>
+                        <div class="form-control-wrap">
+                            <th:block th:if="${record.saleStatus}">판매중</th:block>
+                            <th:block th:if="${!record.saleStatus}">판매중지</th:block>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">신규여부</div>
+                        <div class="form-control-wrap">
+                            <th:block th:if="${record.newYn}">Y</th:block>
+                            <th:block th:if="${!record.newYn}">N</th:block>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">수집 UUID</div>
+                        <div class="form-control-wrap">
+                            [[${record.uuid}]]
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">요금제 코드</div>
+                        <div class="form-control-wrap">
+                            <div th:text="${record.planCode}"> </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">MNO</div>
+                        <div class="form-control-wrap" th:text="${record.mno}"> </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">사업자</div>
+                        <div class="form-control-wrap" th:text="${record.hostNm}"> </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-label">네트워크</div>
+                        <div class="form-control-wrap" th:text="${record.planType}"> </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-label">요금제명</div>
+                        <div class="form-control-wrap" th:text="${record.planName}"> </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">대체 요금제명</div>
+                        <div class="form-control-wrap"  th:text="${record.planNameSmt}"> </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">요금제명2</div>
+                        <div class="form-control-wrap">
+                        	<th:block th:if="${record.supDataVal == 10238976}">
+                        	무제한
+                        	</th:block>
+                        	<th:block th:unless="${record.supDataVal == 10238976}">
+                        	월 <span th:text="${#numbers.formatDecimal(record.supDataVal / 1024.0, 0, (record.supDataVal % 1024 == 0) ? 0 : 1)}"></span>GB
+                        	</th:block>
+                        	<th:block th:if="${record.dailyData gt 0}">
+                        	+ 매일 [[${record.dailyData / 1024.0}]]GB
+                        	</th:block>
+                        	<th:block th:if="${record.intQos gt 0}">
+                        	+ [[${record.intQos}]]Mbps
+                        	</th:block>
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">대체 요금제명2</div>
+                        <div class="form-control-wrap"  th:text="${record.planNameSmtSub}"> </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">기본료</div>
+                        <div class="form-control-wrap">
+                            [[${#numbers.formatInteger(record.normalPrice, 0, 'COMMA') + '원'}]]
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">할인금액</div>
+                        <div class="form-control-wrap">
+                            [[${#numbers.formatInteger(record.salePrice, 0, 'COMMA') + '원'}]]
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">최종금액</div>
+                        <div class="form-control-wrap">
+                            [[${#numbers.formatInteger(record.afterPrice, 0, 'COMMA') + '원'}]]
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">할인기간</div>
+                        <div class="form-control-wrap">
+                            [[${record.promotionPeriod}]]
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">데이터</div>
+						<div class="form-control-wrap">
+							<th:block th:if="${record.supDataVal eq 10238976}">무제한</th:block>
+				              <th:block th:if="${record.supDataVal >= 1024}">
+							     <span th:text="${#numbers.formatDecimal(record.supDataVal / 1024.0, 0, (record.supDataVal % 1024 == 0) ? 0 : 1)}"></span>GB
+							   </th:block>
+				              <th:block th:unless="${record.supDataVal >= 1024}">[[${record.supDataVal}]]MB</th:block>
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">Qos</div>
+                        <div class="form-control-wrap">
+                            [[${record.supQos}]]
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">전화</div>
+                        <div class="form-control-wrap">
+                            [[${record.supCallVal}]]
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">메시지</div>
+                        <div class="form-control-wrap">
+                            [[${record.supSmsVal}]]
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">URL(단순랜딩)</div>
+                        <div class="form-control-wrap">
+                            <a th:href="${record.linkUrl}" target="_blank">[[${record.linkUrl}]]</a>
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">URL(아웃링크)</div>
+                        <div class="form-control-wrap" th:text="${record.urlSmt}"> </div>
+                    </div>
+                    <div class="form-row full-width">
+                        <div class="form-label">실제 체감가</div>
+                        <div class="form-control-wrap" th:text="${record.secondPrice}"> </div>
+                    </div>
+                    <div class="form-row full-width">
+                        <div class="form-label">혜택</div>
+                        <div class="form-control-wrap">
+                            [[${record.benefit}]]
+                        </div>
+                    </div>
+                    <div class="form-row full-width">
+                        <div class="form-label">사은품</div>
+                        <div class="form-control-wrap">
+                            [[${record.freebies}]]
+                        </div>
+                    </div>
+	
+                    <div class="form-row full-width">
+                        <div class="form-label">이미지 뱃지</div>
+                        <div class="form-check-group">
+                            <div class="form-check"  th:if="${record.imageBadgeSpecial}">단독특가 </div>
+                            <div class="form-check" th:if="${record.imageBadgeItComb}">인터넷 결합</div>
+                            <div class="form-check" th:if="${record.imageBadgeSimpleOpen}">간편개통</div>
+                            <div class="form-check" th:if="${record.imageBadgeAddData}">추가데이터제공[[${record.imageBadgeAddDataNm}]]</div>
+                        </div>
+                    </div>
+	
+                    <div class="form-row full-width">
+                        <div class="form-label">혜택</div>
+                        <div class="bnf-manager">
+                            <div class="bnf-manager__container">
+                                <div id="bnfInputs" class="bnf-manager__inputs">
+                                    <ul id="benefitDataList">
+                                    	
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+	                 <!-- 사은품  -->
+                    <div class="form-row full-width">
+                        <div class="form-label">사은품</div>
+                        <div class="gift-manager">
+                            <div class="gift-manager__container">
+                                <div id="giftInputs" class="gift-manager__inputs">
+                                    <ul id="freebieList">
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+	                </div>
+	
+	                <div class="form-row full-width">
+	                    <div class="form-label">지원 <p class="c_red">※ 미입력시 미노출</p></div>
+	                    <div class="form-control-wrap">
+	                        <div class="form-check-group" th:utext="${record.suppContent}"> </div>
+	                    </div>
+	                </div>
+	                <div class="form-row full-width">
+	                    <div class="form-label">미지원 <p class="c_red">※ 미입력시 미노출</p></div>
+	                    <div class="form-control-wrap">
+	                        <div class="form-check-group" th:utext="${record.noSuppContent}"> </div>
+	                    </div>
+	                </div>
+	                <div class="form-row full-width" style="display:none">
+	                    <div class="form-label">이벤트 배너 설정 <p class="c_red">※ 미입력시 미노출</p></div>
+	                    <div class="form-control-wrap">
+	                        <div class="form-check-group">
+	                            <!-- Image Upload Section -->
+	                            <div class="event-banner">
+	                                <!-- PC Banner -->
+	                                <div class="event-banner__section">
+	                                    <div class="event-banner__uploader uploader">
+	                                        <div class="uploader__header">
+	                                            <span class="uploader__title">PC 배너*</span>
+	                                        </div>
+	                                        <div class="uploader__preview" id="pcPreview">
+	                                        	<img th:src="@{${record?.eventBannerImagePcUrl}}"  class="uploader__preview-image">
+	                                        </div>
+	                                    </div>
+	                                </div>
+	
+	                                <!-- Mobile Banner -->
+	                                <div class="event-banner__section">
+	                                    <div class="event-banner__uploader uploader">
+	                                        <div class="uploader__header">
+	                                            <span class="uploader__title">모바일 배너*</span>
+	                                        </div>
+	                                        <div class="uploader__preview" id="mobilePreview"><img th:src="@{${record?.eventBannerImageMoUrl}}"  class="uploader__preview-image"></div>
+	                                    </div>
+	                                </div>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+	                <div class="form-row full-width" style="display:none">
+	                    <div class="form-label"></div>
+	                    <div class="form-control-wrap">
+	                        <div class="form-check-group">
+	                            <div class="link-form">
+	                                <div class="link-form__input-wrap" th:text="${record.eventBannerImageUrl}">
+	                                </div>
+	                                <div class="link-form__options">
+	                                    <div class="link-form__radio-item" th:if="${record.eventBannerImageTarget eq  'S'}">현재 이동 (_self) </div>
+	                                    <div class="link-form__radio-item" th:if="${record.eventBannerImageTarget eq  'P'}">새창 이동 (_self) </div>
+	                                </div>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+            <div class="d-flex justify-content-center gap-2 mt-4 w-100 mb-5">
+                <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="closePop();"> 닫기 </button>
+            </div>
+		</div>
+	</div>
+
+</html>

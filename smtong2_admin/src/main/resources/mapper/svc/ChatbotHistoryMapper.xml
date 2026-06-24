@@ -1,0 +1,31 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.svc.chatbot.mapper.ChatbotHistoryMapper">
+
+    <insert id="insertChatbotHistory" parameterType="kr.co.ucomp.web.svc.chatbot.entity.ChatbotHistoryReqEntity">
+        INSERT INTO tb_svc_chatbot_history
+        (
+            mvno_use_yn,
+            prev_mno,
+            prev_payment,
+            sel_data,
+            sel_company,
+            sel_plan_id,
+            user
+        )
+        VALUES
+        (
+           #{mvnoUseYn},
+           #{preMno},
+           #{prevPayment},
+           #{selData},
+           #{selCompany},
+           #{elPlanId},
+           #{user}
+        )
+
+    </insert>
+
+
+</mapper>

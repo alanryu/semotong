@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='09',menuId ='01'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<!--	<link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+	<style>
+	.c_blue {
+	  color:blue !important;
+	}
+	</style>
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+	 <script id="searchListTmpl" type="text/x-jquery-tmpl">
+		<tr>
+			<td>${rIdx}</td>
+			{{if drCr == 'CR' }}
+				<td><b class="c_blue">${drCrName}</b></td>
+				<td><b class="c_blue">+${amount} {{if availAmount != amount}} (${availAmount}) {{/if}}  </b></td>
+			{{else}}
+				<td><b class="c_red">${drCrName}</b></td>
+				<td><b class="c_red">-${amount}</b></td>
+			{{/if}}
+			<td><b>${crPointTypeName}</b></td>
+			<td><b>${drPointTypeName}</b></td>
+			<td><b><a href="/point/history/edit/${id}">{{html maskName(username)}}</a></b></td>
+			<td><b>${kakaoUserId}</b></td>
+			<td><b>${createName}</b></td>
+			<td>{{html dateToStringDot(createDate)}}</td>
+		</tr>
+	</script>
+	
+			  
+	<script type="text/javascript">
+	
+		document.addEventListener('DOMContentLoaded', function () {
+			currentPage =1;
+			searchList();
+			
+			//th:if="${session.loginUser.allAuthYn == 'Y' or session.loginUser.adminMemAuthYn == 'Y'}">
+			//var test = "[[${session.loginUser.id}]]";
+			//if(test == 2 || test == 4 || test == 9 || test == 12 ){
+			var allAuthYn = "[[${session.loginUser.allAuthYn}]]";
+			var adminMemAuthYn = "[[${session.loginUser.adminMemAuthYn}]]";
+			if(allAuthYn == 'Y' || adminMemAuthYn == 'Y' ){
+				$("#abc").show();
+			}
+			
+			fileMngUploadinit();
+			
+		});
+		
+		//file upload 관련
+		//script.js 이미지 제한, 새로 만든다.
+		function fileMngUploadinit() {
+			// 파일 input 요소들을 찾음
+			const fileInputs = document.querySelectorAll('.file-info.c_red');
+			if (fileInputs.length === 0) return;
+			// text에 뿌려주기
+			function initializePreview(inputNum) {
+				const textInput = document.getElementById(`excelForPointText${inputNum}`);
+				if (textInput) {
+					textInput.value = fileName;
+				}
+			}
+			fileInputs.forEach(fileInput => {
+				const inputNum = fileInput.id.replace('excelForPointText', '');
+				initializePreview(inputNum);
+				fileInput.addEventListener('change', function(e) {
+					const inputNum = this.id.replace('excelForPoint', '');
+					const textInput = document.getElementById(`excelForPointText${inputNum}`);
+					if (!textInput ) return;
+					const file = e.target.files[0];
+					
+					if (file) {
+						textInput.value = file.name;
+					} else {
+						textInput.value = '';
+					}
+				});
+			});
+		}
+		
+		
+		function searchList() {
+			
+			var page = currentPage;
+			if(page =="" || page == null) page =1;
+			var _recordSize =  parseInt($("#recordSize").val());
+			
+			if( !_isDateForm($("#searchStartDt").val()) ){
+				alert("올바른 날짜를 넣어주세요");
+				$("#searchStartDt").focus();
+				return;
+			}
+			if( !_isDateForm($("#searchEndDt").val()) ){
+				alert("올바른 날짜를 넣어주세요");
+				$("#searchEndDt").focus();
+				return;
+			}
+			console.log($("#searchStartDt").val());
+			console.log($("#searchEndDt").val());
+			var params = {
+					 keyword				: $("#keyword").val()							// 입력 검색어 
+			 		,searchStartDt			: $("#searchStartDt").val()						//BaseSearchDto		Dt 임, Date 아님
+			 		,searchEndDt			: $("#searchEndDt").val()						//BaseSearchDto
+			 		,drCr 					: $("input[name='incdec']:checked").val()
+			 		,pointType 				: getCheckedCompanies("searhScore")
+			 		,adminGiftYn			: 'Y'
+			 		,page					: page
+			 		,recordSize 			: _recordSize
+			}
+			
+			$.ajax({
+					 url : '/point/history/ajaxHistoryList'
+					,type : 'POST'
+					,dataType : "json"
+					,contentType:"application/json"
+					,data : JSON.stringify(params)
+					,success: function (data) {
+						
+						var items = data.data
+						$('#searchList').empty();
+						if(data.totalCnt == 0) {
+							//
+						} else {
+							var totalCnt = data.totalCnt;
+							$.each(data.data, function(idx, obj){
+								obj.rIdx = totalCnt - ((params.page - 1) * params.recordSize + idx);
+							});
+							$('#searchListTmpl').tmpl(data.data).appendTo('#searchList');	
+						}
+						$('#totla_count').html("총 "+data.totalCnt+"건");
+						renderPagination(params.page, data.totalCnt, params.recordSize)
+					},
+					error : function(request, status, error){
+						alert(error);
+					},
+					complete:function(){
+						// $('#loading').addClass('display-none');
+					}
+			});
+		}
+		
+		
+		function goInsert(){
+			window.location.href='/point/history/edit/0';
+		}
+		
+		
+		//   -------------------------------------------- 컴포넌트 기본 --------------------------------------------   //
+		
+		//리스트화면 필수
+		function renderPage(page) {
+			currentPage = page;
+			searchList();
+		}
+		//10개씩 보기
+		function changeCombo(){
+			currentPage = 1;
+			searchList()
+		}
+		//체크박스 [전체]동작
+		function selCheckBox(id) {
+			if(id=="") {
+				$("input[id^='searhScore']").prop("checked", false);
+				$("#searhScore01").prop("checked", true);
+			} else {
+				$("#searhScore01").prop("checked", false);
+			}
+		}
+		//초기화(조회조건)
+		function toggleSearchInit(){
+			$("#keyword").val('');
+			$("#incdecAll").prop('checked', true); 			//radio button 노출 : CR, DR
+			selCheckBox(""); //check box 사유 : ACT, RET, OTH....
+			periodButtonInit();
+			currentPage = 1;
+		}
+		
+		//리스트내 표현양식 사용
+		function dateToString(date) {
+			var str = '';
+			if ( date != null ) {
+				var temp = moment(date);
+				str = temp.format('YYYY.MM.DD HH:mm:ss');
+			}
+			return str;
+		}
+		//   -------------------------------------------- 컴포넌트 기본 --------------------------------------------   //
+		
+		
+		// Excel  -------------------------------------------------------------------------------------------------- Excel //
+		function downloadExcel() {
+			var page = 1;
+			var _recordSize =  9999;
+			if( !_isDateForm($("#searchStartDt").val()) ){
+				alert("올바른 날짜를 넣어주세요");
+				$("#searchStartDt").focus();
+				return;
+			}
+			if( !_isDateForm($("#searchEndDt").val()) ){
+				alert("올바른 날짜를 넣어주세요");
+				$("#searchEndDt").focus();
+				return;
+			}
+			var params = {
+					keyword					: $("#keyword").val()							// 입력 검색어 
+			 		,searchStartDate		: $("#searchStartDt").val()						//BaseSearchDto
+			 		,searchEndDate			: $("#searchEndDt").val()						//BaseSearchDto
+			 		,drCr 					: $("input[name='incdec']:checked").val()
+			 		,pointType 				: getCheckedCompanies("searhScore")
+			 		,adminGiftYn			: 'Y'
+			 		,page					: page
+			 		,recordSize 			: _recordSize
+			}
+			var _url = '/point/history/exceldown';
+			downloadExcelProc(params, _url, "PointHistoryList");
+		}
+	
+		
+		//양식 저장,	//docuFormUpload 
+		function docuFormUpload(){
+			var formData = new FormData($('#docuform')[0]);
+			$.ajax({
+				url 		: '/cmm/filemng/document',	
+				type 		: 'post',	
+				enctype 	: 'multipart/form-data',				
+				data 		: formData,
+				async 		: false,					
+				contentType : false,	
+				processData : false,
+				success 	: function (data) {
+					console.log(data);
+					showAlert( '[' + data.data.orgFileNm + ']' + '등록되었습니다', hideDocUploadModal );
+				}
+				,error 		: function(request, status, error){
+					//alert(error);
+					showAlert( 'file upload 중 오류가 발생했습니다.[' + request.responseJSON.message + ']', hideDocUploadModal );
+				}
+				,complete 	: function(){
+				}
+			});
+		}
+		function hideDocUploadModal(){
+			$("#documentUploadModalCancelBtn").trigger('click');
+		}
+		
+		//양식 받기, //jobType 에 따라 파일 받기 : POINT_DOCUMENT, POINT_CODE_DOCUMENT, ...
+		function findFileInfo(jobTypeStr){
+			//최신 document양식 정보 조회
+			var params = {
+					keyword				: "" 
+					,jobType			: jobTypeStr
+					,searchId			: ""
+			}
+			$.ajax({
+				 url : '/cmm/filemng/getFileInfo'
+				,type : 'POST'
+				,dataType : "json"
+				,contentType:"application/json"
+				,data : JSON.stringify(params)
+				,success: function (data) {
+					console.log(data);
+					downloadFileProc(data.data.orgFileNm, data.data.sysFileNm);
+				},
+				error : function(request, status, error){
+					//alert(error);
+				},
+				complete:function(){
+				}
+			});
+		}
+		
+		//pointListUpload()
+		function pointListUpload(){
+			var formData = new FormData($('#pointform')[0]);
+			$.ajax({
+				url 		: '/point/history/historyListInsert',	
+				type 		: 'post',	
+				enctype 	: 'multipart/form-data',				
+				data 		: formData,
+				async 		: false,								
+				contentType : false,	
+				processData : false,
+				success 	: function (data) {
+					console.log(data);
+					if(data.code == 200){
+						showAlert( '[' + data.data.totcnt + ']건 중' + '[' + data.data.inscnt + ']건이' + '등록되었습니다', hidePointUploadModal );
+					}else{
+						showAlert( data.data.msg, hidePointUploadModal );
+					}
+					
+				}
+				,error 	: function(request, status, error){
+					//alert(error);
+					//console.log(request.responseJSON.message);
+					showAlert( 'file upload 중 오류가 발생했습니다.[' + request.responseJSON.message + ']', hidePointUploadModal );
+				}
+				,complete 	: function(){
+				}
+			});
+		}
+		function hidePointUploadModal(){
+			$("#pointListUploadModalCancelBtn").trigger('click');
+		}
+		// Excel  -------------------------------------------------------------------------------------------------- Excel //
+		
+	</script>
+</th:block>
+
+<div class="main-content">
+			<div class="container-fluid">
+				 <!-- 로케이션 & 제목 영역 추가 -->
+				<div class="page-header mb-4">
+					<div class="location mb-2">
+						<small class="text-secondary">
+							<i class="fas fa-home me-1"></i>
+							<a href="/">홈</a> > <a href="/point/history/list">포인트관리</a> > <a href="/point/history/list">포인트 내역</a> >
+						</small>
+					</div>
+					<h2 class="page-title fs-4 mb-4">포인트 내역</h2>
+				</div>
+				
+				<div class="search-section">
+					<div class="row g-3">
+						<div class="col-12">
+						
+							<!-- 검색어 -->
+							<div class="form-row full-width mb-3">
+								<div class="form-label mb-0">검색어</div>
+								<div class="form-control-wrap flex-grow-1">
+									<input type="text" class="form-control" placeholder="검색어를 입력해주세요" id="keyword">
+								</div>
+							</div>
+					
+							<!-- 구분 -->
+							<div class="form-row full-width mb-3">
+								<div class="form-label mb-0">구분</div>
+								<div class="form-control-wrap">
+									<div class="form-check-group">
+										<div class="form-check">
+											<input class="form-check-input" type="radio" name="incdec" id="incdecAll" value="" checked>
+											<label class="form-check-label" for="incdecAll">전체</label>
+										</div>
+										<div class="form-check">
+											<input class="form-check-input" type="radio" name="incdec" id="incdecCr" value="CR">
+											<label class="form-check-label" for="incdecCr">지급</label>
+										</div>
+										<div class="form-check">
+											<input class="form-check-input" type="radio" name="incdec" id="incdecDr"  value="DR">
+											<label class="form-check-label" for="incdecDr">차감</label>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- 사유 -->
+							<div class="form-row mb-3">
+								<div class="form-label mb-0">사유</div>
+								<div class="form-control-wrap">
+									<div class="form-check-group">
+										<div class="form-check">
+											<input class="form-check-input" type="checkbox" name="searhScore" id="searhScore01" value="" checked onclick="selCheckBox('')">
+											<label class="form-check-label" for="searhScore01">전체</label>
+										</div>
+										<div class="form-check">
+											<input class="form-check-input" type="checkbox" name="searhScore" id="searhScore02" value="ACT" onclick="selCheckBox('1')">
+											<label class="form-check-label" for="searhScore02">개통</label>
+										</div>
+										<div class="form-check">
+											<input class="form-check-input" type="checkbox" name="searhScore" id="searhScore03" value="RET" onclick="selCheckBox('2')">
+											<label class="form-check-label" for="searhScore03">가입유지</label>
+										</div>
+										<div class="form-check">
+											<input class="form-check-input" type="checkbox" name="searhScore" id="searhScore04" value="FR" onclick="selCheckBox('3')">
+											<label class="form-check-label" for="searhScore04">친구추천</label>
+										</div>
+										<div class="form-check">
+											<input class="form-check-input" type="checkbox" name="searhScore" id="searhScore05" value="EXR" onclick="selCheckBox('4')">
+											<label class="form-check-label" for="searhScore05">우수후기</label>
+										</div>
+										<div class="form-check">
+											<input class="form-check-input" type="checkbox" name="searhScore" id="searhScore06" value="OTH" onclick="selCheckBox('5')">
+											<label class="form-check-label" for="searhScore06">기타</label>
+										</div>
+									</div>
+								</div>
+							</div>
+					
+							<!-- 처리일 -->
+							<div class="col-12">
+								<div class="form-row full-width">
+									<div class="form-label mb-0">처리일</div>
+									<div class="form-control-wrap d-flex align-items-center gap-2">
+										<div class="d-flex align-items-center gap-2">
+											<input type="date" class="form-control" id="searchStartDt">
+											<span class="text-secondary">-</span>
+											<input type="date" class="form-control" id="searchEndDt">
+										</div>
+										<div class="period-buttons">
+											<div class="d-flex gap-2">
+												<button class="period-button" value="30">최근 1개월</button>
+												<button class="period-button" value="90">최근 3개월</button>
+												<button class="period-button" value="180">최근 6개월</button>
+												<button class="period-button" value="365">최근 1년</button>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-12 text-end mt-2">
+										<button class="btn btn-primary btn-sm me-2" onclick="searchList()">
+											<i class="fas fa-search"></i>
+											검색
+										</button>
+										<button class="btn btn-light btn-sm" onclick="toggleSearchInit();">
+											<i class="fas fa-redo"></i>
+											초기화
+										</button>
+									</div>
+								</div>
+							</div>
+						
+						
+						
+						</div>
+					</div>
+				</div>
+						
+						
+					
+
+				<div class="table-section">
+					<div class="d-flex justify-content-between align-items-center mb-4">
+						<div class="d-flex align-items-center gap-3">
+							<div class="stats-badge">
+								<i class="fas fa-calculator me-1"></i>
+								<span id="totla_count">총 450건</span>
+							</div>
+							<select class="form-select" style="width: 100px" id="recordSize" onchange="changeCombo()">
+								<option value="10">10개씩</option>
+								<option value="20">20개씩</option>
+								<option value="30">30개씩</option>
+								<option value="40">40개씩</option>
+								<option value="50">50개씩</option>
+							</select>
+						</div>
+						<div class="header-actions">
+							<div class="custom-dropdown">
+								<button class="btn btn-primary btn-sm btnDrop" onclick="toggleDropdown()">
+									일괄 지급/차감
+								</button>
+								<div id="myDropdown" class="dropdown-content">
+									<a href="#" 											onclick="findFileInfo('POINT_DOCUMENT')"		>양식 다운로드</a>
+									<!--<a href="#" 											onclick="findFileInfo('POINT_CODE_DOCUMENT')"	>코드 양식 다운로드</a>-->
+									<a href="#" data-bs-toggle="modal" data-bs-target="#uploadModal"										>엑셀 업로드</a>
+									<a id="abc" href="#" data-bs-toggle="modal" data-bs-target="#documentUploadModal" style="display:none;"	>admin upload</a>
+								</div>
+							</div>
+							<button class="btn btn-primary btn-sm btnDrop" onclick="location.href='/point/history/edit/0'">
+								개별 지급/차감
+							</button>
+							<button class="btn btn-success btn-sm">
+								<i class="fas fa-file-excel"></i>
+								엑셀 다운로드
+							</button>
+							
+						</div>
+					</div>
+
+					<table class="table custom-table">
+						<thead>
+							<tr>
+								<th style="width:5%"	>번호</th>
+								<th style="width:5%"	>구분</th>
+								<th style="width:10%"	>지급/차감포인트</th>
+								<th style="width:10%"	>사유</th>
+								<th style="width:15%"	>사용</th>
+								<th style="width:15%"	>회원명</th>
+								<th style="width:15%"	>카카오ID</th>
+								<th style="width:10%"	>담당자</th>
+								<th 	>처리일</th>
+							</tr>
+						</thead>
+						<tbody id="searchList">
+							
+						</tbody>
+					</table>
+
+					<div class="d-flex justify-content-left mt-4">
+						<ul class="pagination">
+							
+						</ul>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Modal 팝업 : 양식 업로드  -->																												<!-- Modal 팝업 : 양식 업로드  -->
+			<div class="modal fade" id="documentUploadModal" tabindex="-1" aria-labelledby="documentUploadModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header border-0 pb-0 mb-4">
+							<h5 class="modal-title fs-6 fw-bold" id="documentUploadModalLabel">양식 업로드</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						
+						<form name="docuform" id="docuform">
+						<div class="modal-body pt-2 pb-4">
+							<div class="form-row-modal">
+								<div class="form-label-modal">양식</div>
+								<div class="form-control-wrap-modal">
+									<select class="form-select" name="jobType" id="jobType">
+										<option value="point_document" selected>포인트 일괄지급 양식</option>
+										<option value="point_code_document">포인트 코드 양식</option>
+									</select>
+								</div>
+								<div class="file-input-wrap">
+									<input type="file" class="file-input"  	id="docuFile" 				name="docuFile">
+									<!--<button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput1').click()" style="min-width:70px">찾기</button>-->
+								</div>
+							</div>
+						</div>
+						</form>
+						
+						<div class="modal-footer border-0 pt-0">
+							<button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal" id="documentUploadModalCancelBtn">취소</button>
+							<button type="button" class="btn btn-dark px-4 btm-sm" onclick="docuFormUpload()">양식 업로드</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Modal 팝업 : 업로드 --> <!-- Modal 팝업 : 업로드 --> <!-- Modal 팝업 : 업로드 --> <!-- Modal 팝업 : 업로드 --> <!-- Modal 팝업 : 업로드 --> <!-- Modal 팝업 : 업로드 -->
+			<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header border-0 pb-0 mb-4">
+							<h5 class="modal-title fs-6 fw-bold" id="uploadModalLabel">포인트 일괄 지급/차감 업로드</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body pt-2 pb-4">
+							📌 파일 업로드 전 확인하세요!
+							각 항목별 코드값을 정확히 입력해야 합니다.
+							코드값 규칙은 [코드 가이드 다운로드]에서 확인하세요.
+							<p>
+							<a href="#" onclick="findFileInfo('POINT_CODE_DOCUMENT')">📎코드 가이드 다운로드</a>
+						</div>
+						
+						<form name="pointform" id="pointform">
+						<div class="modal-body pt-2 pb-4">
+							<div class="file-input-wrap">
+								<input type="file" class="file-info c_red"	id="excelForPoint"		name="excelForPoint"  style="display: none;" accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" >
+								<input type="text" class="form-control" 	id="excelForPointText" readonly>
+								<button type="button" class="btn btn-primary" onclick="document.getElementById('excelForPoint').click()" >찾기</button>
+							</div>
+						</div>
+						</form>
+						
+						<div class="modal-footer border-0 pt-0">
+							<button type="button" class="btn btn-secondary px-4 btm-sm" data-bs-dismiss="modal" id="pointListUploadModalCancelBtn">취소</button>
+							<button type="button" class="btn btn-dark px-4 btm-sm" data-bs-toggle="modal" 														onclick="pointListUpload()"		>업로드</button>	<!-- 엥? 결과보기 화면이 없네.... 일단 modal 남겨두고 ajax 내에서 alert 한다. -->
+							<button type="button" class="btn btn-dark px-4 btm-sm" data-bs-toggle="modal" data-bs-target="#uploadResultModal" style="display:none;" id="uploadResultBtn"		>업로드</button>		<!-- 죈장 클릭 이거 잘 모르겠다. hidden 하고 trigger click으로 처리한다. -->
+						</div>
+					</div>
+				</div>
+			</div>
+
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<!-- Modal 팝업 : 업로드 결과  -->
+			<div class="modal fade" id="uploadResultModal" tabindex="-1" aria-labelledby="uploadResultModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header border-0 pb-0 mb-4">
+							<h5 class="modal-title fs-6 fw-bold" id="uploadResultModalLabel">코드 업로드 결과</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body pt-2 pb-4">
+							<div class="upload-result">
+								<p class="mb-3">
+									업로드 NN건 중 
+									<span class="text-primary">성공 - NN건</span> / 
+									<span class="text-success">설패 - NN건</span> / 
+									<span class="text-danger">실패 - NN건</span>
+								</p>
+								<div class="uuid-list">
+									<p class="fw-bold mb-2">상태 UUID</p>
+									<ul class="list-unstyled">
+										<li>Amobile67085</li>
+										<li>Amobile67085</li>
+										<li>Amobile67085</li>
+										<li>Amobile67085</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer border-0 pt-0">
+							<button type="button"  data-bs-dismiss="modal" class="btn btn-dark px-4 btm-sm">확인</button>
+						</div>
+					</div>
+				</div>
+			</div>
+</DIV>

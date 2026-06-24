@@ -1,0 +1,186 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 추천 요금제 매칭
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 추천 요금제 매칭 페이지
+.F-CB03-06-page {
+	// s: 모통봇 소개 섹션
+	.cb-intro-sec {
+		@include cb-intro-sec;
+		margin-bottom: 4rem; // 요금제 상품목록에 자체작으로 16픽셀 가지고 있음
+	}
+	// e: 모통봇 소개 섹션
+
+	// s: 챗봇 그래프 섹션
+	.cb-graph-sec { /* 1차 수정 : 그래프 cb-graph-sec 전체 수정 */
+		margin-top: 16rem;
+		margin-bottom: 24rem;
+		.graph-wrap {
+			position: relative;
+			--graph-transition: all 0.2s 0.3s ease;
+			.graph-grid {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: calc(32rem * 4);
+				background: url('../images/common/img-graph-grid.svg') repeat 0 0;
+			}
+			.graph-list {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				position: relative;
+				padding: 0 16rem;
+			}
+			.graph-item {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				.graph-track {
+					position: relative;
+					width: 80rem;
+					height: 114rem;
+					margin: 13rem auto 0;
+					.graph-bar {
+						position: absolute;
+						left: 0;
+						bottom: 0;
+						width: 100%;
+						// border-radius: 4rem 4rem 0 0;
+						height: 100%;
+						transition: var(--graph-transition);
+						.value {
+							position: absolute;
+							left: 50%;
+							bottom: calc(100% + 14rem);
+							width: 66rem;
+							padding: 6rem 0rem;
+							border-radius: 4rem;
+							font-weight: 500;
+							font-size: 12rem;
+							line-height: 16rem;
+							color: #fff;
+							text-align: center;
+							transform: translateX(-50%);
+							&::before {
+								content:'';
+								display: block;
+								position: absolute;
+								left: 50%;
+								top: 100%;
+								transform: translateX(-50%);
+								border-left: 7rem solid transparent;
+								border-right: 7rem solid transparent;
+								border-top: 7rem solid transparent;
+							}
+						}
+					}
+				}
+				.graph-data {
+					margin-top: 5rem;
+					text-align: center;
+					.period {
+						font-weight: 500;
+						font-size: 12rem;
+						line-height: 16rem;
+						color: #5A5D60;
+					}
+					.charge {
+						font-weight: 600;
+						font-size: 14rem;
+						line-height: 20rem;
+					}
+				}
+
+				// 컬러구분
+				&.type-normal {
+					.graph-track {
+						.graph-bar {
+							background-color: #B7B9BA;
+						}
+					}
+					.graph-data {
+						.charge {
+							color: #EA2A2A;
+						}
+					}
+				}
+				&.type-savings {
+					.graph-track {
+						.graph-bar {
+							border-radius: 0;
+							background-color:$color-primary;
+							.value {
+								background-color:$color-primary;
+								&::before {
+									border-top-color: $color-primary;
+								}
+							}
+						}
+					}
+					.graph-data {
+						.charge {
+							color: $color-primary;
+						}
+					}
+				}
+			}
+			.graph-savings {
+				position: absolute;
+				top: 13rem;
+				left: 0;
+				width: 100%;
+				height: 114rem;
+				.graph-gage {
+					position: relative;
+					height: 0%;
+					overflow: hidden;
+					border-top: 1px solid $color-primary;
+					background-color: rgba(84, 47, 221, 0.1);
+					transition: var(--graph-transition);
+					&::after {
+						content:'';
+						display: block;
+						position: absolute;
+						left: 0;
+						width: 100%;
+						height: 1px;
+						background-color: $color-primary;
+					}
+					&::after {
+						bottom: 0;
+					}
+				}
+			}
+		}
+	}
+	// e: 챗봇 그래프 섹션
+
+	// s: 요금제 상품 섹션
+	.cb-ratePlanC-sec {
+		// s: 요금제 상품 리스트
+		.ratePlanC-list {
+			@include ratePlanC-list;
+
+			// 요금제 상품 리스트 카드
+			.ratePlanC-card {
+				@include ratePlanC-card;
+			}
+		}
+		// e: 요금제 상품 리스트
+	}
+	// e: 요금제 상품 섹션
+
+	// Case 검색결과 없음
+	.nodata {
+		height: 300rem;
+		@include nodata;
+	}
+
+	.modal-footer {
+		flex-wrap: wrap;
+		gap: 10rem;
+	}
+}
+// e: 추천 요금제 매칭 페이지

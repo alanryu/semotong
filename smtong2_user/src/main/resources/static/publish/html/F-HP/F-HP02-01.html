@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>휴대폰 상세정보 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<!-- 페이지 스크립트 영역 -->
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			// Boottsrap Popover 예외처리 (popover.scss)
+			const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+			const popoverList = [...popoverTriggerList].map(popoverTriggerEl => {
+				return new bootstrap.Popover(popoverTriggerEl, {
+					customClass: 'ui-popover popover-style1 popover-auto',
+					container: '.hp-floating-sec'
+				});
+			});
+
+			// 문서 클릭 시 모든 Popover 닫기
+			document.addEventListener('click', () => {
+				popoverList.forEach(popover => popover.hide());
+			});
+
+		});
+	</script>
+</head>
+
+<body>
+	<!-- 레이아웃 유형구분
+		메인: main-wrapper,
+		서브: sub-wrapper,
+		기타: [기타]-wrapper
+	 -->
+	<div class="wrapper sub-wrapper">
+		<!-- Header Deaktop -->
+		<header class="header-desktop">
+			<div class="header-skip">
+				<a href="#content">본문 바로가기</a>
+			</div>
+
+			<div class="header-sec">
+				<h1 class="title">
+					<!-- 로고 베타 추가 -->
+					<a href="../scenario/F-M01-01.html" class="logo"><span class="blind">세모통</span></a>
+					<!-- <span class="logo-beta"><img src="../../assets/images/common/img-logo-header-beta.png" alt=""></span> -->
+				</h1>
+				<nav class="header-nav">
+					<ul class="nav-list">
+						<li class="nav-item">
+							<!-- 선택된 상태 : is-selected -->
+							<a href="../F-G/F-G01-01.html" role="link" class="ui-btn nav-link">
+								<span>세모통 설명서</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<div class="ui-dropdown">
+								<a href="../scenario/F-P01-01.html" role="link" class="ui-btn nav-link" data-bs-toggle="dropdown" aria-expanded="false">
+									<span>요금제 찾기</span>
+								</a>
+								<div class="dropdown-menu">
+									<ul class="sub-nav">
+										<li class="sub-nav-item">
+											<a href="../scenario/F-P01-01.html" role="link" class="ui-btn sub-nav-link">
+												<span>알뜰요금제</span>
+											</a>
+										</li>
+										<li class="sub-nav-item">
+											<a href="../scenario/F-P01-01.html" role="link" class="ui-btn sub-nav-link">
+												<i class="ui-icn icn-h20-sk" aria-label="SKT"></i>
+												<i class="ui-icn icn-h20-kt" aria-label="KT"></i>
+												<i class="ui-icn icn-h20-lgu-02" aria-label="U+"></i>
+												요금제
+											</a>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</li>
+						<li class="nav-item">
+							<a href="../F-I/F-I01-01.html" role="link" class="ui-btn nav-link">
+								<span>인터넷</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../F-E/F-E01-01.html" role="link" class="ui-btn nav-link">
+								<span>이벤트</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../F-MY/F-MY01-01.html" role="link" class="ui-btn nav-link">
+								<span>마이페이지</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+		<!-- // Header Deaktop -->
+
+		<!-- Header Mobile -->
+		<header class="header-mobile only-mo">
+			<section class="header-sec">
+				<h1 class="title">
+					<!-- 로고 베타 추가 -->
+					<a href="../scenario/F-M01-01.html" class="logo"><span class="blind">세모통</span></a>
+					<!-- <span class="logo-beta"><img src="../../assets/images/common/img-logo-header-beta.png" alt=""></span> -->
+				</h1>
+				<button type="button" class="ui-btn btn-aside" data-bs-toggle="modal" data-bs-target="#asideModal">
+					<i class="ui-icn icn-32-anb-bk" aria-label="메뉴열기"></i>
+				</button>
+			</section>
+			<!-- // Mobile Header -->
+		</header>
+		<!-- // Header -->
+
+		<!-- Mobile Nav Modal (include_mobileNav.html) -->
+		<aside class="modal modal-full fade aside-modal" id="asideModal" tabindex="-1" role="dialog" aria-labelledby="asideModalLabel" aria-hidden="true"></aside>
+		<!-- Mobile Nav Modal -->
+
+		<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-HP02-01-page">
+				<!-- 핸드폰 상세정보 섹션 -->
+				<section class="hp-detail-sec">
+					<div class="sec-inner">
+						<div class="hp-detail-view">
+							<img src="../../assets/images/upload/@thumb-hp-01.png" alt="" class="thumb" />
+						</div>
+						<div class="hp-detail-cont">
+							<p class="sec-telecom">SKT, KT, LG U+</p>
+							<h2 class="sec-tit">아이폰 16 PRO 512GB</h2>
+
+							<h3 class="sec-tit-sub">색상 <em>블랙</em></h3>
+							<div class="detail-color">
+								<label class="rdo-color">
+									<input type="radio" name="frmColor" checked/>
+									<span class="rdo">
+										<i aria-label="#4B4C4E" style="background-color: #4B4C4E;"></i>
+									</span>
+								</label>
+								<label class="rdo-color">
+									<input type="radio" name="frmColor"/>
+									<span class="rdo">
+										<i aria-label="#FFE2E4" style="background-color: #FFE2E4;"></i>
+									</span>
+								</label>
+								<label class="rdo-color">
+									<input type="radio" name="frmColor"/>
+									<span class="rdo">
+										<i aria-label="#FFFAE2" style="background-color: #FFFAE2;"></i>
+									</span>
+								</label>
+								<label class="rdo-color">
+									<input type="radio" name="frmColor"/>
+									<span class="rdo">
+										<i aria-label="#F1F5E6" style="background-color: #F1F5E6;"></i>
+									</span>
+								</label>
+								<label class="rdo-color">
+									<input type="radio" name="frmColor"/>
+									<span class="rdo">
+										<i aria-label="#F3F7F8" style="background-color: #F3F7F8;"></i>
+									</span>
+								</label>
+								<label class="rdo-color">
+									<input type="radio" name="frmColor"/>
+									<span class="rdo">
+										<i aria-label="#FFE3E5" style="background-color: #FFE3E5;"></i>
+									</span>
+								</label>
+							</div>
+
+							<h3 class="sec-tit-sub">할부 개월</h3>
+							<div class="detail-radio">
+								<label class="installment-rdo">
+									<input type="radio" name="frmInstallment" checked>
+									<span class="rdo"><span>전체</span></span>
+								</label>
+								<label class="installment-rdo">
+									<input type="radio" name="frmInstallment">
+									<span class="rdo"><span>8개월</span></span>
+								</label>
+								<label class="installment-rdo">
+									<input type="radio" name="frmInstallment">
+									<span class="rdo"><span>12개월</span></span>
+								</label>
+								<label class="installment-rdo">
+									<input type="radio" name="frmInstallment">
+									<span class="rdo"><span>24개월</span></span>
+								</label>
+								<label class="installment-rdo">
+									<input type="radio" name="frmInstallment">
+									<span class="rdo"><span>36개월</span></span>
+								</label>
+							</div>
+
+							<h3 class="sec-tit-sub">스펙</h3>
+							<div class="detail-spec">
+								<table class="spec-table">
+									<caption>
+										<strong>핸드폰 스펙</strong>
+										<p>색상, CPU, 디스플레이, 사이즈, 무게, 카메라, 메모리, 배터리, 방수 정보로 구성된 표입니다.</p>
+									</caption>
+									<tbody>
+										<tr>
+											<th scope="row">색상</th>
+											<td>블루,실버,쉐도우,옐로우,민트</td>
+										</tr>
+										<tr>
+											<th scope="row">CPU</th>
+											<td>스냅드래곤 8Gen3 (4nm,Octa-core)</td>
+										</tr>
+										<tr>
+											<th scope="row">디스플레이</th>
+											<td>
+												<p>메인 : 6.7 Dynamic AMOLED 2X</p>
+												<p>커버 : 3.4 Super AMOLED</p>
+											</td>
+										</tr>
+										<tr>
+											<th scope="row">사이즈</th>
+											<td>
+												<p>165.1 x 71.9 x 6.9mm </p>
+												<p>(접힌  상태 : 85.1 x 71.9 x 14.9mm)</p>
+											</td>
+										</tr>
+										<tr>
+											<th scope="row">무게</th>
+											<td>187g</td>
+										</tr>
+										<tr>
+											<th scope="row">카메라</th>
+											<td>
+												<p>후면 초광각 12M + 광각 50MP</p>
+												<p>(f2.2,f1.8), 전면 10MP(f2.2)</p>
+											</td>
+										</tr>
+										<tr>
+											<th scope="row">메모리</th>
+											<td>ROM:12GB, ROM:512GB</td>
+										</tr>
+										<tr>
+											<th scope="row">배터리</th>
+											<td>4,000mAh</td>
+										</tr>
+										<tr>
+											<th scope="row">방수</th>
+											<td>IP48</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+
+							<h3 class="sec-tit-sub">사은품</h3>
+							<div class="detail-gift">
+								<p>
+									<i class="ui-icn icn-16-plan-gift-gr"></i>
+									구매 확정 시, 신세계 상품권 10만원 증정
+								</p>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- // 핸드폰 상세정보 섹션 -->
+
+				<!-- 구매신청 플로팅 섹션 -->
+				<section class="hp-floating-sec">
+					<div class="sec-inner">
+						<div class="floating-cont">
+							<p class="charge">
+								월 58,640원
+								<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto" data-bs-content="출고가 1,407,360원">
+									<i class="ui-icn icn-16-plan-quse-gr" aria-label="툴팁"></i>
+								</button>
+							</p>
+							<p class="info">24개월 할부 기준(무이자)</p>
+						</div>
+						<div class="floating-btn">
+							<button type="button" class="ui-btn btn-action primary" data-bs-toggle="modal" data-bs-target="#FHP0201P01Modal">
+								<span>구매 신청하기</span>
+							</button>
+						</div>
+					</div>
+				</section>
+				<!-- //구매신청 플로팅 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+	</div>
+</body>
+
+</html>

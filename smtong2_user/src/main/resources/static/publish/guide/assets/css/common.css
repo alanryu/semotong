@@ -1,0 +1,20 @@
+@charset "utf-8";
+
+/*-------------------------------------------------------------------
+	Guide
+-------------------------------------------------------------------*/
+/* html, body {height:100%;} */
+/* .g-wrap {min-height:100%; background-color:rgba(0,0,51,0.1);} */
+.g-header {position:fixed; z-index:100; display:flex; flex-wrap: wrap; justify-content: space-between; align-items: center; width:100%; height:64px; background-color: #222; color:#fff;}
+.g-in-sec {padding-left:30px; padding-right:30px;}
+.g-logo {margin:10px 0; font-size:22px; text-align: center; font-weight:300;}
+.g-gnb ul {display:flex; justify-content: center; margin:-10px;}
+.g-gnb li {margin:10px; flex:0 1 auto;}
+.g-gnb a {display:block; padding:8px 12px; font-size:18px; border-radius:6px; font-weight:500; text-align:center;}
+.g-gnb .is-selected a {background-color:#fff; color:#222;}
+.g-sub {padding:10px 30px; border-bottom:1px solid #ddd; background-color:#fff;}
+.g-sub ul {display:flex; justify-content: center; margin:-1px;}
+.g-sub li {margin:1px;}
+.g-sub a {display:block; padding:8px 24px; font-size:16px;}
+.g-top {display:flex; justify-content: center; align-items:center; position:fixed; right:20px; bottom:20px; width:60px; height:60px; background-color:#222; border-radius:50%; color:#fff; font-size:16px;}
+.g-top span {position:relative; top:5px; display:block; width:18px; height:18px; transform:rotate(-45deg); border:1px solid #fff; border-width:1px 1px 0 0;}

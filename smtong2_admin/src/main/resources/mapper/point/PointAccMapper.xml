@@ -1,0 +1,79 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.point.mapper.PointAccMapper">
+	
+	<sql id="Point_Column_list">
+			 p.id
+			,p.user_id
+			,p.balance
+			,p.status
+			,p.comment
+			,p.last_history_id
+			,p.last_history_date
+			,p.last_npay_id
+			,p.last_npay_date
+			,p.last_cash_id
+			,p.last_cash_date
+			,p.create_date
+			,p.create_id
+			,p.modified_date
+			,p.modified_id
+			
+			,u.username
+			,u.kakao_user_id
+			,u.join_date
+			,u.birth_day
+			,AES_DECRYPT(FROM_BASE64(u.phone_number), 'tb_mbm_user') phoneNumber
+			
+	</sql>
+	<sql id="PointWhereInfo">
+		<where>
+			<if test='searchUserId != null and searchUserId !=""'>
+			AND u.id = #{searchUserId}
+			</if>
+			
+			<if test='searchKakaoUserId != null and searchKakaoUserId !=""'>
+			AND u.kakao_user_id = #{searchKakaoUserId}
+			</if>
+			<if test='keyword != null and keyword !=""'>
+			AND (u.username LIKE CONCAT('%', #{keyword}, '%') OR u.kakao_user_id LIKE CONCAT('%', #{keyword}, '%'))
+			</if>
+		</where>
+	</sql>
+	
+	
+	<select id="getMyPoint" parameterType="kr.co.ucomp.web.point.dto.PointAccDTO" resultType="kr.co.ucomp.web.point.entity.PointAccEntity">
+		SELECT
+		<include refid="Point_Column_list" />
+		FROM tb_mbm_user u
+		LEFT JOIN tb_mbm_point p ON u.id = p.user_id
+		<include refid="PointWhereInfo" />
+	</select>
+	
+	<select id="getPointUserList" parameterType="kr.co.ucomp.web.point.dto.PointAccDTO" resultType="kr.co.ucomp.web.point.entity.PointAccEntity">
+		SELECT
+		<include refid="Point_Column_list" />
+		FROM tb_mbm_user u
+		LEFT JOIN tb_mbm_point p ON u.id = p.user_id
+		<include refid="PointWhereInfo" />
+	</select>
+	
+	<update id="update"  parameterType="kr.co.ucomp.web.point.entity.PointAccEntity" >
+		UPDATE tb_mbm_point 
+		SET 
+			 balance            = balance + #{amount}
+			,bef_balance         = balance
+			,last_history_id    = IFNULL(#{lastHistoryId		}, last_history_id      )
+			,last_history_date  = CASE WHEN #{lastHistoryId} IS NULL THEN last_history_date ELSE NOW() END
+			,last_npay_id       = IFNULL(#{lastNpayId			}, last_npay_id       	)
+			,last_npay_date     = CASE WHEN #{lastNpayId} IS NULL THEN last_npay_date ELSE NOW() END
+			,last_cash_id       = IFNULL(#{lastCashId			}, last_cash_id       	)
+			,last_cash_date     = CASE WHEN #{lastCashId} IS NULL THEN last_cash_date ELSE NOW() END
+		WHERE id = #{id}
+	</update>
+
+
+
+
+</mapper>

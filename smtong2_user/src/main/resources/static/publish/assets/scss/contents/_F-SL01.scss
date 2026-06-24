@@ -1,0 +1,45 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 외부영업 요금제 목록
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 외부영업 요금제 목록
+.F-SL01-page {
+	padding-top: 40rem;
+	padding-bottom: calc(40rem + $safe-area-bottom);
+
+	// s: 이벤트 혜택
+	.event-benefit-sec {
+		margin-bottom:50rem;
+		@include sec-basic;
+
+		.event-bnr + .event-benefit {
+			margin-top: 10rem;
+		}
+	}
+	// e: 이벤트 혜택
+
+	// s: 상품리스트 섹션
+	.ratePlanC-sec {
+		@include sec-basic;
+
+		// 요금제 상품 리스트 공통
+		.ratePlanC-list {
+			@include ratePlanC-list;
+			padding-top: 0;
+
+			// 요금제 상품 리스트 카드 공통
+			.ratePlanC-card {
+				@include ratePlanC-card;
+			}
+		}
+
+		// nodata 공통
+		.nodata {
+			@include nodata;
+		}
+
+	}
+	// e: 상품리스트 섹션
+}
+// e: 외부영업 요금제 목록

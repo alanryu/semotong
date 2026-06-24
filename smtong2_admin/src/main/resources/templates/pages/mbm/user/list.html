@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='02',menuId ='01'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+
+	 <script id="userListTmpl" type="text/x-jquery-tmpl">
+		<tr>
+		    <td>${id}</td>
+		    <td><a href="/mbm/users/edit?searchId=${id}">${username}</a></td>
+		    <td>${ageGroup}</td>
+		    <td>${birthDay}</td>
+		    <td>${birthYear}</td>
+ 			<!--<td>{{html birthDay.substring(0,4)}}</td>-->
+			<td>${email}</td>
+			<td>{{if channelYn == 1}}Y{{else}}N{{/if}}</td>
+			<td>{{html getStateNm(memberStat)}}</td>
+		    <td>{{html getDateStr(joinDate)}}</td>
+		</tr>
+	</script>
+	<script type="text/javascript">
+		document.addEventListener('DOMContentLoaded', function () {
+			currentPage =1;
+			
+			searchList();
+			
+			document.getElementById("recordSize").addEventListener("change", function () {
+				currentPage =1;
+				searchList();
+			});
+			
+		});
+		
+		
+		function getStateNm(stat) {
+			var res="";
+			if(stat =="ACTIVE") {
+				res = "활동";
+			}
+			if(stat =="STOP") {
+				res = "중지";
+			}
+			if(stat =="DROP") {
+				res = "탈퇴";
+			}
+			return res;
+		}
+		
+		function changeCombo(){
+			currentPage = 1;
+			searchList()
+		}
+		
+		function renderPage(page) {
+			currentPage = page;
+			searchList();
+		}
+		
+		
+		function searchList() {
+			
+			var page = currentPage;
+			if(page =="" || page == null) page =1;
+			var _recordSize =  parseInt($("#recordSize").val());
+			
+			var _searchAgeGroup = $("input[name='searchAgeGroup']:checked").val()
+			var _searchUserState = $("input[name='searchUserState']:checked").val()
+			
+			var params = {
+			     searchType : $("#searchType").val(),
+				 keyword : $("#keyword").val(),
+				 searchStartDt : $("#searchStartDt").val(),
+				 searchEndDt : $("#searchEndDt").val(),
+				 searchUserState : _searchUserState,
+				 searchAgeGroup : _searchAgeGroup,
+				 searchChannelYn : $('input[name=searchChannelYn]:checked').val(),
+				 page : page,
+				 recordSize : _recordSize
+			}
+			
+			$.ajax({
+			   url : '/mbm/users/ajaxList',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+				success: function (data) {
+					//if(page==1) {
+						$('#searchList').empty();
+					//}
+					
+					$('#listCount').html("총 " + data.totalCnt +"건" );
+					if( data.totalCnt > 0 ) {
+						$('#userListTmpl').tmpl(data.data).appendTo('#searchList');
+					}
+					
+					renderPagination(page,data.totalCnt,_recordSize);
+			    },
+				error : function(request, status, error){
+		            alert(error);
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+			});
+		}
+		
+		function toggleSearchInit(){
+			$("#searchType").val("NAME").prop('selected', true);
+			$("#searchAgeGroup01").prop('checked', true);
+			$("#searchUserState01").prop('checked', true);
+			
+			$("#keyword").val('');
+			
+			periodButtonInit();
+			
+			periodButtonInit();
+			currentPage = 1;
+		}
+		
+		
+		
+		function downloadExcel() {
+			var page = 1;
+			var _recordSize = 9999;
+			
+			var _searchAgeGroup = $("input[name='searchAgeGroup']:checked").val()
+			var _searchUserState = $("input[name='searchUserState']:checked").val()
+			
+			var params = {
+			     searchType : $("#searchType").val(),
+				 keyword : $("#keyword").val(),
+				 searchStartDt : $("#searchStartDt").val(),
+				 searchEndDt : $("#searchEndDt").val(),
+				 searchUserState : _searchUserState,
+				 searchAgeGroup : _searchAgeGroup,
+				 page : page,
+				 recordSize : _recordSize
+			}
+			
+			var _url = '/mbm/users/exceldown';
+			
+			downloadExcelProc(params,_url,"userList");
+			
+		}
+	</script>
+</th:block>
+
+<div class="main-content">
+            <div class="container-fluid">
+                 <!-- 로케이션 & 제목 영역 추가 -->
+                <div class="page-header mb-4">
+                    <div class="location mb-2">
+                        <small class="text-secondary">
+                            <i class="fas fa-home me-1"></i>
+                            <a href="#">홈</a> > <a href="/mbm/users/list">회원관리</a> > <a href="/mbm/users/list">회원목록</a>
+                        </small>
+                    </div>
+                    <h2 class="page-title fs-4 mb-4">회원목록</h2>
+                </div>
+                
+                <div class="search-section">
+                    <!-- 검색어 -->
+                    <div class="col-12 mb-2">
+                        <div class="form-row full-width">
+                            <div class="form-label mb-0">검색조건</div>
+                            <div class="form-control-wrap flex-grow-1">
+                                <select class="form-select" id="searchType">
+                                    <option value="NAME">회원명</option>
+                                    <option value="KAKAO">카카오계정</option>
+                                </select>
+                            </div>
+                            <div class="position-relative col-9">
+                                <i class="fas fa-search position-absolute" style="left: 16px; top: 15.5px; color: #94a3b8;"></i>
+                                <input type="text" class="form-control ps-5" placeholder="검색어를 입력하세요" id="keyword">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-2">
+                        <div class="form-row full-width">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="form-label mb-0">검색기간</div>
+                                <select class="form-select" style="width: 120px">
+                                    <option>등록일자</option>
+                                </select>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="date" class="form-control" style="width: 150px" id="searchStartDt">
+                                    <span class="text-secondary">-</span>
+                                    <input type="date" class="form-control" style="width: 150px" id="searchEndDt">
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="period-button" value="0">오늘</button>
+                                    <button class="period-button" value="7">1주일</button>
+                                    <button class="period-button" value="30">1개월</button>
+                                    <button class="period-button" value="90">3개월</button>
+                                    <button class="period-button" value="180">6개월</button>
+                                    <button class="period-button" value="365">1년</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div id="detailSearchArea" class="col-12" style="display: none;">
+						<div class="row align-items-center mb-3">
+	                        <div class="col-12">
+	                            <div class="d-flex align-items-center gap-3">
+	                                <div class="form-label mb-0">연령대</div>
+	                                <div class="radio-group">
+	                                    <div class="form-check form-check-inline">
+	                                        <input class="form-check-input" type="radio" name="searchAgeGroup" id="searchAgeGroup01" value="" checked>
+	                                        <label class="form-check-label" for="searchAgeGroup01">전체</label>
+	                                    </div>
+	                                    <div class="form-check form-check-inline">
+	                                        <input class="form-check-input" type="radio" name="searchAgeGroup" id="searchAgeGroup02" value="10">
+	                                        <label class="form-check-label" for="searchAgeGroup02">10</label>
+	                                    </div>
+	                                    <div class="form-check form-check-inline">
+	                                        <input class="form-check-input" type="radio" name="searchAgeGroup" id="searchAgeGroup03" value="20">
+	                                        <label class="form-check-label" for="searchAgeGroup03">20</label>
+	                                    </div>
+	                                    <div class="form-check form-check-inline">
+	                                        <input class="form-check-input" type="radio" name="searchAgeGroup" id="searchAgeGroup04" value="30">
+	                                        <label class="form-check-label" for="searchAgeGroup04">30</label>
+	                                    </div>
+	                                    <div class="form-check form-check-inline">
+	                                        <input class="form-check-input" type="radio" name="searchAgeGroup" id="searchAgeGroup05" value="40">
+	                                        <label class="form-check-label" for="searchAgeGroup05">40</label>
+	                                    </div>
+	                                    <div class="form-check form-check-inline">
+	                                        <input class="form-check-input" type="radio" name="searchAgeGroup" id="searchAgeGroup06" value="50">
+	                                        <label class="form-check-label" for="searchAgeGroup06">50</label>
+	                                    </div>
+	                                    <div class="form-check form-check-inline">
+	                                        <input class="form-check-input" type="radio" name="searchAgeGroup" id="searchAgeGroup07" value="60">
+	                                        <label class="form-check-label" for="searchAgeGroup07">60 이상</label>
+	                                    </div>
+	                                </div>
+	                            </div>
+	                        </div>
+	                    </div>
+	                    <div class="row align-items-center mb-3">
+	                        <div class="col-12">
+	                            <div class="d-flex align-items-center gap-3">
+	                                <div class="form-label mb-0">카카오 채널<br/>추가여부</div>
+	                                <div class="radio-group">
+	                                    <div class="form-check form-check-inline">
+	                                        <input class="form-check-input" type="radio" name="searchChannelYn" id="searchChannelYn01" value="" checked>
+	                                        <label class="form-check-label" for="searchChannelYn01">전체</label>
+	                                    </div>
+	                                    <div class="form-check form-check-inline">
+	                                        <input class="form-check-input" type="radio" name="searchChannelYn" id="searchChannelYn02" value="1">
+	                                        <label class="form-check-label" for="searchChannelYn02">Y</label>
+	                                    </div>
+	                                    <div class="form-check form-check-inline">
+	                                        <input class="form-check-input" type="radio" name="searchChannelYn" id="searchChannelYn03" value="0">
+	                                        <label class="form-check-label" for="searchChannelYn03">N</label>
+	                                    </div>
+	                                </div>
+	                            </div>
+	                        </div>
+	                    </div>
+	                    <div class="row align-items-center mb-3">
+	                        <div class="col-12">
+	                            <div class="d-flex align-items-center gap-3">
+	                                <div class="form-label mb-0">회원구분</div>
+	                                <div class="radio-group">
+	                                    <div class="form-check form-check-inline">
+	                                        <input class="form-check-input" type="radio" name="searchUserState" id="searchUserState01" value="" checked>
+	                                        <label class="form-check-label" for="searchUserState01">전체</label>
+	                                    </div>
+	                                    <div class="form-check form-check-inline">
+	                                        <input class="form-check-input" type="radio" name="searchUserState" id="searchUserState02" value="ACTIVE">
+	                                        <label class="form-check-label" for="searchUserState02">활동</label>
+	                                    </div>
+	                                    <div class="form-check form-check-inline">
+	                                        <input class="form-check-input" type="radio" name="searchUserState" id="searchUserState03" value="STOP">
+	                                        <label class="form-check-label" for="searchUserState03">중지</label>
+	                                    </div>
+	                                    <div class="form-check form-check-inline">
+	                                        <input class="form-check-input" type="radio" name="searchUserState" id="searchUserState04" value="DROP">
+	                                        <label class="form-check-label" for="searchUserState04">탈퇴</label>
+	                                    </div>
+	                                </div>
+	                            </div>
+	                        </div>
+	                    </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 text-end mt-2">
+                            <button class="btn btn-light me-2 btn-sm" onclick="toggleSearchInit()">
+								<i class="fas fa-redo"></i>
+								초기화
+							</button>
+							<button class="btn btn-primary btn-sm me-2" onclick="toggleDetailSearch()">
+	                            <i class="fas fa-chevron-down"></i>
+	                            상세검색
+	                        </button>
+                            <button class="btn btn-primary btn-sm" onclick="searchList();">
+                                <i class="fas fa-search"></i>
+                                검색
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="stats-badge">
+                                <i class="fas fa-calculator me-1"></i>
+                                <span id="listCount"></span>
+                            </div>
+                            <select class="form-select" style="width: 100px" id="recordSize" onchange="changeCombo()">
+                                <option value="10">10개씩</option>
+								<option value="20">20개씩</option>
+								<option value="30">30개씩</option>
+								<option value="40">40개씩</option>
+								<option value="50">50개씩</option>
+                            </select>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-light btn-sm">
+                                <i class="fas fa-download"></i>
+                                다운로드
+                            </button>
+                            <!-- <button class="btn btn-primary btn-sm" onclick="location.href='/mbm/company/edit'">
+                                <i class="fas fa-plus"></i>
+                                신규등록
+                            </button> -->
+                        </div>
+                    </div>
+
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th>번호</th>
+                                <th>이름</th>
+                                <th>연령대</th>
+                                <th>생일</th>
+                                <th>출생년도</th>
+                                <th>카카오계정</th>
+                                <th>카카오 채널 추가</th>
+                                <th>회원구분</th>
+                                <th>등록일</th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchList">
+                            
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-left mt-4">
+                        <ul class="pagination">
+                            
+                        </ul>
+                    </div>
+                </div>
+            </div>
+</DIV>

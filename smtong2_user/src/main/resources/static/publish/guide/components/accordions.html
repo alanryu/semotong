@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Accordions | 세모통 스타일가이드</title>
+	<meta http-equiv="X-UA-Compatible" content="ie=edge chrome=1" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="프로젝트가이드, 세모통 스타일가이드" />
+	<meta name="description" content="프로젝트가이드, 세모통 스타일가이드" />
+	<link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 인크루드 설정용도(개발적용안함) -->
+	<link rel="stylesheet" type="text/css" href="css/guide.css" /><!-- 가이드전용 -->
+</head>
+
+<body>
+	<div class="wrapper sub_page">
+		<!-- Header -->
+		<div data-include="include_header.html"></div>
+		<!-- // Header -->
+
+		<!-- Container -->
+		<div class="container">
+			<main id="content" class="content" role="main">
+				<div class="content-body">
+					<div class="out-sec in-sec">
+						<h1 class="g-h1">Accordion</h1>
+					</div>
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">기본 구조</h2>
+						</div>
+						<div class="g-section-body">
+							<ul class="g-desc">
+								<li><a href="https://getbootstrap.com/docs/5.3/components/accordion/" target="_blank" class="g-link">https://getbootstrap.com/docs/5.3/components/accordion/</a></li>
+								<li>아코디언 안의 한 항목을 열 때 다른 항목이 자동으로 닫히지 않게 하려면 data-bs-parent 속성을 삭제한다.</li>
+							</ul>
+							<xmp>
+<div class="ui-accordion accordion-유형" id="accordionExample">
+	<div class="accordion-item">
+		<h3 class="accordion-header">
+			<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+				aria-expanded="true" aria-controls="collapseOne">
+				Accordion Item #1
+			</button>
+		</h3>
+		<div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+			<div class="accordion-body">
+				Accordion Panel #1
+			</div>
+		</div>
+	</div>
+	<div class="accordion-item">
+		<h3 class="accordion-header">
+			<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+				data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+				Accordion Item #2
+			</button>
+		</h3>
+		<div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+			<div class="accordion-body">
+				Accordion Panel #2
+			</div>
+		</div>
+	</div>
+	<div class="accordion-item">
+		<h3 class="accordion-header">
+			<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+				data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+				Accordion Item #3
+			</button>
+		</h3>
+		<div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+			<div class="accordion-body">
+				Accordion Panel #3
+			</div>
+		</div>
+	</div>
+</div>
+							</xmp>
+						</div>
+					</section>
+					<!-- // Section -->
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">Styles</h2>
+						</div>
+						<div class="g-section-body">
+							<p>UI 공통은 없으며, 페이지별 스타일 처리</p>
+						</div>
+					</section>
+					<!-- // Section -->
+				</div>
+			</main>
+		</div>
+		<!-- // Container -->
+
+		<!-- Footer (include_footer.html) -->
+		<div data-include="include_footer.html"></div>
+		<!-- // Footer -->
+	</div>
+
+	<script>
+		// https://getbootstrap.com/docs/5.3/components/toasts/
+		const toastTrigger = document.getElementById('liveToastBtn')
+		const toastLiveExample = document.getElementById('liveToast')
+
+		if (toastTrigger) {
+			const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
+			toastTrigger.addEventListener('click', () => {
+				toastBootstrap.show()
+			})
+		}
+	</script>
+
+</body>
+
+</html>

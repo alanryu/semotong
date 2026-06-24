@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='공지사항', layoutSubTitleYN='Y', layoutFooterYn='Y'">
+
+<th:block layout:fragment="css"></th:block>
+<th:block layout:fragment="script">
+	<script type="text/javascript">
+	$(document).ready(function(){
+		
+		$('#go-list').on('click', function(){
+			
+			$(location).attr('href', '/cms/notice/noticeList');
+		});
+	});
+	</script>
+<th:block>
+<!-- Container -->
+<main role="main" class="container">
+	<!-- content -->
+	<div class="content F-CS02-02-page">
+		<!-- 공지사항 상세 섹션 -->
+		<section class="notice-detail-sec">
+			<div class="sec-inner">
+				<div class="notice-detail">
+					<div class="detail-header">
+						<h2 class="tit"><strong th:text="${info.title}">[안내] 카카오 회원가입 후 로그인이 안될 때 안내</strong></h2>
+						<p class="date" th:text="${#dates.format(info.createDate, 'yyyy.MM.dd')}">2024.11.01</p>
+					</div>
+					<div class="detail-body">
+						<div class="data-view" th:utext="${info.content}">
+							<p>안녕하세요. 세모통입니다.</p>
+							<p>카카오 아이디 연동으로 세모통에 회원가입을 한 후 로그인을 시도했으나 로그인이 되지 않는 경우(가입 완료 했으나 가입되지 않은 회원으로 표시되고, 회원 가입 시, 이미 가입된 회원이라 표시되는 경우)의 해결 방법에 대해 안내드릴게요.</p>
+							<p>모든 브라우저의 카카오 및 다음(www.daum.net)에서 로그아웃하기</p>
+							<p>회원님들께서 세모통에 가입하실 때의 카카오 ID와 로그인을 시도하고 계신 카카오ID가 다른 경우가 있어요. </p>
+							<p>이 때에는 고객님께서 사용하시는 모든 브라우(Internet Explorer, Chrome 등)에서 다음(www.daum.net) 사이트에 접속하셔서 로그아웃 하신 후 다시 세모통에 접속하셔서 [카카오로 로그인 하기] 버튼을 클릭하여 로그인 시도를 해주세요.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- // 공지사항 상세 섹션 -->
+
+		<!-- 플로팅 섹션 -->
+		<section class="floating-sec">
+			<div class="sec-inner">
+				<button type="button" class="ui-btn btn-action primary" id="go-list">
+					<span>목록</span>
+				</button>
+			</div>
+		</section>
+		<!-- // 플로팅 섹션 -->
+	</div>
+	<!-- // content -->
+</main>
+<!-- // Container -->

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="robots" content="noindex, nofollow">
+    <title>세모통 로그인</title>
+	<link rel="stylesheet" type="text/css" th:href="@{css/bootstrap.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{css/design.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{css/login.css}" />
+	<script th:src="@{/js/libs/jquery.min.js}"></script>
+	<script th:src="@{/js/libs/librurys.min.js}"></script>
+	<script th:src="@{/js/libs/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/js/ui/script.js}"></script>
+	<script>
+	
+		document.addEventListener('DOMContentLoaded', () => {
+			const input = document.querySelector('input[type="password"]');
+			input.addEventListener('keydown', function(event) {
+				console.log(event.key);
+				  if (event.key === 'Enter') {
+					  login()
+				  }
+			});
+			
+			var errMsg = "[[${param.errorMsg}]]";
+			
+			if(errMsg =="99" || errMsg == '91') {
+				alert("아이디 와 패스워드가 일치하지 않습니다.");
+				window.location.href = "/login"
+			}
+			
+			/* if(errMsg =="91") {
+				alert("아이디가 존재하지 않습니다.");
+				window.location.href = "/login"
+			} */
+			
+			if(errMsg =="92") {
+				alert("사용이 정지된 계정입니다. 시스템관리자에게 문의하세요.");
+				window.location.href = "/login"
+			}
+			
+			if(errMsg =="98") {
+				alert("사용권한이 없습니다. 시스템관리자에게 문의하세요.");
+				window.location.href = "/login"
+			}
+			
+			  const userIdInput = document.getElementById("username");
+			  const rememberMeCheckbox = document.getElementById("rememberMe");
+			
+			 // 로컬 스토리지에서 값 읽기
+			  const savedUserId = localStorage.getItem("userId");
+			  if (savedUserId) {
+			    userIdInput.value = savedUserId;
+			    rememberMeCheckbox.checked = true;
+			  }
+			  
+			  
+			$("#username").focus();
+		});
+		
+		function login() {
+			if($("#username").val() == "") {
+				showAlert('아이디를 입력해 주세요.');
+				return false;
+			}
+			
+			if($("#password").val() == "") {
+				showAlert('비밀번호를 입력해 주세요.');
+				return false;
+			}
+			
+		  const userIdInput = document.getElementById("username");
+		  const rememberMeCheckbox = document.getElementById("rememberMe");
+			
+			if (rememberMeCheckbox.checked) {
+		      localStorage.setItem("userId", userIdInput.value);
+		    } else {
+		      localStorage.removeItem("userId");
+		    }
+		
+		
+			
+			loginForm.submit();
+		}
+	</script>
+</head>
+<body>
+    <div class="login-container d-flex align-items-center justify-content-center min-vh-100">
+        <div class="login-card">
+            <!-- 로고 영역 -->
+            <div class="text-center mb-4">
+                <img src="/images/SMT1-3.png" alt="세모통 로고" class="logo-img">
+            </div>
+            
+            <!-- 로그인 타이틀 -->
+			<h1 class="text-center mb-4">로그인</h1>
+            <h2 class="text-center text-secondary fs-6 mb-4">세모통 계정으로 로그인하세요</h2>
+
+            <!-- 로그인 폼 -->
+            <form id="loginForm" action="/loginProc" method="POST">
+                <div class="floating-input mb-3">
+                    <input type="text" class="form-control" id="username" name="username" placeholder=" " required maxlength="20">
+                    <label for="username">아이디</label>
+                </div>
+                
+                <div class="floating-input mb-4">
+                    <input type="password"  class="form-control" name="password" id="password" placeholder=" " required maxlength="20">
+                    <label for="password">비밀번호</label>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input"  type="checkbox" id="rememberMe" style="position:relative; top:2px;">
+                        <label class="form-check-label" for="rememberMe"> 로그인 상태 유지 </label>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-primary w-100 mb-4" onclick="login();">
+                    로그인
+                </button>
+            </form>
+
+            <!-- 도움말 텍스트 -->
+            <p class="text-center text-secondary small">
+                아이디와 비밀번호를 잊어버리신 경우<br>시스템 관리자에게 문의하세요.
+				<span th:switch="${activeProfile}">
+				    <span th:case="'dev'">(Development)</span>
+				    <span th:case="'local'">(Local)</span>
+				    <span th:case="'prod'">(Production)</span>
+					<span th:case="'staging'">(Staging)</span>
+				    <span th:case="*">(Unknown)</span> <!-- 기본값 -->
+				</span>
+            </p>
+        </div>
+    </div>
+
+
+    <!-- 공통 알림 Modal -->
+    <div class="modal fade" id="commonAlertModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fs-6 fw-bold">안내</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center pb-4" id="commonAlertMessage">
+                    <!-- 메시지가 여기에 동적으로 들어갑니다 -->
+                </div>
+                <div class="modal-footer border-0 pt-0 justify-content-center">
+                    <button type="button" class="btn btn-dark px-4" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>

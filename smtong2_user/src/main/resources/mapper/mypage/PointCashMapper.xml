@@ -1,0 +1,85 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.mypage.mapper.PointCashMapper">
+	
+	<sql id="Point_Column_list">
+			 c.id
+			,p.user_id
+			,c.point_id
+			,c.bank_code
+			,GET_CODE_NAME('bank_code', c.bank_code) AS bankName
+			,c.account_no
+			,c.account_name
+			,c.amount
+			,c.req_date
+			,c.status
+			,c.memo
+			,c.create_date
+			,c.create_id
+			,c.modified_date
+			,c.modified_id
+	</sql>
+	<sql id="PointWhereInfo">
+		<where>
+			<if test='searchUserId != null and searchUserId !=""'>
+			AND u.id = #{searchUserId}
+			</if>
+		</where>
+	</sql>
+	
+	
+	<select id="getMyPointCash" parameterType="kr.co.ucomp.web.mypage.dto.PointCashDTO" resultType="kr.co.ucomp.web.mypage.entity.PointCashEntity">
+		SELECT
+		<include refid="Point_Column_list" />
+		FROM tb_mbm_user u
+		LEFT JOIN tb_mbm_point 			p ON u.id = p.user_id
+		LEFT JOIN tb_mbm_point_cash 	c ON p.id = c.point_id
+		<include refid="PointWhereInfo" />
+		ORDER BY c.id DESC
+	</select>
+	
+	<select id="getMyPointCashById" parameterType="kr.co.ucomp.web.mypage.dto.PointCashDTO" resultType="kr.co.ucomp.web.mypage.entity.PointCashEntity">
+		SELECT
+		<include refid="Point_Column_list" />
+		FROM tb_mbm_user u
+		LEFT JOIN tb_mbm_point 			p ON u.id = p.user_id
+		LEFT JOIN tb_mbm_point_cash 	c ON p.id = c.point_id
+		WHERE c.id = #{searchCashId}
+	</select>
+	
+	<insert id="insertCash" parameterType="kr.co.ucomp.web.mypage.entity.PointCashEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+	INSERT INTO tb_mbm_point_cash(
+			 point_id
+			,bank_code
+			,account_no
+			,account_name
+			
+			,amount
+			,req_date
+			,status
+			
+			,memo
+			
+			,create_date
+			,create_id
+	)VALUES (
+			 #{pointId			}
+			,#{bankCode			}
+			,#{accountNo		}
+			,#{accountName		}
+			
+			,#{amount			}
+			,NOW()
+			,#{status			}
+			
+			,#{memo				}
+			
+			,NOW()
+			,#{createId			}
+		)
+	</insert>
+
+
+
+</mapper>

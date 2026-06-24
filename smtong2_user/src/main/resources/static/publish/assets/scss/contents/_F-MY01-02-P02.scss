@@ -1,0 +1,35 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 추천내역
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 추천내역 페이지
+.F-MY01-02-P02-page {
+	// 탭 간격
+	.tab-style1 {
+		padding-bottom: 0;
+	}
+
+	// s: 추천내역 섹션
+	.recom-history-sec {
+		.recom-history-list {
+			@include recom-history-list;
+
+			.recom-history-card {
+				@include recom-history-card;
+			}
+		}
+	}
+	// e: 추천내역 섹션
+
+	// s: 노데이터 섹션
+	.nodata-sec {
+		@include nodata-sec;
+
+		.nodata {
+			@include nodata;
+		}
+	}
+	// e: 노데이터 섹션
+}
+// e: 추천내역 페이지

@@ -1,0 +1,129 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 자주하는 질문
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 자주하는 질문 페이지
+.F-G03-01-page {
+
+	// 페이시 여백
+	@include bottom-spacer;
+
+	// s: 자주묻는 질문 섹션
+	.faq-sec {
+		margin-top: var(--sec-outer-margin);
+		@include sec-basic;
+
+		// 분류 키워드
+		.keyword-swiper {
+			padding-bottom: 16rem;
+			overflow: visible;
+			&::before {
+				content:'';
+				display: block;
+				height: 8rem;
+				margin: 20rem calc(#{$mobile-outer-spacer} * -1);
+				background-color: #F5F5F5;
+			}
+			.swiper-wrapper {
+				.swiper-slide {
+					width: auto;
+				}
+			}
+			@include media-tablet-xs {
+				margin-top: 30rem;
+				overflow: hidden;
+				&::before {
+					display: none;
+				}
+			}
+		}
+
+		.keyword-btn {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 36rem;
+			padding: 0 9rem;
+			font-weight: 500;
+			font-size: 14rem;
+			color: #36383A;
+			border-radius: 6rem;
+			border:1px solid transparent;
+			background-color: #EFF0F0;
+			&.is-selected {
+				border-color: $color-primary;
+				background-color: #EAE6FB;
+				color: $color-primary;
+			}
+		}
+
+		// 자주묻는 질문 아코디언
+		.faq-accordion-wrap {
+			.faq-toolbar {
+				padding: 16rem 0;
+				.count {
+					font-weight: 500;
+					font-size: 12rem;
+					line-height: 16rem;
+					color: #63666A;
+				}
+			}
+
+			.faq-accordion {
+				@include faq-accordion;
+				margin-top: 0;
+				.acco-item:first-child {
+					border-top: 1px solid #eff0f0;
+				}
+				.acco-header {
+					.acco-button {
+						flex-wrap: wrap;
+						.part {
+							display: block;
+							margin-bottom: 8rem;
+							font-weight: 600;
+							font-size: 12rem;
+							line-height: 16rem;
+							color: $color-primary;
+						}
+						> span {
+							display: block;
+							width: 100%;
+							padding-left: 0;
+							.is-keyword {
+								color: $color-primary;
+							}
+						}
+					}
+				}
+
+				.faq-inquery {
+					margin-top: 16rem;
+					padding: 16rem;
+					border-radius: 2rem;
+					background-color: #F5F5F5;
+					p {
+						font-weight: 500;
+						font-size: 14rem;
+						line-height: 20rem;
+						color: #2A2B2D;
+					}
+					.btn-sub.xl {
+						margin-top: 16rem;
+					}
+				}
+			}
+
+			.nodata {
+				@include nodata;
+				.btn-sub {
+					margin-top: 16rem;
+				}
+			}
+		}
+	}
+	// e: 자주묻는 질문 섹션
+
+}
+// e: 자주하는 질문 페이지

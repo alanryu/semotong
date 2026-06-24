@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>세모통</title>
+        <link
+            href="../../css/bootstrap.min.css"
+            rel="stylesheet">
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            rel="stylesheet">
+          <link
+            href="../../css/design.css"
+            rel="stylesheet">
+    </head>
+    <body>
+        <div class="sidebarWrapper">
+            <div class="left-sidebar">
+                <div class="admin-profile">
+                    <div class="profile-letter">A</div>
+                    <div>
+                        <div class="fw-semibold text-dark">관리자 - 아무개님</div>
+                        <small class="text-muted">UPDATE -<br> 2024-12-12 18:02</small>
+                    </div>
+                </div>
+                <ul class="menu-list">
+                    <!-- 계정권한관리 -->
+                    <li class="menu-item">
+                        <a href="../account/account.html" class="menu-link">
+                            <i class="fas fa-user-cog"></i>
+                            <span>계정권한관리</span>
+                        </a>
+                    </li>
+                    <!-- 회원관리 -->
+                    <li class="menu-item">
+                        <a href="../members/members.html" class="menu-link">
+                            <i class="fas fa-users"></i>
+                            <span>회원관리</span>
+                        </a>
+                    </li>
+                    <!-- 입점사관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="#" class="menu-link">
+                            <i class="fas fa-building"></i>
+                            <span>입점사관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                                <a href="../business/list.html" class="submenu-link">사업자 목록</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../business/manage.html" class="submenu-link">입점사 관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 상품관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="#" class="menu-link">
+                            <i class="fas fa-box"></i>
+                            <span>상품관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item ">
+                                <a href="../product/rateplan.html" class="submenu-link">요금제</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../product/scraping.html" class="submenu-link">스크래핑 관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="javascript:;" class="submenu-link">인터넷</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 신청관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="../applications/applications.html" class="menu-link">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>신청관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item ">
+                                <a href="../product/rateplan.html" class="submenu-link">요금제 신청내역</a>
+                            </li>
+                            <li class="submenu-item active">
+                                <a href="../product/internet.html" class="submenu-link">인터넷 신청내역</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 정산관리 -->
+                    <li class="menu-item">
+                        <a href="../settlements/settlements.html" class="menu-link">
+                            <i class="fas fa-calculator"></i>
+                            <span>정산관리</span>
+                        </a>
+                    </li>
+                    <!-- 서비스관리 -->
+                    <li class="menu-item has-submenu active open">
+                        <a href="../services/services.html" class="menu-link">
+                            <i class="fas fa-cog"></i>
+                            <span>서비스관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                                <a href="../services/services.html" class="submenu-link">배너관리</a>
+                                <ul class="subsubmenu">
+                                    <li><a href="../services/services.html" class="subsubmenu-link">메인</a></li>
+                                    <li><a href="../services/services_combination.html" class="subsubmenu-link">결합</a></li>
+                                    <li><a href="../services/services_chatbot.html" class="subsubmenu-link">챗봇</a></li>
+                                </ul>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/board.html" class="submenu-link">게시판관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/member.html" class="submenu-link">회원관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/event.html" class="submenu-link">이벤트관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/tax.html" class="submenu-link">세무통설명서관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/after.html" class="submenu-link">후기관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/quality.html" class="submenu-link">질문진단보관리</a>
+                            </li>
+                            <li class="submenu-item active">
+                                <a href="../services/chat.html" class="submenu-link">챗봇요금제관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/portfolio.html" class="submenu-link">포트폴리오관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <button class="toggle-sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="main-content">
+            <div class="container-fluid">
+                <div class="page-header d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="location mb-2">
+                            <small class="text-secondary">
+                                <i class="fas fa-home me-1"></i>
+                                <a href="javascript:;">홈</a>
+                                >
+                                <a href="javascript:;">서비스 관리</a>
+                                >
+                                <a href="javascript:;">챗봇요금제관리</a>
+                            </small>
+                        </div>
+                        <h2 class="page-title fs-4 mb-4">
+                            챗봇요금제 수정
+                        </h2>
+                    </div>
+                </div>
+
+                <div class="table-section p-4">
+                    <!-- 필터 드롭다운 영역 -->
+                    <div class="d-flex mb-3">
+                        <div class="me-2">
+                            <select class="form-select pe-5" style="height:40px">
+                                <option selected>통신망 선택</option>
+                                <option>SKT</option>
+                                <option>KT</option>
+                                <option>LG U+</option>
+                            </select>
+                        </div>
+                        <div class="me-2">
+                            <select class="form-select  pe-5"  style="height:40px">
+                                <option selected>데이터 용량 선택</option>
+                                <option>1GB</option>
+                                <option>5GB</option>
+                                <option>10GB</option>
+                                <option>20GB</option>
+                                <option>무제한</option>
+                            </select>
+                        </div>
+                        <div class="me-2">
+                            <select class="form-select  pe-5"  style="height:40px">
+                                <option selected>QoS 선택</option>
+                                <option>일반</option>
+                                <option>프리미엄</option>
+                            </select>
+                        </div>
+                        <div class="me-2">
+                            <select class="form-select  pe-5"  style="height:40px">
+                                <option selected>전화 제공량 선택</option>
+                                <option>기본제공</option>
+                                <option>무제한</option>
+                            </select>
+                        </div>
+                        <div class="me-2">
+                            <select class="form-select  pe-5"  style="height:40px">
+                                <option selected>문자 제공량 선택</option>
+                                <option>기본제공</option>
+                                <option>무제한</option>
+                            </select>
+                        </div>
+                        <div class="search-input d-flex gap-2 flex-grow-1">
+                            <input type="text" class="form-control" placeholder="요금제명을 입력해주세요.">
+                            <button class="btn btn-dark"><span>검색</span></button>
+                        </div>
+                    </div>
+
+                    <!-- 요금제 선택 영역 -->
+                    <div class="registered-plans mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">요금제 선택</h5>
+                            
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table custom-table table-bordered">
+                                <colgroup>
+                                    <col style="width: 40px;">
+                                    <col style="width: 80px;">
+                                    <col style="width: 80px;">
+                                    <col style="width: 80px;">
+                                    <col style="width: 140px;">
+                                    <col style="width: 80px;">
+                                    <col style="width: 80px;">
+                                    <col style="width: 80px;">
+                                    <col style="width: 80px;">
+                                    <col style="width: 60px;">
+                                    <col style="width: 60px;">
+                                    <col style="width: 60px;">
+                                    <col style="width: 100px;">
+                                    <col style="width: 100px;">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>선택</th>
+                                        <th>통신망</th>
+                                        <th>네트워크</th>
+                                        <th>사업자</th>
+                                        <th>요금제명</th>
+                                        <th>기본료</th>
+                                        <th>할인금액</th>
+                                        <th>할인기간</th>
+                                        <th>데이터</th>
+                                        <th>QoS</th>
+                                        <th>전화</th>
+                                        <th>문자</th>
+                                        <th>혜택</th>
+                                        <th>최근수정일</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="d-flex centerMovingButton">
+                        <button class="btn btn-sm btn-outline-secondary me-2">▼</button>
+                        <button class="btn btn-sm btn-outline-secondary">▲</button>
+                    </div>
+
+                    <!-- 등록 요금제 영역 -->
+                    <div class="registered-plans mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">등록 요금제</h5>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table custom-table table-bordered">
+                                <colgroup>
+                                    <col style="width: 40px;">
+                                    <col style="width: 80px;">
+                                    <col style="width: 80px;">
+                                    <col style="width: 80px;">
+                                    <col style="width: 140px;">
+                                    <col style="width: 80px;">
+                                    <col style="width: 80px;">
+                                    <col style="width: 80px;">
+                                    <col style="width: 80px;">
+                                    <col style="width: 60px;">
+                                    <col style="width: 60px;">
+                                    <col style="width: 60px;">
+                                    <col style="width: 100px;">
+                                    <col style="width: 140px;">
+                                    <col style="width: 60px;">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="checkall"></th>
+                                        <th>통신망</th>
+                                        <th>네트워크</th>
+                                        <th>사업자</th>
+                                        <th>요금제명</th>
+                                        <th>기본료</th>
+                                        <th>할인금액</th>
+                                        <th>할인기간</th>
+                                        <th>데이터</th>
+                                        <th>QoS</th>
+                                        <th>전화</th>
+                                        <th>문자</th>
+                                        <th>혜택</th>
+                                        <th>라벨 설정</th>
+                                        <th>순서</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="checkbox" checked></td>
+                                        <td>SKT</td>
+                                        <td>5G</td>
+                                        <td>SKT</td>
+                                        <td><a href="#" style="color: #007bff;">5G 언택트 52</a></td>
+                                        <td>89,000원</td>
+                                        <td>25,000원</td>
+                                        <td>24개월</td>
+                                        <td>200GB</td>
+                                        <td>무제한</td>
+                                        <td>무제한</td>
+                                        <td>무제한</td>
+                                        <td>3</td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <div class="form-check mb-1 txt-left">
+                                                    <input class="form-check-input" type="checkbox" id="label_recommend_1" name="label_recommend" checked>
+                                                    <label class="form-check-label" for="label_recommend_1">세모통추천</label>
+                                                </div>
+                                                <div class="form-check mb-1 txt-left">
+                                                    <input class="form-check-input" type="checkbox" id="label_lowprice_1" name="label_lowprice">
+                                                    <label class="form-check-label" for="label_lowprice_1">최저가 보장</label>
+                                                </div>
+                                                <div class="form-check txt-left">
+                                                    <input class="form-check-input" type="checkbox" id="label_benefits_1" name="label_benefits">
+                                                    <label class="form-check-label" for="label_benefits_1">최다혜택</label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                <button class="btn btn-sm btn-outline-secondary me-1">▲</button>
+                                                <button class="btn btn-sm btn-outline-secondary">▼</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" checked></td>
+                                        <td>KT</td>
+                                        <td>5G</td>
+                                        <td>KT</td>
+                                        <td><a href="#" style="color: #007bff;">슈퍼플랜 베이직</a></td>
+                                        <td>80,000원</td>
+                                        <td>22,000원</td>
+                                        <td>12개월</td>
+                                        <td>150GB</td>
+                                        <td>무제한</td>
+                                        <td>무제한</td>
+                                        <td>무제한</td>
+                                        <td>4</td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <div class="form-check mb-1 txt-left">
+                                                    <input class="form-check-input" type="checkbox" id="label_recommend_2" name="label_recommend">
+                                                    <label class="form-check-label" for="label_recommend_2">세모통추천</label>
+                                                </div>
+                                                <div class="form-check mb-1 txt-left">
+                                                    <input class="form-check-input" type="checkbox" id="label_lowprice_2" name="label_lowprice" checked>
+                                                    <label class="form-check-label" for="label_lowprice_2">최저가 보장</label>
+                                                </div>
+                                                <div class="form-check txt-left">
+                                                    <input class="form-check-input" type="checkbox" id="label_benefits_2" name="label_benefits">
+                                                    <label class="form-check-label" for="label_benefits_2">최다혜택</label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                <button class="btn btn-sm btn-outline-secondary me-1">▲</button>
+                                                <button class="btn btn-sm btn-outline-secondary">▼</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" checked></td>
+                                        <td>LGU+</td>
+                                        <td>5G</td>
+                                        <td>LG U+</td>
+                                        <td><a href="#" style="color: #007bff;">U+5G 프리미어</a></td>
+                                        <td>85,000원</td>
+                                        <td>20,000원</td>
+                                        <td>무제한</td>
+                                        <td>100GB</td>
+                                        <td>5Mbps</td>
+                                        <td>무제한</td>
+                                        <td>무제한</td>
+                                        <td>5</td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <div class="form-check mb-1 txt-left">
+                                                    <input class="form-check-input" type="checkbox" id="label_recommend_3" name="label_recommend">
+                                                    <label class="form-check-label" for="label_recommend_3">세모통추천</label>
+                                                </div>
+                                                <div class="form-check mb-1 txt-left">
+                                                    <input class="form-check-input" type="checkbox" id="label_lowprice_3" name="label_lowprice">
+                                                    <label class="form-check-label" for="label_lowprice_3">최저가 보장</label>
+                                                </div>
+                                                <div class="form-check txt-left">
+                                                    <input class="form-check-input" type="checkbox" id="label_benefits_3" name="label_benefits" checked>
+                                                    <label class="form-check-label" for="label_benefits_3">최다혜택</label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                <button class="btn btn-sm btn-outline-secondary me-1">▲</button>
+                                                <button class="btn btn-sm btn-outline-secondary">▼</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" checked></td>
+                                        <td>SKT</td>
+                                        <td>LTE</td>
+                                        <td>헬로모바일</td>
+                                        <td><a href="#" style="color: #007bff;">데이터 걱정없는 유심 11GB+</a></td>
+                                        <td>38,500원</td>
+                                        <td>15,500원</td>
+                                        <td>평생</td>
+                                        <td>11GB</td>
+                                        <td>1Mbps</td>
+                                        <td>300분</td>
+                                        <td>300건</td>
+                                        <td>2</td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <div class="form-check mb-1 txt-left">
+                                                    <input class="form-check-input" type="checkbox" id="label_recommend_4" name="label_recommend" checked>
+                                                    <label class="form-check-label" for="label_recommend_4">세모통추천</label>
+                                                </div>
+                                                <div class="form-check mb-1 txt-left">
+                                                    <input class="form-check-input" type="checkbox" id="label_lowprice_4" name="label_lowprice" checked>
+                                                    <label class="form-check-label" for="label_lowprice_4">최저가 보장</label>
+                                                </div>
+                                                <div class="form-check txt-left">
+                                                    <input class="form-check-input" type="checkbox" id="label_benefits_4" name="label_benefits">
+                                                    <label class="form-check-label" for="label_benefits_4">최다혜택</label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                <button class="btn btn-sm btn-outline-secondary me-1">▲</button>
+                                                <button class="btn btn-sm btn-outline-secondary">▼</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 타이틀 / 메모 -->
+                    <div class="form-section mt-4 mb-3">
+                        <table class="table table-bordered">
+                            <colgroup>
+                                <col style="width: 150px;">
+                                <col style="width: auto;">
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <th class="bg-dark text-white text-center align-middle">타이틀</th>
+                                    <td>
+                                        <input type="text" class="form-control" placeholder="타이틀을 입력해주세요" value="3월4주차 인기요금제">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-dark text-white text-center align-middle">메모</th>
+                                    <td>
+                                        <textarea class="form-control" rows="3" placeholder="메모를 입력해주세요">주별 체크 필요 요금제</textarea>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+                <!-- 버튼 영역 -->
+                <div class="d-flex justify-content-center gap-3 mt-5">
+                    <button type="button" class="btn btn-lg btn-secondary px-5"
+                        onclick="if(confirm('입력한 내용이 저장되지 않습니다. 목록으로 돌아가시겠습니까?')) history.back()"
+                    >
+                        목록
+                    </button>
+                    <button type="button" class="btn btn-lg btn-dark px-5" id="registerBtn">
+                        수정
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal 팝업 -->
+        <div class="modal fade" id="businessSelectModal" tabindex="-1" aria-labelledby="businessSelectModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header border-0 pb-0 mb-4">
+                        <h5 class="modal-title fs-6 fw-bold" id="businessSelectModalLabel">사업자 불러오기</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body pt-2 pb-4">
+                        <div class="form-row-modal">
+                            <div class="form-label-modal">사업자</div>
+                            <div class="form-control-wrap-modal">
+                                <select class="form-select">
+                                    <option selected>사업자 선택</option>
+                                    <option>KG모바일</option>
+                                    <option>고고모바일</option>
+                                    <option>쉐이크모바일</option>
+                                    <option>아이즈모바일</option>
+                                    <option>에르엘</option>
+                                    <option>에이모바일</option>
+                                    <option>이치모바일</option>
+                                    <option>인스모바일</option>
+                                    <option>티플러스</option>
+                                    <option>프리티</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-secondary px-4 btn-sm" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-dark px-4">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirm Modal -->
+        <div class="modal fade" id="commonConfirmModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fs-6 fw-bold">확인</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center pb-4" id="commonConfirmMessage">
+                    <!-- 메시지가 여기에 동적으로 들어갑니다 -->
+                </div>
+                <div class="modal-footer border-0 pt-0 justify-content-center">
+                    <button type="button" class="btn btn-secondary px-4 btn-sm" id="confirmModalCancelBtn">취소</button>
+                    <button type="button" class="btn btn-dark px-4 btn-sm" id="confirmModalConfirmBtn">확인</button>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script src="../../js/script.js"></script>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('DOM이 로드되었습니다.');
+                
+                // 목록 이동 버튼 클릭 이벤트 처리
+                const moveDownBtn = document.querySelector('.centerMovingButton .btn-outline-secondary:first-child');
+                const moveUpBtn = document.querySelector('.centerMovingButton .btn-outline-secondary:last-child');
+                
+                // 요금제 선택 테이블 (첫 번째 registered-plans 클래스 요소)
+                const plansContainers = document.querySelectorAll('.registered-plans');
+                
+                if (plansContainers.length >= 2) {
+                    const selectTableContainer = plansContainers[0];
+                    const targetTableContainer = plansContainers[1];
+                    
+                    const selectTable = selectTableContainer.querySelector('table');
+                    const targetTable = targetTableContainer.querySelector('table tbody');
+                    
+                    // 모두 선택 체크박스 기능 추가
+                    const checkAllBox = document.getElementById('checkall');
+                    if (checkAllBox) {
+                        checkAllBox.addEventListener('change', function() {
+                            const isChecked = this.checked;
+                            const allCheckboxes = targetTableContainer.querySelectorAll('tbody input[type="checkbox"]');
+                            
+                            allCheckboxes.forEach(function(checkbox) {
+                                checkbox.checked = isChecked;
+                            });
+                        });
+                        
+                        // 개별 체크박스 상태에 따라 전체 선택 체크박스 상태 변경
+                        targetTableContainer.addEventListener('change', function(e) {
+                            if (e.target.type === 'checkbox' && e.target !== checkAllBox) {
+                                const allCheckboxes = targetTableContainer.querySelectorAll('tbody input[type="checkbox"]');
+                                const allChecked = Array.from(allCheckboxes).every(checkbox => checkbox.checked);
+                                
+                                checkAllBox.checked = allChecked;
+                                checkAllBox.indeterminate = !allChecked && Array.from(allCheckboxes).some(checkbox => checkbox.checked);
+                            }
+                        });
+                    }
+                    
+                    // 모든 요소가 존재하는지 확인
+                    if (moveDownBtn && moveUpBtn && selectTable && targetTable) {
+                        
+                        // 아래로 이동 버튼 (▼) 클릭 시
+                        moveDownBtn.addEventListener('click', function() {
+                            
+                            // 요금제 선택 테이블에서 체크된 행 가져오기
+                            const selectRows = selectTable.querySelectorAll('tbody tr');
+                            
+                            // 현재 등록된 요금제 수 확인
+                            const currentRegisteredCount = targetTable.querySelectorAll('tr').length;
+                            
+                            // 체크된 행 수 확인
+                            let checkedCount = 0;
+                            selectRows.forEach(function(row) {
+                                const checkbox = row.querySelector('input[type="checkbox"]');
+                                if (checkbox && checkbox.checked) {
+                                    const planName = row.cells[4].innerText;
+                                    const existingPlans = targetTable.querySelectorAll('tr');
+                                    let isDuplicate = false;
+                                    
+                                    existingPlans.forEach(function(existingRow) {
+                                        if (existingRow.cells[4].innerText === planName) {
+                                            isDuplicate = true;
+                                        }
+                                    });
+                                    
+                                    if (!isDuplicate) {
+                                        checkedCount++;
+                                    }
+                                }
+                            });
+                            
+                            // 등록 가능한 최대 요금제 수 체크
+                            const maxPlans = 10;
+                            if (currentRegisteredCount + checkedCount > maxPlans) {
+                                alert(`요금제는 최대 ${maxPlans}개까지 등록 가능합니다. 현재 ${currentRegisteredCount}개가 등록되어 있습니다.`);
+                                return;
+                            }
+                            
+                            // 체크된 행들을 등록 요금제 테이블로 이동
+                            selectRows.forEach(function(row) {
+                                const checkbox = row.querySelector('input[type="checkbox"]');
+                                if (checkbox && checkbox.checked) {
+                                    
+                                    // 이미 등록된 요금제인지 확인 (요금제명 기준)
+                                    const planName = row.cells[4].innerText;
+                                    const existingPlans = targetTable.querySelectorAll('tr');
+                                    let isDuplicate = false;
+                                    
+                                    existingPlans.forEach(function(existingRow) {
+                                        if (existingRow.cells[4].innerText === planName) {
+                                            isDuplicate = true;
+                                        }
+                                    });
+                                    
+                                    // 중복이 아닌 경우에만 추가
+                                    if (!isDuplicate) {
+                                        console.log('새 항목을 추가합니다:', planName);
+                                        
+                                        // 새 행 생성
+                                        const newRow = document.createElement('tr');
+                                        
+                                        // 원본 행의 내용 복사 (최근수정일 제외)
+                                        for (let i = 0; i < 13; i++) {
+                                            const newCell = document.createElement('td');
+                                            newCell.innerHTML = row.cells[i].innerHTML;
+                                            newRow.appendChild(newCell);
+                                        }
+                                        
+                                        // 라벨 설정 셀 추가
+                                        const labelCell = document.createElement('td');
+                                        labelCell.innerHTML = `
+                                            <div class="d-flex flex-column">
+                                                <div class="form-check mb-1 txt-left">
+                                                    <input class="form-check-input" type="checkbox" id="label_recommend_${Date.now()}" name="label_recommend">
+                                                    <label class="form-check-label" for="label_recommend_${Date.now()}">세모통추천</label>
+                                                </div>
+                                                <div class="form-check mb-1 txt-left">
+                                                    <input class="form-check-input" type="checkbox" id="label_lowprice_${Date.now()}" name="label_lowprice">
+                                                    <label class="form-check-label" for="label_lowprice_${Date.now()}">최저가 보장</label>
+                                                </div>
+                                                <div class="form-check txt-left">
+                                                    <input class="form-check-input" type="checkbox" id="label_benefits_${Date.now()}" name="label_benefits">
+                                                    <label class="form-check-label" for="label_benefits_${Date.now()}">최다혜택</label>
+                                                </div>
+                                            </div>
+                                        `;
+                                        newRow.appendChild(labelCell);
+                                        
+                                        // 순서 버튼 추가
+                                        const orderCell = document.createElement('td');
+                                        orderCell.innerHTML = `
+                                            <div class="d-flex justify-content-center">
+                                                <button class="btn btn-sm btn-outline-secondary me-1">▲</button>
+                                                <button class="btn btn-sm btn-outline-secondary">▼</button>
+                                            </div>
+                                        `;
+                                        newRow.appendChild(orderCell);
+                                        
+                                        // 체크박스 체크된 상태로 설정
+                                        const newCheckbox = newRow.querySelector('input[type="checkbox"]');
+                                        if (newCheckbox) {
+                                            newCheckbox.checked = true;
+                                        }
+                                        
+                                        // 등록 요금제 테이블에 추가
+                                        targetTable.appendChild(newRow);
+                                        
+                                        // 전체 선택 체크박스 상태 업데이트
+                                        if (checkAllBox) {
+                                            const allCheckboxes = targetTableContainer.querySelectorAll('tbody input[type="checkbox"]');
+                                            const allChecked = Array.from(allCheckboxes).every(checkbox => checkbox.checked);
+                                            
+                                            checkAllBox.checked = allChecked;
+                                            checkAllBox.indeterminate = !allChecked && Array.from(allCheckboxes).some(checkbox => checkbox.checked);
+                                        }
+                                    } else {
+                                        console.log('중복된 항목입니다:', planName);
+                                    }
+                                }
+                            });
+                        });
+                        
+                        // 위로 이동 버튼 (▲) 클릭 시
+                        moveUpBtn.addEventListener('click', function() {
+                            
+                            // 등록 요금제 테이블에서 체크된 행 삭제
+                            const targetRows = targetTable.querySelectorAll('tr');
+                            
+                            targetRows.forEach(function(row) {
+                                const checkbox = row.querySelector('input[type="checkbox"]');
+                                if (checkbox && checkbox.checked) {
+                                    // 삭제할 행의 요금제명 가져오기
+                                    const planName = row.cells[4].innerText;
+                                    
+                                    // 요금제 선택 테이블에서 해당 요금제 찾아서 체크박스 해제
+                                    const selectRows = selectTable.querySelectorAll('tbody tr');
+                                    selectRows.forEach(function(selectRow) {
+                                        const selectPlanName = selectRow.cells[4].innerText;
+                                        if (selectPlanName === planName) {
+                                            const selectCheckbox = selectRow.querySelector('input[type="checkbox"]');
+                                            if (selectCheckbox) {
+                                                selectCheckbox.checked = false;
+                                            }
+                                        }
+                                    });
+                                    
+                                    // 행 삭제
+                                    row.remove();
+                                }
+                            });
+                            
+                            // 모든 행이 삭제된 경우 체크박스 상태 업데이트
+                            if (checkAllBox) {
+                                const remainingCheckboxes = targetTableContainer.querySelectorAll('tbody input[type="checkbox"]');
+                                checkAllBox.checked = remainingCheckboxes.length > 0 && Array.from(remainingCheckboxes).every(checkbox => checkbox.checked);
+                                checkAllBox.indeterminate = remainingCheckboxes.length > 0 && !checkAllBox.checked && Array.from(remainingCheckboxes).some(checkbox => checkbox.checked);
+                            }
+                        });
+                        
+                        // 등록 요금제 테이블 내의 순서 버튼 처리 (이벤트 위임)
+                        targetTableContainer.addEventListener('click', function(e) {
+                            if (e.target.classList.contains('btn-outline-secondary')) {
+                                const button = e.target;
+                                const row = button.closest('tr');
+                                
+                                // 위로 이동 버튼 (▲)
+                                if (button.textContent === '▲') {
+                                    const prevRow = row.previousElementSibling;
+                                    if (prevRow) {
+                                        row.parentNode.insertBefore(row, prevRow);
+                                    }
+                                }
+                                // 아래로 이동 버튼 (▼)
+                                else if (button.textContent === '▼') {
+                                    const nextRow = row.nextElementSibling;
+                                    if (nextRow) {
+                                        row.parentNode.insertBefore(nextRow, row);
+                                    }
+                                }
+                            }
+                        });
+                        
+                        // 등록 버튼 클릭 이벤트 처리
+                        const registerBtn = document.getElementById('registerBtn');
+                        if (registerBtn) {
+                            registerBtn.addEventListener('click', function() {
+                                
+                                // 확인 창 표시
+                                if (confirm('수정하시겠습니까?')) {
+                                    // 수정 로직 구현 (여기서는 예시로 알림만 표시)
+                                    alert('요금제가 성공적으로 수정되었습니다.');
+                                    // 실제 수정 처리 로직은 여기에 추가 (API 호출 등)
+                                    // location.href = '../services/chat.html'; // 수정 후 목록 페이지로 이동
+                                }
+                            });
+                        }
+                    } else {
+                        console.error('일부 요소를 찾을 수 없습니다:', {
+                            moveDownBtn: !!moveDownBtn,
+                            moveUpBtn: !!moveUpBtn,
+                            selectTable: !!selectTable,
+                            targetTable: !!targetTable
+                        });
+                    }
+                } else {
+                }
+            });
+        </script>
+    </body>
+</html>

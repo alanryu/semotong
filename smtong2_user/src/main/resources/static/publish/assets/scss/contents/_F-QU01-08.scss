@@ -1,0 +1,71 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 휴대폰 정보입력
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 휴대폰 정보입력 페이지
+.F-QU01-08-page {
+	.accordion-help {
+		margin-top: 30rem;
+		padding: 8rem 16rem;
+		border-radius: 18rem;
+		background-color: #F4F5F8;
+		.accordion-button {
+			width: 100%;
+			display: flex;
+			align-items: flex-start;
+			gap: 6rem;
+			font-weight: 500;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: #5A5D60;
+			.ui-icn {
+				top: 2rem;
+			}
+			.icn-16-acco-gr {
+				margin-left: auto;
+			}
+			&:not(.collapsed) {
+				.icn-16-acco-gr {
+					transform: rotate(180deg);
+				}
+			}
+		}
+		.accordion-body {
+			margin-top: 20rem;
+			.tab-content {
+				margin-top: 18rem;
+			}
+		}
+	}
+
+	.set-device {
+		margin-bottom: -8rem;
+		&-desc {
+			display: flex;
+			align-items: center;
+			font-weight: 500;
+			font-size: 12rem;
+			line-height: 16rem;
+			color: #5A5D60;
+			em {
+				font-weight: 700;
+				color: #000;
+			}
+			.ui-icn {
+				margin-right: 4rem;
+			}
+		}
+		&-img {
+			display: flex;
+			justify-content: center;
+			margin-top: 16rem;
+			img {
+				width: 100%;
+				max-width: 300rem;
+			}
+		}
+	}
+
+}
+// e: 휴대폰 정보입력 페이지

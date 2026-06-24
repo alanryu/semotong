@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Pagination | 세모통 스타일가이드</title>
+	<meta http-equiv="X-UA-Compatible" content="ie=edge chrome=1" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="프로젝트가이드, 세모통 스타일가이드" />
+	<meta name="description" content="프로젝트가이드, 세모통 스타일가이드" />
+	<link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 인크루드 설정용도(개발적용안함) -->
+	<link rel="stylesheet" type="text/css" href="css/guide.css" /><!-- 가이드전용 -->
+</head>
+
+<body>
+	<div class="wrapper sub_page">
+		<!-- Header -->
+		<div data-include="include_header.html"></div>
+		<!-- // Header -->
+
+		<!-- Container -->
+		<div class="container">
+			<main id="content" class="content" role="main">
+				<div class="content-body">
+					<div class="out-sec in-sec">
+						<h1 class="g-h1">Pagination</h1>
+					</div>
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">기본 구조</h2>
+						</div>
+						<div class="g-section-body">
+							<!-- pc -->
+							<div class="pagination only-pc">
+								<button type="button" class="ui-btn page-first"><i class="ui-icn icn-first">처음</i></button>
+								<button type="button" class="ui-btn page-prev"><i class="ui-icn icn-prev">이전</i></button>
+								<button type="button" class="ui-btn page-num">1</button>
+								<button type="button" class="ui-btn page-num is-current" aria-current="page">2</button>
+								<button type="button" class="ui-btn page-num">3</button>
+								<button type="button" class="ui-btn page-num">4</button>
+								<button type="button" class="ui-btn page-num">5</button>
+								<button type="button" class="ui-btn page-num">6</button>
+								<button type="button" class="ui-btn page-num">7</button>
+								<button type="button" class="ui-btn page-num">8</button>
+								<button type="button" class="ui-btn page-num">9</button>
+								<button type="button" class="ui-btn page-num">10</button>
+								<button type="button" class="ui-btn page-next"><i class="ui-icn icn-next">다음</i></button>
+								<button type="button" class="ui-btn page-last"><i class="ui-icn icn-last">마지막</i></button>
+							</div>
+							<!-- // pc -->
+
+							<!-- mo -->
+							<div class="pagination only-mo">
+								<button type="button" class="ui-btn btn-page-more">
+									<span class="txt">더보기</span>
+									(<em title="현재 페이지 번호">1</em>/<em title="총 페이지 수">12</em>)
+								</button>
+							</div>
+							<!-- // mo -->
+						</div>
+					</section>
+					<!-- // Section -->
+				</div>
+			</main>
+		</div>
+		<!-- // Container -->
+
+		<!-- Footer (include_footer.html) -->
+		<div data-include="include_footer.html"></div>
+		<!-- // Footer -->
+	</div>
+</body>
+
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:fragment="Content">
+
+<head>
+
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="알뜰폰, 알뜰폰 요금제, 최저가 요금제, 인터넷 결합, 번호이동, USIM, 통신비 절약, MVNO, 세모통" />
+	<meta name="description" content="통신호갱 없는 세상, 세모통에서 알뜰폰 요금제를 비교하고 최저가 추천을 받아보세요. USIM 신규가입 및 번호 이동을 쉽고 빠르게 할 수 있습니다!" />
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+	<title>유저 유형 선택 | 세모통</title>
+
+	<!-- index.html 고유 CSS 추가 -->
+	<link rel="stylesheet" type="text/css" th:href="@{/css/semotong.css}" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+	
+	<script th:src="@{/js/libs/jquery.min.js}"></script>
+	<script th:src="@{/js/libs/librurys.min.js}"></script>
+	<script th:src="@{/js/libs/jquery.tmpl.min.js}"></script>
+	<script th:src="@{/js/ui/ui.common.js}"></script>
+	<script th:src="@{/js/ui/commonUtil.js}"></script>
+	<script th:src="@{/js/libs/experienced.js}"></script>
+	<script th:src="@{/js/libs/unexperienced.js}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+	<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+	
+	
+	<!-- 페이지 스크립트 영역 -->
+	<script type="text/javascript">
+		document.addEventListener("DOMContentLoaded", function() {
+			// 모달 바로 볼 수 있도록 호출
+			var FCB01Modal = new bootstrap.Modal(document.getElementById('FCB01Modal'));
+			FCB01Modal.show();
+			
+			/* modal 창 닫기 버튼 클릭 */
+			$('.btn-close').on('click', function(){
+				var confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+				confirmModal.show();
+			});
+			
+			/* modal 창 닫기 */
+			$('#win-close').on('click', function(){
+				window.close();
+			})
+			
+			/* modal footer 클릭 (처음으로) */
+			$('#first-btn').on('click', function(){
+				var confirmModal = new bootstrap.Modal(document.getElementById('confirmModal-2'));
+				confirmModal.show();
+			});
+			
+			/* 처음으로 이동 (페이지 리로드)*/
+			$('#go-first').on('click', function(){
+				location.reload();
+			});
+			
+			/* 다른 요금제를 안내해 드릴까요? 버튼 */
+			$(document).on('click', '#more-list-main', function(){
+				
+				var type = $(this).data('type');
+				
+				window.opener.parent.location.href = '/pbm/plan/planList/' + type;
+				window.close();
+			});
+			
+			setPopover('ui-popover popover-style1');
+			
+			/* 뒤로가기 버튼 클릭 action */
+			$('#btn-back').on('click', function(){
+				
+				/* 현재 위치 */
+				var stat = $('#step').val();
+					
+				if ( stat == 'experienced' || stat == 'step1' ) { 	//알뜰폰 사용 유경험자 / 알뜰폰 사용 무경험자 1스텝
+					location.reload();
+				} else if ( stat == 'step2' ) {
+					$('#step').val('step1');
+					callHtml('step1');
+				} else if ( stat == 'step3' ) {
+					$('#step').val('step2');
+					callHtml('step2');
+				} else if ( stat == 'step4' ) {
+					$('#step').val('step3');
+					callHtml('step3');
+				} else if ( stat == 'step5' ) {
+					$('#step').val('step4');
+					callHtml('step4');
+				} else if ( stat == 'step6' ) {
+					if ( param.hostType == 'mno' ) {
+						$('#step').val('step4');
+						callHtml('step4');
+					} else {
+						$('#step').val('step5');
+						callHtml('step5');
+					}
+				} else if ( stat == 'step7' ) {
+					$('#step').val('step6');
+					callHtml('step6');
+				}
+			});
+		})
+	</script>
+</head>
+
+<body>
+
+	<div class="wrapper">
+		<div class="modal-demo-page">
+			<!-- 트리거로 모달 띄우기 -->
+			<button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#FCB01Modal">
+			</button>
+		</div>
+	</div>
+
+	<!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+	-->
+	<!-- modal default -->
+	<div class="modal fade modal-full" id="FCB01Modal" tabindex="-1" role="dialog" aria-labelledby="FCB01ModalLabel" aria-hidden="true" data-bs-backdrop="static">
+		<input type="hidden" id="step" value="step1"/>	<!-- 현재 페이지 표시 -->
+		<div class="modal-dialog">
+			<div class="modal-content F-CB01-page" id="modal-content-css">
+				<div class="modal-header">
+					<button type="button" class="ui-btn" id="btn-back" style="display:none;">
+						<i class="ui-icn icn-32-back-bk" aria-label="뒤로가기"></i>
+					</button>
+					<h3 class="modal-title blind" id="FCB01ModalLabel">추천 챗봇</h3>
+					<button type="button" class="ui-btn btn-close" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-progress" style="display:none;">
+					<!-- 진행율 프로그레스 -->
+					<div class="progress-step">
+						<span class="progress-value" aria-label="Step 1/6" style="width: 25%"></span>
+					</div>
+					<!-- // 진행율 프로그레스 -->
+				</div>
+				<div class="modal-body" id="modal-contents">
+					<!-- 모통봇 소개 섹션 -->
+					<section class="cb-intro-sec">
+						<div class="sec-inner">
+							<div class="intro-img">
+								<i class="ui-icn icn-62-motong" aria-hidden="true"></i>
+							</div>
+							<div class="intro-con">
+								<p>안녕하세요. 고객님께 딱 맞는<br> 요금을 추천해드릴 모통봇 이에요.</p>
+								<p>모통봇이 알아서 잘 딱 깔끔하고<br>센스있게 알려드릴게요.</p>
+							</div>
+						</div>
+					</section>
+					<!-- // 모통봇 소개 섹션 -->
+
+					<!-- 사용자 유형선택 섹션 -->
+					<section class=" cb-selection-sec">
+						<div class="sec-inner">
+							<p class="selection-tit">
+								알뜰폰, 잘 알고 계세요?
+							</p>
+							<div class="selection-frm">
+								<!-- 선택된 상태 : is-selected 클래스 -->
+								<label class="selection-rdo" id="ui-chatbot-o">
+									<img src="/images/common/img-chatbot-o.png" alt="Yes" />
+									<span class="ui-rdo">
+										<input type="radio" name="frmTypeRadio1" onchange="setRadioSelected('frmTypeRadio1', '.selection-rdo')">
+										<span class="rdo"><span><em>네,</em> 알뜰폰 사용해 본 적이 <br>있어서 잘 알아요.</span></span>
+									</span>
+								</label>
+								<label class="selection-rdo" id="ui-chatbot-x">
+									<img src="/images/common/img-chatbot-x.png" alt="No" />
+									<span class="ui-rdo">
+										<input type="radio" name="frmTypeRadio1" onchange="setRadioSelected('frmTypeRadio1', '.selection-rdo')">
+										<span class="rdo"><span><em>아니오.</em> 알뜰폰이 <br>처음이에요.</span></span>
+									</span>
+								</label>
+							</div>
+						</div>
+					</section>
+					<!-- // 사용자 유형선택 섹션 -->
+				</div>
+				
+				<div class="modal-footer" style="display:none;">
+					<button type="button" class="ui-btn btn-action primary" id="first-btn">
+						<span>처음으로</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal default -->
+	
+	<!-- Modal Confirm -->
+	<div class="modal modal-confirm fade" id="confirmModal" tabindex="-1" role="alertdialog" data-bs-backdrop="static" aria-labelledby="confirmModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<section class="msg-sec">
+						<h4 class="sec-tit">요금을 추천해드리는 중이에요. 그만 하시겠어요?</h4>
+						<!-- <p class="sec-txt"><span class="txt-primary">Confirm 설명 텍스트</span>가 들어가는 영역입니다.</p> -->
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal">
+						<span>계속 할게요</span>
+					</button>
+					<button type="button" class="ui-btn btn-modal primary" id="win-close">
+						<span>네</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // Modal Confirm -->
+	
+	<!-- Modal Confirm -->
+	<div class="modal modal-confirm fade" id="confirmModal-2" tabindex="-1" role="alertdialog" data-bs-backdrop="static" aria-labelledby="confirmModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<section class="msg-sec">
+						<h4 class="sec-tit">처음부터 다시 시작하시겠어요?</h4>
+						<!-- <p class="sec-txt"><span class="txt-primary">Confirm 설명 텍스트</span>가 들어가는 영역입니다.</p> -->
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal">
+						<span>계속 할게요</span>
+					</button>
+					<button type="button" class="ui-btn btn-modal primary" id="go-first">
+						<span>네</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // Modal Confirm -->
+	
+	<!-- Modal Confirm -->
+	<div class="modal modal-confirm fade" id="confirmModal-3" tabindex="-1" role="alertdialog" data-bs-backdrop="static" aria-labelledby="confirmModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<section class="msg-sec">
+						<h4 class="sec-tit">요금제 페이지로 이동하시겠어요?</h4>
+						<!-- <p class="sec-txt"><span class="txt-primary">Confirm 설명 텍스트</span>가 들어가는 영역입니다.</p> -->
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal">
+						<span>계속 할게요</span>
+					</button>
+					<button type="button" class="ui-btn btn-modal primary" id="go-list">
+						<span>네</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // Modal Confirm -->
+	
+	<!-- Modal Alert -->
+	<div class="modal modal-alert fade" id="alertModal" tabindex="-1" role="alertdialog" data-bs-backdrop="static" aria-labelledby="alertModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title blind" id="alertModalLabel">Alert Message</h3>
+				</div>
+				<div class="modal-body">
+					<section class="msg-sec">
+						<h4 class="sec-tit">Alert 제목 텍스트가 들어가는 영역입니다.</h4>
+						<p class="sec-txt"><span class="txt-primary"></span></p>
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal primary" data-bs-dismiss="modal" onclick="alertModalCloseClick()" id="alertModalCloseId">
+						<span>확인</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="modal modal-confirm fade" id="shareModal" tabindex="-1" role="alertdialog" aria-labelledby="shareModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="shareModalLabel">공유하기</h3>
+				</div>
+				<div class="modal-body">
+					<section class="share-sec">
+						<button type="button" class="ui-btn" id="kakaoShareBtn" onclick="createKakaoBtn();">
+							<i class="ui-icn icn-80-kakao" aria-hidden="true"></i>
+							<span>카카오톡</span>
+						</button>
+						<button type="button" class="ui-btn" onclick="urlCopyBtn();" id="urlCopyBtnId">
+							<i class="ui-icn icn-80-copy" aria-hidden="true"></i>
+							<span>URL 복사</span>
+						</button>
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal" id="closeShareModal">
+						<span>닫기</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

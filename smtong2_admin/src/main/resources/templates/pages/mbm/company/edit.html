@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='03',menuId ='01'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script type="text/javascript">
+	
+		$(document).ready(function(){
+			var url = $(location).attr('href');
+			var searchParams = new URL(url).searchParams;
+			var type = searchParams.get('type');
+			
+			var txt = '등록되었습니다.';
+			if ( type == 'create' ) {
+				showAlert(txt, goList);
+			}
+			
+			if ( type == 'update' ) {
+				txt = '수정되었습니다.';
+				showAlert(txt, goList);
+			}
+		});
+		
+		function saveData() {
+			var txt = '등록하시겠습니까?';
+			
+			var url = $(location).attr('href');
+			var searchParams = new URL(url).searchParams;
+			var searchId = searchParams.get('searchId');
+			
+			if ( searchId != null && searchId != '' ) {
+				txt = '수정하시겠습니까?';
+			}
+			showConfirm( txt,
+	                () => { $("#recordForm").submit() },
+	                () => { },
+	                '사업자 등록'
+	         )
+		}
+		
+		
+		
+		
+		function goList(){
+			window.location.href="/mbm/company/list";
+		}
+	</script>
+		
+</th:block>
+
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="location mb-2">
+            <small class="text-secondary">
+                <i class="fas fa-home me-1"></i>
+                <a href="#">홈</a> > <a href="/mbm/company/list">입점사관리</a> > <a href="/mbm/company/list">사업자목록</a>
+            </small>
+        </div>
+        <h2 class="page-title fs-4 mb-4">
+            사업자 등록
+        </h2>
+
+        <!-- 입력 폼 섹션 -->
+		<form id="recordForm" th:object="${record}" method="POST" th:action="${record.id == null or record.id == 0} ? '/mbm/company/create' : '/mbm/company/update'" enctype="multipart/form-data">
+			<input type="hidden" th:field="*{id}" >
+	        <div class="search-section detail">
+	            <!-- 사업자명 -->
+	            <div class="form-row full-width">
+	                <div class="form-label">
+	                    사업자명<span class="required">*</span>
+	                </div>
+	                <div class="form-control-wrap">
+	                    <input type="text" class="form-control" placeholder="사업자명을 입력해주세요(예:에이모바일)" th:field="*{name}" required>
+						<th:block th:if="${#fields.hasErrors('name')}" class="error"><span th:errors="*{name}" class="required">Field error</span></th:block>
+	                </div>
+	            </div>
+	
+	            <!-- 회사 -->
+	            <div class="form-row full-width">
+	                <div class="form-label">
+	                    회사<span class="required">*</span>
+	                </div>
+	                <div class="form-control-wrap">
+	                    <input type="text" class="form-control" placeholder="회사명을 입력해주세요" th:field="*{companyNm}" required>
+						<th:block th:if="${#fields.hasErrors('companyNm')}" class="error"><span th:errors="*{companyNm}" class="required">Field error</span></th:block>
+	                </div>
+	            </div>
+	
+	            <!-- 사업자코드 -->
+	            <div class="form-row full-width">
+	                <div class="form-label">
+	                    사업자코드
+	                </div>
+	                <div class="form-control-wrap">
+	                    <input type="text" class="form-control" placeholder="사업자코드를 입력해주세요" th:field="*{companyCode}">
+	                </div>
+	            </div>
+	
+	            <!-- 통신사구분 -->
+	            <div class="form-row full-width">
+	                <div class="form-label">
+	                    통신사구분<span class="required">*</span>
+	                </div>
+	                <div class="form-control-wrap">
+						
+		                <div class="form-check-group" th:with="selectedList=${#strings.setSplit(record.companyMno ?: '', ',')}">			
+		                    <div class="form-check">
+								<input class="form-check-input" type="checkbox" id="companyMnoSkt" name="companyMno"  value="SKT" th:checked="${selectedList.contains('SKT')}" />					
+		                        <label class="form-check-label" for="companyMnoSkt">SKT</label>
+		                    </div>
+		                    <div class="form-check">
+		                        <input class="form-check-input" type="checkbox" id="companyMnoKt" name="companyMno"  value="KT" th:checked="${selectedList.contains('KT')}" />
+		                        <label class="form-check-label" for="companyMnoKt">KT</label>
+		                    </div>
+		                    <div class="form-check">
+		                        <input class="form-check-input" type="checkbox" id="companyMnoKt" name="companyMno"  value="LGU" th:checked="${selectedList.contains('LGU')}" />
+		                        <label class="form-check-label" for="lgu">U+</label>
+		                    </div>
+		                    <th:block th:if="${#fields.hasErrors('companyMno')}" class="error"><span th:errors="*{companyMno}" class="required">Field error</span></th:block>
+		                </div>
+	                </div>
+				</div>
+				<!-- 업무시간 -->
+	            <div class="form-row full-width">
+	                <div class="form-label">
+	                    업무시간
+	                </div>
+	                <div class="form-control-wrap">
+	                    <input type="text" class="form-control" placeholder="업무시간을 입력해주세요" th:field="*{workTime}">
+	                </div>
+	            </div>
+				
+				<!-- 고객센터 -->
+	            <div class="form-row full-width">
+	                <div class="form-label">
+	                    고객센터
+	                </div>
+	                <div class="form-control-wrap">
+	                    <input type="text" class="form-control" placeholder="고객센터를 입력해주세요" th:field="*{customerCenetr}">
+	                </div>
+	            </div>
+					
+				<!-- 주소 -->
+	            <div class="form-row full-width">
+	                <div class="form-label">
+	                    주소
+	                </div>
+	                <div class="form-control-wrap">
+	                    <input type="text" class="form-control" placeholder="주소를 입력해주세요" th:field="*{companyAdress}">
+	                </div>
+	            </div>
+					
+				<!-- 홈페이지 URL -->
+	            <div class="form-row full-width">
+	                <div class="form-label">
+	                    홈페이지 URL
+	                </div>
+	                <div class="form-control-wrap">
+	                    <input type="text" class="form-control" placeholder="홈페이지 URL울 입력해주세요" th:field="*{homepageUrl}">
+	                </div>
+	            </div>
+					
+				<!-- 로고 이미지 -->
+	            <div class="form-row full-width">
+	                <div class="form-label">
+	                    로고 이미지
+	                </div>
+					<div class="form-control-wrap">
+                           <div class="file-input-wrap">
+                             <input type="file" class="uploader__input" name="uploadFile" id="uploadFile" accept=".svg,.jpg,.png,.jpeg" onchange="BannerUploader.preview(this, 'pcPreview')" />
+                             <input type="text" class="form-control" readonly id="fileText1" name="logoImg" th:value="${record != null ? record.logoImg : ''}">
+                             <button type="button" class="btn btn-secondary" onclick="BannerUploader.trigger('uploadFile')">찾기</button>
+                         </div>
+				         <div class="file-info c_red">
+				             이미지 형식의 파일만 업로드 가능합니다. (jpg, png, jpeg) / 권장 사이즈: 지정해주세요
+				         </div>
+	                     <div class="preview-wrap" id="pcPreview">
+<!--	                     	<img th:src="@{${#strings.contains(record?.logoImg, 'upload') ? record.logoImg : 'https://www.smtong.co.kr' + record.logoImg}}" class="uploader__preview-image">-->
+							 <img th:if="${record != null and record.logoImg != null}"
+								  th:src="@{${#strings.contains(record.logoImg,'upload') ? record.logoImg : #strings.concat('https://www.smtong.co.kr', record.logoImg)}}"
+								  class="uploader__preview-image">
+						 </div>
+                     </div>
+	            </div>
+
+				<!-- 정렬순서 -->
+				<div class="form-row full-width">
+				    <div class="form-label">
+				        정렬순서<span class="required">*</span>
+				    </div>
+				    <div class="form-control-wrap">
+				        <input type="text" class="form-control" placeholder="정렬순서를 입력해주세요" th:field="*{orderNo}" required>
+						<th:block th:if="${#fields.hasErrors('orderNo')}" class="error"><span th:errors="*{orderNo}" class="required">Field error</span></th:block>
+				    </div>
+				</div>
+				
+				<div class="form-row full-width">
+				    <div class="form-label">
+				        제휴사 구분
+				    </div>
+				    <div class="form-control-wrap">
+	                    <div class="form-check-group">
+	                        <div class="form-check">
+	                            <input class="form-check-input" type="radio" id="allyPartnetYn01" th:field="*{allyPartnetYn}" value="1" >
+	                            <label class="form-check-label" for="allyPartnetYn01">Y</label>
+	                        </div>
+	                        <div class="form-check">
+	                            <input class="form-check-input" type="radio" id="allyPartnetYn02" th:field="*{allyPartnetYn}" value="0" >
+	                            <label class="form-check-label" for="allyPartnetYn02">N</label>
+	                        </div>
+	                    </div>
+	                </div>
+				</div>
+				
+				<div class="form-row full-width">
+				    <div class="form-label">
+				        간편개통 구분
+				    </div>
+				    <div class="form-control-wrap">
+	                    <div class="form-check-group">
+	                        <div class="form-check">
+	                            <input class="form-check-input" type="radio" id="simpleOpenYn01" th:field="*{simpleOpenYn}" value="1" >
+	                            <label class="form-check-label" for="simpleOpenYn01">Y</label>
+	                        </div>
+	                        <div class="form-check">
+	                            <input class="form-check-input" type="radio" id="simpleOpenYn02" th:field="*{simpleOpenYn}" value="0" >
+	                            <label class="form-check-label" for="simpleOpenYn02">N</label>
+	                        </div>
+	                    </div>
+	                </div>
+				</div>
+					
+				<!-- 사용여부 -->
+	            <div class="form-row full-width">
+	                <div class="form-label">
+	                   사용여부<span class="required">*</span>
+	                </div>
+					<div class="form-control-wrap">
+	                    <div class="form-check-group">
+	                        <div class="form-check">
+	                            <input class="form-check-input" type="radio" th:field="*{useYn}" id="useYn01" value="1" >
+	                            <label class="form-check-label" for="useYn01">사용</label>
+	                        </div>
+	                        <div class="form-check">
+	                            <input class="form-check-input" type="radio" th:field="*{useYn}" id="useYn02" value="0" >
+	                            <label class="form-check-label" for="useYn02">미사용</label>
+	                        </div>
+							<th:block th:if="${#fields.hasErrors('useYn')}" class="error"><span th:errors="*{useYn}" class="required">Field error</span></th:block>
+	                    </div>
+	                </div>
+	            </div>
+	            </div>
+            </form>
+        </div>
+        
+        <!-- 버튼 영역 -->
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">
+                닫기
+            </button>
+            <button type="button" class="btn btn-lg btn-dark px-4 btn-sm" onclick="saveData();">
+                저장
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='09',menuId ='04'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	
+	<script type="text/javascript">
+		document.addEventListener('DOMContentLoaded', () => {
+			 
+		});
+				
+		function moveList() {
+			window.location.href='/point/plan/list';
+		}
+		
+		function openViewPlanDetail(planId) {
+			window.open("/pbm/plan/view?searchId="+planId);
+			//window.location.href="/pbm/plan/view?searchId="+planId;
+		}
+
+	</script>
+</th:block>
+
+<div class="main-content">
+	<div class="container-fluid">
+	<div class="page-header  d-flex justify-content-between align-items-start">
+		<div>
+			<div class="location mb-2">
+			<small class="text-secondary">
+				<i class="fas fa-home me-1"></i>
+				<a href="/mbm/adminuser/list">홈</a> > <a href="/point/plan/list">포인트관리</a> > <a href="/point/plan/list">포인트요금제 신청내역</a>
+			</small>
+		</div>
+		<h2 class="page-title fs-4 mb-4">포인트요금제 신청내역 상세</h2>
+		</div>
+	</div>
+		 
+	<!-- 등록 폼 섹션 -->
+		<input type="hidden" id="orderId" th:value="${orderReq?.id}"/>
+		
+		<div class="search-section detail">
+			  <div class="form-row">
+                  <div class="form-label">회원명</div>
+                  <div class="form-control-wrap" th:text="${orderReq.orderNm}">  </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-label">카카오ID</div>
+                  <div class="form-control-wrap" th:text="${orderReq.kakaoUserId}">  </div>
+              </div>
+              
+              <div class="form-row">
+                  <div class="form-label">연락처</div>
+                  <div class="form-control-wrap" th:text="${orderReq.orderPhone}">  </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-label">가입유형</div>
+                  <div class="form-control-wrap" th:if="${orderReq.entrType == '01'}">신규가입</div>
+                  <div class="form-control-wrap" th:if="${orderReq.entrType == '02'}">번호이동 </div>
+              </div>
+              
+              <div class="form-row">
+                  <div class="form-label">MNO</div>
+                  <div class="form-control-wrap" th:text="${orderReq.telecomCd}"> </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-label">사업자</div>
+                  <div class="form-control-wrap" th:text="${orderReq.companyNm}"> </div>
+              </div>
+              
+              
+              
+              <div class="form-row full-width">
+                  <div class="form-label">요금제명</div>
+                  <div class="form-control-wrap"><a href="#"  th:text="${orderReq.planNm}" th:onclick="|openViewPlanDetail('${orderReq.planId}')|"></a> </div>
+              </div>
+              
+              <div class="form-row full-width">
+                  <div class="form-label">개통유지</div>
+                  <div class="form-control-wrap" th:if="${orderReq.orderState == '06'}">Y</div>
+                  <div class="form-control-wrap" th:if="${orderReq.orderState != '06'}">N</div>
+              </div>
+              
+              <div class="form-row full-width">
+                  <div class="form-label">신청일</div>
+                  <div class="form-control-wrap" >[[${T(kr.co.ucomp.common.util.CommonUtil).formatDateTime(orderReq.orderDttm)}]]</div>
+              </div>
+
+              <div class="form-row full-width">
+                  <div class="form-label">개통일</div>
+                  <div class="form-control-wrap" th:text="${orderReq.openCompDttm}"> </div>
+              </div>
+              
+              
+		</div><!-- End Detail -->
+			
+		
+	<!-- 버튼 영역 -->
+	<div class="d-flex justify-content-center gap-2 mt-4">
+		<button type="button" class="btn btn-lg btn-dark px-4 btn-sm" 		onclick="moveList()">목록</button>
+	</div>
+		 
+		 
+		
+
+	</div>
+</div>

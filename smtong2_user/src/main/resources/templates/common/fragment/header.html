@@ -1,0 +1,139 @@
+<html lagn="ko" 
+      xmlns:th="http://www.thymeleaf.org" 
+      th:fragment="HeaderFragment">
+	
+	<!-- Header Deaktop -->
+	<header class="header-desktop">
+		<div class="header-skip">
+			<a href="#content">본문 바로가기</a>
+		</div>
+
+		<div class="header-sec">
+			<h1 class="title">
+				<a href="/" class="logo"><span class="blind">세모통</span></a>
+			</h1>
+			<nav class="header-nav">
+				<ul class="nav-list">
+					<li class="nav-item">
+						<!-- 선택된 상태 : is-selected -->
+						<a href="/csm/baekseo/baekseoList" role="link" class="ui-btn nav-link" th:classappend="${menuId eq '01'} ? is-selected : ''">
+							<span>세모통 설명서</span>
+						</a>
+					</li>
+					
+					<li class="nav-item">
+						<!-- 2025-05-20 조찬기 : GNB UI 개선건 (PC) -->
+						<div class="ui-dropdown">
+							<a href="javascript:void(0);" role="link" class="ui-btn nav-link" data-bs-toggle="dropdown" aria-expanded="false">
+								<span>요금제 찾기</span>
+							</a>
+							<div class="dropdown-menu">
+								<ul class="sub-nav">
+									<li class="sub-nav-item">
+										<a href="/pbm/plan/planList/mvno" role="link" class="ui-btn sub-nav-link">
+											<span>알뜰요금제</span>
+										</a>
+									</li>
+									<li class="sub-nav-item">
+										<a href="/pbm/plan/planList/mno" role="link" class="ui-btn sub-nav-link">
+											<i class="ui-icn icn-h20-sk" aria-label="SKT"></i>
+											<i class="ui-icn icn-h20-kt" aria-label="KT"></i>
+											<i class="ui-icn icn-h20-lgu-02" aria-label="U+"></i>
+											요금제
+										</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</li>
+										
+				<!--	<li class="nav-item">
+						<a href="/pbm/plan/planList/mvno" role="link" class="ui-btn nav-link" th:classappend="${menuId eq '02'} ? is-selected : ''">
+							<span>알뜰폰</span>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="/pbm/plan/planList/mno" role="link" class="ui-btn nav-link" th:classappend="${menuId eq '06'} ? is-selected : ''">
+							<span>통신3사</span>
+						</a>
+					</li>-->
+					<li class="nav-item">
+						<a href="/internet/internetReq" role="link" class="ui-btn nav-link" th:classappend="${menuId eq '03'} ? is-selected : ''">
+							<span>인터넷</span>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="/event/eventList" role="link" class="ui-btn nav-link" th:classappend="${menuId eq '04'} ? is-selected : ''">
+							<span>이벤트</span>
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="/users/mypage" role="link" class="ui-btn nav-link" th:classappend="${menuId eq '05'} ? is-selected : ''">
+							<span>마이페이지</span>
+						</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</header>
+	<!-- // Header Deaktop -->
+
+<th:block th:if="${layoutSubTitleYN == 'N' || #strings.isEmpty(layoutSubTitleYN)}">
+<!-- Header Mobile -->
+	<!-- 모바일 헤더에 로고가 나오는 케이스에 한하여 모바일전용 클래스 only-mo 적용 -->
+	<!-- layoutHeaderPrimaryYn='Y' , 헤더가 투명해지는 class적용 main -->
+	<th:block th:if="${layoutHeaderPrimaryYn == 'Y'}">
+		<header class="header-mobile transparent only-mo">
+	</th:block>
+	<th:block th:if="${layoutHeaderPrimaryYn != 'Y'}">
+		<header class="header-mobile only-mo">
+	</th:block>
+		<section class="header-sec">
+			<h1 class="title">
+				<a href="/" class="logo"><span class="blind">세모통</span></a>
+				<!-- <span class="logo-beta"><img src="/images/common/img-logo-header-beta.png" alt=""></span> -->
+			</h1>
+			<button type="button" class="ui-btn btn-aside" data-bs-toggle="modal" data-bs-target="#asideModal">
+				<i class="ui-icn icn-32-anb-bk" aria-label="메뉴열기"></i>
+			</button>
+		</section>
+		<!-- // Mobile Header -->
+	</header>
+
+	<!-- // Header -->
+</th:block>	
+
+<th:block th:if="${layoutSubTitleYN == 'Y'}">	
+	<!-- Header Mobile -->
+	<header class="header-mobile">
+		<section class="header-sec">
+			<button  th:if="${goBackYN != 'N'}"    type="button" class="ui-btn" onclick="window.history.back();">
+				<i class="ui-icn icn-32-back-bk" aria-label="뒤로가기"></i>
+			</button>			
+			
+			<h1 class="title" id="subPageTitleNm">[[${subPageTitle}]]</h1>
+			
+			<!-- 헤더 추가 옵션들 -->
+			<button th:if="${funcType != null && funcType.equals('neardelete')}"  type="button" class="ui-btn" onclick="location.href='/users/delNearview'">
+				<i class="ui-icn icn-32-remove-bk" aria-label="전체삭제"></i>
+			</button>
+			
+			<button th:if="${funcType != null && funcType.equals('zzimdelete')}"  type="button" class="ui-btn" onclick="location.href='/users/delZzim'">
+				<i class="ui-icn icn-32-remove-bk" aria-label="전체삭제"></i>
+			</button>
+			
+			<!-- 헤더 추가 옵션들 -->
+			
+			<button type="button" class="ui-btn btn-aside" data-bs-toggle="modal" data-bs-target="#asideModal">
+				<i class="ui-icn icn-32-anb-bk" aria-label="메뉴열기"></i>
+			</button>
+		</section>
+		<!-- // Header Mobile -->
+	</header>
+	<!-- // Header -->
+</th:block>	
+	
+<script>
+
+</script>	
+</html>

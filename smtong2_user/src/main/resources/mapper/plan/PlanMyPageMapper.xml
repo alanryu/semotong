@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.plan.mapper.PlanMyPageMapper">
+	
+	
+	<sql id="Base_Column_list">
+		 a.id
+		,a.uuid
+		,a.plan_code
+		,a.plan_name
+		,a.plan_name_smt
+		,a.mno
+		,a.host
+		,GET_COMPANY_NM(a.host) hostNm
+		,a.plan_type
+		,a.sup_data_val
+		,a.sup_qos
+		,a.sup_call_val
+		,a.sup_sms_val
+		,a.normal_price
+		,a.sale_price
+		,a.after_price
+		,a.promotion_period
+		,a.promotion_period_val
+		,a.combination_enable
+		,a.benefit
+		,a.freebies
+		,a.link_url
+		,a.url_smt
+		,a.business_name
+		,a.etc
+		,a.sale_status
+		,a.disp_yn
+		,a.new_yn
+		,a.image_badge_special
+		,a.image_badge_it_comb
+		,a.image_badge_add_data
+		,a.image_badge_add_data_nm
+		,a.image_badge_simple_open
+		,a.supp_content
+		,a.no_supp_content
+		,a.event_banner_image_pc
+		,a.event_banner_image_mo
+		,a.event_banner_image_url
+		,a.event_banner_image_target
+		,a.create_date
+		,a.create_id
+		,a.modified_date
+		,a.modified_id
+		,a.point_plan_yn
+		,a.m12_price
+		,a.m24_price
+		,IFNULL(a.sup_call_buga_val, '') as sup_call_buga_val
+		,(a.sup_qos / 1024) AS int_qos
+		,a.daily_data
+		,a.plan_name_smt_sub
+		,a.second_price
+		,(select max(logo_img) from tb_mbm_company_list where id = a.host)  planLogoImg
+		,b.order_state
+		,b.open_comp_dttm
+	</sql>
+	
+	<sql id="listWhereInfo">
+		<where>
+			<if test='searchUserId != null and searchUserId !=""'>
+			AND b.create_id = #{searchUserId}
+			AND b.order_state = '06'
+			</if>
+		</where>
+	</sql>
+	
+	
+	
+	<select id="getMyPlanList" parameterType="kr.co.ucomp.web.plan.dto.searchPlanZzimDto" resultType="kr.co.ucomp.web.plan.entity.PlanEntity">
+		SELECT
+		<include refid="Base_Column_list" />
+		FROM tb_pmb_plan_online_open b
+		LEFT JOIN tb_pmb_plan_list a ON a.id = b.plan_id
+		<include refid="listWhereInfo" />
+	</select>
+	
+	<select id="getMyPlan" parameterType="kr.co.ucomp.web.plan.dto.searchPlanZzimDto" resultType="kr.co.ucomp.web.plan.entity.PlanEntity">
+		SELECT
+		<include refid="Base_Column_list" />
+		FROM tb_pmb_plan_online_open b
+		LEFT JOIN tb_pmb_plan_list a ON a.id = b.plan_id
+		<include refid="listWhereInfo" />
+		ORDER BY b.create_date DESC
+		LIMIT 1
+	</select>
+
+
+
+</mapper>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.csm.mapper.SemotongReviewMapper">
+	
+	<sql id="Base_Column_list">
+			r.id,
+			r.review_type,
+			r.company_id,
+			CASE r.company_id WHEN 9999 THEN '세모통' ELSE GET_COMPANY_NM(r.company_id) END AS companyName,			
+			r.content,
+			r.score,
+			r.display_yn,
+			r.manage_id,
+			IFNULL(c.user_name, '') AS adminName,
+			r.manage_memo,
+			r.plan_id,
+			p.plan_name,
+			r.create_date,
+			r.create_id,
+			b.username,
+			r.modified_date,
+			r.modified_id
+	</sql>
+	
+	<sql id="listWhereInfo">
+		<where>
+			<if test=" searchReviewType != null and searchReviewType != '' ">
+				AND r.review_type = #{searchReviewType}
+			</if>
+			<if test=" searchKeyword != null and !searchKeyword.equals('') ">
+				AND r.content LIKE CONCAT('%', #{searchKeyword}, '%') OR p.plan_name LIKE CONCAT('%', #{searchKeyword}, '%')
+			</if>
+			<if test=" searchPeriodType.equals('CREATE')">
+				AND r.create_date        BETWEEN #{searchStartDate} AND CONCAT(#{searchEndDate}, ' 23:59:59')
+			</if>
+			<if test=" searchDisplayYn !=null and !searchDisplayYn.equals('') ">
+				AND r.display_yn = #{searchDisplayYn}
+			</if>
+			
+		</where>
+	</sql>
+
+	<select id="reviewList" parameterType="kr.co.ucomp.web.csm.dto.SemotongReviewDto" resultType="kr.co.ucomp.web.csm.entity.SemotongReviewEntity">
+		SELECT
+		<include refid="Base_Column_list" />
+		FROM
+			tb_csm_semotong_review r
+		LEFT JOIN tb_pmb_plan_list p    ON r.plan_id = p.id
+		LEFT JOIN tb_mbm_user b         ON r.create_id = b.id
+		LEFT JOIN tb_mbm_admin_user c   ON r.modified_id = c.id
+		
+		<include refid="listWhereInfo" />
+		ORDER BY r.create_date DESC 
+		LIMIT #{offset}, #{recordSize}
+	</select>
+	<select id="countReviewList" parameterType="kr.co.ucomp.web.csm.dto.SemotongReviewDto" resultType="java.lang.Long">
+		SELECT count(1)
+		FROM
+			tb_csm_semotong_review r
+		LEFT JOIN tb_pmb_plan_list p    ON r.plan_id = p.id
+		LEFT JOIN tb_mbm_user b         ON r.create_id = b.id
+		LEFT JOIN tb_mbm_admin_user c   ON r.modified_id = c.id
+		<include refid="listWhereInfo" />
+	</select>
+	
+
+	<select id="review" parameterType="kr.co.ucomp.web.csm.dto.SemotongReviewDto" resultType="kr.co.ucomp.web.csm.entity.SemotongReviewEntity">
+		SELECT
+		<include refid="Base_Column_list" />
+		FROM
+			tb_csm_semotong_review r
+		LEFT JOIN tb_pmb_plan_list p    ON r.plan_id = p.id
+		LEFT JOIN tb_mbm_user b         ON r.create_id = b.id
+		LEFT JOIN tb_mbm_admin_user c   ON r.modified_id = c.id
+		WHERE r.id = #{searchId}
+	</select>
+
+	<insert id="insertReview" parameterType="kr.co.ucomp.web.csm.entity.SemotongReviewEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+		INSERT INTO tb_csm_semotong_review (review_type, content, score, display_yn, manage_id, manage_memo, create_id, plan_id)
+		VALUES(
+			#{reviewType},
+			#{content},
+			#{score},
+			#{displayYn},
+			#{manageId},
+			#{manageMemo},
+			#{createId},
+			#{planId}
+		);
+	</insert>
+
+	<update id="updateReview" parameterType="kr.co.ucomp.web.csm.entity.SemotongReviewEntity">
+		UPDATE tb_csm_semotong_review 
+		SET
+			 manage_memo    =#{manageMemo}
+			,display_yn    =#{displayYn}
+			,modified_date  = now()
+			,modified_id    =#{modifiedId}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="deleteReview" parameterType="kr.co.ucomp.web.csm.entity.SemotongReviewEntity">
+		DELETE FROM tb_csm_semotong_review
+		WHERE id = #{id}
+	</delete>
+	
+	<update id="updateDisplayYn"  parameterType="kr.co.ucomp.web.csm.entity.SemotongReviewEntity" >
+		UPDATE tb_csm_semotong_review 
+		SET	   display_yn    = #{displayYn}
+		WHERE  id            = #{id}
+	</update>
+	
+
+</mapper>

@@ -1,0 +1,2102 @@
+<!DOCTYPE html>
+<html lagn="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+			>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<title>알뜰폰 요금제 비교 | 최저가 추천 및 번호이동 | 세모통</title>
+
+	<meta name="keywords" content="알뜰폰, 알뜰폰 요금제, 최저가 요금제, 인터넷 결합, 번호이동, USIM, 통신비 절약, MVNO, 세모통" />
+	<meta name="description" content="통신호갱 없는 세상, 세모통에서 알뜰폰 요금제를 비교하고 최저가 추천을 받아보세요. USIM 신규가입 및 번호 이동을 쉽고 빠르게 할 수 있습니다!" />
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+	<!-- Open Graph (SNS 공유 최적화) -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="알뜰폰 요금제 비교 | 최저가 추천 및 번호이동 | 세모통" />
+	<meta property="og:description" content="알뜰폰 최저가 요금제를 찾고 계신가요? 세모통에서 간편하게 비교하고 USIM 신규가입, 번호이동까지 한 번에 해결하세요!" />
+	<meta property="og:image" th:content="${baseUrl} + '/images/common/semotong-og-image.jpg'" />
+	<meta property="og:url" th:content="${baseUrl}" />
+	<meta property="og:site_name" content="세모통" />
+
+	<link rel="stylesheet" type="text/css" th:href="@{/css/semotong.css}" />
+	 <script th:src="@{/js/libs/jquery.min.js}"></script>
+	<script th:src="@{/js/libs/librurys.min.js}"></script>
+	<script th:src="@{/js/libs/jquery.tmpl.min.js}"></script>
+	<script th:src="@{/js/ui/ui.common.js}"></script>
+	<script th:src="@{/js/ui/commonUtil.js}"></script>
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.0.0/swiper-bundle.min.css" />
+	<script src="https://cdn.jsdelivr.net/npm/swiper@11.0.0/swiper-bundle.min.js"></script>
+	<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+	<script type="text/javascript">
+
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+
+		$(document).ready(function(){
+
+			var combiSwiper = new Swiper(".combi-swiper", {
+				threshold: 3,
+				spaceBetween: 10,
+				pagination: {
+					el: ".swiper-pagination",
+				},
+				autoplay: {
+					delay: 2500,
+					disableOnInteraction: false,
+				},
+			});
+
+			/* 자주묻는 질문 */
+			getFaqList("cate03","");
+
+
+			// 12개월 / 24개월 요금 계산
+			var normalPrice = "[[${result.normalPrice}]]";
+			var salePrice = "[[${result.salePrice}]]";
+			var afterPrice = "[[${result.afterPrice}]]";
+			var period = "[[${result.promotionPeriodVal}]]";
+
+			var m12Price = "[[${result.m12Price}]]";
+			var m24Price = "[[${result.m24Price}]]";
+
+			$("#sum12MonPrice").html(addCommas(m12Price) + "원");
+			$("#sum24MonPrice").html(addCommas(m24Price) + "원");
+
+			// 비슷한 요금제 리스트
+			var supDataVal = "[[${result.supDataVal}]]";
+			var supQos = "[[${result.supQos}]]";
+			getSimilarPlanList(supDataVal, supQos);
+
+			setTabSwipe();
+
+			const supDataTotal = "[[${result.supDataTotal}]]";
+			const savings = calculateSavings(supDataTotal);
+
+			// 두 번째 위치: progress-label
+			const progressLabel = document.querySelector('.progress-label');
+			if (progressLabel) {
+					progressLabel.textContent = `약 ${savings}만원`;
+					progressLabel.style.width = `calc(${savings} / ${savings} * 100%)`;
+			}
+
+			const yearlyCost = calculateYearlyCost();
+			const costLabel = document.getElementById('yearly-cost-label');
+
+			if (costLabel) {
+					costLabel.textContent = `약 ${yearlyCost.formatted}`;
+					costLabel.style.width = `calc(${yearlyCost.value} / ${savings} * 100%)`;
+			}
+
+			const savingsLabel = document.getElementById('savings-label');
+			if (savingsLabel) {
+					savingsLabel.textContent = `약 ${savings - yearlyCost.value}만원 이득`;
+					savingsLabel.style.width = `calc(100% - ${yearlyCost.value} / ${savings} * 100%)`;
+			}
+
+			const savePrice = document.getElementById("savePrice");
+			if (savePrice) {
+					savePrice.textContent = savings - yearlyCost.value;
+			}
+
+
+		})
+
+				/* 글자 수 체크(Byte체크 아님) */
+		function writeCheck() {
+
+			var length = $('#reportContent').val().length;
+			if ( length > 500 ) {
+				var val = $('#reportContent').val().substring(0,500);
+				$('#reportContent').val(val);
+			}
+
+			$('#count').html(length);
+		}
+
+		function secExpandHendler(id, button) {
+			const $expand = document.querySelector(id);
+			const isExpanded = button.getAttribute('aria-expanded') === 'true';
+			$expand.classList.toggle('is-expanded');
+			button.setAttribute('aria-expanded', !isExpanded);
+		}
+
+		function goOneToOne() {
+			var isLogin ="[[${session.isLoginYn}]]";
+			if(isLogin == 'Y') {
+				location.href = "/csm/onetoone/onetoone";
+			} else {
+				location.href = "/users/mypage";
+			}
+		}
+
+		function calculateSavings(supDataVal) {
+			const data = supDataVal / 1024;
+
+			if (data === 9999) {
+					return 90;
+			} else if (data >= 72) {
+					return 80;
+			} else if (data >= 16) {
+					return 70;
+			} else if (data >= 8) {
+					return 50;
+			} else {
+					return 40;
+			}
+		}
+
+		function calculateYearlyCost() {
+				const salePrice = parseInt("[[${result.salePrice}]]", 10);
+				let promotionPeriodVal = parseInt("[[${result.promotionPeriodVal}]]", 10);
+
+				if (promotionPeriodVal === 9999 || promotionPeriodVal === 0) {
+						promotionPeriodVal = 12;
+				}
+				const afterPrice = parseInt("[[${result.afterPrice}]]", 10);
+
+				const promotionCost = salePrice * promotionPeriodVal;
+				const regularCost = afterPrice * (12 - promotionPeriodVal);
+				const totalCost = promotionCost + regularCost;
+
+				// 금액 표시 로직
+				if (totalCost >= 10000) {
+						const manWon = Math.floor(totalCost / 10000);
+						return {
+								value: manWon,
+								formatted: `${manWon}만원`
+						};
+				} else {
+						const cheonWon = Math.ceil(totalCost / 1000);
+						return {
+								value: cheonWon,
+								formatted: `${cheonWon}천원`
+						};
+				}
+		}
+
+		function openBenefitModalFromData(button) {
+
+			const title = button.getAttribute('data-benefit-title');
+			const content = button.getAttribute('data-benefit-content');
+			const image = button.getAttribute('data-benefit-image');
+			const url = button.getAttribute('data-benefit-url');
+
+			document.getElementById('benefitModalLabel').textContent = title;
+
+			const benefitTextDiv = document.getElementById('benefitText');
+
+			if (benefitTextDiv) {
+					if (content && content !== 'null' && content !== '' && content !== 'undefined') {
+							// content가 있으면 내용 설정하고 보이기
+							benefitTextDiv.innerHTML = content;
+							benefitTextDiv.style.display = 'block';
+
+							const links = benefitTextDiv.querySelectorAll('a');
+							links.forEach(link => {
+									link.setAttribute('target', '_blank');
+									link.setAttribute('rel', 'noopener noreferrer');
+							});
+
+					} else {
+							// content가 없으면 숨기기
+							benefitTextDiv.style.display = 'none';
+					}
+			}
+
+			const modalImageElement = document.getElementById('benefitImage');
+			if (modalImageElement) {
+					if (image && image !== 'null' && image !== '' && image !== 'undefined') {
+							modalImageElement.src = image;
+							modalImageElement.alt = title;
+							modalImageElement.style.display = 'block';
+					} else {
+							modalImageElement.style.display = 'none';
+							modalImageElement.src = '';
+					}
+			}
+
+			const benefitUrlButton = document.getElementById('benefitUrl');
+			if (benefitUrlButton) {
+					if (url && url !== 'null' && url !== '' && url !== 'undefined') {
+							// URL이 있으면 버튼 보이기 및 클릭 이벤트 설정
+							benefitUrlButton.style.display = 'block';
+							benefitUrlButton.onclick = function() {
+									window.open(url, '_blank');
+							};
+					} else {
+							// URL이 없으면 버튼 숨기기
+							benefitUrlButton.style.display = 'none';
+					}
+			}
+
+			var benefitModal = new bootstrap.Modal(document.getElementById('benefitModal'));
+			benefitModal.show();
+		}
+
+
+		function clickShare() {
+        var planId = "[[${result.id}]]";
+        var planNameSmt = "[[${result.planNameSmt}]]";
+        var salePrice = "[[${result.salePrice}]]";
+        var hostNm = "[[${result.hostNm}]]";
+				console.log("🚀 ~ clickShare ~ planId, planNameSmt, salePrice, hostNm:", planId, planNameSmt, salePrice, hostNm)
+        kakaoInit(planId, planNameSmt, salePrice, hostNm);
+
+
+    }
+
+		function writeErrReport(planId) {
+			var isLogin ="[[${session.isLoginYn}]]";
+			if(isLogin == 'Y') {
+				$("#planId").val(planId);
+				var FP0201P01Modal = new bootstrap.Modal(document.getElementById('FP0201P01Modal'));
+				FP0201P01Modal.show();
+
+				// hidden - focus error 대응
+				const modalBtn	= document.getElementById('createErrReportBtnId');
+				modalBtn.addEventListener('click', () => {
+					modalBtn.blur();
+				});
+
+			} else {
+				setRetunUrl();
+			}
+		}
+
+				function createErrReport() {
+			$("#reportType").val($("input[name='chkReportType']:checked").val());
+
+			var reportContent 			= $('#reportContent').val();
+
+			if(reportContent == null || reportContent == '' || reportContent.length < 1){
+				alertModalShow("불편했던 내용을 알려주세요.", "오류제보");
+				$('#reportContent').focus();
+				return;
+			}
+
+			var params = {
+				planId :  $("#planId").val(),
+				reportType : $("#reportType").val(),
+				reportContent : $("#reportContent").val(),
+				processSp: "01"
+		    }
+
+			$.ajax({
+			   url : '/pbm/error-report/create',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+			   beforeSend: function(xhr){
+			       xhr.setRequestHeader(header,token);
+			    },
+				success: function (data) {
+
+					if(data.code == 201) {
+						//알려주셔서 감사합니다.
+						var FP0201P02Modal = new bootstrap.Modal(document.getElementById('FP0201P02Modal'));
+						FP0201P02Modal.show();
+
+						const modalBtn	= document.getElementById('FP0201P02ModalCloseBtn');
+						modalBtn.addEventListener('click', () => {
+							modalBtn.blur();
+						});
+					} else {
+						alertModalShow(data.message, "");
+					}
+
+			    },
+				error : function(request, status, error){
+					alertModalShow(error,"");
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+			});
+		}
+
+		function goPlanSalesDetail(id) {
+
+			var path = window.location.pathname;
+		    var segments = path.split("/");
+		    var searchSalesId = "[[${recomSalesId}]]";
+
+			// navigateTo("/sales/" + segments[2] + "/" + segments[3] + "/planDetail?planid=" + id + "&recomSalesId="+searchSalesId);
+			navigateTo("/b2b/" + segments[2] + "/planDetail?planid=" + id + "&recomSalesId="+searchSalesId);
+		}
+
+		function getSimilarPlanList(searchData,searchQos) {
+	  		var page = 1;
+	  		var pageSize = 5;
+			var params = {
+			     keyword : "",
+				 searchSaleSp : "SALE",
+				 searchOrderType : "SP",
+				 searchData : searchData,
+				 searchQos : searchQos,
+				 page : page,
+				 recordSize : pageSize
+			    }
+
+				$.ajax({
+				   url : '/pbm/plan/getPlanlist',
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+				   beforeSend: function(xhr){
+				       xhr.setRequestHeader(header,token);
+				    },
+					success: function (data) {
+
+						$('#similarPlanList').empty();
+						if(data.totalCnt ==0) {
+							$('#similarPlanSec').hide();
+						} else {
+
+							// 현재 요금제는 뺀다.
+							let newData = data.data.filter( x => {
+								return x.id != "[[${result.id}]]";
+							})
+
+							if(newData == undefined || newData == null || newData == ''){
+								$('#similarPlanSec').hide();
+							}
+							$('#similarPlanListTmpl').tmpl(newData).appendTo('#similarPlanList');
+							// 비슷한 요금제 스와이프
+							const similarPlanSwiper = new Swiper(".similar-plan-swiper", {
+								threshold: 3,
+								spaceBetween: 10,
+								slidesPerView: 'auto',
+								resistance: true,
+								resistanceRatio: 0
+							});
+						}
+				    },
+					error : function(request, status, error){
+						alertModalShow(error,"");
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+				});
+		}
+
+		/* 유심 구매처*/
+		function openUsimBuy() {
+			var mno = "[[${result.mno}]]";
+			var hostNm = "[[${result.hostNm}]]";
+
+			if(mno =="SKT" && hostNm !="세븐보바일") {
+				mno = "SKTEX";
+			} else if(mno=="LGT") {
+				mno = "LGU"
+			}
+
+			var UsimBuyModal = new bootstrap.Modal(document.getElementById('UsimBuy'+mno));
+			UsimBuyModal.show();
+		}
+
+		function openQosModal() {
+			var QosModalLabel = new bootstrap.Modal(document.getElementById('QosModal'));
+			QosModalLabel.show();
+		}
+
+		function goReqPlan() {
+
+			var isLogin = "[[${session.isLoginYn}]]";
+			var planid 	= "[[${planid}]]";
+			var imageBadgeSimpleOpen = "[[${result.imageBadgeSimpleOpen}]]";
+			var recomSalesId 	= "[[${recomSalesId}]]";
+
+			//1. 사이트 이동 표시 모달 팝업
+			if(isLogin =="Y") {
+				if(imageBadgeSimpleOpen) {
+					windowOpen("/order/selCustType?reqPlanid="+planid + "&recomSalesId="+recomSalesId);
+				} else {
+					windowOpen("/pmb/plan-request/planReq?reqPlanid="+planid + "&recomSalesId="+recomSalesId);
+				}
+
+			} else {
+				setRetunUrl();
+			}
+
+		}
+
+		function goback() {
+		    var path = window.location.pathname;
+		    var segments = path.split("/");
+
+			// navigateTo("/sales/" + segments[2] + "/" + segments[3]);
+			navigateTo("/b2b/" + segments[2]);
+		}
+
+
+	function setRetunUrl() {
+
+			var params = {
+
+			    }
+
+				$.ajax({
+				   url : '/users/setCurruntpage',
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+				   beforeSend: function(xhr){
+				       xhr.setRequestHeader(header,token);
+				    },
+					success: function (data) {
+						alertModalShow("요금제 신청을 위해 로그인을 해주세요.", "",kakaoLogin);
+				    },
+					error : function(request, status, error){
+						alertModalShow(error,"");
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+				});
+		}
+
+
+		function kakaoLogin() {
+			navigateTo('/users/kakaologin');
+		}
+
+		/* 자주묻는 질문 */
+		function getFaqList(cateCode,searchKewword) {
+	  		var page = 1;
+	  		var pageSize = 10;
+
+			var params = {
+			     keyword : searchKewword,
+			     displayYn : 1,
+			     categoryId : cateCode,
+				 page : page,
+				 recordSize : pageSize
+			    }
+
+				$.ajax({
+				   url : '/cms/faq/list',
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+				   beforeSend: function(xhr){
+				       xhr.setRequestHeader(header,token);
+				    },
+					success: function (data) {
+						if(page == 1) {
+							$('#faqAccordion').empty();
+						}
+						if(data.totalCnt ==0) {
+							$('#nodataFaqListTmpl').tmpl(params).appendTo('#faqAccordion');
+						} else {
+							$('#faqListTmpl').tmpl(data.data).appendTo('#faqAccordion');
+						}
+				    },
+					error : function(request, status, error){
+						alertModalShow(error,"");
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+				});
+		}
+	</script>
+
+	<script id="similarPlanListTmpl" type="text/x-jquery-tmpl">
+		<div class="swiper-slide">
+			<div class="similar-plan-card">
+				<div class="card-body">
+					<p class="card-tit"><strong>[${mno}] {{html getPlanNm(planName,planNameSmt)}}</strong></p>
+					<dl class="card-con">
+						<dt>음성</dt>
+						<dd>{{html getCallStr(supCallVal)}}</dd>
+						<dt>데이터</dt>
+						<dd>{{html getDataStr(supDataVal,supQos)}}</dd>
+						<dt>문자메시지</dt>
+						<dd>{{html getSmsStr(supSmsVal)}}</dd>
+					</dl>
+					<p class="card-charge">{{html getPriceStr(salePrice)}}</p>
+					<button type="button" class="card-button" onclick="javascript:goPlanSalesDetail('${id}');">
+						<span class="blind">요금제 자세히보기</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</script>
+
+	<!-- faq 조회 데이터 없음 -->
+	<script id="nodataFaqListTmpl" type="text/x-jquery-tmpl">
+	<!-- Case 검색시 노출 -->
+	<div class="faq-toolbar">
+		<p class="count">"${keyword}" 검색 결과 0개</p>
+	</div>
+	<!-- Case 검색시 노출 -->
+	<!-- Case 검색결과 없음 -->
+	<div class="nodata">
+		<i class="ui-icn icn-110-nodata-cry" aria-hidden="true"></i>
+		<p class="nodata-tit"><strong>검색 결과가 없네요.</strong></p>
+		<p class="nodata-txt">원하시는 내용이 없으신가요?</p>
+		<p class="nodata-txt">1:1 문의로 질문해주세요.</p>
+		<button type="button" class="ui-btn btn-sub primary xl">
+			<span>1:1 문의하러 가기</span>
+		</button>
+	</div>
+	<!-- //faq 조회 데이터 없음-->
+	</script>
+
+	<script id="faqListTmpl" type="text/x-jquery-tmpl">
+		<div class="acco-item">
+				<h3 class="acco-header">
+					<button class="acco-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqAccordion${id}"
+						aria-expanded="false" aria-controls="faqAccordion${id}">
+						<strong class="part">${faqCategoryNm}</strong>
+						<span>${inquiry}</span>
+						<i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+					</button>
+				</h3>
+				<div id="faqAccordion${id}" class="acco-collapse collapse" data-bs-parent="#faqAccordion${id}">
+					<div class="acco-body">
+						<div class="acco-answer">
+							<p>{{html ansContent}}</p>
+						</div>
+						<div class="faq-inquery">
+							<p>도움이 되셨나요? 더 자세하게 알고 싶으시다면!</p>
+							<button type="button" class="ui-btn btn-sub primary xl" onclick="goOneToOne()">
+								<span>1:1 문의하러 가기</span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+	</script>
+</head>
+<body>
+	<div class="wrapper only-container">
+		<!-- Header Mobile -->
+		<header class="header-mobile">
+			<section class="header-sec">
+				<button type="button" class="ui-btn" onclick="goback()">
+					<i class="ui-icn icn-32-back-bk" aria-label="이전 페이지"></i>
+				</button>
+				<h1 class="title">요금제 목록</h1>
+			</section>
+			<!-- // Mobile Header -->
+		</header>
+		<!-- // Header -->
+
+		<!-- Container -->
+		<main role="main" class="container">
+    <!-- content -->
+    <div class="content F-P02-01-page">
+      <!-- 상품 리스트 섹션 -->
+      <section class="ratePlanC-sec">
+        <div class="sec-inner">
+          <!--  요금제 공통 타입 C : 요금제 상품 리스트 카드 -->
+          <div class="ratePlanC-card">
+            <div class="card-body">
+              <div class="card-util">
+                <div class="card-util-label">
+                  <span class="label skt" th:if="${#strings.toUpperCase(result.mno) == 'SKT'}">SKT망</span>
+                  <span class="label kt" th:if="${#strings.toUpperCase(result.mno) == 'KT'}">KT망</span>
+                  <span class="label lgu" th:if="${#strings.toUpperCase(result.mno) == 'LGU'}">U+망</span>
+                  <span class="label semotong" th:if="${result.imageBadgeSpecial == true}">세모통 Only</span>
+                  <span class="label merge" th:if="${result.imageBadgeItComb == true}">인터넷 결합</span>
+                  <span class="label open" th:if="${result.imageBadgeSimpleOpen == true}">간편개통</span>
+                  <span class="label lowest" th:if="${result.imageBadgeLowest == true}">최저가보상</span>
+                </div>
+                <div class="card-util-btn">
+                  <button
+                    type="button"
+                    class="ui-btn"
+                    aria-selected="${result.planLoginUserZzimCnt > 0} ? true : false"
+                    th:classappend="${result.planLoginUserZzimCnt > 0} ? 'is-selected'"
+                    th:attr="data-planId=${result.id}"
+                    th:onclick="|clickZzim('${result.id}', this)|"
+                  >
+                    <i class="ui-icn icn-20-plan-like-gr" aria-label="좋아요"></i>
+                  </button>
+
+                  <button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#shareModal" onclick="clickShare();">
+                    <i class="ui-icn icn-20-plan-share-gr" aria-label="공유하기"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="card-tit">
+                <strong>
+                  <th:block th:if="${result.planNameSmtSub == null || result.planNameSmtSub == ''}">
+                    <th:block th:if="${result.supDataVal == 10238976}"> 무제한 </th:block>
+                    <th:block th:unless="${result.supDataVal == 10238976}">
+                      월 
+					  <th:block th:if="${result.supDataVal >= 1024}">
+  			  			   <span th:text="${#numbers.formatDecimal(result.supDataVal / 1024.0, 0, (result.supDataVal % 1024 == 0) ? 0 : 1)}"></span>GB
+  			  			</th:block>
+  			            <th:block th:unless="${result.supDataVal >= 1024}">[[${result.supDataVal}]]MB</th:block>
+                    </th:block>
+                    <th:block th:if="${result.dailyData gt 0}"> + 매일 [[${result.dailyData / 1024}]]GB </th:block>
+                    <!-- <th:block th:if="${result.intQos gt 0}"> + [[${result.intQos}]]Mbps </th:block> -->
+                  </th:block>
+                  <th:block th:if="${result.planNameSmtSub != null && result.planNameSmtSub != ''}">
+                    [[${result.planNameSmtSub}]]
+                  </th:block>
+                </strong>
+                <button type="button" class="ui-btn" onclick="openQosModal()" th:if="${result.supQos != '0'}">
+                  <i class="ui-icn icn-16-plan-quse-gr" aria-label="툴팁"></i>
+                </button>
+                <!-- <button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto"
+										data-bs-content="텍스트와 용량이 작은 이미지 페이지 까지 확인할 수 있어요. 유튜브 480p로 재생돼요.">
+										<i class="ui-icn icn-16-plan-quse-gr" aria-label="툴팁"></i>
+									</button> -->
+              </div>
+              <div class="card-name">
+                <p th:if="${result.supQos > 0}"
+                  th:text="${
+                      result.supQos < 1000 ? '남은 데이터 없이도 카톡 대화는 할 수 있어요.(400/700Kbps)' :
+                      result.supQos < 3000 ? '남은 데이터 없이도 음악 감상이 가능해요.(1Mbps)' :
+                      result.supQos < 5000 ? '남은 데이터 없이도 720p 화질로 볼 수 있어요.(3Mbps)' :
+                      '남은 데이터 없이도 쾌적하게 사용할 수 있어요.(5Mbps)'
+                  }">
+                </p>
+              </div>
+              <div class="card-info">
+                <span class="label"
+                  ><i class="ui-icn icn-12-tel-gr" aria-hidden="true"></i>[[${result.supCallVal eq 9999 ? '무제한' :
+                  result.supCallVal + '분'}]]</span
+                >
+                <span class="split" aria-hidden="true"></span>
+                <span class="label"
+                  ><i class="ui-icn icn-12-mail-gr" aria-hidden="true"></i>[[${result.supSmsVal eq 9999 ? '무제한' :
+                  result.supSmsVal + '건'}]]</span
+                >
+                <span class="split" aria-hidden="true"></span>
+                <span class="label"
+                  ><i class="ui-icn icn-12-antena-gr" aria-hidden="true"></i>[[${result.planType}]]</span
+                >
+              </div>
+              <div class="card-charge">
+                <div class="brand">
+                  <img th:src="${result.planLogoImg}" />
+                  <!-- <span class="brand-rating"><i class="ui-icn icn-14-plan-star-pr" aria-label="평점"></i>4.5</span> -->
+                </div>
+                <div class="charge">
+										<p class="charge-tit">
+										<th:block th:if="${result.salePrice > 999}">[[${#numbers.formatInteger(result.salePrice,0,'COMMA')}]]원</th:block>
+										<th:block th:unless="${result.salePrice > 999}">[[${result.salePrice}]]원</th:block>
+
+										<p class="charge-point" th:if="${result.secondPrice != null && result.secondPrice != ''}"><em class="tit">실제 체감가</em>[[${result.secondPrice}]]</p>
+
+										<th:block th:if="${result?.promotionPeriodVal == '9999'}">
+										<p class="charge-txt">
+										[[${result.promotionPeriod}]]
+										</th:block>
+
+										<th:block th:unless="${result?.promotionPeriodVal == '0' or result?.promotionPeriodVal == '9999'}">
+										<p class="charge-txt" th:unless="${result.promotionPeriod.isEmpty()}">
+										[[${result.promotionPeriod}]] 이후
+										<th:block th:if="${result.afterPrice > 999}">[[${#numbers.formatInteger(result.afterPrice,0,'COMMA')}]]원</th:block>
+										<th:block th:unless="${result.afterPrice > 999}">[[${result.afterPrice}]]원</th:block>
+										</p>
+										</th:block>
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--  // 요금제 공통 타입 C : 요금제 상품 카드 -->
+
+
+          <div class="ratePlan-info">
+            <button type="button" class="ui-btn btn-texted" aria-expanded="false" data-bs-toggle="modal" th:attr="onclick=|writeErrReport('${planid}');|">
+              <span>요금제 정보가 잘못 되었나요?</span>
+            </button>
+          </div>
+        </div>
+      </section>
+      <!-- // 상품 리스트 섹션 -->
+
+      <!-- 탭 목록 -->
+      <!-- <div class="ui-tab tab-style2">
+					<div class="swiper tab-swiper">
+						<div class="swiper-wrapper" role="tablist">
+							<div class="swiper-slide" role="presentation">
+								<button class="tab-link active" id="tab-01" data-bs-toggle="tab" data-bs-target="#tab-01-pane" type="button" role="tab" aria-controls="tab-01-pane" aria-selected="true">요금제 상세 정보</button>
+							</div>
+							<div class="swiper-slide" role="presentation">
+								<button class="tab-link" id="tab-02" data-bs-toggle="tab" data-bs-target="#tab-02-pane" type="button" role="tab" aria-controls="tab-02-pane" aria-selected="false">사은품</button>
+							</div>
+							<div class="swiper-slide" role="presentation">
+								<button class="tab-link" id="tab-03" data-bs-toggle="tab" data-bs-target="#tab-03-pane" type="button" role="tab" aria-controls="tab-03-pane" aria-selected="false">요금제 리뷰</button>
+							</div>
+							<div class="swiper-slide" role="presentation">
+								<button class="tab-link" id="tab-04" data-bs-toggle="tab" data-bs-target="#tab-04-pane" type="button" role="tab" aria-controls="tab-04-pane" aria-selected="false">자주묻는 질문</button>
+							</div>
+						</div>
+					</div>
+				</div> -->
+      <!-- // 탭 목록 -->
+
+      <!-- 섹션 펼쳐보기/접어보기 -->
+      <div class="expand-sec-group" id="secExpand">
+        <!-- 이런 혜택을 받을 수 있어요 -->
+        <section class="benefit-sec">
+          <div class="sec-inner">
+            <div class="sec-header" th:if="${result.benefitList != null and !result.benefitList.isEmpty()}">
+              <h2 class="sec-tit">이런 혜택을 받을 수 있어요</h2>
+            </div>
+            <div class="sec-body">
+              <!-- 혜택: 통신사 -->
+              <th:block th:with="telecomBenefits=${result.benefitList != null ?
+                                                  result.benefitList.?[provider == 'telecom'] : null}">
+                  <div class="benefit-box" th:if="${telecomBenefits != null and !telecomBenefits.isEmpty()}">
+                      <h3 class="benefit-tit">
+                          [[${telecomBenefits[0].hostNm}]]에서 드려요
+                      </h3>
+
+                      <ul class="benefit-list">
+                        <li class="benefit-item" th:each="benefit : ${telecomBenefits}">
+                            <div class="benefit-card">
+                                <div class="benefit-card-img">
+                                    <img th:src="${benefit.benefitIcon}" alt="아이콘" />
+                                </div>
+                                <div class="benefit-card-con">
+                                    <p class="tit">
+                                        <button type="button"
+                                                th:class="${!#strings.isEmpty(benefit.benefitContent2)
+                                                          or !#strings.isEmpty(benefit.benefitImage)
+                                                          or !#strings.isEmpty(benefit.benefitUrl)}
+                                                          ? 'ui-btn' : 'ui-btn no-cursor'"
+                                                th:data-benefit-title="${benefit.benefitTitle}"
+                                                th:data-benefit-content="${benefit.benefitContent2}"
+                                                th:data-benefit-image="${benefit.benefitImage}"
+                                                th:data-benefit-url="${benefit.benefitUrl}"
+                                                th:attr="onclick=${!#strings.isEmpty(benefit.benefitContent2)
+                                                                  or !#strings.isEmpty(benefit.benefitImage)
+                                                                  or !#strings.isEmpty(benefit.benefitUrl)}
+                                                                  ? 'openBenefitModalFromData(this)' : 'return false;'">
+                                            [[${benefit.benefitTitle}]]
+                                        </button>
+                                        <i class="ui-icn icn-16-more-bk"
+                                          th:if="${!#strings.isEmpty(benefit.benefitContent2)
+                                                    or !#strings.isEmpty(benefit.benefitImage)
+                                                    or !#strings.isEmpty(benefit.benefitUrl)}">
+                                        </i>
+                                    </p>
+                                    <p class="txt">
+                                        [[${benefit.benefitContent}]]
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                  </div>
+              </th:block>
+
+              <!-- 혜택: 세모통 -->
+              <th:block th:with="semoBenefits=${result.benefitList != null ?
+                                                  result.benefitList.?[provider == 'semo'] : null}">
+                  <div class="benefit-box" th:if="${semoBenefits != null and !semoBenefits.isEmpty()}">
+                      <h3 class="benefit-tit">
+                        세모통이 드려요
+                      </h3>
+
+                      <ul class="benefit-list">
+                          <li class="benefit-item" th:each="benefit : ${semoBenefits}">
+                              <div class="benefit-card">
+                                  <div class="benefit-card-img">
+                                      <img th:src="${benefit.benefitIcon}" alt="아이콘" />
+                                  </div>
+                                  <div class="benefit-card-con">
+                                      <p class="tit">
+                                          <button type="button"
+                                                th:class="${!#strings.isEmpty(benefit.benefitContent2)
+                                                          or !#strings.isEmpty(benefit.benefitImage)
+                                                          or !#strings.isEmpty(benefit.benefitUrl)}
+                                                          ? 'ui-btn' : 'ui-btn no-cursor'"
+                                                th:data-benefit-title="${benefit.benefitTitle}"
+                                                th:data-benefit-content="${benefit.benefitContent2}"
+                                                th:data-benefit-image="${benefit.benefitImage}"
+                                                th:data-benefit-url="${benefit.benefitUrl}"
+                                                th:attr="onclick=${!#strings.isEmpty(benefit.benefitContent2)
+                                                                  or !#strings.isEmpty(benefit.benefitImage)
+                                                                  or !#strings.isEmpty(benefit.benefitUrl)}
+                                                                  ? 'openBenefitModalFromData(this)' : 'return false;'">
+                                            [[${benefit.benefitTitle}]]
+                                        </button>
+                                        <i class="ui-icn icn-16-more-bk"
+                                          th:if="${!#strings.isEmpty(benefit.benefitContent2)
+                                                    or !#strings.isEmpty(benefit.benefitImage)
+                                                    or !#strings.isEmpty(benefit.benefitUrl)}">
+                                        </i>
+                                      </p>
+                                      <p class="txt">
+                                          [[${benefit.benefitContent}]]
+                                      </p>
+                                  </div>
+                              </div>
+                          </li>
+                      </ul>
+                  </div>
+              </th:block>
+
+              <!-- 혜택: 인터넷결합 -->
+              <th:block th:with="internetBenefits=${result.benefitList != null ? result.benefitList.?[provider == 'internet'] : null}">
+                <div class="benefit-box primary" th:if="${internetBenefits != null and !internetBenefits.isEmpty()}">
+                    <h3 class="benefit-tit">인터넷 결합하면 받을 수 있어요.</h3>
+                    <ul class="benefit-list">
+                        <li class="benefit-item" th:each="benefit : ${internetBenefits}">
+                            <div class="benefit-card">
+                                <div class="benefit-card-img">
+                                    <img th:src="${benefit.benefitIcon}" alt="아이콘" />
+                                </div>
+                                <div class="benefit-card-con">
+                                    <p class="tit">
+                                        <button type="button"
+                                                th:class="${!#strings.isEmpty(benefit.benefitContent2)
+                                                          or !#strings.isEmpty(benefit.benefitImage)
+                                                          or !#strings.isEmpty(benefit.benefitUrl)}
+                                                          ? 'ui-btn' : 'ui-btn no-cursor'"
+                                                th:data-benefit-title="${benefit.benefitTitle}"
+                                                th:data-benefit-content="${benefit.benefitContent2}"
+                                                th:data-benefit-image="${benefit.benefitImage}"
+                                                th:data-benefit-url="${benefit.benefitUrl}"
+                                                th:attr="onclick=${!#strings.isEmpty(benefit.benefitContent2)
+                                                                  or !#strings.isEmpty(benefit.benefitImage)
+                                                                  or !#strings.isEmpty(benefit.benefitUrl)}
+                                                                  ? 'openBenefitModalFromData(this)' : 'return false;'">
+                                            [[${benefit.benefitTitle}]]
+                                        </button>
+                                        <i class="ui-icn icn-16-more-bk"
+                                          th:if="${!#strings.isEmpty(benefit.benefitContent2)
+                                                    or !#strings.isEmpty(benefit.benefitImage)
+                                                    or !#strings.isEmpty(benefit.benefitUrl)}">
+                                        </i>
+                                    </p>
+                                    <p class="txt">
+                                        [[${benefit.benefitContent}]]
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+              </th>
+              <!-- //혜택: 인터넷결합 -->
+          </div>
+          </div>
+        </section>
+        <!-- // 이런 혜택을 받을 수 있어요 -->
+
+        <!-- 요금제 상세 정보 섹션 -->
+        <section class="ratePlan-detail-sec">
+          <div class="sec-inner">
+            <div class="sec-header">
+              <h2 class="sec-tit">요금제 상세 정보</h2>
+            </div>
+            <div class="sec-body">
+              <!-- 요금제 상세 카드 -->
+              <div class="ratePlan-detail-card">
+                <div class="card-header">
+                  <p class="card-tit">[[${result.planNameSmt.isEmpty() ? result.planName : result.planNameSmt}]]</p>
+                  <p class="card-explain">
+                    지금 이 요금제로 가입한다면 이동통신 3사 요금제를 이용하는 것보다 1년 동안 평균 <span id="savePrice"></span>만원을 아낄 수 있어요!
+                  </p>
+                </div>
+                <div class="card-body">
+                  <!-- 통신비 정보 -->
+                  <div class="price-info">
+                    <div class="price-desc">1년 평균 통신비</div>
+                    <div class="price-item-group">
+                      <div class="price-item type-a">
+                        <div class="price-label">
+                          <i class="ui-icn icn-h20-sk" aria-label="SKT"></i>
+                          <i class="ui-icn icn-h20-kt" aria-label="KT"></i>
+                          <i class="ui-icn icn-h20-lgu-02" aria-label="LG U+"></i>
+                        </div>
+                        <div class="price-progress">
+                          <div class="progress" role="progressbar">
+                            <span class="progress-label"></span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="price-divider"></div>
+                      <div class="price-item type-b">
+                        <div class="price-label">
+                          <img th:src="${result.planLogoImg}" alt="아이콘" />
+                        </div>
+                        <div class="price-progress" role="progressbar">
+                          <div class="progress">
+                                <span class="progress-label" id="yearly-cost-label">약 30만원</span>
+                                <span class="progress-label" id="savings-label">40만원 이득</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- //통신비 정보 -->
+
+                  <!-- 요금제 정보 -->
+                  <ul class="card-info">
+                    <li><strong class="tit">통화</strong><span class="txt">[[${result.supCallVal eq 9999 ? '무제한' : result.supCallVal + '분'}]]</span></li>
+                    <li><strong class="tit">문자</strong><span class="txt">[[${result.supSmsVal eq 9999 ? '무제한' : result.supSmsVal + '건'}]]</span></li>
+                    <li><strong class="tit">통신망</strong><span class="txt">[[${result.mno eq 'LGU' ? 'U+' : result.mno}]]망</span></li>
+                    <li><strong class="tit">통신 기술</strong><span class="txt">[[${result.planType}]]</span></li>
+                    <li><strong class="tit">데이터</strong>
+                      <span class="txt">
+                        <th:block th:if="${result.supDataVal == 10238976}">
+                        무제한
+                        </th:block>
+                        <th:block th:unless="${result.supDataVal == 10238976}">
+                        월 
+						<th:block th:if="${result.supDataVal >= 1024}">
+				  			   <span th:text="${#numbers.formatDecimal(result.supDataVal / 1024.0, 0, (result.supDataVal % 1024 == 0) ? 0 : 1)}"></span>GB
+				  			</th:block>
+				            <th:block th:unless="${result.supDataVal >= 1024}">[[${result.supDataVal}]]MB</th:block>
+                        </th:block>
+                        <th:block th:if="${result.dailyData gt 0}">
+                        + 매일 [[${result.dailyData / 1024}]]GB
+                        </th:block>
+                      </span>
+                    </li>
+
+                    <th:block th:if="${result.supQos == 0}">
+                        <li><strong class="tit">QoS</strong><span class="txt">-</span></li>
+                    </th:block>
+                    <th:block th:unless="${result.supQos == 0}">
+                        <th:block th:if="${T(java.lang.Integer).valueOf(result.supQos) ge 1024}">
+                            <li><strong class="tit">QoS</strong><span class="txt">[[${T(java.lang.Integer).valueOf(result.supQos) / 1024}]]Mbps</span></li>
+                        </th:block>
+                        <th:block th:unless="${T(java.lang.Integer).valueOf(result.supQos) ge 1024}">
+                            <li><strong class="tit">QoS</strong><span class="txt">[[${result.supQos}]]Kbps</span></li>
+                        </th:block>
+                    </th:block>
+
+                    <li><strong class="tit">할인</strong><span class="txt">[[${result.promotionPeriod eq '' ? '-' : result.promotionPeriod}]]</span></li>
+                    <li><strong class="tit">부가통화</strong><span class="txt">[[${ result.supCallBugaVal eq '' ? '-' : result.supCallBugaVal }]]</span></li>
+                  </ul>
+                  <!-- //요금제 정보 -->
+
+                  <button
+                    type="button"
+                    class="ui-btn btn-more-list"
+                    onclick="openUsimBuy();"
+                  >
+                    <span>유심 준비하면 좀 더 빠르게 신청이 가능해요!</span>
+                    <i class="ui-icn icn-16-more-02-gr" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- // 요금제 상세 카드 -->
+
+              <!-- 요금제상세 아코디언 -->
+              <!-- 8차 수정 : 요금제 상세 정보 내용 수정 -->
+              <div class="ratePlan-detail-acco" id="planAccordion">
+
+
+                <!-- 02.07 배수석 요청(카톡) 임시 주석 처리 -->
+                <div class="acco-item" th:if="${result.suppContent != null and result.suppContent != ''}">
+                  <h3 class="acco-header">
+                    <button class="acco-button" type="button" data-bs-toggle="collapse" data-bs-target="#planAccordion1"
+                      aria-expanded="false" aria-controls="planAccordion1">
+                      <span>지원</span>
+                      <i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+                    </button>
+                  </h3>
+                  <div id="planAccordion1" class="acco-collapse collapse" data-bs-parent="#planAccordion">
+                    <div class="acco-body">
+                      <div class="acco-answer">
+                      <div class="acco-answer" th:utext="${result.suppContent}">
+
+                      </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="acco-item" th:if="${result.noSuppContent != null and result.noSuppContent != ''}">
+                  <h3 class="acco-header">
+                    <button class="acco-button collapsed" type="button" data-bs-toggle="collapse"
+                      data-bs-target="#planAccordion2" aria-expanded="false" aria-controls="planAccordion2">
+                      <span>미지원</span>
+                      <i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+                    </button>
+                  </h3>
+                  <div id="planAccordion2" class="acco-collapse collapse" data-bs-parent="#planAccordion">
+                    <div class="acco-body">
+                      <div class="acco-answer" th:utext="${result.noSuppContent}">
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- // 02.07 배수석 요청(카톡) 임시 주석 처리 -->
+                <!-- 20250402 유의사항 추가 -->
+                <div class="acco-item" th:if="${result.noticeContent != null and result.noticeContent != ''}">
+                  <h3 class="acco-header">
+                    <button class="acco-button collapsed" type="button" data-bs-toggle="collapse"
+                      data-bs-target="#planAccordion3" aria-expanded="false" aria-controls="planAccordion3">
+                      <span>유의사항</span>
+                      <i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+                    </button>
+                  </h3>
+                  <div id="planAccordion3" class="acco-collapse collapse" data-bs-parent="#planAccordion">
+                    <div class="acco-body">
+                      <div class="acco-answer" th:utext="${result.noticeContent}">
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="acco-item">
+                  <h3 class="acco-header">
+                    <button
+                      class="acco-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#planAccordion3"
+                      aria-expanded="false"
+                      aria-controls="planAccordion3"
+                    >
+                      <span>초과이용요금</span>
+                      <i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+                    </button>
+                  </h3>
+                  <div id="planAccordion3" class="acco-collapse collapse" data-bs-parent="#planAccordion">
+                    <div class="acco-body">
+                      <div class="acco-answer">
+                        <p>음성 1.98원/초</p>
+                        <p>영상 3.3원/초</p>
+                        <p>문자 22원/건</p>
+                        <p>데이터 22.53원/MB</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="acco-item">
+                  <h3 class="acco-header">
+                    <button
+                      class="acco-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#planAccordion4"
+                      aria-expanded="false"
+                      aria-controls="planAccordion4"
+                    >
+                      <span>데이터 (상세)</span>
+                      <i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+                    </button>
+                  </h3>
+                  <div id="planAccordion4" class="acco-collapse collapse" data-bs-parent="#planAccordion">
+                    <div class="acco-body">
+                      <div class="acco-answer">
+                        <p>
+                          데이터 무제한 혜택을 상업적으로 이용하여 네트워크 품질을 영향을 미치거나 네트워크 상황에 따라
+                          장애 발생 우려가 있는 경우에는 일반 사용자 보호를 위해 데이터의 속도제어, 이용제한, 차단,
+                          해지가 될 수 있어요.
+                        </p>
+                        <p>
+                          기본 제공 데이터내에서 m-Voip(무선 인터넷망을 활용해 무료로 음성통화를 이용하는 서비스. 예를
+                          들면 카카오 보이스톡, 네이버 라인 등이 있어요) 사용이 가능해요.
+                        </p>
+                        <p>
+                          기본제공량 초과 시 별도 요금은 부과되지 않지만 속도가 제어되면서 네트워크 환경에 따라 속도가
+                          일시적으로 느려질 수 있어요. QoS 이용 시 속도는 평균 속도이며, 사용 환경에 따라 다를 수
+                          있어요.
+                        </p>
+                        <div>
+                          <h3>
+                            QoS(Quality of Service : 통신 서비스 품질, 보통 데이터 속도를 말해요) 체감 속도는 다음과
+                            같아요.
+                          </h3>
+                          <ol>
+                            <li>
+                              1Mbps : 텍스트와 용량이 작은 이미지 페이지 이용가능하며 재생 속도는 480p로 스마트폰이나
+                              화면이 작은 장치에서 일반적으로 사용해요.
+                            </li>
+                            <li>
+                              3Mbps : 용량이 큰 이미지 파일 등 큰 불편함 없이 이용가능하며 재생 속도는 720p로 480p보다
+                              2배 더 선명하고 더 큰 화면에서 볼 수 있어요.
+                            </li>
+                            <li>
+                              광고성 스팸 메시지를 발송과 같이 상업적 목적으로 이용하거나 물리적 장치 또는 자동발송
+                              프로그램을 이용하는 경우
+                            </li>
+                            <li>
+                              5Mbps : 대부분 쾌적하게 이용가능하며 재생 속도는 1080p로 영화를 보기에 가장 뛰어난
+                              고화질로 품질이 가장 높아요.
+                            </li>
+                          </ol>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="acco-item">
+                  <h3 class="acco-header">
+                    <button
+                      class="acco-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#planAccordion5"
+                      aria-expanded="false"
+                      aria-controls="planAccordion5"
+                    >
+                      <span>음성 (상세)</span>
+                      <i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+                    </button>
+                  </h3>
+                  <div id="planAccordion5" class="acco-collapse collapse" data-bs-parent="#planAccordion">
+                    <div class="acco-body">
+                      <div class="acco-answer">
+                        <p>
+                          부가통화 이용시 부가통화 사업자가 정하는 바에 따라 별도의 정보이용료가 발생될 수 있어요.
+                          불법스팸/상업적 용도 사용/비정상적인 과도한 사용을 방지하기 위해 경우에 따라 서비스를 제한할
+                          수 있어요.
+                        </p>
+                        <div>
+                          <h3>아래 내용을 참고하세요.</h3>
+                          <ol>
+                            <li>
+                              음성통화량이 일 600분을 초과하는 횟수가 월 중 3회가 넘는 경우 : 영상통화는 음성의 1.66배로
+                              차감
+                            </li>
+                            <li>
+                              음성/영상통화량 수신처가 월 1천 회선(합산) 초과하는 경우 : 광고 및 상업적 목적으로
+                              이용하는 것으로 간주
+                            </li>
+                            <li>음성통화량이 월 6,000분을 초과할 경우</li>
+                          </ol>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="acco-item">
+                  <h3 class="acco-header">
+                    <button
+                      class="acco-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#planAccordion6"
+                      aria-expanded="false"
+                      aria-controls="planAccordion6"
+                    >
+                      <span>메시지 (상세)</span>
+                      <i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+                    </button>
+                  </h3>
+                  <div id="planAccordion6" class="acco-collapse collapse" data-bs-parent="#planAccordion">
+                    <div class="acco-body">
+                      <div class="acco-answer">
+                        <p>문자의 '기본제공' 혜택 제한 기준은 아래를 참고하세요.</p>
+                        <div>
+                          <h3>SMS, MMS(텍스트형, 멀티미디어형) 포함</h3>
+                          <ol>
+                            <li>일 SMS&MMS 사용량이 (SKT망 : 500건 / KT망 : 500건 / LG망 : 500건)을 초과하는 경우</li>
+                            <li>
+                              일 SMS&MMS 사용량이 (SKT망 : 200건 / KT&U+망 : 150건)을 초과하는 횟수가 월 중 10회를
+                              넘는 경우
+                            </li>
+                            <li>
+                              광고성 스팸 메시지를 발송과 같이 상업적 목적으로 이용하거나 물리적 장치 또는 자동발송
+                              프로그램을 이용하는 경우
+                            </li>
+                            <li>수신처가 (SKT망 : 월 3,000개 / KT&U+망 : 월 2,000개) 회선을 초과하는 경우</li>
+                          </ol>
+                          <p><small>※ 기본 제공되는 문자 미소진시, 잔여량은 이월되지 않아요.</small></p>
+                        </div>
+                        <p>
+                          문자메시지 기본 제공량 소진시 문자 SMS 22원/건, LMS 44원/건, MMS(사진/그림/배경음악 첨부)
+                          220원/건, MMS(동영상 첨부) 440원/건 청구돼요.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- // 요금제상세 아코디언 -->
+            </div>
+          </div>
+        </section>
+        <!-- // 요금제 상세 정보 섹션 -->
+
+        <!-- 자주묻는 질문 섹션 -->
+        <section class="faq-sec">
+          <div class="sec-inner">
+            <div class="sec-header">
+              <h2 class="sec-tit">자주묻는질문</h2>
+            </div>
+            <div class="sec-body">
+              <!-- 자주묻는 질문 아코디언 -->
+              <div class="faq-accordion" id="faqAccordion">
+
+              </div>
+              <!-- // 자주묻는 질문 아코디언 -->
+            </div>
+          </div>
+        </section>
+        <!-- // 자주묻는 질문 섹션 -->
+
+        <!-- 알뜽폰 개통 방법 -->
+        <section class="account-sol-sec">
+          <div class="sec-inner">
+            <h2 class="sec-tit">알뜰폰 개통 방법 궁금하시죠?</h2>
+            <div class="ui-tab tab-style3">
+              <ul class="tab-list" role="tablist">
+                <li class="tab-item" role="presentation">
+                  <button
+                    class="tab-link active"
+                    id="tab-11"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-11-pane"
+                    type="button"
+                    role="tab"
+                    aria-controls="tab-11-pane"
+                    aria-selected="true"
+                  >
+                    쓰던 번호로 개통
+                  </button>
+                </li>
+                <li class="tab-item" role="presentation">
+                  <button
+                    class="tab-link"
+                    id="tab-12"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-12-pane"
+                    type="button"
+                    role="tab"
+                    aria-controls="tab-12-pane"
+                    aria-selected="false"
+                  >
+                    새 번호 사용
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <!-- 8차 수정 : 개통 방법 내용 변경 -->
+            <div class="tab-content">
+              <div
+                class="tab-pane fade show active"
+                id="tab-11-pane"
+                role="tabpanel"
+                aria-labelledby="tab-11"
+                tabindex="0"
+              >
+                <ol class="solution-steps">
+                  <li><em class="num">1</em>요금제 조회하고 유심 구매 (오프라인 또는 배송 받기)</li>
+                  <li><em class="num">2</em>번호이동으로 가입 신청</li>
+                  <li><em class="num">3</em>번호이동 사전인증 진행</li>
+                  <li><em class="num">4</em>개통 완료 안내받으면 유심 교체!</li>
+                </ol>
+              </div>
+              <div class="tab-pane fade" id="tab-12-pane" role="tabpanel" aria-labelledby="tab-12" tabindex="0">
+                <ol class="solution-steps">
+                  <li><em class="num">1</em>요금제 조회하고 유심 구매 (오프라인 또는 배송 받기)</li>
+                  <li><em class="num">2</em>신규가입으로 가입 신청</li>
+                  <li><em class="num">3</em>해피콜 받기</li>
+                  <li><em class="num">4</em>개통 완료 안내받으면 유심 넣고 바로 사용!</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- // 알뜽폰 개통 방법 -->
+
+        <!-- 펼치기 토글 -->
+        <div class="expand-sec-btn">
+          <button
+            type="button"
+            class="ui-btn btn-expand"
+            aria-expanded="false"
+            onclick="secExpandHendler('#secExpand', this)"
+          >
+            <span>상세정보</span>
+            <i class="ui-icn icn-20-expand-arw-gr" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 비슷한 요금제 섹션 -->
+      <section class="similar-plan-sec">
+        <div class="sec-inner">
+          <div class="sec-header">
+            <h2 class="sec-tit">비슷한 요금제</h2>
+          </div>
+          <div class="sec-body">
+            <!-- 비슷한 요금제 스와이프 -->
+            <div class="swiper similar-plan-swiper">
+              <div class="swiper-wrapper" id="similarPlanList">
+                <div class="swiper-slide">
+                  <div class="similar-plan-card">
+                    <div class="card-body">
+                      <p class="card-tit"><strong>[SKT] 150G+최대5Mbps</strong></p>
+                      <dl class="card-con">
+                        <dt>음성</dt>
+                        <dd>무제한+부가통화 300분</dd>
+                        <dt>데이터</dt>
+                        <dd>71GB+다 쓰면 최대 5Mbps</dd>
+                        <dt>문자메시지</dt>
+                        <dd>기본제공</dd>
+                      </dl>
+                      <p class="card-charge">19,540원</p>
+                      <button type="button" class="card-button">
+                        <span class="blind">요금제 자세히보기</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- // 비슷한 요금제 스와이프 -->
+          </div>
+        </div>
+      </section>
+      <!-- // 비슷한 요금제 섹션 -->
+
+      <!-- 납부금액 알림 섹션 -->
+      <section class="payment-noti-sec">
+        <div class="sec-inner">
+          <!-- Case 인터넷 결합 시 할인 금액 보기: is-sale 클래스 추가 -->
+          <div class="payment-noti" id="paymentNoti">
+            <div class="payment-tit">
+              <h2 class="blind">월 납부금액 알려드릴게요.</h2>
+              <p class="charge"><strong>월 [[${#numbers.formatInteger(result.salePrice,0,'COMMA')}]]원</strong></p> <!-- Case 월 납부금액 보기 -->
+							<p class="charge-sale"><strong>월 15,500원</strong><span>(인터넷 결합 할인 예상 금액)</span></p> <!-- Case 인터넷 결합 시 할인 금액 보기 -->
+              <p class="charge-point" th:if="${result.secondPrice != null && result.secondPrice != ''}"><em class="tit">실제 체감가</em>[[${result.secondPrice}]]</p>
+              <th:block th:unless="${result?.promotionPeriodVal == '0' or result?.promotionPeriodVal == '9999'}">
+								<p class="explan"><em>[[${result.promotionPeriodVal}]]</em>개월 이후 <em class="price">[[${#numbers.formatInteger(result.afterPrice,0,'COMMA')}]]원</em>으로 변동돼요!</p>
+							</th:block>
+            </div>
+            <div class="payment-con">
+              <div class="item">
+                <p class="tit">12개월 합산 청구 금액</p>
+                <p class="charge" id="sum12MonPrice"></p>
+              </div>
+              <div class="item">
+                <p class="tit">24개월 합산 청구 금액</p>
+                <p class="charge" id="sum24MonPrice">2,000,000원</p>
+              </div>
+            </div>
+            <div class="payment-btn">
+              <button type="button" class="ui-btn btn-action primary" onclick="goReqPlan();">
+                <span>신청하기</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- // 납부금액 알림 섹션 -->
+    </div>
+    <!-- // content -->
+  </main>
+		<!-- // Container -->
+	</div>
+
+
+<!-- modal default -->
+<div class="modal fade modal-full" id="benefitModal" tabindex="-1" role="dialog" aria-labelledby="benefitModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content benefit-modal-page">
+      <div class="modal-header">
+        <h3 class="modal-title" id="benefitModalLabel"></h3>
+        <button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+          <i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+        </button>
+
+      </div>
+      <div class="modal-body">
+        <!-- 컨텐츠 섹션 -->
+        <section class="benefit-detail-sec">
+          <!-- Case 이미지 -->
+          <div class="benefit-image">
+            <img src=""
+            id="benefitImage" alt="혜택 상세 정보" />
+          </div>
+
+          <!-- Case 텍스트 -->
+
+          <div class="benefit-text">
+            <div class="data-view" id="benefitText">
+
+            </div>
+          </div>
+        </section>
+        <!-- // 컨텐츠 섹션 -->
+      </div>
+
+      <!-- Case 혜택등록시 -->
+      <div class="modal-footer">
+        <button type="button" class="ui-btn btn-action primary" id="benefitUrl">
+          <span>혜택 보러가기</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- // modal default -->
+
+
+<!-- modal 유심 구매 안내 -->
+<div class="modal modal-full fade-pc" id="UsimBuyKT" tabindex="-1" role="dialog" aria-labelledby="FP0201P03ModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content F-P02-01-P03-page">
+			<div class="modal-header">
+				<h3 class="modal-title" id="FP0201P03ModalLabel">유심 구매 안내</h3>
+				<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+					<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+				</button>
+			</div>
+			<div class="modal-body">
+				<!-- 유심구매 안내 섹션 -->
+				<section class="usimBuy-intro-sec">
+					<div class="sec-inner">
+						<div class="intro-box">
+							<div class="intro-img">
+								<img src="/images/common/img-80-int-char.png" alt="" />
+							</div>
+							<div class="intro-con">
+								<p class="tit">알뜰 요금제 개통을 위한 첫번째 단계<br><em>유심 구매처</em> 알려드려요!</p>
+								<p class="txt">요금제 바꾸기 어렵지 않아요. <br>유심만 구매하면 개통은 일사천리!</p>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- // 유심구매 안내 섹션 -->
+
+				<!-- 어디서 구매하나요 섹션 -->
+				<section class="usimBuy-store-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h4 class="sec-tit">KT 유심은 어디서 구매하나요?</h4>
+						</div>
+						<div class="sec-body">
+							<div class="usim-img">
+								<img src="/images/common/img-usim-kt.jpg" alt="KT 유심">
+							</div>
+							<ul class="usim-store-list">
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">가까운 이마트 24에서 <br>바로 유심을 구매할 수 있어요</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="windowOpen('https://www.emart24.co.kr/store');"><span>위치확인</span></button>
+										</div>
+										<div class="card-info">
+											<span class="info">일반유심 6,600원</span>
+											<span class="split" aria-hidden="true"></span>
+											<span class="info">NFC유심 8,800원</span>
+
+
+											<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto" data-bs-content="금융 결제나 교통 카드를 사용하신다면 NFC 유심을 구매하셔야 해요.">
+												<i class="ui-icn icn-16-usim-quse-gr" aria-label="툴팁"></i>
+											</button>
+										</div>
+									</div>
+								</li>
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">가까운 CU 편의점에서 <br>바로 유심을 구매할 수 있어요</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="windowOpen('https://www.pocketcu.co.kr/store/around');"><span>위치확인</span></button>
+										</div>
+										<div class="card-info">
+											<span class="info">일반유심 6,600원</span>
+											<span class="split" aria-hidden="true"></span>
+											<span class="info">NFC유심 8,800원</span>
+											<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto" data-bs-content="금융 결제나 교통 카드를 사용하신다면 NFC 유심을 구매하셔야 해요.">
+												<i class="ui-icn icn-16-usim-quse-gr" aria-label="툴팁"></i>
+											</button>
+										</div>
+									</div>
+								</li>
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">eSIM으로 개통할거에요.</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="window.open('/csm/baekseo/detail/56')"><span>eSIM?</span></button>
+										</div>
+										<div class="card-info">
+											<p class="info-txt">eSIM은 개통하실 때 구매하셔야 해요.</p>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<!-- // 어디서 구매하나요 섹션 -->
+			</div>
+		</div>
+	</div>
+</div>
+<!-- // modal 유심 구매 안내 KT -->
+
+
+<!-- modal 유심 구매 안내 LGU-->
+<div class="modal modal-full fade-pc" id="UsimBuyLGU" tabindex="-1" role="dialog" aria-labelledby="FP0201P04ModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content F-P02-01-P04-page">
+			<div class="modal-header">
+				<h3 class="modal-title" id="FP0201P04ModalLabel">유심 구매 안내</h3>
+				<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+					<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+				</button>
+			</div>
+			<div class="modal-body">
+				<!-- 유심구매 안내 섹션 -->
+				<section class="usimBuy-intro-sec">
+					<div class="sec-inner">
+						<div class="intro-box">
+							<div class="intro-img">
+								<img src="/images/common/img-80-int-char.png" alt="" />
+							</div>
+							<div class="intro-con">
+								<p class="tit">알뜰 요금제 개통을 위한 첫번째 단계<br><em>유심 구매처</em> 알려드려요!</p>
+								<p class="txt">요금제 바꾸기 어렵지 않아요. <br>유심만 구매하면 개통은 일사천리!</p>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- // 유심구매 안내 섹션 -->
+
+				<!-- 어디서 구매하나요 섹션 -->
+				<section class="usimBuy-store-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h4 class="sec-tit">U+ 유심은 어디서 구매하나요?</h4>
+						</div>
+						<div class="sec-body">
+							<div class="usim-img">
+								<img src="/images/common/img-usim-lg.jpg" alt="U+ 유심">
+							</div>
+							<ul class="usim-store-list">
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">가까운 이마트 24에서 <br>원칩을 구매할 수 있어요.</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="windowOpen('https://www.emart24.co.kr/store');"><span>위치확인</span></button>
+										</div>
+										<div class="card-info">
+											<span class="info">NFC유심 8,800원</span>
+											<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto" data-bs-content="금융 결제나 교통 카드를 사용하신다면 NFC 유심을 구매하셔야 해요.">
+												<i class="ui-icn icn-16-usim-quse-gr" aria-label="툴팁"></i>
+											</button>
+										</div>
+									</div>
+								</li>
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">가까운 CU 편의점에서 <br>원칩을 구매할 수 있어요.</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="windowOpen('https://www.pocketcu.co.kr/store/around');"><span>위치확인</span></button>
+										</div>
+										<div class="card-info">
+											<span class="info">NFC유심 8,800원</span>
+											<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto" data-bs-content="금융 결제나 교통 카드를 사용하신다면 NFC 유심을 구매하셔야 해요.">
+												<i class="ui-icn icn-16-usim-quse-gr" aria-label="툴팁"></i>
+											</button>
+										</div>
+									</div>
+								</li>
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">가까운 수도권 지하철역에서 <br>원칩을 구매할 수 있어요.</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="windowOpen('/cms/notice/detail/38');"><span>위치확인</span></button>
+										</div>
+										<div class="card-info">
+											<span class="info">NFC유심 8,800원</span>
+											<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto" data-bs-content="금융 결제나 교통 카드를 사용하신다면 NFC 유심을 구매하셔야 해요.">
+												<i class="ui-icn icn-16-usim-quse-gr" aria-label="툴팁"></i>
+											</button>
+										</div>
+									</div>
+								</li>
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">가까운 대구 지하철역에서 <br>원칩을 구매할 수 있어요.</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="windowOpen('/cms/notice/detail/39');"><span>위치확인</span></button>
+										</div>
+										<div class="card-info">
+											<span class="info">NFC유심 8,800원</span>
+											<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto" data-bs-content="금융 결제나 교통 카드를 사용하신다면 NFC 유심을 구매하셔야 해요.">
+												<i class="ui-icn icn-16-usim-quse-gr" aria-label="툴팁"></i>
+											</button>
+										</div>
+									</div>
+								</li>
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">eSIM으로 개통할거에요.</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="window.open('/csm/baekseo/detail/56')"><span>eSIM?</span></button>
+										</div>
+										<div class="card-info">
+											<p class="info-txt">eSIM은 개통하실 때 구매하셔야 해요.</p>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<!-- // 어디서 구매하나요 섹션 -->
+			</div>
+		</div>
+	</div>
+</div>
+<!-- // modal 유심 구매 안내 LGU -->
+
+
+
+<!-- modal 유심 구매 안내 SKT -->
+<div class="modal modal-full fade-pc" id="UsimBuySKT" tabindex="-1" role="dialog" aria-labelledby="FP0201P05ModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content F-P02-01-P05-page">
+			<div class="modal-header">
+				<h3 class="modal-title" id="FP0201P05ModalLabel">유심 구매 안내</h3>
+				<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+					<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+				</button>
+			</div>
+			<div class="modal-body">
+				<!-- 유심구매 안내 섹션 -->
+				<section class="usimBuy-intro-sec">
+					<div class="sec-inner">
+						<div class="intro-box">
+							<div class="intro-img">
+								<img src="/images/common/img-80-int-char.png" alt="" />
+							</div>
+							<div class="intro-con">
+								<p class="tit">알뜰 요금제 개통을 위한 첫번째 단계<br><em>유심 구매처</em> 알려드려요!</p>
+								<p class="txt">요금제 바꾸기 어렵지 않아요. <br>유심만 구매하면 개통은 일사천리!</p>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- // 유심구매 안내 섹션 -->
+
+				<!-- 어디서 구매하나요 섹션 -->
+				<section class="usimBuy-store-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h4 class="sec-tit">SKT 유심은 어디서 구매하나요?</h4>
+						</div>
+						<div class="sec-body">
+							<div class="usim-img">
+								<img src="/images/common/img-usim-skt.jpg" alt="SKT 유심">
+							</div>
+							<ul class="usim-store-list">
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">가까운 이마트 24에서 <br>SK세븐모바일 유심을 <br>구매할 수 있어요.</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="windowOpen('https://www.emart24.co.kr/store');"><span>위치확인</span></button>
+										</div>
+										<div class="card-info">
+											<span class="info">일반유심 6,600원</span>
+											<span class="split" aria-hidden="true"></span>
+											<span class="info">NFC유심 8,800원</span>
+											<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto" data-bs-content="금융 결제나 교통 카드를 사용하신다면 NFC 유심을 구매하셔야 해요.">
+												<i class="ui-icn icn-16-usim-quse-gr" aria-label="툴팁"></i>
+											</button>
+										</div>
+									</div>
+								</li>
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">가까운 CU 편의점에서 <br>SK세븐모바일 유심을 <br>구매할 수 있어요.</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="windowOpen('https://www.pocketcu.co.kr/store/around');"><span>위치확인</span></button>
+										</div>
+										<div class="card-info">
+											<span class="info">일반유심 6,600원</span>
+											<span class="split" aria-hidden="true"></span>
+											<span class="info">NFC유심 8,800원</span>
+											<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto" data-bs-content="금융 결제나 교통 카드를 사용하신다면 NFC 유심을 구매하셔야 해요.">
+												<i class="ui-icn icn-16-usim-quse-gr" aria-label="툴팁"></i>
+											</button>
+										</div>
+									</div>
+								</li>
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">가까운 GS 편의점에서<br>SK세븐모바일 유심을<br>구매할 수 있어요</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="windowOpen('https://gs25.gsretail.com/gscvs/ko/store-services/locations');"><span>위치확인</span></button>
+										</div>
+										<div class="card-info">
+											<span class="info">일반유심 6,600원</span>
+											<span class="split" aria-hidden="true"></span>
+											<span class="info">NFC유심 8,800원</span>
+											<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto" data-bs-content="금융 결제나 교통 카드를 사용하신다면 NFC 유심을 구매하셔야 해요.">
+												<i class="ui-icn icn-16-usim-quse-gr" aria-label="툴팁"></i>
+											</button>
+										</div>
+									</div>
+								</li>
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">가까운 세븐일레븐 편의점에서<br>SK세븐모바일 유심을<br>구매할 수 있어요</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="windowOpen('https://www.7-eleven.co.kr/util/storeLayerPop.asp');"><span>위치확인</span></button>
+										</div>
+										<div class="card-info">
+											<span class="info">일반유심 6,600원</span>
+											<span class="split" aria-hidden="true"></span>
+											<span class="info">NFC유심 8,800원</span>
+											<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto" data-bs-content="금융 결제나 교통 카드를 사용하신다면 NFC 유심을 구매하셔야 해요.">
+												<i class="ui-icn icn-16-usim-quse-gr" aria-label="툴팁"></i>
+											</button>
+										</div>
+									</div>
+								</li>
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">가까운 홈플러스에서<br>SK세븐모바일 유심을<br>구매할 수 있어요</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="windowOpen('https://corporate.homeplus.co.kr/store/HyperMarket.aspx');"><span>위치확인</span></button>
+										</div>
+										<div class="card-info">
+											<span class="info">NFC유심 4,400원</span>
+											<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto" data-bs-content="금융 결제나 교통 카드를 사용하신다면 NFC 유심을 구매하셔야 해요.">
+												<i class="ui-icn icn-16-usim-quse-gr" aria-label="툴팁"></i>
+											</button>
+										</div>
+									</div>
+								</li>
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">가까운 이마트에서<br>SK세븐모바일 유심을<br>구매할 수 있어요</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="windowOpen('https://store.emart.com/branch/list.do');"><span>위치확인</span></button>
+										</div>
+										<div class="card-info">
+											<span class="info">NFC유심 4,400원</span>
+											<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto" data-bs-content="금융 결제나 교통 카드를 사용하신다면 NFC 유심을 구매하셔야 해요.">
+												<i class="ui-icn icn-16-usim-quse-gr" aria-label="툴팁"></i>
+											</button>
+										</div>
+									</div>
+								</li>
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">가까운 GS 더 프레시에서<br>SK세븐모바일 유심을<br>구매할 수 있어요</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="windowOpen('http://gsthefresh.gsretail.com/thefresh/ko/market-info/find');"><span>위치확인</span></button>
+										</div>
+										<div class="card-info">
+											<span class="info">NFC유심 8,800원</span>
+											<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto" data-bs-content="금융 결제나 교통 카드를 사용하신다면 NFC 유심을 구매하셔야 해요.">
+												<i class="ui-icn icn-16-usim-quse-gr" aria-label="툴팁"></i>
+											</button>
+										</div>
+									</div>
+								</li>
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">가까운 다이소에서<br>SK세븐모바일 유심을<br>구매할 수 있어요</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="windowOpen('https://www.daisomall.co.kr/ms/msg/SCR_MSG_0019');"><span>위치확인</span></button>
+										</div>
+										<div class="card-info">
+											<span class="info">NFC유심 8,800원</span>
+											<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto" data-bs-content="금융 결제나 교통 카드를 사용하신다면 NFC 유심을 구매하셔야 해요.">
+												<i class="ui-icn icn-16-usim-quse-gr" aria-label="툴팁"></i>
+											</button>
+										</div>
+									</div>
+								</li>
+								<li class="usim-store-item">
+									<div class="usim-store-card">
+										<div class="card-title">
+											<p class="title">eSIM으로 개통할거에요.</p>
+											<button type="button" class="ui-btn btn-sub xs" onclick="window.open('/csm/baekseo/detail/56')"><span>eSIM?</span></button>
+										</div>
+										<div class="card-info">
+											<p class="info-txt">eSIM은 개통하실 때 구매하셔야 해요.</p>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<!-- // 어디서 구매하나요 섹션 -->
+			</div>
+		</div>
+	</div>
+</div>
+<!-- // modal 유심 구매 안내 SKT-->
+
+<!-- modal 유심 구매 안내 -->
+<div class="modal modal-full fade-pc" id="UsimBuySKTEX" tabindex="-1" role="dialog" aria-labelledby="FP0201P06ModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content F-P02-01-P06-page">
+			<div class="modal-header">
+				<h3 class="modal-title" id="FP0201P06ModalLabel">유심 구매 안내</h3>
+				<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+					<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+				</button>
+			</div>
+			<div class="modal-body">
+				<!-- 유심구매 안내 섹션 -->
+				<section class="usimBuy-intro-sec">
+					<div class="sec-inner">
+						<div class="intro-box">
+							<div class="intro-img">
+								<img src="/images/common/img-80-int-char.png" alt="" />
+							</div>
+							<div class="intro-con">
+								<p class="tit">알뜰 요금제 개통을 위한 첫번째 단계<br><em>유심 구매처</em> 알려드려요!</p>
+								<p class="txt">요금제 바꾸기 어렵지 않아요. <br>유심만 구매하면 개통은 일사천리!</p>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- // 유심구매 안내 섹션 -->
+
+				<!-- 어디서 구매하나요 섹션 -->
+				<section class="usimBuy-store-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h4 class="sec-tit">SKT 유심은 어디서 구매하나요?</h4>
+						</div>
+						<div class="sec-body">
+							<div class="usim-img">
+								<img src="/images/common/img-usim-char.jpg" alt="">
+							</div>
+							<div class="usim-msg">
+								<p>SK망 유심은 입점사별로 달라요.</p>
+								<p>개통하시면서 유심을 구매하셔야 해요.</p>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- // 어디서 구매하나요 섹션 -->
+			</div>
+		</div>
+	</div>
+</div>
+<!-- // modal 유심 구매 안내 -->
+
+<!-- Modal Confirm -->
+<div class="modal modal-confirm fade" id="confirmDiv" tabindex="-1" role="alertdialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 class="modal-title blind">Confirm Message</h3>
+			</div>
+			<div class="modal-body">
+				<section class="msg-sec">
+					<h4 class="sec-tit">가입유형 선택</h4>
+					<p class="sec-txt">어떤 방법으로 신청하시겠어요?</p>
+				</section>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal" onClick="goReqPlanSub('N')">
+					<span>신규가입</span>
+				</button>
+				<button type="button" class="ui-btn btn-modal primary" data-bs-dismiss="modal" onClick="goReqPlanSub('M')">
+					<span>번호이동</span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal modal-alert fade" id="alertModal" tabindex="-1" role="alertdialog" data-bs-backdrop="static" aria-labelledby="alertModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title blind" id="alertModalLabel">Alert Message</h3>
+				</div>
+				<div class="modal-body">
+					<section class="msg-sec">
+						<h4 class="sec-tit">Alert 제목 텍스트가 들어가는 영역입니다.</h4>
+						<p class="sec-txt"><span class="txt-primary"></span></p>
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal primary" data-bs-dismiss="modal" id="alertModalCloseId">
+						<span>확인</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- modal 제보문의 -->
+	<div class="modal modal-confirm fade" id="FP0201P01Modal" tabindex="-1" role="dialog" aria-labelledby="FP0201P01ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-P02-01-P01-page">
+				<div class="modal-header">
+					<h3 class="modal-title blind" id="confirmModalLabel">Confirm Message</h3>
+				</div>
+				<div class="modal-body">
+					<!-- 컨텐츠 섹션 -->
+
+					<section class="msg-sec">
+							<input type="hidden" id="planId" name="planId">
+							<input type="hidden" id="reportType" name="reportType">
+							<input type="hidden" id="processSp" name="processSp">
+
+							<p class="sec-tit">고객님, 잘못된 정보가<br> 제공되어 죄송합니다.</p>
+							<p class="sec-txt">어떤 내용인지 알려주시겠어요?</p>
+							<ul class="report-list">
+								<li class="report-item">
+									<label class="ui-rdo rdo-style1 type-block">
+										<input type="radio" name="chkReportType" onchange="setRadioSelected('chkReportType', '.rdo-style1')" value="01" checked/>
+										<span class="rdo"><span>서비스 오류</span></span>
+									</label>
+								</li>
+								<li class="report-item">
+									<label class="ui-rdo rdo-style1 type-block">
+										<input type="radio" name="chkReportType" onchange="setRadioSelected('chkReportType', '.rdo-style1')" value="02"/>
+										<span class="rdo"><span>요금제 / 인터넷 정보</span></span>
+									</label>
+								</li>
+								<li class="report-item">
+									<label class="ui-rdo rdo-style1 type-block">
+										<input type="radio" name="chkReportType" onchange="setRadioSelected('chkReportType', '.rdo-style1')" value="03"/>
+										<span class="rdo"><span>이벤트 / 사은품 정보</span></span>
+									</label>
+								</li>
+								<li class="report-item">
+									<label class="ui-rdo rdo-style1 type-block">
+										<input type="radio" name="chkReportType" onchange="setRadioSelected('chkReportType', '.rdo-style1')" value="04"/>
+										<span class="rdo"><span>기타</span></span>
+									</label>
+								</li>
+								<li class="report-item">
+									<div class="ui-textarea">
+										<textarea name="reportContent" id="reportContent" cols="50" rows="4" class="textarea" placeholder="불편했던 내용을 써주세요. (필수)" onKeyup="writeCheck()"></textarea>
+										<p class="bytes"><em class="count" id="count">0</em>/500</p>
+									</div>
+								</li>
+							</ul>
+					</section>
+					<!-- // 컨텐츠 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal">
+						<span>취소하기</span>
+					</button>
+					<button type="button" class="ui-btn btn-modal primary" data-bs-dismiss="modal" onclick="createErrReport();" id="createErrReportBtnId">
+						<span>보내기</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal 제보문의 -->
+
+			<!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+	-->
+	<!-- modal 제보완료 -->
+	<div class="modal modal-alert fade" id="FP0201P02Modal" tabindex="-1" role="alertdialog" data-bs-backdrop="static" aria-labelledby="FP0201P02ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<!-- alert 공통인 경우: F-P02-01-P01-page 페이지 구분 불필요 -->
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title blind" id="confirmModalLabel">Confirm Message</h3>
+				</div>
+				<div class="modal-body">
+					<!-- 컨텐츠 섹션 -->
+					<section class="msg-sec">
+						<p class="sec-tit">알려주셔서 감사합니다.</p>
+						<p class="sec-txt">
+							감사합니다. 고객님 <br>알려주신 내용은 빠르게 반영하겠습니다. <br>제보해주셔서 감사합니다.
+						</p>
+					</section>
+					<!-- // 컨텐츠 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal primary" data-bs-dismiss="modal" id="FP0201P02ModalCloseBtn">
+						<span>확인</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal 제보완료 -->
+
+
+
+	<!-- 공유하기 Modal Alert -->
+	<div class="modal modal-alert fade sharemodal" id="shareModal" tabindex="-1" role="alertdialog" aria-labelledby="shareModalLabel" aria-hidden="true">
+	<!-- <div class="modal modal-alert fade sharemodal" id="shareModal" tabindex="-1" role="alertdialog" aria-labelledby="shareModalLabel" style="display:none;"> -->
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="shareModalLabel">공유하기</h3>
+				</div>
+				<div class="modal-body">
+					<section class="share-sec">
+						<button type="button" class="ui-btn" id="kakaoShareBtn" onclick="createKakaoBtn();">
+							<i class="ui-icn icn-80-kakao" aria-hidden="true"></i>
+							<span>카카오톡</span>
+						</button>
+						<button type="button" class="ui-btn" onclick="urlCopyBtn();" id="urlCopyBtnId">
+							<i class="ui-icn icn-80-copy" aria-hidden="true"></i>
+							<span>URL 복사</span>
+						</button>
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal" id="closeShareModal">
+						<span>닫기</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 공유하기 Modal Alert -->
+
+	<!-- 03.27 카카오 링크 공유하기 Modal Alert -->
+	<div class="modal modal-alert fade sharemodal" id="shareLinkModal" tabindex="-1" role="alertdialog" aria-labelledby="shareModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="shareModalLabel">공유하기</h3>
+				</div>
+				<div class="modal-body">
+					<section class="share-sec">
+						<button type="button" class="ui-btn" id="kakaoShareBtnLink" onclick="createKakaoBtnLink();">
+							<i class="ui-icn icn-80-kakao" aria-hidden="true"></i>
+							<span>카카오톡</span>
+						</button>
+						<button type="button" class="ui-btn" onclick="event_urlCopyBtn();" id="urlCopyBtnId">
+							<i class="ui-icn icn-80-copy" aria-hidden="true"></i>
+							<span>URL 복사</span>
+						</button>
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal" id="closeShareModal">
+						<span>닫기</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 공유하기 Modal Alert -->
+
+</body>
+</html>

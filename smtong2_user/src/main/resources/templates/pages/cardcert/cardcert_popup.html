@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/popup_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='카드본인인증'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ 
+ <script>
+	
+	
+	$( document ).ready(function() {
+		
+		request();
+		
+	   
+	});
+	
+	
+	function request(){
+
+		document.form1.action = "[[${popupUrl}]]";
+		document.form1.method = "post";
+
+		document.form1.submit();
+	}
+	
+	
+ </script>
+</th:block>
+
+<!-- Container -->
+<main role="main" class="container">
+
+
+	<form name="form1">
+		<!-- 인증 요청 정보 -->
+		<!--// 필수 항목 -->
+		<input type="hidden" name="cpCd" th:value="${CP_CD}">	<!-- 토큰 -->
+		<input type="hidden" name="mdlTkn" th:value="${MDL_TKN}">	<!-- 토큰 --> 
+		<!-- 필수 항목 //-->	
+	</form>
+	
+	
+</main>
+
+	
+</html>

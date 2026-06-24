@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='내 계정', layoutSubTitleYN='Y'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<!--	<link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+
+<script>
+	$( document ).ready(function() {
+
+	})
+	
+	function goHome(){
+		location.href="/";
+	}
+	function goMyinfo(){
+		location.href = "/users/myinfo";
+	}
+	
+	function exitSemotong(){
+		showConfirm(
+			'탈퇴 하시겠습니까?',
+			() => {
+				dropUser()
+			},
+			() => {
+				console.log('취소 클릭');
+			},
+			'회원탈퇴'
+		)
+		
+	}
+	function dropUser(){
+
+		$.ajax({
+			 url 				: '/users/delete'
+			,type 				: 'POST'
+			,dataType 			: "json"
+			,contentType		: "application/json"
+			,beforeSend:function(xhr){
+				xhr.setRequestHeader(header,token);
+			}
+			,success:function (data) {
+				alertModalShow("탈퇴 처리 되었습니다.", "", goHome);
+			}
+			,error:function(request, status, error){
+				alertModalShow(error,"");
+			}
+			,complete:function(){
+			}
+		});
+	}
+
+	
+	// ----------------------- 작성 완료 된 세모통후기 삭제
+	
+	function delPopUpDenied(val){
+		alertModalShow("포인트 전환 내역이 있어 삭제가 불가능합니다.", "");
+	}
+	
+	function delPopUp(val){
+		$("#hId").val(val);
+		showConfirm(
+			'삭제 하시겠습니까?',
+			() => {
+				goDelete();
+			},
+			() => {
+				//
+			},
+			'삭제'
+		)
+	}
+	
+	// modal 에서 예 눌름
+	function goDelete(){
+		location.href="/csm/review/delete/" + $("#hId").val();
+	}
+	
+ 	
+	//수정 영역 열기(textarea) - 수정 눌러 열기 -
+	function updSemotongReviewItmOpen(val,sp){
+		textAreaAddLisner(sp);
+		$("#"+sp+"ReviewOrgDv"+val).css("display","none");
+		$("#"+sp+"ReviewModDv"+val).css("display","");
+	}
+	
+	//세모통 후기 수정
+	function updSemotongReviewItm(val,sp,rId){
+		
+		var starValue		= $("#"+sp+"ReviewStarIns"+val).val();	//ok
+		var textValue		= $("#"+sp+"ReviewContentIns"+val).val();	//ok
+		
+		if(starValue < 1){
+			alertModalShow("별점을 선택해주세요.", "");
+			return;
+		}
+		
+		if(textValue.length < 10){
+			alertModalShow("후기는 10자 이상 작성해주세요.", "");
+			return;
+		}
+		
+		if ( starValue <= 0 ) {
+			alertModalShow("이용 별점을 등록해주세요.", "");
+			return;
+		}
+		
+		var updId = val;
+		if(sp =="order") {
+			updId = rId;
+		}
+		
+		var params = { id		: updId
+					,content 	: textValue
+					,score 		: starValue
+					,modifiedId : '[[${session.userInfo.id		}]]'
+					}
+		$.ajax({
+			 url 				: '/csm/review/update'
+			,type 				: 'POST'
+			,dataType 			: "json"
+			,contentType		: "application/json"
+			,data 				: JSON.stringify(params)
+			,beforeSend:function(xhr){
+				xhr.setRequestHeader(header,token);
+			}
+			,success:function (data) {
+				alertModalShow("후기를 수정하였습니다. ", "", goMyinfo);
+			}
+			,error:function(request, status, error){
+				alertModalShow(error,"");
+			}
+			,complete:function(){
+			}
+		});
+	}
+	
+	//첫 리뷰 작성
+	function semotongReviewIns(ids,reviewSp,planId){
+
+		var starValue		= $("#"+reviewSp+"ReviewStarIns"+ids).val();	//ok
+		var textValue		= $("#"+reviewSp+"ReviewContentIns"+ids).val();	//ok
+		var companyId		= $("#"+reviewSp+"ReviewCompany"+ids).val();	//ok
+		var orderId			= ids;	//ok
+		
+		if(reviewSp =="semotong") {
+			if ( companyId == "" ) {
+				alertModalShow("통신사를 선택해 주세요.", "");
+				return;
+			}	
+			orderId ="";
+		}
+		
+		
+		if(starValue < 1){
+			alertModalShow("별점을 선택해주세요.", "");
+			return;
+		}
+		
+		if(textValue.length < 10){
+			alertModalShow("후기는 10자 이상 작성해주세요.", "");
+			return;
+		}
+		
+		if ( starValue <= 0 ) {
+			alertModalShow("이용 별점을 등록해주세요.", "");
+			return;
+		}
+		
+		var params = { 
+						 content 	: textValue
+						,score 		: starValue
+						,reviewType : reviewSp.toUpperCase()
+						,companyId  : companyId
+						,orderId	 : orderId
+						,planId : planId
+						,displayYn  : 'Y'
+						,createId   : '[[${session.userInfo.id		}]]'
+					}
+		$.ajax({
+			 url 				: '/csm/review/create'
+			,type 				: 'POST'
+			,dataType 			: "json"
+			,contentType		: "application/json"
+			,data 				: JSON.stringify(params)
+			,beforeSend:function(xhr){
+				xhr.setRequestHeader(header,token);
+			}
+			,success:function (data) {
+				alertModalShow("후기가 저장 되었습니다.", resetPage);
+			}
+			,error:function(request, status, error){
+				alertModalShow(error,"");
+			}
+			,complete:function(){
+			}
+		});
+	}
+	
+	function textAreaAddLisner(sp) {
+		
+		if(sp =="order") {
+			document.querySelectorAll("[id^='orderReviewContentIns']").forEach((element) => {
+				element.addEventListener("keyup", function (event) {
+					const id = element.id;
+					var subId = id.replace("orderReviewContentIns","");
+					if(subId.length >0) {
+						inputLimitLengthChecked(event.target, "applyButtonO"+subId, "countO"+subId, 500);
+					} else {
+						inputLimitLengthChecked(event.target, "applyButtonO", "countO", 500);	
+					}
+					
+				});
+			});
+		} else {
+			document.querySelectorAll("[id^='semotongReviewContentIns']").forEach((element) => {
+				element.addEventListener("keyup", function (event) {
+					const id = element.id;
+					var subId = id.replace("semotongReviewContentIns","");
+					if(subId.length >0) {
+						inputLimitLengthChecked(event.target, "applyButtonI"+subId, "countI"+subId, 500);
+					} else {
+						inputLimitLengthChecked(event.target, "applyButtonI", "countI", 500);	
+					}
+					
+				});
+			});
+		}
+		
+		
+	}
+	
+	// 길이 단위
+	function inputLimitLengthChecked( obj , btnId, countId, maxLen) {
+		var calLength = {
+				getLength : function( string ) {
+					if( string == null || string.length == 0 ) {
+						return 0;
+					}
+					return string.length;
+				}
+		};
+		if( calLength.getLength( obj.value ) > maxLen ) {
+			var str = obj.value.slice(0, maxLen);
+			obj.value = str;
+		} else {
+			$("[id = "+countId+"]").text(calLength.getLength( obj.value )+"/");
+			if( calLength.getLength( obj.value ) > 0 && $("[id = "+btnId+"]").is(":disabled") ){
+				$("[id = "+btnId+"]").attr("disabled", false);
+			}
+		}
+	}
+		
+	// ----------------------------------------------- 간편개통 후기 -------------------------------------------------------- //
+	
+	
+	function setTelecom(element){
+		const dataId = element.getAttribute("data-id");
+		$("#semotongReviewCompany").val(dataId);
+	}
+		
+	
+	function openModal(id) {
+		
+		if(id=="PartnersModal") {
+			getCompanyList();
+		} else {
+			getOrderReviewList()
+		}
+		
+	}
+	
+	// 간편개통 리뷰 리스트
+	function getOrderReviewList() {
+		
+		$.ajax({
+			 url 				: '/csm/review/orderReviewList'
+			,type 				: 'POST'
+			,dataType 			: "json"
+			,contentType		: "application/json"
+			,beforeSend:function(xhr){
+				xhr.setRequestHeader(header,token);
+			}
+			,success:function (data) {
+				console.log(data);
+				
+				$('#orderReviewList').empty();
+				$('#orderReviewListTmpl').tmpl(data.data).appendTo('#orderReviewList');
+				
+				textAreaAddLisner('order');
+				
+				var PartnersModal = new bootstrap.Modal(document.getElementById("FMY0102P01Modal"));
+				PartnersModal.show();
+			}
+			,error:function(request, status, error){
+				alertModalShow(error,"");
+			}
+			,complete:function(){
+			}
+		});
+		
+	}
+	
+	// 통신사 리스트
+	function getCompanyList(){
+
+		$.ajax({
+			 url 				: '/mbm/company/reviewComplist'
+			,type 				: 'POST'
+			,dataType 			: "json"
+			,contentType		: "application/json"
+			,beforeSend:function(xhr){
+				xhr.setRequestHeader(header,token);
+			}
+			,success:function (data) {
+				$('#companyList').empty();
+				$('#companyListTmpl').tmpl(data.data).appendTo('#companyList');
+				
+				var PartnersModal = new bootstrap.Modal(document.getElementById("PartnersModal"));
+				PartnersModal.show();
+				
+			}
+			,error:function(request, status, error){
+				alertModalShow(error,"");
+			}
+			,complete:function(){
+			}
+		});
+	}
+	
+	
+	function getSemotongReview() {
+		var params = {  reviewType 	: "SEMOTONG"
+				,createId : '[[${session.userInfo.id		}]]'
+		}
+		$.ajax({
+			 url 				: '/csm/review/list'
+			,type 				: 'POST'
+			,dataType 			: "json"
+			,contentType		: "application/json"
+			,data 				: JSON.stringify(params)
+			,beforeSend:function(xhr){
+				xhr.setRequestHeader(header,token);
+			}
+			,success:function (data) {
+				textAreaAddLisner('semotong');
+				$("#semotongReviewList").empty();
+				$('#semotongReviewListTmpl').tmpl(data.data).appendTo('#semotongReviewList');
+			}
+			,error:function(request, status, error){
+				alertModalShow(error,"");
+			}
+			,complete:function(){
+			}
+		});
+	}
+	function resetPage() {
+		$('#alertModalCloseId').on('click', function(){
+			location.href = "/users/myinfo";
+		});
+	}	
+</script>
+
+
+<script id="companyListTmpl" type="text/x-jquery-tmpl">
+	<li role="option" tabindex="0" data-bs-dismiss="modal" data-id="${id}"  data-reviewCnt="${compReviewCnt}" onclick="setSelectValued('#frmTelecom', this,'',setTelecom)">${name}</li>
+</script>
+
+
+<script id="semotongReviewListTmpl" type="text/x-jquery-tmpl">
+	<li class="review-item">
+		<!-- Case 리뷰 카드 결과 -->
+		<div class="review-card" id="semotongReviewOrgDv${id}">
+			<div class="card-body">
+
+				<p class="card-label is-written">작성완료</p>
+				<button type="button" class="ui-btn card-remove" onclick="delPopUp('${id}')">
+					<i class="ui-icn icn-20-remove-gr" aria-label="삭제"></i>
+				</button>
+				<div class="card-cont">
+					<p class="card-brand"><img src="${planLogoImg}" alt="${companyNm} 로고" /></p>
+					<p class="card-title"><strong>${companyNm}</strong></p>
+				</div>
+			</div>
+			<div class="card-footer">
+				<!-- Case 작성완료 -->
+				<div class="card-written">
+					<p class="written-sat">
+						<i class="ui-icn icn-16-star-pr" aria-hidden="true"></i>
+						<strong class="val">${score}.0</strong>
+					</p>
+					<button type="button" class="ui-btn written-mod" onclick="updSemotongReviewItmOpen('${id}','semotong')">
+						<span>수정</span>
+					</button>
+					<!-- Textarea 에서 작성한 그대로 테스트 -->
+					<p class="written-cont">${content}</p>
+				</div>
+			</div>
+		</div>
+		<!-- // Case 리뷰 카드 결과 -->
+
+		<!-- Case 리뷰 카드 수정 -->
+		<div class="review-card" id="semotongReviewModDv${id}" style="display:none">
+			<div class="card-footer">
+				<div class="card-cont">
+					<input type="hidden"  id="semotongReviewCompany${id}" value="${companyId}">
+					<p class="card-brand"><img src="${planLogoImg}" alt="${companyNm} 로고" /></p>
+					<p class="card-title"><strong>${companyNm}</strong></p>
+				</div>
+				<!-- // 통신사 선택 -->
+				<!-- Case 작성대기 (입력후) -->
+				<div class="card-wait">
+					<div class="wait-rating">
+						<p class="rating-tit">통신사는 어떠셧나요?</p>
+						<!-- 선택후: 평점수정, is-selected, aria-selected="true" -->
+						<div class="rating-star" aria-label="평점: 0점">
+							<input type="hidden"  class="sancho-input" id="semotongReviewStarIns${id}">
+							<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="1별"></i></button>
+							<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="2별"></i></button>
+							<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="3별"></i></button>
+							<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="4별"></i></button>
+							<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="5별"></i></button>
+						</div>
+					</div>
+					<div class="wait-frm">
+						<div class="ui-textarea">
+							<textarea id="semotongReviewContentIns${id}" cols="50" rows="2" class="textarea" placeholder="고객님의 소중한 의견을 적어주세요.(최소 10자 이상)">${content}</textarea>
+							<p class="bytes"><em class="count" id="countI${id}">0/</em>500</p>
+						</div>
+					</div>
+					<div class="wait-action">
+						<button type="button" class="ui-btn btn-action primary"  onclick="javascript:updSemotongReviewItm('${id}','semotong','');" id="applyButtonI${id}" disabled>
+							<span>수정하기</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- // Case 리뷰 카드 수정 -->
+	
+	
+	</li>
+</script>
+
+		
+
+
+
+
+<script id="orderReviewListTmpl" type="text/x-jquery-tmpl">
+	<!-- // 작성된 리뷰 -->
+{{if reviewId > -1 }}
+	<li class="review-item">
+		<div class="review-card" id="orderReviewOrgDv${id}">
+			<div class="card-body">
+				<p class="card-label is-written">작성완료</p>
+
+			{{if pointHistoryAvailAmount != null && pointHistoryAvailAmount == 'EXX'}}				
+				<button type="button" class="ui-btn card-remove" onclick="delPopUpDenied('${reviewId}')">
+			{{else}}
+				<button type="button" class="ui-btn card-remove" onclick="delPopUp('${reviewId}')">
+			{{/if}}
+					<i class="ui-icn icn-20-remove-gr" aria-label="삭제"></i>
+				</button>
+				<div class="card-cont">
+					<p class="card-brand"><img src="${planLogoImg}" alt="{companyNm} 로고" /></p>
+					<p class="card-title">
+					<strong>
+						{{if planNameSmtSub == null || planNameSmtSub == ''}}
+							{{if supDataVal == 10238976}}
+							무제한
+							{{else}}
+							월 {{html getDataStr(supDataVal)}}
+							{{/if}}
+							{{if dailyData > 0}}
+							+ 매일 {{html getDataStr(dailyData)}}
+							{{/if}}
+							{{if supQos > 0}}
+							+ {{html getQosStr(supQos)}}
+							{{/if}}
+						{{else}}
+							${planNameSmtSub}
+						{{/if}}
+					</strong>
+					</p>
+					<p class="card-date">개통일 {{html openCompDttm.substr(0,10).replaceAll("-",".")}}</p>
+				</div>
+			</div>
+			<div class="card-footer">
+				<!-- Case 작성완료 -->
+				<div class="card-written">
+					<p class="written-sat">
+						<i class="ui-icn icn-16-star-pr" aria-hidden="true"></i>
+						<strong class="val">${score}.0</strong>
+					</p>
+					<button type="button" class="ui-btn written-mod" onclick="updSemotongReviewItmOpen('${id}','order')">
+						<span>수정</span>
+					</button>
+					<p class="written-cont">${content}</p>
+				</div>
+			</div>
+		</div>
+	</li>
+	<!-- // 작성된 리뷰 -->
+
+	<!-- // Case 리뷰 수정-->
+		<div class="review-card" id="orderReviewModDv${id}" style="display:none">
+			<div class="card-body">
+				<p class="card-label">리뷰수정</p>
+				
+			{{if pointHistoryAvailAmount != null && pointHistoryAvailAmount == 'EXX'}}				
+				<button type="button" class="ui-btn card-remove" onclick="delPopUpDenied('${reviewId}')">
+			{{else}}
+				<button type="button" class="ui-btn card-remove" onclick="delPopUp('${reviewId}')">
+			{{/if}}
+
+					<i class="ui-icn icn-20-remove-gr" aria-label="삭제"></i>
+				</button>
+				<div class="card-cont">
+					<input type="hidden"  id="orderReviewCompany${id}" value="${companyId}">
+					<p class="card-brand"><img src="${planLogoImg}" alt="{companyNm} 로고" /></p>
+					<p class="card-title">
+					<strong>
+						{{if planNameSmtSub == null || planNameSmtSub == ''}}
+							{{if supDataVal == 10238976}}
+							무제한
+							{{else}}
+							월 {{html getDataStr(supDataVal)}}
+							{{/if}}
+							{{if dailyData > 0}}
+							+ 매일 {{html getDataStr(dailyData)}}
+							{{/if}}
+							{{if supQos > 0}}
+							+ {{html getQosStr(supQos)}}
+							{{/if}}
+						{{else}}
+							${planNameSmtSub}
+						{{/if}}
+					</strong>
+					</p>
+					<p class="card-date">개통일 {{html openCompDttm.substr(0,10).replaceAll("-",".")}}</p>
+				</div>
+			</div>
+			<div class="card-footer">
+				<!-- Case 작성대기 (입력후) -->
+				<div class="card-wait">
+					<div class="wait-rating">
+						<p class="rating-tit">서비스는 어떠셧나요?</p>
+						<!-- 선택후: 평점수정, is-selected, aria-selected="true" -->
+						<div class="rating-star" aria-label="평점: 0점">
+							<input type="hidden"  class="sancho-input" id="orderReviewStarIns${id}">
+							<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="1별"></i></button>
+							<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="2별"></i></button>
+							<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="3별"></i></button>
+							<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="4별"></i></button>
+							<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="5별"></i></button>
+						</div>
+					</div>
+					<div class="wait-frm">
+						<div class="ui-textarea">
+							<textarea id="orderReviewContentIns${id}" cols="50" rows="2" class="textarea" placeholder="고객님의 소중한 의견을 적어주세요.(최소 10자 이상)">${content}</textarea>
+							<p class="bytes"><em class="count" id="countO${id}">0/</em>500</p>
+						</div>
+					</div>
+					<div class="wait-action">
+						<button type="button" class="ui-btn btn-action primary" onclick="javascript:updSemotongReviewItm('${id}','order','${reviewId}');" id="applyButtonO${id}" disabled>
+							<span>수정하기</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- // Case 리뷰수정-->
+{{else}}
+	<li class="review-item">
+		<!-- // Case 리뷰작성대기-->
+		<div class="review-card">
+			<div class="card-body">
+				<p class="card-label">작성대기</p>
+				<button type="button" class="ui-btn card-remove">
+					<i class="ui-icn icn-20-remove-gr" aria-label="삭제"></i>
+				</button>
+				<div class="card-cont">
+					<input type="hidden"  id="orderReviewCompany${id}" value="${companyId}">
+					<p class="card-brand"><img src="${planLogoImg}" alt="{hostNm} 로고" /></p>
+					<p class="card-title">
+					<strong>
+						{{if planNameSmtSub == null || planNameSmtSub == ''}}
+							{{if supDataVal == 10238976}}
+							무제한
+							{{else}}
+							월 {{html getDataStr(supDataVal)}}
+							{{/if}}
+							{{if dailyData > 0}}
+							+ 매일 {{html getDataStr(dailyData)}}
+							{{/if}}
+							{{if supQos > 0}}
+							+ {{html getQosStr(supQos)}}
+							{{/if}}
+						{{else}}
+							${planNameSmtSub}
+						{{/if}}
+					</strong>
+					</p>
+					<p class="card-date">개통일 {{html openCompDttm.substr(0,10).replaceAll("-",".")}}</p>
+				</div>
+			</div>
+			<div class="card-footer">
+				<!-- Case 작성대기 (입력후) -->
+				<div class="card-wait">
+					<div class="wait-rating">
+						<p class="rating-tit">서비스는 어떠셧나요?</p>
+						<!-- 선택후: 평점수정, is-selected, aria-selected="true" -->
+						<div class="rating-star" aria-label="평점: 0점">
+							<input type="hidden"  class="sancho-input" id="orderReviewStarIns${id}">
+							<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="1별"></i></button>
+							<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="2별"></i></button>
+							<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="3별"></i></button>
+							<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="4별"></i></button>
+							<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="5별"></i></button>
+						</div>
+					</div>
+					<div class="wait-frm">
+						<div class="ui-textarea">
+							<textarea name="" id="orderReviewContentIns${id}" cols="50" rows="2" class="textarea" placeholder="고객님의 소중한 의견을 적어주세요.(최소 10자 이상)"></textarea>
+							<p class="bytes"><em class="count" id="countO${id}">0/</em>500</p>
+						</div>
+					</div>
+					<div class="wait-action">
+						<button type="button" class="ui-btn btn-action primary" onclick="javascript:semotongReviewIns('${id}','order','${planId}');" id="applyButtonO${id}" disabled>
+							<span>등록하기</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- // Case 리뷰작성대기-->
+	</li>
+{{/if}}
+</script>
+
+
+
+
+</th:block>
+	
+<input type="hidden" id="hId" name="hId" value="" >
+
+	<!-- Container -->
+	<main role="main" class="container">
+		<!-- content -->
+		<div class="content F-MY01-02-page">
+			<!-- 내계정 섹션 -->
+			 <section class="my-account-sec">
+				<div class="sec-inner">
+					<!-- 내계정 목록 -->
+					<ul class="my-account-list">
+						<li class="my-account-item">
+							<div class="my-account-label">
+								<strong class="tit">이름</strong>
+							</div>
+							<div class="my-account-con">
+								<p class="txt">[[${session.userInfo.username		}]]</p>
+							</div>
+						</li>
+						<li class="my-account-item">
+							<div class="my-account-label">
+								<strong class="tit">전화번호</strong>
+							</div>
+							<div class="my-account-con">
+								<p class="txt">[[${session.userInfo.phoneNumber		}]]</p>
+							</div>
+						</li>
+						<li class="my-account-item">
+							<div class="my-account-label">
+								<strong class="tit">이메일</strong>
+							</div>
+							<div class="my-account-con">
+								<p class="txt">[[${session.userInfo.email		}]]</p>
+							</div>
+						</li>
+						<li class="my-account-item"								  style="display:none;" id="goApplyModalOpen"><!-- 1차 제외 -->
+							<div class="my-account-label">
+								<strong class="tit">알림 설정</strong>
+								<p class="info">혜택이나 프로모션을 알려드려요.</p>
+							</div>
+							<div class="my-account-con">
+								<div class="ui-switch">
+									<input type="checkbox" name="sSwitch1" id="sSwitch11" value="" checked />
+									<label for="sSwitch11"></label>
+								</div>
+							</div>
+						</li>
+						<li class="my-account-item">
+							<div class="my-account-label">
+								<strong class="tit">내 후기 관리</strong>
+							</div>
+							<div class="my-account-con">
+								<button type="button" class="ui-btn" data-bs-toggle="modal" onclick="openModal('FMY0102P01Modal')"><span class="txt primary" id="totalCnt" th:text="|${reviewCnt} 건|"></span></button>
+							</div>
+						</li>
+						<!--  1차 제외 
+						<li class="my-account-item">
+							<div class="my-account-label">
+								<strong class="tit">추천 내역</strong>
+							</div>
+							<div class="my-account-con">
+								<button type="button" class="ui-btn"><span class="txt primary">3건</span></button>
+							</div>
+						</li>
+						 -->
+						<li class="my-account-item">
+							<div class="my-account-label">
+								<button type="button" class="ui-btn" onclick="javascript:exitSemotong();">
+									<span class="tit">탈퇴하기</span>
+								</button>
+							</div>
+						</li>
+					</ul>
+					<!-- // 내계정 목록 -->
+				</div>
+			 </section>
+			<!-- // 내계정 섹션 -->
+		</div>
+		<!-- // content -->
+	</main>
+	<!-- // Container -->
+	
+	
+	
+	
+	
+	
+	<div class="modal modal-full fade" id="FMY0102P01Modal" tabindex="-1" role="dialog" aria-labelledby="FMY0102P01ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-MY01-02-P01-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FMY0102P01ModalLabel">내 후기 관리</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<!-- modal-body -->
+				<div class="modal-body">
+					<!-- 탭 목록 -->
+					<div class="ui-tab tab-style1">
+						<ul class="tab-list" role="tablist">
+							<li class="tab-item" role="presentation">
+								<button class="tab-link active" id="tab-11" data-bs-toggle="tab" data-bs-target="#tab-11-pane" type="button" role="tab" aria-controls="tab-11-pane" aria-selected="true">구매 상품 후기</button>
+							</li>
+							<li class="tab-item" role="presentation">
+								<button class="tab-link" id="tab-12" data-bs-toggle="tab" data-bs-target="#tab-12-pane" type="button" role="tab" aria-controls="tab-12-pane" aria-selected="false" onclick="getSemotongReview();">세모통 후기</button>
+							</li>
+						</ul>
+					</div>
+					<!-- // 탭 목록 -->
+
+					<!-- 탭 패널 -->
+					<div class="tab-content">
+						<!-- 탭 패널: 구매 상품 후기 -->
+						<div class="tab-pane fade show active" id="tab-11-pane" role="tabpanel" aria-labelledby="tab-11" tabindex="0">
+							<!-- 리뷰 섹션 -->
+							<section class="review-sec">
+								<div class="sec-inner">
+									<!-- 리뷰 목록 -->
+									<ul class="review-list" id="orderReviewList">
+										
+										
+									</ul>
+									<!-- // 리뷰 목록 -->
+
+									<!-- Case 목록이 많은 경우 더보기 -->
+									<!-- <button type="button" class="ui-btn btn-more-list">
+										<i class="ui-icn icn-16-more-list-gr" aria-hidden="true"></i>
+										<span>더보기</span>
+									</button> -->
+								</div>
+							</section>
+							<!-- // 리뷰 섹션 -->
+						</div>
+						<!-- // 탭 패널: 구매 상품 후기 -->
+						
+						
+						
+
+						<!-- 탭 패널: 세모통 후기 -->
+						<div class="tab-pane fade" id="tab-12-pane" role="tabpanel" aria-labelledby="tab-12" tabindex="0">
+							<!-- 리뷰 섹션 -->
+							<!-- 2024-12-12 조찬기 : 세모통후기 추가 (.F-MY01-02-P01-page .review-sec {} 전체 확인 부탁드립니다.) -->
+							<section class="review-sec">
+								<div class="sec-inner">
+									<div class="sec-header">
+										<h2 class="sec-tit">[[${session.userInfo.username}]] 고객님, <br>세모통 서비스는 어떠셨나요?</h2>
+										<p class="sec-explain">고객님의 의견으로 더 좋은 서비스를<br>드릴 수 있도록 노력할게요.</p>
+									</div>
+									<div class="sec-body">
+										<!-- 리뷰 목록 -->
+										<ul class="review-list">
+											<li class="review-item">
+												<!-- Case 리뷰 카드 등록 -->
+												<div class="review-card">
+													<div class="card-footer">
+														<!-- 통신사 선택 -->
+														<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+														<div class="basic-frm">
+															 <div class="frm-field">
+																 <div class="frm-title">
+																	 <label class="tit" for="frmTelecom">통신사를 선택해주세요.</label>
+																 </div>
+																 <div class="frm-content">
+																	 <div class="ui-sel">
+																		 <!-- 선택전 is-placeholder, (선택후 삭제) -->
+																		 <button type="button" id="frmTelecom" class="sel is-placeholder" role="combobox" aria-haspopup="listbox" onclick="openModal('PartnersModal')">
+																			 <span>통신사를 선택해 주세요.</span>
+																			 <i class="ui-icn icn-20-select-arw" aria-hidden="true"></i>
+																		 </button>
+																	 </div>
+																 </div>
+															 </div>
+															 <input type="hidden"  id="semotongReviewCompany">
+														</div>
+														<!-- // 통신사 선택 -->
+														<!-- Case 작성대기 (입력후) -->
+														<div class="card-wait">
+															<div class="wait-rating">
+																<p class="rating-tit">통신사는 어떠셧나요?</p>
+																<!-- 선택후: 평점수정, is-selected, aria-selected="true" -->
+																<div class="rating-star" aria-label="평점: 0점">
+																	<input type="hidden"  class="sancho-input" id="semotongReviewStarIns">
+																	<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="1별"></i></button>
+																	<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="2별"></i></button>
+																	<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="3별"></i></button>
+																	<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="4별"></i></button>
+																	<button type="button" class="ui-btn" aria-selected="false" onclick="sanchoSetRating(this)"><i class="ui-icn icn-24-star-gr" aria-label="5별"></i></button>
+																</div>
+															</div>
+															<div class="wait-frm">
+																<div class="ui-textarea">
+																	<textarea id="semotongReviewContentIns" cols="50" rows="2" class="textarea" placeholder="고객님의 소중한 의견을 적어주세요.(최소 10자 이상)"></textarea>
+																	<p class="bytes"><em class="count" id="countI">0/</em>500</p>
+																</div>
+															</div>
+															<div class="wait-action">
+																<button type="button" class="ui-btn btn-action primary"  onclick="javascript:semotongReviewIns('','semotong','-1');" id="applyButtonI" disabled>
+																	<span>등록하기</span>
+																</button>
+															</div>
+														</div>
+													</div>
+												</div>
+												<!-- // Case 리뷰 카드 등록 -->
+											</li>
+										</ul>
+											
+											
+										<ul class="review-list" id="semotongReviewList">
+
+										</ul>
+										<!-- // 리뷰 목록 -->
+
+										<!-- Case 목록이 많은 경우 더보기 -->
+										<!-- <button type="button" class="ui-btn btn-more-list">
+											<i class="ui-icn icn-16-more-list-gr" aria-hidden="true"></i>
+											<span>더보기</span>
+										</button> -->
+									</div>
+								</div>
+							</section>
+							<!-- // 리뷰 섹션 -->
+						</div>
+						<!-- // 탭 패널: 세모통 후기 -->
+					</div>
+					<!-- // 탭 패널 -->
+				</div>
+				<!-- //modal-body -->
+				<!-- modal-footer -->
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary">
+						<span>추가하기</span>
+					</button>
+				</div>
+				<!-- // modal-footer -->
+			</div>
+		</div>
+	</div>
+	<!-- // modal default -->
+	
+	
+<!-- 정렬 modal select -->
+	<div class="modal modal-select fade" id="PartnersModal" tabindex="-1" role="dialog" aria-labelledby="PartnersModalLabel" aria-hidden="true" style="z-index: 3000;">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="PartnersModalLabel">통신사</h3>
+					<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 콤보박스 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<!-- modal-select 공통 -->
+							<ul class="select-listbox" role="listbox" id="companyList">
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmTelecom', this)">헬로비젼</li>
+							</ul>
+						</div>
+					</section>
+					<!-- // 콤보박스 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 정렬 modal select -->
+		
+	
+	
+</html>

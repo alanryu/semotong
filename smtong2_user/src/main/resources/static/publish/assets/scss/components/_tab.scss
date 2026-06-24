@@ -1,0 +1,207 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 탭 메뉴
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------
+	@@ 공통
+-------------------------------------------------------------------*/
+// s: 기본
+.ui-tab {
+	flex: none;
+	.tab-list {
+		display: flex;
+		width: 100%;
+		.tab-link {
+			display: block;
+		}
+		.tab-link:disabled {
+			opacity: 0.75;
+		}
+	}
+}
+
+.tab-content {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	flex-basis: auto;
+}
+.tab-pane {
+	display: none;
+	flex-direction: column;
+	flex-grow: 1;
+	flex-basis: auto;
+	width: 100%;
+	&.active {
+		display: flex;
+	}
+}
+
+/* 강조 */
+
+/*-------------------------------------------------------------------
+	@@ 유형
+-------------------------------------------------------------------*/
+/* 스타일1 */
+.tab-style1 {
+	position: sticky;
+	top: $mobile-height-header;
+	padding-bottom: 20rem;
+	padding-top: 16rem;
+	background-color: #fff;
+	z-index: 10;
+	@include out-sec;
+
+	.tab-list {
+		@include in-sec;
+	}
+
+	.tab-item {
+		flex:1;
+	}
+	.tab-link {
+		width: 100%;
+		height: 36rem;
+		font-weight: 600;
+		font-size: 16rem;
+		line-height: 22rem;
+		color: #B7B9BA;
+		text-align: center;
+		border-bottom: 2px solid #EFF0F0;
+		&.active {
+			color: #000000;
+			border-color: #000;
+		}
+	}
+}
+
+@include media-tablet-xs {
+	.container {
+		.tab-style1 {
+			top: $pc-height-header;
+			padding-top: 12rem;
+		}
+	}
+
+}
+
+/* 스타일2 */
+.tab-style2 {
+	width: 100%;
+	position: sticky;
+	top: $mobile-height-header;
+	overflow: hidden;
+	padding-bottom: 20rem;
+	padding-top: 16rem;
+	background-color: #fff;
+	z-index: 10;
+	@include out-sec;
+	&::before { /* 7차 수정 : 탭 스티키 라인 수정 */
+		content:'';
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+		top: 41rem;
+		width: 100%;
+		max-width: 720rem;
+		height: 1rem;
+		background-color: #EFF0F0;
+	}
+	.swiper-wrapper {
+		position: relative;
+	}
+	.swiper-slide {
+		box-sizing: border-box;
+		width: auto;
+		flex: none;
+	}
+
+	.tab-list {
+		gap: 16rem;
+	}
+	.tab-link {
+		position: relative;
+		display: block;
+		height: 26rem;
+		border-bottom: 0;
+		font-weight: 600;
+		font-size: 16rem;
+		line-height: 22rem;
+		color: #B7B9BA;
+		text-align: center;
+		border-bottom: 1px solid transparent;
+		&.active {
+			color: #000000;
+			border-color: #000;
+		}
+	}
+}
+@include media-tablet-xs {
+	.container {
+		.tab-style2 {
+			top: $pc-height-header;
+			padding-top: 16rem;
+			padding-left: 0;
+			padding-right: 0;
+			.tab-swiper { /* 7차 수정 : 탭 스티키 레이아웃 수정 */
+				@include in-sec;
+			}
+			.swiper-wrapper {
+				display: flex;
+				justify-content: space-around;
+				overflow: hidden;
+				.swiper-slide {
+					display: flex;
+					justify-content: center;
+					text-align: center;
+				}
+			}
+			.tab-list {
+				justify-content: space-around;
+				@include in-sec;
+				.tab-item {
+					flex:1 1 auto;
+				}
+			}
+		}
+	}
+	.only-container {
+		.container {
+			.tab-style1 {
+				top: 0;
+			}
+			.tab-style2 {
+				top: 0;
+			}
+		}
+	}
+}
+
+/* 스타일3 */
+.tab-style3 {
+	width: 100%;
+	.tab-list {
+		display: flex;
+		padding: 4rem;
+		border-radius: 20rem;
+		background-color: #EFF0F0;
+		.tab-item {
+			flex: 1 1 auto;
+			width: 100%;
+			.tab-link {
+				width: 100%;
+				padding: 8rem;
+				border-radius: 20rem;
+				font-weight: 600;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #63666A;
+				text-align: center;
+				&.active {
+					background-color: #fff;
+				}
+			}
+		}
+	}
+}

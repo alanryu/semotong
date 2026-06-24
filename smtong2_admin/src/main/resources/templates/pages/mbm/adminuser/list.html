@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layout/default_layout}"
+  layout:fragment="Content"
+  th:with="menuIdGroup ='01',menuId ='01'"
+>
+  <!-- index.html 고유 CSS 추가 -->
+  <th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+  </th:block>
+  <!-- index.html 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+    <script id="searchListTmpl" type="text/x-jquery-tmpl">
+      <tr>
+          <td>
+              <input type="checkbox" class="form-check-input" value="${id}">
+          </td>
+          <td>${id}</td>
+          <td>
+              <div class="d-flex gap-2">
+                  <button class="action-btn btn-sm" onclick="location.href='/mbm/adminuser/edit?id=${id}'">
+                      <i class="fas fa-edit me-1"></i>
+                      수정
+                  </button>
+                  <button class="action-btn btn-sm" onclick="deleteRow('${id}');">
+                      <i class="fas fa-trash me-1"></i>
+                      삭제
+                  </button>
+              </div>
+          </td>
+          <td>${userName}</td>
+          <td>${adminId}</td>
+          <td>{{html getAuthTypeNm(authType) }}</td>
+      	<td>${comGroup}</td>
+          <td>${phoneNumber}</td>
+      	<td>${email}</td>
+          <td>{{html getDateStr(createDate)}}</td>
+      </tr>
+    </script>
+    <script type="text/javascript">
+      function getAuthTypeNm(val) {
+        console.log(val);
+        var res = "";
+        if (val == "ADMIN") {
+          res = "마스터";
+        }
+
+        if (val == "MANAGE") {
+          res = "운영자";
+        }
+
+        if (val == "INTERNET") {
+          res = "인터넷 상담";
+        }
+
+        if (val == "INTERNET2") {
+          res = "인터넷 CS";
+        }
+
+        if (val == "SALES") {
+          res = "영업담당자";
+        }
+        if (val == "MKT") {
+          res = "광고관리자";
+        }
+
+        if (val == "APIADMIN") {
+          res = "API계정";
+        }
+
+        if (val == "SKYLIFE") {
+          res = "스카이라이프담당자";
+        }
+        return res;
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        getList();
+
+        document.getElementById("pageSize").addEventListener("change", function () {
+          currentPage = 1;
+          getList();
+        });
+      });
+
+      function changeCombo() {
+        currentPage = 1;
+        searchList();
+      }
+
+      function renderPage(page) {
+        currentPage = page;
+        getList();
+      }
+
+      function deleteRow(id) {
+        showConfirm(
+          "삭제하시겠습니까?",
+          () => {
+            deleteDb(id);
+          },
+          () => {
+            // 취소 시 실행할 로직
+          },
+          "계정 삭제"
+        );
+      }
+
+      function deleteDb(id) {
+        $.ajax({
+          url: "/mbm/adminuser/delete",
+          type: "DELETE",
+          data: { delId: id },
+          success: function (data) {
+            console.log(data);
+            showAlert("삭제되었습니다.", getList);
+          },
+          error: function (request, status, error) {
+            showAlert(error);
+          },
+          complete: function () {
+            // $('#loading').addClass('display-none');
+          },
+        });
+      }
+
+      function getList() {
+        var page = currentPage;
+        if (page == null || page == "") page = 1;
+        var pageSize = $("#pageSize").val();
+        var searchAuthType = $("input[name='searchAuthType']:checked").val();
+        console.log("🚀 ~ getList ~ searchAuthType:", searchAuthType);
+
+        var params = {
+          searchMenuType: "ADMIN",
+          searchType: $("#searchType").val(),
+          keyword: $("#keyword").val(),
+          searchAuthType: searchAuthType,
+          page: page,
+          recordSize: pageSize,
+        };
+
+        $.ajax({
+          url: "/mbm/adminuser/getlist",
+          type: "POST",
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(params),
+          success: function (data) {
+            console.log(data);
+            $("#searchList").empty();
+
+            $("#totla_count").html("총 " + data.totalCnt + "건");
+            if (data.totalCnt > 0) {
+              $("#searchListTmpl").tmpl(data.data).appendTo("#searchList");
+            }
+
+            renderPagination(page, data.totalCnt, pageSize);
+          },
+          error: function (request, status, error) {
+            showAlert(error);
+          },
+          complete: function () {
+            // $('#loading').addClass('display-none');
+          },
+        });
+      }
+
+      function downloadExcel() {
+        var page = 1;
+        var pageSize = "999";
+        var searchAuthType = $("input[name='searchAuthType']:checked").val();
+
+        var params = {
+          searchType: $("#searchType").val(),
+          keyword: $("#keyword").val(),
+          searchAuthType: searchAuthType,
+          page: page,
+          recordSize: pageSize,
+        };
+        var _url = "/mbm/adminuser/exceldown";
+
+        downloadExcelProc(params, _url, "adminUserList");
+      }
+
+      function toggleSearchInit() {
+        $("#searchType").val("name");
+        $("#keyword").val("");
+        $("#searchAuthType01").prop("checked", true);
+      }
+    </script>
+  </th:block>
+
+  <div class="main-content">
+    <div class="container-fluid">
+      <!-- 로케이션 & 제목 영역 추가 -->
+      <div class="page-header mb-4">
+        <div class="location mb-2">
+          <small class="text-secondary">
+            <i class="fas fa-home me-1"></i>
+            <a href="/mbm/adminuser/list">홈</a> > <a href="/mbm/adminuser/list">계정권한관리</a> >
+            <a href="/mbm/adminuser/list">계정권한목록</a>
+          </small>
+        </div>
+        <h2 class="page-title fs-4 mb-4">계정권한목록</h2>
+      </div>
+
+      <div class="search-section">
+        <!-- 검색어 -->
+        <div class="col-12 mb-2">
+          <div class="form-row full-width">
+            <div class="form-label mb-0">검색조건</div>
+            <div class="form-control-wrap flex-grow-1">
+              <select class="form-select" id="searchType" name="searchType">
+                <option value="name">이름</option>
+                <option value="admin_id">아이디</option>
+              </select>
+            </div>
+            <div class="position-relative col-9">
+              <i class="fas fa-search position-absolute" style="left: 16px; top: 15.5px; color: #94a3b8"></i>
+              <input type="text" class="form-control ps-5" placeholder="검색어를 입력하세요" id="keyword" name="keyword" />
+            </div>
+          </div>
+        </div>
+        <div class="row align-items-center mb-3">
+          <div class="col-12">
+            <div class="d-flex align-items-center gap-3">
+              <div class="form-label mb-0">계정분류</div>
+              <div class="radio-group">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="searchAuthType" id="searchAuthType01" value="" checked />
+                  <label class="form-check-label" for="searchAuthType01">전체</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="searchAuthType" id="searchAuthType02" value="ADMIN" />
+                  <label class="form-check-label" for="searchAuthType02">마스터</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="searchAuthType" id="searchAuthType03" value="MANAGE" />
+                  <label class="form-check-label" for="searchAuthType03">운영자</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="searchAuthType" id="searchAuthType04" value="INTERNET" />
+                  <label class="form-check-label" for="searchAuthType04">인터넷 상담</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="searchAuthType" id="searchAuthType08" value="INTERNET2" />
+                  <label class="form-check-label" for="searchAuthType08">인터넷 CS</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="searchAuthType" id="searchAuthType05" value="SALES" />
+                  <label class="form-check-label" for="searchAuthType05">영업담당자</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="searchAuthType" id="searchAuthType06" value="MKT" />
+                  <label class="form-check-label" for="searchAuthType06">광고관리자</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="searchAuthType" id="searchAuthType07" value="SKYLIFE" />
+                  <label class="form-check-label" for="searchAuthType07">스카이라이프관리자</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 text-end mt-2">
+            <button class="btn btn-light me-2 btn-sm" onclick="toggleSearchInit()">
+              <i class="fas fa-redo"></i>
+              초기화
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="getList();">
+              <i class="fas fa-search"></i>
+              검색
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="d-flex align-items-center gap-3">
+            <div class="stats-badge">
+              <i class="fas fa-calculator me-1"></i>
+              <span id="totla_count">총 450건</span>
+            </div>
+            <select class="form-select" style="width: 100px" id="pageSize" onchange="changeCombo()">
+              <option value="10">10개씩</option>
+              <option value="20">20개씩</option>
+              <option value="30">30개씩</option>
+              <option value="40">40개씩</option>
+              <option value="50">50개씩</option>
+            </select>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-light btn-sm">
+              <i class="fas fa-download"></i>
+              다운로드
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="location.href='/mbm/adminuser/edit?id='">
+              <i class="fas fa-plus"></i>
+              신규등록
+            </button>
+          </div>
+        </div>
+
+        <table class="table custom-table">
+          <thead>
+            <tr>
+              <th>
+                <input type="checkbox" class="form-check-input" />
+              </th>
+              <th>번호</th>
+              <th>편집</th>
+              <th>이름</th>
+              <th>아이디</th>
+              <th>계정분류</th>
+              <th>소속</th>
+              <th>전화번호</th>
+              <th>이메일</th>
+              <th>등록일</th>
+            </tr>
+          </thead>
+          <tbody id="searchList">
+            <tr>
+              <td>
+                <input type="checkbox" class="form-check-input" />
+              </td>
+              <td>450</td>
+              <td>
+                <div class="d-flex gap-2">
+                  <button class="action-btn btn-sm" onclick="location.href='../business/list_modify.html'">
+                    <i class="fas fa-edit me-1"></i>
+                    수정
+                  </button>
+                  <button class="action-btn btn-sm">
+                    <i class="fas fa-trash me-1"></i>
+                    삭제
+                  </button>
+                </div>
+              </td>
+              <td>에이모바일</td>
+              <td>(주)에이스멤버쉽</td>
+              <td>Amobile</td>
+              <td>SKT</td>
+              <td>2024-12-12</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="d-flex justify-content-left mt-4">
+          <ul class="pagination"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</html>

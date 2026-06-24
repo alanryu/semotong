@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>마이페이지 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<!-- 페이지 스크립트 영역 -->
+	<!-- Swiper Librarys -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+	<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+			// 이벤트 스와이프
+		    var eventSwiper = new Swiper(".event-swiper", {
+				threshold: 3,
+				spaceBetween: 10,
+				pagination: {
+					el: ".swiper-pagination",
+				},
+				autoplay: {
+					delay: 2500,
+					disableOnInteraction: false,
+				},
+			});
+		})
+	</script>
+</head>
+
+<body>
+	<!-- 레이아웃 유형구분
+		메인: main-wrapper,
+		서브: sub-wrapper,
+		기타: [기타]-wrapper
+	 -->
+	<div class="wrapper main-wrapper">
+		<!-- Header Deaktop -->
+		<header class="header-desktop">
+			<div class="header-skip">
+				<a href="#content">본문 바로가기</a>
+			</div>
+
+			<div class="header-sec">
+				<h1 class="title">
+					<!-- 로고 베타 추가 -->
+					<a href="../scenario/F-M01-01.html" class="logo"><span class="blind">세모통</span></a>
+					<!-- <span class="logo-beta"><img src="../../assets/images/common/img-logo-header-beta.png" alt=""></span> -->
+				</h1>
+				<nav class="header-nav">
+					<ul class="nav-list">
+						<li class="nav-item">
+							<!-- 선택된 상태 : is-selected -->
+							<a href="../F-G/F-G01-01.html" role="link" class="ui-btn nav-link">
+								<span>세모통 설명서</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<div class="ui-dropdown">
+								<a href="../scenario/F-P01-01.html" role="link" class="ui-btn nav-link" data-bs-toggle="dropdown" aria-expanded="false">
+									<span>요금제 찾기</span>
+								</a>
+								<div class="dropdown-menu">
+									<ul class="sub-nav">
+										<li class="sub-nav-item">
+											<a href="../scenario/F-P01-01.html" role="link" class="ui-btn sub-nav-link">
+												<span>알뜰요금제</span>
+											</a>
+										</li>
+										<li class="sub-nav-item">
+											<a href="../scenario/F-P01-01.html" role="link" class="ui-btn sub-nav-link">
+												<i class="ui-icn icn-h20-sk" aria-label="SKT"></i>
+												<i class="ui-icn icn-h20-kt" aria-label="KT"></i>
+												<i class="ui-icn icn-h20-lgu-02" aria-label="U+"></i>
+												요금제
+											</a>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</li>
+						<li class="nav-item">
+							<a href="../F-I/F-I01-01.html" role="link" class="ui-btn nav-link">
+								<span>인터넷</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../F-E/F-E01-01.html" role="link" class="ui-btn nav-link">
+								<span>이벤트</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../F-MY/F-MY01-01.html" role="link" class="ui-btn nav-link">
+								<span>마이페이지</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+		<!-- // Header Deaktop -->
+
+		<!-- Header Mobile -->
+		<!-- 모바일 헤더에 로고가 나오는 케이스에 한하여 모바일전용 클래스 only-mo 적용 -->
+		<!-- 4차 수정 : 마이페이지 헤더 수정
+			- 모바일 헤더 only-mo 클래스 추가
+			- 모바일 헤더 '마이페이지'를 로고로 변경
+			- 모바일 헤더 '고객센터' 버튼을 '나의정보 영역'으로 이동
+		 -->
+		<header class="header-mobile only-mo">
+			<section class="header-sec">
+				<h1 class="title">
+					<!-- 로고 베타 추가 -->
+					<a href="../scenario/F-M01-01.html" class="logo"><span class="blind">세모통</span></a>
+					<!-- <span class="logo-beta"><img src="../../assets/images/common/img-logo-header-beta.png" alt=""></span> -->
+				</h1>
+				<button type="button" class="ui-btn btn-aside" data-bs-toggle="modal" data-bs-target="#asideModal">
+					<i class="ui-icn icn-32-anb-bk" aria-label="메뉴열기"></i>
+				</button>
+			</section>
+			<!-- // Header Mobile -->
+		</header>
+		<!-- // Header -->
+
+		<!-- Aside Modal (include_mobileNav.html) -->
+		<aside class="modal modal-full fade aside-modal" id="asideModal" tabindex="-1" role="dialog" aria-labelledby="asideModalLabel" aria-hidden="true"></aside>
+		<!-- Aside Modal -->
+
+		<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-MY02-01-page">
+				<!-- 나의정보 섹션 -->
+				<section class="my-info-sec">
+					<div class="sec-inner">
+						<!-- 나의정보 -->
+						<div class="my-info-profile">
+							<!-- 3차 수정 : 인사말 변경 -->
+							<p class="name"><strong>안녕하세요, 고객님!</strong></p>
+							<p class="explain">
+								간편 로그인으로 세모통의<br> 다양한 서비스를 이용하실 수 있어요.
+							</p>
+							<!-- 4차 수정 : 고객센터 버튼 나의정보로 이동 및 클래스 추가 -->
+							<button type="button" class="ui-btn btn-cs">
+								<i class="ui-icn icn-32-headset-bk" aria-label="고객센터"></i>
+							</button>
+							<button type="button" class="ui-btn btn-kakao">
+								<i class="ui-icn icn-18-kakao-bk" aria-hidden="true"></i>
+								<span>카카오 로그인</span>
+							</button>
+						</div>
+						<!-- // 나의정보 -->
+
+						<!-- 3차 수정 : 요금제 조회영역 삭제 -->
+						<!-- 요금제 대시보드 -->
+						<!-- <div class="my-info-rateplan-status">
+							<ul class="status-list">
+								<li class="status-item">
+									<strong class="tit">최근 본 요금제</strong>
+									<em class="val">0개</em>
+								</li>
+								<li class="status-item">
+									<strong class="tit">찜한 요금제</strong>
+									<em class="val">0개</em>
+								</li>
+								<li class="status-item">
+									<strong class="tit">신청 요금제</strong>
+									<em class="val">0개</em>
+								</li>
+							</ul>
+
+							<div class="status-more">
+								<button type="button" class="ui-btn">
+									<i class="ui-icn icn-16-emo-hand"></i>
+									<span>세모통이 추천하는 <em>나만의 요금제</em>를 확인해보세요.</span>
+									<i class="ui-icn icn-16-more-gr" aria-label="더보기"></i>
+								</button>
+							</div>
+						</div> -->
+						<!-- // 요금제 대시보드 -->
+					</div>
+				</section>
+				<!-- // 나의정보 섹션 -->
+
+				<!-- 고객지원 섹션 -->
+				<section class="cscenter-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit"><i class="ui-icn icn-20-headset-bk"></i>고객지원</h2>
+						</div>
+						<div class="sec-body">
+							<ul class="cs-menu-list">
+								<li class="cs-menu-item">
+									<a href="#" class="cs-menu-btn">
+										<span>공지사항</span>
+										<i class="ui-icn icn-16-more-gr" aria-hidden="true"></i>
+									</a>
+								</li>
+								<li class="cs-menu-item">
+									<a href="#" class="cs-menu-btn">
+										<span>1:1 문의</span>
+										<i class="ui-icn icn-16-more-gr" aria-hidden="true"></i>
+									</a>
+								</li>
+								<li class="cs-menu-item">
+									<a href="#" class="cs-menu-btn">
+										<span>자주묻는 질문</span>
+										<i class="ui-icn icn-16-more-gr" aria-hidden="true"></i>
+									</a>
+								</li>
+								<!-- 3차 수정 : 비로그인시 로그아웃 삭제 -->
+								<!-- <li class="cs-menu-item">
+									<a href="#" class="cs-menu-btn">
+										<span>로그아웃</span>
+										<i class="ui-icn icn-16-more-gr" aria-hidden="true"></i>
+									</a>
+								</li> -->
+							</ul>
+						</div>
+					</div>
+				</section>
+				<!-- // 고객지원 섹션 -->
+
+				<!-- 이벤트 섹션 -->
+				<section class="event-sec">
+					<div class="sec-inner">
+						<div class="swiper event-swiper">
+							<div class="swiper-wrapper">
+								<div class="swiper-slide">
+									<button type="button" class="event-bnr">
+										<img src="../../assets/images/upload/@bnr-event-01-mo.png" alt="이벤트 내용" class="only-mo" />
+										<img src="../../assets/images/upload/@bnr-event-01-pc.png" alt="이벤트 내용" class="only-pc" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="event-bnr">
+										<img src="../../assets/images/upload/@bnr-event-02-mo.png" alt="이벤트 내용" class="only-mo" />
+										<img src="../../assets/images/upload/@bnr-event-02-pc.png" alt="이벤트 내용" class="only-pc" />
+									</button>
+								</div>
+							</div>
+							<div class="swiper-pagination"></div>
+						</div>
+					</div>
+				</section>
+				<!-- // 배너 섹션 -->
+ 			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+
+		<!-- Footer (include_footer.html) -->
+		<footer class="footer"></footer>
+		<!-- // Footer -->
+
+		<!-- floating Nav (include_floatingNav.html) -->
+		<nav class="floating-nav"></nav>
+		<!-- // floating Nav- -->
+	</div>
+</body>
+
+</html>

@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <script src="assets/js/guide.include.js"></script>
+    <script>include.meta()</script>
+    <script>include.head()</script>
+</head>
+
+<body>
+    <div class="g-wrapper" class="g-convention-wrap">
+        <script>include.header()</script>
+        <div class="g-container">
+            <script>include.aside()</script>
+
+            <!-- Content -->
+            <article class="g-content" class="">
+                <div class="g-content-header">
+                    <h1 class="g-h1">네임규칙</h1>
+                    <small class="g-explain-h1">Publishing Conventions</small>
+                </div>
+                <div class="g-content-body">
+                    <!-- section2 -->
+                    <section id="section2" class="g-section">
+                        <div class="g-section-header">
+                            <h2 class="g-h2">예약어</h2>
+                        </div>
+                        <div class="g-section-body">
+                            <h3 class="g-h3">표기법</h3>
+                            <div class="g-tbl-type1">
+                                <table>
+                                    <caption>공통 네이밍 규칙 예</caption>
+                                    <colgroup>
+                                        <col style="width:20%">
+                                        <col style="width:25%">
+                                        <col style="width:25%">
+                                        <col>
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th>종류</th>
+                                            <th>구분</th>
+                                            <th>번호</th>
+                                            <th>예시</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="align-l">ID Selector</td>
+                                            <td class="align-l">카멜표기법</td>
+                                            <td class="align-l">한 자리수 (생략가능, 2, 3)</td>
+                                            <td class="align-l">errorMesage</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="align-l">Class Selector</td>
+                                            <td class="align-l">하이픈 표기법</td>
+                                            <td class="align-l">한 자리수 (생략가능, 2, 3)</td>
+                                            <td class="align-l">tab-page, tbl-type1, tbl-type2</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="align-l">Image</td>
+                                            <td class="align-l">언더바 표기법</td>
+                                            <td class="align-l">두 자리수 (01, 02, 03)</td>
+                                            <td class="align-l">img-24-arrow-right-02.svg</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="align-l">파일 및 폴더</td>
+                                            <td class="align-l">언더바 표기법</td>
+                                            <td class="align-l">두 자리수 (01, 02, 03)</td>
+                                            <td class="align-l">cyber_center</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <h3 class="g-h3">ID Selector</h3>
+                            <div class="g-tbl-type1">
+                                <table>
+                                    <caption>예약어</caption>
+                                    <colgroup>
+                                        <col span="2" style="width:25%;" />
+                                        <col />
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th>구분</th>
+                                            <th>예시</th>
+                                            <th>설명</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>싱글 네이밍</td>
+                                            <td>content</td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>멀티 네이밍</td>
+                                            <td>popupName</td>
+                                            <td>팝업호출시 필요</td>
+                                        </tr>
+                                        <tr>
+                                            <td>예외 네이밍</td>
+                                            <td>sFormTitle</td>
+                                            <td>온라인서식 for/id 연결</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <h3 class="g-h3">Class Selector</h3>
+                            <div class="g-tbl-type1">
+                                <table>
+                                    <caption>예약어</caption>
+                                    <colgroup>
+                                        <col span="2" style="width:25%;" />
+                                        <col />
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th>구분</th>
+                                            <th>예약어</th>
+                                            <th>설명</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td rowspan="9">레이아웃</td>
+                                            <td>.wrapper</td>
+                                            <td>전체 영역</td>
+                                        </tr>
+                                        <tr>
+                                            <td>.skipnav</td>
+                                            <td>바로가기 영역</td>
+                                        </tr>
+                                        <tr>
+                                            <td>.header</td>
+                                            <td>머리글 영역</td>
+                                        </tr>
+                                        <tr>
+                                            <td>.container</td>
+                                            <td>페이지 영역</td>
+                                        </tr>
+                                        <tr>
+                                            <td>.aside</td>
+                                            <td>사이드 영역</td>
+                                        </tr>
+                                        <tr>
+                                            <td>.content</td>
+                                            <td>본문 영역</td>
+                                        </tr>
+                                        <tr>
+                                            <td>.content-header</td>
+                                            <td>본문 헤더 영역</td>
+                                        </tr>
+                                        <tr>
+                                            <td>.content-body</td>
+                                            <td>본문 내용 영역</td>
+                                        </tr>
+                                        <tr>
+                                            <td>.footer</td>
+                                            <td>바닥글 영역</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <h3 class="g-h3">이미지 네이밍 규칙</h3>
+                            <div class="g-tbl-type1">
+                                <table>
+                                    <caption>이미지 예약어</caption>
+                                    <colgroup>
+                                        <col span="2" style="width:25%;" />
+                                        <col />
+                                    </colgroup>
+                                    <thead>
+                                        <tr>
+                                            <th>분류</th>
+                                            <th>파일명</th>
+                                            <th>설명</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>아이콘</td>
+                                            <td>icn-</td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>배경</td>
+                                            <td>bg-</td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>일반</td>
+                                            <td>img-</td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>임시</td>
+                                            <td>@</td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                    <!-- // Section2 -->
+                </div>
+            </article>
+            <!-- //Content -->
+        </div>
+        <script>include.footer()</script>
+    </div>
+</body>
+
+</html>

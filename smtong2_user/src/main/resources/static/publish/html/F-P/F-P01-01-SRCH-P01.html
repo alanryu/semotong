@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>요금제 검색 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<!-- 페이지 스크립트 영역 -->
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			// 모달 바로 볼 수 있도록 호출
+			var searchModal = new bootstrap.Modal(document.getElementById('searchModal'));
+			searchModal.show();
+		});
+
+		function removeHandler(el) {
+			el.closest('li').remove();
+		}
+	</script>
+</head>
+
+<body>
+	<div class="wrapper">
+		<div style="padding: 30rem;">
+			<!-- 트리거로 모달 띄우기 -->
+			<button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#searchModal">
+				MODAL OPEN
+			</button>
+		</div>
+	</div>
+
+	<!--
+		[모달 가이드]
+		모달 효과 : fade (공통)
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+		// 1차 수정 : fade-pc 사용안함, fade 공통으로 사용
+	-->
+	<!-- modal default -->
+	<div class="modal modal-full" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-P01-01-srch-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="searchModalLabel">검색</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+
+				</div>
+				<div class="modal-body">
+					<!-- 컨텐츠 섹션 -->
+					<section class="ratePlan-search-sec">
+						<div class="ratePlan-search">
+							<div class="ratePlan-search-form">
+								<div class="ui-inp">
+									<input type="text" name="" value="" placeholder="검색어를 입력해 주세요." class="inp" />
+									<div class="on-right">
+										<button type="button" class="ui-btn btn-srch">
+											<i class="ui-icn icn-20-srch-bk" aria-label="검색"></i>
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<!-- 최근검색어 -->
+							<div class="ratePlan-search-cont">
+								<div class="ratePlan-search-title">
+									<p class="tit">최근 검색어</p>
+									<p class="info">
+										<button type="button" class="ui-btn texted">
+											<span>모두 지우기</span>
+										</button>
+									</p>
+								</div>
+								<ul class="ratePlan-keyword-list">
+									<li>
+										<div class="ratePlan-keyword">
+											데이터1
+											<button type="button" class="ui-btn remove" onclick="removeHandler(this)">
+												<i class="ui-icn icn-16-remove-bk" aria-hidden="true"></i>
+											</button>
+										</div>
+									</li>
+									<li>
+										<div class="ratePlan-keyword">
+											데이터2
+											<button type="button" class="ui-btn remove" onclick="removeHandler(this)">
+												<i class="ui-icn icn-16-remove-bk" aria-hidden="true"></i>
+											</button>
+										</div>
+									</li>
+									<li>
+										<div class="ratePlan-keyword">
+											데이터3
+											<button type="button" class="ui-btn remove" onclick="removeHandler(this)">
+												<i class="ui-icn icn-16-remove-bk" aria-hidden="true"></i>
+											</button>
+										</div>
+									</li>
+									<li>
+										<div class="ratePlan-keyword">
+											데이터4
+											<button type="button" class="ui-btn remove" onclick="removeHandler(this)">
+												<i class="ui-icn icn-16-remove-bk" aria-hidden="true"></i>
+											</button>
+										</div>
+									</li>
+									<li>
+										<div class="ratePlan-keyword">
+											데이터5
+											<button type="button" class="ui-btn remove" onclick="removeHandler(this)">
+												<i class="ui-icn icn-16-remove-bk" aria-hidden="true"></i>
+											</button>
+										</div>
+									</li>
+									<li>
+										<div class="ratePlan-keyword">
+											데이터
+											<button type="button" class="ui-btn remove" onclick="removeHandler(this)">
+												<i class="ui-icn icn-16-remove-bk" aria-hidden="true"></i>
+											</button>
+										</div>
+									</li>
+									<li>
+										<div class="ratePlan-keyword">
+											데이터6
+											<button type="button" class="ui-btn remove" onclick="removeHandler(this)">
+												<i class="ui-icn icn-16-remove-bk" aria-hidden="true"></i>
+											</button>
+										</div>
+									</li>
+									<li>
+										<div class="ratePlan-keyword">
+											데이터7
+											<button type="button" class="ui-btn remove" onclick="removeHandler(this)">
+												<i class="ui-icn icn-16-remove-bk" aria-hidden="true"></i>
+											</button>
+										</div>
+									</li>
+								</ul>
+							</div>
+							<!-- //최근검색어 -->
+
+							<!-- 이런요금제 필요하세요 -->
+							<div class="ratePlan-search-cont">
+								<div class="ratePlan-search-title">
+									<p class="tit">어떤 요금제가 필요하세요?</p>
+								</div>
+								<ul class="ratePlan-chip-list">
+									<li>
+										<button class="ratePlan-chip primary">
+											<span>인터넷 결합 요금제</span>
+										</button>
+									</li>
+									<li>
+										<button class="ratePlan-chip primary">
+											<span>소진시 속도</span>
+										</button>
+									</li>
+									<li>
+										<button class="ratePlan-chip primary">
+											<span>할인 기간</span>
+										</button>
+									</li>
+									<li>
+										<button class="ratePlan-chip primary">
+											<span>오직! 세모통에서만</span>
+										</button>
+									</li>
+									<li>
+										<button class="ratePlan-chip primary">
+											<span>OTT 구독 혜택</span>
+										</button>
+									</li>
+								</ul>
+							</div>
+							<!-- //이런요금제 필요하세요 -->
+						</div>
+					</section>
+
+					<div class="divider-sec"></div>
+
+					<section class="ratePlan-vogue-sec">
+						<div class="ratePlan-search">
+							<div class="ratePlan-search-cont">
+								<div class="ratePlan-search-title">
+									<p class="tit">주간 Top 5 인기 요금제</p>
+									<p class="info">4.28 10:00 기준</p>
+								</div>
+								<ul class="ratePlan-vogue-list">
+									<li>
+										<a href="#" class="ratePlan-vogue-link">
+											<b>1</b>
+											<span>[KG모바일] 월 11GB+매일2GB+3Mbps</span>
+											<i class="ui-icn icn-16-more-gr"></i>
+										</a>
+									</li>
+									<li>
+										<a href="#" class="ratePlan-vogue-link">
+											<b>2</b>
+											<span>[스피츠모바일] 월 7GB+1Mbps</span>
+											<i class="ui-icn icn-16-more-gr"></i>
+										</a>
+									</li>
+									<li>
+										<a href="#" class="ratePlan-vogue-link">
+											<b>3</b>
+											<span>[헬로모바일] 월 5GB+1Mbps</span>
+											<i class="ui-icn icn-16-more-gr"></i>
+										</a>
+									</li>
+									<li>
+										<a href="#" class="ratePlan-vogue-link">
+											<b>4</b>
+											<span>[SKT] 월 3GB</span>
+											<i class="ui-icn icn-16-more-gr"></i>
+										</a>
+									</li>
+									<li>
+										<a href="#" class="ratePlan-vogue-link">
+											<b>5</b>
+											<span>[모나] 월 10GB+1Mbps</span>
+											<i class="ui-icn icn-16-more-gr"></i>
+										</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</section>
+					<!-- // 컨텐츠 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal default -->
+</body>
+
+</html>

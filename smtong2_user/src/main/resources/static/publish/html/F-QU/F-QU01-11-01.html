@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>간편개통 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<script>
+		function tabHandler(targetId, element) {
+			document.querySelectorAll("[id$='-pane']").forEach(el => el.classList.remove("active"));
+
+			const targetElement = document.getElementById(targetId);
+			if (targetElement) {
+				targetElement.classList.add("active");
+			}
+
+			// 라디오 버튼 체크 여부 확인 (선택 사항)
+			if (element) {
+				element.checked = true;
+			}
+		};
+	</script>
+</head>
+
+<body>
+	<!-- 레이아웃이 없는 경우  -->
+	<div class="wrapper only-container">
+		<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-QU-page F-QU01-11-01-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">요금 납부 방법을 선택해주세요.</h2>
+							<p class="sec-explain">신청 후에도 고객센터에서 납부 방법을 변경할 수 있어요.</p>
+							<p class="sec-explain">홍길동님 명의의 카드 또는 계좌를 등록해 주세요.</p>
+							<!-- 2025-02-28 줄바꿈 및 텍스트 추가 -->
+							<br>
+							<p class="sec-explain">가입자 본인 카드 및 계좌만 가능해요.</p>
+						</div>
+						<div class="sec-body">
+							<!-- 등록폼 -->
+							<div class="basic-frm">
+								<!-- 납부방법 선택 -->
+								<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label class="tit" for="frmFiled11">납부방법</label>
+									</div>
+									<div class="frm-content">
+										<ul class="frm-group">
+											<label class="ui-rdo rdo-style2">
+												<input type="radio" name="frmSurvey" id="FQU0111-01" aria-controls="FQU0111-01-pane" checked onchange="tabHandler('FQU0111-01-pane', this)" />
+												<span class="rdo"><span>카드</span></span>
+											</label>
+											<label class="ui-rdo rdo-style2">
+												<input type="radio" name="frmSurvey" id="FQU0111-02" aria-controls="FQU0111-02-pane" onchange="tabHandler('FQU0111-02-pane', this)" />
+												<span class="rdo"><span>계좌이체</span></span>
+											</label>
+										</ul>
+									</div>
+								</div>
+								<!-- // 납부방법 선택 -->
+
+								<div class="tab-content">
+									<!-- 카드 그룹 -->
+									<div class="tab-pane active" id="FQU0111-01-pane" role="tabpanel" aria-labelledby="FQU0111-01" tabindex="0">
+										<div class="frm-field-group">
+											<!-- 이름 입력 -->
+											<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+											<div class="frm-field">
+												<div class="frm-title">
+													<label class="tit" for="frmFiled12">이름</label>
+												</div>
+												<div class="frm-content">
+													<div class="ui-inp">
+														<input type="tel" name="" id="frmFiled12" value="" placeholder="홍길동" title="" class="inp" oninput="setRegularNumber(this)"/>
+													</div>
+												</div>
+											</div>
+											<!-- // 이름 입력 -->
+											<!-- 카드사 선택 -->
+											<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+											<div class="frm-field">
+												<div class="frm-title">
+													<label class="tit" for="frmFiled13">카드사</label>
+												</div>
+												<div class="frm-content">
+													<div class="ui-sel">
+														<!-- 선택전 is-placeholder, (선택후 삭제) -->
+														<button type="button" id="frmFiled13" class="sel is-placeholder" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#FQU011101P01Modal">
+															<span>선택</span>
+															<i class="ui-icn icn-20-select-arw" aria-hidden="true"></i>
+														</button>
+													</div>
+												</div>
+											</div>
+											<!-- // 카드사 선택 -->
+											<!-- 카드번호 입력 -->
+											<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+											<div class="frm-field">
+												<div class="frm-title">
+													<label class="tit" for="frmFiled14">카드번호</label>
+												</div>
+												<div class="frm-content">
+													<div class="ui-inp">
+														<input type="tel" name="" id="frmFiled14" value="" placeholder="숫자만 입력해주세요." title="" class="inp" oninput="setRegularNumber(this)"/>
+													</div>
+												</div>
+											</div>
+											<!-- // 카드번호 선택 -->
+											<!-- 유효기간 입력 -->
+											<div class="frm-field">
+												<div class="frm-title">
+													<label class="tit" for="frmFiled15">유효기간</label>
+												</div>
+												<div class="frm-content">
+													<div class="frm-group">
+														<div class="ui-inp">
+															<input type="tel" name="" id="frmFiled14" value="" placeholder="MM" title="" class="inp" oninput="setRegularNumber(this)"/>
+														</div>
+														<div class="ui-inp">
+															<input type="tel" name="" id="frmFiled14" value="" placeholder="YYYY" title="" class="inp" oninput="setRegularNumber(this)"/>
+														</div>
+													</div>
+												</div>
+											</div>
+											<!-- // 유효기간 입력 -->
+										</div>
+									</div>
+									<!-- //카드 그룹 -->
+
+									<!-- 계좌이체 -->
+									<div class="tab-pane" id="FQU0111-02-pane" role="tabpanel" aria-labelledby="FQU0111-02" tabindex="0">
+										<div class="frm-field-group">
+											<div class="frm-field-group">
+												<!-- 이름 입력 -->
+												<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+												<div class="frm-field">
+													<div class="frm-title">
+														<label class="tit" for="frmFiled22">이름</label>
+													</div>
+													<div class="frm-content">
+														<div class="ui-inp">
+															<input type="tel" name="" id="frmFiled22" value="" placeholder="홍길동" title="" class="inp" oninput="setRegularNumber(this)"/>
+														</div>
+													</div>
+												</div>
+												<!-- // 이름 입력 -->
+												<!-- 은행 선택 -->
+												<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+												<div class="frm-field">
+													<div class="frm-title">
+														<label class="tit" for="frmFiled23">은행</label>
+													</div>
+													<div class="frm-content">
+														<div class="ui-sel">
+															<!-- 선택전 is-placeholder, (선택후 삭제) -->
+															<button type="button" id="frmFiled23" class="sel is-placeholder" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#FQU011101P02Modal">
+																<span>선택</span>
+																<i class="ui-icn icn-20-select-arw" aria-hidden="true"></i>
+															</button>
+														</div>
+													</div>
+												</div>
+												<!-- // 은행 선택 -->
+												<!-- 계좌번호 입력 -->
+												<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+												<div class="frm-field">
+													<div class="frm-title">
+														<label class="tit" for="frmFiled24">계좌번호</label>
+													</div>
+													<div class="frm-content">
+														<div class="ui-inp">
+															<input type="tel" name="" id="frmFiled24" value="" placeholder="숫자만 입력해주세요." title="" class="inp" oninput="setRegularNumber(this)" />
+														</div>
+													</div>
+												</div>
+												<!-- // 계좌번호 선택 -->
+											</div>
+										</div>
+									</div>
+									<!-- 계좌이체 -->
+								</div>
+							</div>
+							<!-- // 등록폼 -->
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" disabled>
+							<span>다음</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 플로팅 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+	</div>
+
+	<!--
+		[모달 가이드]
+		모달 효과 : fade (공통)
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+		// 1차 수정 : fade-pc 사용안함, fade 공통으로 사용
+	-->
+	<!-- 카드선택 Modal -->
+	<div class="modal modal-select fade" id="FQU011101P01Modal" tabindex="-1" role="dialog" aria-labelledby="FQU011101P01ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FQU011101P01ModalLabel">카드를 선택하세요.</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+
+				</div>
+				<div class="modal-body">
+					<!-- 상담신청 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<ul class="select-listbox has-img" role="listbox">
+								<!-- 이미 선택목록이 있는 경우 class="is-selected" 추가 -->
+								<li role="option" tabindex="0" data-bs-dismiss="modal" class="is-selected" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>BC</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>KB</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>현대</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>삼성</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>롯데</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>NH</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>우리</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>하나SK</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>새마을</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>제주</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>광주</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>신한</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>KDB</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>수협</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>신협</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>씨티</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>우체국</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>K뱅크</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>전북</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled13', this)">
+									<strong>카카오뱅크</strong>
+								</li>
+							</ul>
+						</div>
+					</section>
+					<!-- // 상담신청 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 카드선택 Modal -->
+	<!-- 은행선택 Modal -->
+	<div class="modal modal-select fade" id="FQU011101P02Modal" tabindex="-1" role="dialog" aria-labelledby="FQU011101P02ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FQU011101P02ModalLabel">은행을 선택하세요.</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+
+				</div>
+				<div class="modal-body">
+					<!-- 상담신청 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<ul class="select-listbox has-img" role="listbox">
+								<!-- 선택된 상태 is-selected 클래스 추가 -->
+								<li class="select-item is-selected" role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<!-- 2025-03-06 조찬기 : icn-34-bank-kb 으로 변경 -->
+									<i class="ui-icn icn-34-bank-kb" aria-hidden="true"></i>
+									<strong>KB국민은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-sc" aria-hidden="true"></i>
+									<strong>SC제일은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-bnk" aria-hidden="true"></i>
+									<strong>경남은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-kjb" aria-hidden="true"></i>
+									<strong>광주은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-ibk" aria-hidden="true"></i>
+									<strong>기업은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-nh" aria-hidden="true"></i>
+									<strong>NH농협</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-nh" aria-hidden="true"></i>
+									<strong>지역농축협</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-dgb" aria-hidden="true"></i>
+									<strong>대구은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-bnk" aria-hidden="true"></i>
+									<strong>부산은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-kdb" aria-hidden="true"></i>
+									<strong>산업은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-kfcc" aria-hidden="true"></i>
+									<strong>새마을금고</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-suhyup" aria-hidden="true"></i>
+									<strong>수협</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-sb" aria-hidden="true"></i>
+									<strong>신한은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-shinhyup" aria-hidden="true"></i>
+									<strong>신협</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-hb" aria-hidden="true"></i>
+									<strong>하나(외환)은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-wb" aria-hidden="true"></i>
+									<strong>우리은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-wo" aria-hidden="true"></i>
+									<strong>우체국</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-kjb" aria-hidden="true"></i>
+									<strong>전북은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-nh" aria-hidden="true"></i>
+									<strong>축협</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-kakao" aria-hidden="true"></i>
+									<strong>카카오뱅크</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-kbank" aria-hidden="true"></i>
+									<strong>케이뱅크</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-citi" aria-hidden="true"></i>
+									<strong>한국씨티은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-toss" aria-hidden="true"></i>
+									<strong>토스뱅크</strong>
+								</li>
+							</ul>
+						</div>
+					</section>
+					<!-- // 상담신청 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 은행선택 Modal -->
+
+</body>
+
+</html>

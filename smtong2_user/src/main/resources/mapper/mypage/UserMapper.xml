@@ -1,0 +1,158 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.mypage.mapper.UserMapper">
+
+
+	
+	<sql id="Base_Column_list">
+			id,
+			AES_DECRYPT(FROM_BASE64(email), 'tb_mbm_user') email,
+            username,
+            active_yn,
+            AES_DECRYPT(FROM_BASE64(phone_number), 'tb_mbm_user') phoneNumber,
+            age_group,
+            age_group_val,
+            birth_day,
+            birth_year,
+            kakao_user_id,
+            join_date,
+            disable_resn,
+            pi_agree_yn,
+            pi_agree_dttm,
+            pol_agree_yn,
+            pol_agree_dttm,
+            sms_agree_yn,
+            sms_agree_dttm,
+            email_agree_yn,
+            email_agree_dttm,
+            member_stat,
+            create_date,
+            create_id,
+            modified_date,
+            modified_id
+	</sql>
+
+    <!-- 신규 User 추가 -->
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_mbm_user (
+            email,
+            username,
+            active_yn,
+            phone_number,
+            age_group,
+            age_group_val,
+            birth_day,
+            birth_year,
+            kakao_user_id,
+            join_date,
+            disable_resn,
+            pi_agree_yn,
+            pi_agree_dttm,
+            pol_agree_yn,
+            pol_agree_dttm,
+            sms_agree_yn,
+            sms_agree_dttm,
+            email_agree_yn,
+            email_agree_dttm,
+            member_stat,
+            create_date,
+            create_id,
+            modified_date,
+            modified_id
+        ) VALUES (
+                     TO_BASE64(AES_ENCRYPT(#{email},'tb_mbm_user')),
+                     #{username, jdbcType=VARCHAR},
+                     #{activeYn, jdbcType=CHAR},
+                     TO_BASE64(AES_ENCRYPT(#{phoneNumber},'tb_mbm_user')),
+                     #{ageGroup, jdbcType=VARCHAR},
+                     #{ageGroupVal, jdbcType=VARCHAR},
+                     #{birthDay, jdbcType=VARCHAR},
+                     #{birthYear, jdbcType=VARCHAR},
+                     #{kakaoUserId, jdbcType=VARCHAR},
+                     COALESCE(#{joinDate}, CURRENT_TIMESTAMP),
+                     #{disableResn, jdbcType=VARCHAR},
+                     #{piAgreeYn, jdbcType=CHAR},
+                     #{piAgreeDttm, jdbcType=TIMESTAMP},
+                     #{polAgreeYn, jdbcType=CHAR},
+                     #{polAgreeDttm, jdbcType=TIMESTAMP},
+                     #{smsAgreeYn, jdbcType=CHAR},
+                     #{smsAgreeDttm, jdbcType=TIMESTAMP},
+                     #{emailAgreeYn, jdbcType=CHAR},
+                     #{emailAgreeDttm, jdbcType=TIMESTAMP},
+                     #{memberStat, jdbcType=VARCHAR},
+                     CURRENT_TIMESTAMP,
+                     #{createId, jdbcType=VARCHAR},
+                     CURRENT_TIMESTAMP,
+                     #{modifiedId, jdbcType=VARCHAR}
+                 )
+    </insert>
+	<update id="updateUser">
+		UPDATE tb_mbm_user SET username = #{username, jdbcType=VARCHAR},
+			<if test='birthDay != null and birthDay !=""'>
+				birth_day = #{birthDay, jdbcType=VARCHAR},
+			</if>
+			
+			<if test='birthYear != null and birthYear !=""'>
+				birth_year = #{birthYear, jdbcType=VARCHAR},
+			</if>
+			<if test='ageGroup != null and ageGroup !=""'>
+				age_group = #{ageGroup, jdbcType=VARCHAR},
+			</if>
+			<if test='ageGroupVal != null and ageGroupVal !=""'>
+				age_group_val = #{ageGroupVal, jdbcType=VARCHAR},
+			</if>
+			 <if test='activeYn != null and activeYn !=""'>
+			 	active_yn = #{activeYn, jdbcType=VARCHAR},
+			 </if>
+			 <if test='phoneNumber != null and phoneNumber !=""'>
+			 	phone_number = TO_BASE64(AES_ENCRYPT(#{phoneNumber},'tb_mbm_user')),
+			 </if>
+			 <if test='email != null and email !=""'>
+			 	email =TO_BASE64(AES_ENCRYPT(#{email},'tb_mbm_user')),
+			 </if>
+			 kakao_user_id = #{kakaoUserId, jdbcType=VARCHAR}
+			 
+		 WHERE id = #{id}
+	</update>
+    <!-- User 조회 -->
+    <select id="getUserById" resultType="kr.co.ucomp.web.mypage.dto.UserDTO">
+        SELECT
+            *
+        FROM tb_mbm_user
+        WHERE id = #{id}
+    </select>
+
+    <!-- 활성화된 사용자 이메일로 조회 -->
+    <select id="findUserEntityByEmailAndDisable" resultType="kr.co.ucomp.web.mypage.dto.UserDTO">
+        SELECT
+           <include refid="Base_Column_list" />
+        FROM tb_mbm_user
+        WHERE email = #{email}
+          AND active_yn = #{activeYn}
+    </select>
+
+
+
+    <!-- 활성화된 사용자 이메일로 조회 -->
+    <select id="getUserByKakaoId" resultType="kr.co.ucomp.web.mypage.dto.UserDTO">
+        SELECT
+           <include refid="Base_Column_list" />
+        FROM tb_mbm_user
+        WHERE kakao_user_id = #{kakaoUserId}
+    </select>
+
+
+    <update id="deleteUserToggle" parameterType="kr.co.ucomp.web.mypage.dto.UserDTO" >
+        UPDATE tb_mbm_user
+        SET member_stat = #{memberStat},
+        active_yn = #{activeYn}
+        WHERE id = #{id}
+    </update>
+    
+    <update id="updateChannel" parameterType="kr.co.ucomp.web.mypage.dto.UserDTO" >
+    	UPDATE tb_mbm_user
+    	SET channel_yn = #{channelYn}
+    	WHERE kakao_user_id = #{kakaoUserId}
+    </update>
+</mapper>

@@ -1,0 +1,53 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 약관동의
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 약관동의
+.F-QU01-03-page {
+	.agree-terms {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+		margin-top: 32rem;
+		&-all {
+			padding-bottom: 20rem;
+			margin-bottom: 20rem;
+			border-bottom: 1px solid #EFF0F0;
+			.chk-style1 .chk > span {
+				color: #000;
+			}
+		}
+		&-list {
+			margin-bottom: 24rem;
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+		&-tit {
+			margin-bottom: 10rem;
+			font-weight: 600;
+			font-size: 16rem;
+			line-height: 22rem;
+			color: #46484B;
+		}
+		&-item {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 6rem;
+			&:last-child {
+				margin-bottom: 0;
+			}
+			.chk-style1 .chk > span {
+				font-size: 15rem;
+				letter-spacing: -0.07em;
+			}
+			.btn-more { /* 6차 수정 : 동의여부 구조로 변경 (여기까지) */
+				width: 28rem;
+				height: 28rem;
+			}
+		}
+	}
+}
+// e: 약관동의

@@ -1,0 +1,60 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 추천내역
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 추천내역 페이지
+.F-MY01-02-P01-page {
+
+	// 탭 간격
+	.tab-style1 {
+		padding-bottom: 0;
+	}
+
+	// s: 리뷰 섹션
+	.review-sec {
+		/* 2024-12-12 내후기관리 review-sec 전체수정 */
+		@include sec-basic;
+		.sec-header {
+			padding-top: 24rem;
+			margin-bottom: 14rem;
+			.sec-explain {
+				margin-top: 6rem;
+			}
+		}
+
+		.review-list {
+			@include review-list;
+
+			.review-card { /* 2024-12-12 내후기관리 review-card 전체수정 */
+				@include review-card;
+
+				.basic-frm {
+					width: 100%;
+					@include basic-frm;
+					margin-bottom: 16rem;
+				}
+			}
+		}
+
+		@include media-tablet-xs {
+			.sec-header {
+				br {
+					display: none;
+				}
+			}
+		}
+	}
+	// e: 리뷰 섹션
+
+	// s: 노데이터 섹션
+	.nodata-sec {
+		@include nodata-sec;
+
+		.nodata {
+			@include nodata;
+		}
+	}
+	// e: 노데이터 섹션
+}
+// e: 추천내역 페이지

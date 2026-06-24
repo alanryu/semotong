@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.pmb.mapper.InternetPlanMapper">
+
+	
+	<sql id="Base_Column_list_Info">
+		a.id
+		,a.prod_name
+		,a.internet_mno_id
+		,a.channel_count
+		,a.internet_speed
+		,a.normal_price
+		,a.combination_price
+		,a.normal_freeble_price
+		,a.combination_freeble_price
+		,a.use_yn
+		,a.site_sp
+		,a.manager
+		,a.create_date
+		,a.create_id
+		,a.modified_date
+		,a.modified_id
+		,a.stress_txt
+		,GET_ADMIN_USER_NM(a.create_id) as createNm
+		,GET_ADMIN_USER_NM(a.modified_id) as modifiedNm 
+		,b.name AS internetMno
+	</sql>
+	
+	<sql id="listWhereInfo">
+		<if test='keyword != null and keyword !=""'>
+			AND prod_name LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		<if test='searchUseYn != null and searchUseYn !=""'>
+			AND a.use_yn = #{searchUseYn}
+		</if>
+		<if test='searchStartDt != null and searchStartDt !=""'>
+			AND a.create_date  <![CDATA[>=]]> #{searchStartDt}
+		</if>
+		<if test='searchEndDt != null and searchEndDt !=""'>
+			AND a.create_date <![CDATA[<=]]> #{searchEndDt}
+		</if>
+		<if test='searchInternetMno != null and searchInternetMno !=""'>
+			AND a.internet_mno_id IN
+	         <foreach item="item" index="index" collection="_parameter.searchInternetMno.split(',')" open="(" separator="," close=")">
+	             #{item}
+	         </foreach>
+		</if>
+
+		 <!-- internet_speed-->
+    	 <if test='searchInternetSpeed != null and searchInternetSpeed !=""'>
+    	 	AND a.internet_speed IN
+	         <foreach item="item" index="index" collection="_parameter.searchInternetSpeed.split(',')" open="(" separator="," close=")">
+	             #{item}
+	         </foreach>
+    	 </if>
+    	 
+		<choose>
+			<when test='searchSiteSp != null and searchSiteSp !=""'>
+				AND a.site_sp =  #{searchSiteSp}
+			</when>
+			<otherwise>
+				AND a.site_sp = '01'
+			</otherwise>
+		</choose>
+		    	 
+    	 
+	</sql>
+	
+	
+	<select id="list" parameterType="kr.co.ucomp.web.pmb.dto.InternetPlanSearchDTO" resultType="kr.co.ucomp.web.pmb.entity.InternetPlanEntity">
+		SELECT
+			<include refid="Base_Column_list_Info" />
+		FROM tb_pmb_internet_plan_list a 
+		LEFT OUTER JOIN tb_pmb_internet_mno b
+		ON a.internet_mno_id = b.id
+		WHERE 1=1
+		<include refid="listWhereInfo" />
+		ORDER BY a.id DESC
+		LIMIT #{offset}, #{recordSize}
+	</select>
+	
+	<select id="listWithOutLimit" parameterType="kr.co.ucomp.web.pmb.dto.InternetPlanSearchDTO" resultType="kr.co.ucomp.web.pmb.entity.InternetPlanEntity">
+		SELECT
+			<include refid="Base_Column_list_Info" />
+		FROM tb_pmb_internet_plan_list a 
+		LEFT OUTER JOIN tb_pmb_internet_mno b
+		ON a.internet_mno_id = b.id
+		WHERE 1=1
+		<include refid="listWhereInfo" />
+		ORDER BY a.id DESC
+	</select>
+	
+	<select id="count" parameterType="kr.co.ucomp.web.pmb.dto.InternetPlanSearchDTO" resultType="java.lang.Long">
+		SELECT COUNT(1)
+		FROM tb_pmb_internet_plan_list a 
+		LEFT OUTER JOIN tb_pmb_internet_mno b
+		ON a.internet_mno_id = b.id
+		WHERE 1=1
+		<include refid="listWhereInfo" />
+	</select>
+	
+	
+	<select id="getDetail" parameterType="int" resultType="kr.co.ucomp.web.pmb.entity.InternetPlanEntity">
+		SELECT
+			<include refid="Base_Column_list_Info" />
+		FROM tb_pmb_internet_plan_list a 
+		LEFT OUTER JOIN tb_pmb_internet_mno b
+		ON a.internet_mno_id = b.id
+		WHERE a.id = #{id}
+	</select>
+	
+	<insert id="create"  parameterType="kr.co.ucomp.web.pmb.entity.InternetPlanEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+		INSERT INTO tb_pmb_internet_plan_list (
+			 prod_name
+			,internet_mno_id
+			,channel_count
+			,internet_speed
+			,normal_price
+			,combination_price
+			,normal_freeble_price
+			,combination_freeble_price
+			,use_yn
+			,site_sp 
+			,manager               
+			,create_id                
+			,modified_id
+			,stress_txt 
+		)VALUES(	
+			#{prodName}
+			,#{internetMnoId}
+			,#{channelCount}
+			,#{internetSpeed}
+			,#{normalPrice}
+			,#{combinationPrice}
+			,#{normalFreeblePrice}
+			,#{combinationFreeblePrice}
+			,#{useYn}
+			,#{siteSp}
+			,#{createId}
+			,#{createId}
+			,#{modifiedId}
+			,#{stressTxt}
+		);
+	</insert>
+	
+	<update id="update"  parameterType="kr.co.ucomp.web.pmb.entity.InternetPlanEntity" >
+		UPDATE tb_pmb_internet_plan_list 
+		SET		
+			prod_name                 	= #{prodName}
+			,internet_mno_id           	= #{internetMnoId}
+			,channel_count             	= #{channelCount}
+			,internet_speed            	= #{internetSpeed}
+			,normal_price              	= #{normalPrice}
+			,combination_price         	= #{combinationPrice}
+			,normal_freeble_price      	= #{normalFreeblePrice}
+			,combination_freeble_price 	= #{combinationFreeblePrice}
+			,use_yn                    	= #{useYn}
+			,site_sp                    	= #{siteSp}
+			,manager                   	= #{modifiedId}
+			,modified_date             	= Now()
+			,modified_id               	= #{modifiedId}
+			,stress_txt					= #{stressTxt}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		DELETE FROM tb_pmb_internet_plan_list
+		WHERE id = #{id}
+	</delete>
+	
+	
+	
+	<select id="getInternetPlanMno" resultType="kr.co.ucomp.web.pmb.entity.InternetPlanMnoEntity">
+		SELECT
+			id
+			,name
+			,mno_logo
+			,manager
+			,use_yn
+			,new_use_yn
+			,new_ui_use_yn
+			,alam_rcv_num
+		FROM tb_pmb_internet_mno
+		WHERE 1=1
+		<choose>
+			<when test='isNewYn == "Y"'>
+				AND new_ui_use_yn = 'Y'
+				<if test='useYn != null and useYn !=""'>
+					AND new_use_yn = #{useYn}
+				</if>
+				<if test='mnoId != null and mnoId !=""'>
+					AND id = #{mnoId}
+				</if>
+			</when>
+			<otherwise>
+				<if test='useYn != null and useYn !=""'>
+					AND use_yn = #{useYn}
+				</if>
+				<if test='mnoId != null and mnoId !=""'>
+					AND id = #{mnoId}
+				</if>
+			</otherwise>
+		</choose>
+		
+		<choose>
+			<when test='isNewYn == "Y"'>
+				order by order_no
+			</when>
+			<otherwise>
+				order by id
+			</otherwise>
+		</choose>
+				
+		
+
+	</select>
+	
+	<update id="updataAlamRcvNum" parameterType="kr.co.ucomp.web.pmb.entity.InternetPlanMnoEntity" >
+		update tb_pmb_internet_mno
+		SET 
+			alam_rcv_num = #{alamRcvNum}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

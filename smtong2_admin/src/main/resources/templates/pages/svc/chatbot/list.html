@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='07',menuId ='09'">
+	  
+<th:block layout:fragment="css">
+<style>
+.modal-dialog.custom-size {
+  max-width: 1100px; /* 원하는 크기로 설정 */
+  width: 100%; /* 반응형 크기 조정 */
+}
+</style>
+</th:block>
+
+<th:block layout:fragment="script">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script> 
+<script type="text/javascript">
+
+	$(document).ready(function(){
+		searchResult();
+		
+
+		
+		$(document).on('click', '.order-set', function(){
+			
+			var arrow = $(this).data('arrow');
+			
+			var row = $(this).parent().parent();
+			var num = row.index();
+			
+			var max = $('#list-area').find('tr').length;
+			
+			if ( arrow == 'down' ) {
+				
+				if ( num >= max ) {
+					return false;
+				} else {
+					row.next().after(row);
+				}
+			} else if ( arrow == 'up' ) {
+				
+				if(num == 0) { 
+					return false;
+				} else {
+					row.prev().before(row);
+				}
+			}
+			
+			/* 전체 화살표 방향 다시 설정 및 정렬데이터 setting */
+			var orderIds = [];
+			$('#list-area').find('tr').each(function(idx){
+				var html = '';
+				var data = $(this).find('td').last().data('id');
+				if ( idx == 0 ) {
+					html += '<button class="btn btn-dark order-set" data-arrow="down">▼</button>';
+					$(this).find('td').last().html(html);
+				} else if ( idx === max - 1 ) {
+					html += '<button class="btn btn-dark order-set" data-arrow="up">▲</button>';
+					$(this).find('td').last().html(html);
+				} else {
+					html += '<button class="btn btn-dark order-set" data-arrow="up">▲</button>';
+					html += '<button class="btn btn-dark order-set" data-arrow="down" style="margin-left:5px">▼</button>';
+					$(this).find('td').last().html(html);
+				}
+				
+				orderIds.push($(this).find('td').last().data('id'));
+			});
+			
+			$.ajax({
+				url 		: '/svc/chatbotGroup/listorder',
+				type 		: 'post',
+				dataType 	: 'json',
+				data 		: {orderIds : orderIds.join(',')},
+				async 		: false,
+				success 	: function (data) {
+					
+				},
+				error 		: function(request, status, error){
+					showAlert(error);
+				},
+				complete 	: function(){
+				}
+			});
+		});
+	})
+	
+	/* 검색 결과 */
+	function searchResult() {
+		
+		var params = {
+			  page : 1
+			, recordSize : 10
+		}
+		
+		/* 등록일 */
+		if ( $('#searchStartDt').val() != null && $('#searchStartDt').val() != '' ) {
+			params.searchStartDt = $('#searchStartDt').val();
+		}
+		if ( $('#searchEndDt').val() != null && $('#searchEndDt').val() != '' ) {
+			params.searchEndDt = $('#searchEndDt').val();
+		}
+		
+		params.keyword = $('#keyword').val();
+		
+		$.ajax({
+			url 		: '/svc/chatbotGroup/listProc',
+			type 		: 'post',
+			dataType 	: 'json',
+			contentType : 'application/json',
+			data 		: JSON.stringify(params),
+			async 		: false,
+			success 	: function (data) {
+				
+				$('#list-area').empty();	
+				
+				var totalCnt = data.totalCnt;
+				$.each(data.data, function(idx, obj){
+					var rIdx = totalCnt - ((params.page - 1) * params.recordSize + idx);
+					obj.rIdx = rIdx;
+					
+					/* 순서 방향 설정 */
+					if ( idx == 0 ) obj.arrow = 'd'
+					else if ( idx == 9 || rIdx == 1 ) obj.arrow = 'u'
+					else obj.arrow = 'b';
+				});
+				
+				$('#chatbotlist').tmpl(data.data).appendTo('#list-area');
+				
+				//renderPagination(params.page, data.totalCnt, params.recordSize);
+			},
+			error 		: function(request, status, error){
+				showAlert(error);
+			},
+			complete 	: function(){
+			}
+		});
+	}
+	
+	
+	function goEdit(id) {
+		window.location.href= "/svc/chatbotGroup/edit?searchId="+id;
+	}
+	
+	
+	/* 요금제 그룹에 속한 요금제 리스트 데이터 get */
+	function getPlanList(id) {
+
+		$.ajax({
+			url 		: '/svc/chatbotGroup/detail',
+			type 		: 'post',
+			data 		: {id : id},
+			async 		: false,
+			success 	: function (data) {
+				
+				
+				if(data!=null) {
+					var mvno = data.data.mvno == "ALL" ? "" : data.data.mvno;
+					var supData = data.data.supData;
+					var subQos = data.data.subQos == null ? 0 : data.data.subQos /1024;
+					$("#planListTitle").html(data.data.groupName + "(" + data.data.title+")");
+					var params = {
+							searchChatbotGroupId : id
+					}
+					$.ajax({
+					   url : '/svc/chatbot/planList',
+				       type : 'POST',
+				       dataType : "json",
+				       contentType:"application/json",
+					   data : JSON.stringify(params),
+						success: function (data) {
+							$('#planListTmpl').tmpl(data.data).appendTo('#planList');
+							
+							var planListModal = new bootstrap.Modal(document.getElementById('planListModal'));
+							planListModal.show();
+							
+					    },
+						error : function(request, status, error){
+				            alert(error);
+				        },
+				        complete:function(){
+				           // $('#loading').addClass('display-none');
+				        }
+					});
+				}
+				
+				
+				
+			
+			},
+			error 		: function(request, status, error){
+				showAlert(error);
+			},
+			complete 	: function(){
+			}
+		});
+	}
+	
+	
+	
+	function deleteRow(delId) {
+		showConfirm( '삭제하시겠습니까?',
+                () => { deleteProc(delId) },
+                () => { },
+                '요금제그룹삭제'
+         )
+	}
+	
+	
+	
+	/* 삭제 */
+	function deleteProc(id) {
+		
+		$.ajax({
+			url 		: '/svc/chatbotGroup/delete',
+			type 	: 'DELETE',
+			data 	: {delId: id},
+			async 	: false,
+			success 	: function (data) {
+				showAlert('삭제 되었습니다.', searchResult);
+			},
+			error 	: function(request, status, error){
+				showAlert(error);
+	        },
+	        complete:function(){
+	        }
+		});
+		
+	}
+	
+</script>
+<script id="chatbotlist" type="text/x-jquery-tmpl">
+	<tr>
+		<!-- 번호 -->
+		<td>${rIdx}</td>
+		<!-- 편집 -->
+		<td>
+			<div class="d-flex gap-2">
+				<div class="custom-dropdown">
+					<button class="action-btn btn-sm btnDrop" onclick="goEdit('${id}')">
+                		<i class="fas fa-edit me-1"></i>
+                    	수정
+                	</button>
+				</div>
+                <button class="action-btn btn-sm" onclick="deleteRow('${id}');">
+                	<i class="fas fa-trash me-1"></i>
+                    삭제
+                </button>
+            </div>
+		</td>
+		<!-- 요금제 그룹 -->
+		<td><a href="javascript:goEdit('${id}');">${groupName}</a></td>
+		<!-- 타이틀 -->
+		<td>${title}</td>
+		<!-- 등록 개수 -->
+		<td><a href="javascript:getPlanList('${id}');">${regCnt}</a></td>
+		<!-- 메모 -->
+		<td>${groupMemo}</td>
+		<!-- 등록일 -->
+		<td>{{html dateToStringDot(createDate)}}</td>
+		<!-- 순서 -->
+		<td class="order-item" data-id="${id}">
+			{{if arrow == 'd'}}
+			<button class="btn btn-dark order-set" data-arrow="down">▼</button>
+			{{else arrow == 'u'}}
+			<button class="btn btn-dark order-set" data-arrow="up">▲</button>
+			{{else}}
+			<button class="btn btn-dark order-set" data-arrow="up">▲</button>
+			<button class="btn btn-dark order-set" data-arrow="down">▼</button>
+			{{/if}}
+		</td>
+	</tr>
+</script>
+
+<script id="planListTmpl" type="text/x-jquery-tmpl">
+<tr  class="gift-select__row">
+    <td class="gift-select__td">${planName }</td>
+	<td class="gift-select__td">{{html getDataStr(supDataVal)}} </td>
+	<td class="gift-select__td">{{html getDataStr(dailyData )}} </td>
+    <td class="gift-select__td">{{html getQosStr(supQos)}}</td>
+	<td class="gift-select__td">{{html getCallStr(supCallVal)}}/{{html getSmsStr(supSmsVal)}}</td>
+	<td class="gift-select__td">{{html getPriceStr(normalPrice)}}</td>
+	<td class="gift-select__td">{{html getPriceStr(salePrice)}}</td>
+	<td class="gift-select__td">{{if chatbotPlanRecomYn}}Y{{else}}N{{/if}}</td>
+	<td class="gift-select__td">{{if chatbotPlanLowPriceYn}}Y{{else}}N{{/if}}</td>
+	<td class="gift-select__td">{{if chatbotPlanMaxBenefitYn}}Y{{else}}N{{/if}}</td>
+</tr>
+</script>
+
+</th:block>
+
+
+
+
+<div class="main-content">
+	<div class="container-fluid">
+		<!-- 로케이션 & 제목 영역 추가 -->
+	    <div class="page-header mb-4">
+	        <div class="location mb-2">
+	            <small class="text-secondary">
+	                <i class="fas fa-home me-1"></i>
+	                <a href="javascript:;">홈</a>
+	                >
+	                <a href="javascript:;">서비스 관리</a>
+	                >
+	                <a href="javascript:;" class="title-txt">챗봇요금제관리</a>
+	            </small>
+	        </div>
+	        <h2 class="page-title fs-4 mb-4">챗봇요금제관리</h2>
+	    </div>
+	    <!-- 
+	    <div class="container mt-4 mb-4" id="tab-menu">
+	        <ul class="tab-menu">
+	            <li>
+	              <a href="javascript:;">미사용고객</a>
+	            </li>
+	            <li class="active">
+	              <a href="javascript:;">사용고객</a>
+	            </li>
+	        </ul>
+	    </div> -->
+	    <!-- 검색 영역 -->
+	    <div class="search-section">
+	    	<input type="hidden" id="banner-type" value=""/>
+	    	<div class="row g-3">
+	            <div class="col-12">
+	                <div class="col-12">
+	                    <div class="form-row full-width">
+	                      <div class="form-label mb-0">등록일</div>
+	                      <div class="form-control-wrap d-flex align-items-center gap-2">
+	                          <div class="d-flex align-items-center gap-2">
+	                              <input type="date" id="searchStartDt" name="searchStartDt" class="form-control" value="">
+	                              <span class="text-secondary">-</span>
+	                              <input type="date" id="searchEndDt" name="searchEndDt" class="form-control" value="">
+	                          </div>
+	                          <div class="period-buttons">
+                                <div class="d-flex gap-2">
+                                  	<button class="period-button" value="0">오늘</button>
+                                    <button class="period-button" value="7">1주일</button>
+                                    <button class="period-button" value="30">1개월</button>
+                                    <button class="period-button" value="90">3개월</button>
+                                    <button class="period-button" value="180">6개월</button>
+                                    <button class="period-button" value="365">1년</button>
+                                </div>
+	                          </div>
+	                      </div>
+	                  </div>
+	                </div>
+	
+	                <!-- 검색어 -->
+	                <div class="form-row full-width mb-3">
+	                  <div class="form-label mb-0">검색어</div>
+	                  <div class="form-control-wrap flex-grow-1">
+	                      <input type="text" id="keyword" class="form-control" placeholder="검색어를 입력해주세요">
+	                  </div>
+	                </div>
+	
+	                <div class="row">
+	                  <div class="col-12 text-end mt-2">
+	                      <button class="btn btn-primary btn-sm me-2" onclick="searchResult()">
+	                          <i class="fas fa-search"></i>
+	                          검색
+	                      </button>
+	                      <button class="btn btn-light btn-sm" onclick="resetSearch()">
+	                          <i class="fas fa-redo"></i>
+	                          초기화
+	                      </button>
+	                  </div>
+	              </div>
+	            </div>
+	        </div>
+	    </div>
+	    
+	    <!-- contents 영역 -->
+	    <div class="table-section">
+		    <div class="d-flex justify-content-between align-items-center mb-4">
+		        <div class="d-flex align-items-center gap-3">
+		        </div>
+		        <div class="header-actions">
+	                <div class="custom-dropdown">
+	                    <button class="btn btn-primary btn-sm btnDrop" onclick="goEdit('')">
+	                        <i class="fas fa-calculator"></i>
+	                        등록
+	                    </button>
+	                </div>
+		        </div>
+		    </div>
+		    
+		    <table class="table custom-table">
+	            <thead>
+	                <tr>
+	                    <th>번호</th>
+	                    <th>편집</th>
+	                    <th>요금제 그룹</th>
+	                    <th>타이틀</th>
+	                    <th>등록 개수</th>
+	                    <th>메모</th>
+	                    <th>등록일</th>
+	                    <th >순서</th>
+	                </tr>
+	            </thead>
+	            <tbody id="list-area">
+	            </tbody>
+	        </table>
+	        
+	        <div class="d-flex justify-content-left mt-4">
+                <ul class="pagination">
+                    
+                </ul>
+            </div>
+	    </div>
+	</div>
+</div>
+
+
+
+
+
+<!-- 틍록된 요금제 리스트 팝업 -->
+<div class="modal fade" id="planListModal" tabindex="-1" aria-labelledby="planListModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered custom-size">
+        <div class="modal-content">
+         	<div class="modal-header border-0 pb-0 mb-4">
+                <h5 class="modal-title fs-6 fw-bold" id="planListTitle">요금제 리스트 </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="gift-select__table__outer">
+	            <table class="bnf-select__table">
+		            <thead>
+		                <tr>
+			                <th class="bnf-select__th">요금제</th>
+			                <th class="bnf-select__th" style="width:90px">데이터</th>
+			                <th class="bnf-select__th" style="width:90px">일제공<br>데이터</th>
+			                <th class="bnf-select__th" style="width:90px">QOS</th>
+			                <th class="bnf-select__th" style="width:110px">전화/메세지</th>
+			                <th class="bnf-select__th" style="width:90px">기본료</th>
+			                <th class="bnf-select__th" style="width:90px">할인금액</th>
+			                <th class="bnf-select__th" style="width:80px">세모통<br>추천</th>
+			                <th class="bnf-select__th" style="width:80px">초저가</th>
+			                <th class="bnf-select__th" style="width:80px">최다혜택</th>
+		                </tr>
+		            </thead>
+		            <tbody id="planList">
+		                
+		
+		            </tbody>
+		        </table>
+	        </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal" id="btn-close-memo-modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>

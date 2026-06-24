@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='09',menuId ='01'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<!--	<link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script type="text/javascript">
+
+	
+		document.addEventListener('DOMContentLoaded', () => {
+			
+			//저장 후 메세지
+			var procMsg = "[[${procMsg}]]";
+			if(procMsg!="" || procMsg !="") {
+				if(procMsg == "sucess") {
+					showAlert("저장되었습니다.",moveList);
+				} else {
+					alert(procMsg);
+				}
+			}
+			
+			/* 회원찾기 버튼 */
+			$('#bnfAddBtn').on('click', function(){
+				$('.bnf-select__overlay, .bnf-select').show();
+			});
+			/* 회원찾기 검색 enter */ 
+			$('#keyword').on('keyup', function(key){
+				if (key.keyCode == 13) {
+					schUserList();
+				}
+			});
+			/* 회원찾기 닫기 버튼 */
+			$('.plan-add-cls').on('click', function(){
+				$('.bnf-select__overlay, .bnf-select').hide();
+			});
+			
+			var drcrcheckval = $("input[name='drCr']:checked").val();
+			if(drcrcheckval != null && drcrcheckval != ""){
+				onclickDrCr(drcrcheckval);
+			}
+		});
+		// Go to List
+		function moveList() {
+			window.location.href="/point/history/list";
+		}
+		// 그래도 갈꺼니?
+		function goList() {
+			showConfirm( '입력한 내용이 저장되지 않습니다. 목록으로 돌아가시겠습니까?',
+					() => { 
+						moveList(); 
+					},
+					() => { },
+					'포인트관리'
+			 )
+		}
+		
+		
+		//[등록] 클릭
+		function saveData() {
+			showConfirm( '저장 하시겠습니까?',
+					() => { 
+						saveProc();
+					},
+					() => { },
+					'포인트관리'
+			 )
+		}
+		function saveProc() {
+			$("#recordForm").submit();
+		}
+		
+		//숫자 입력란 제한 
+		function handleOnInput(el, maxlength) {
+			if(el.value.length > maxlength)  {
+				el.value = el.value.substr(0, maxlength);
+			}
+		}
+		
+		function checkNumber(event) {
+		  if(event.key >= 0 && event.key <= 9) {
+		    return true;
+		  }
+		  
+		  return false;
+		}
+		
+		
+		// 관리자 차감 기능 crPointType7
+		function onclickDrCr(val){
+			//alert(val);
+			if(val == "DR"){
+				//$("[id = "+btnId+"]").attr("disabled", true);
+				$("#crPointType1").attr("disabled", true);
+				$("#crPointType2").attr("disabled", true);
+				$("#crPointType3").attr("disabled", true);
+				$("#crPointType4").attr("disabled", true);
+				$("#crPointType5").attr("disabled", true);
+				$("#crPointType6").attr("disabled", true);
+				$("#crPointType7").attr("disabled", false);
+			}else{
+				$("#crPointType1").attr("disabled", false);
+				$("#crPointType2").attr("disabled", false);
+				$("#crPointType3").attr("disabled", false);
+				$("#crPointType4").attr("disabled", false);
+				$("#crPointType5").attr("disabled", false);
+				$("#crPointType6").attr("disabled", false);
+				$("#crPointType7").attr("disabled", true);
+			}
+		}
+		
+		
+		//   ------------------------------------------- 회원찾기   --------------------------------- //
+		/* 요금제 검색 */
+		function schUserList() {
+			
+			var params = {
+				 searchType 		: $('#searchType').val()
+				,keyword 			: $('#keyword').val()
+			}
+			
+			$.ajax({
+				url 		: '/point/history/ajaxUserList'
+				,type 		: 'POST'
+				,dataType 	: 'json'
+				,contentType : 'application/json'
+				,data 		: JSON.stringify(params)
+				,async 		: false
+				,success 	: function (data) {
+					$('#user-area').empty();
+					$('#user-list').tmpl(data.data).appendTo('#user-area');
+				}
+				,error 		: function(request, status, error){
+				}
+				,complete 	: function(){
+				}
+			});
+		}
+		
+		// - 회원 조회 내 : [등록] 버튼 클릭
+		/* 요금제 추가 레이어팝업 등록 버튼 */
+		function userAdd(){
+			var id = $('input[name=popUserList]:checked').val();
+			var jsonStr = $('input[name=popUserList]:checked').data('json');
+			
+			if ( id != undefined ) {
+				$("#pointId").val(jsonStr.id);
+				$("#userId").val(jsonStr.userId);
+				$("#username").val(jsonStr.username);
+				$("#kakaoUserId").val(jsonStr.kakaoUserId);
+				
+			}
+			$('.bnf-select__overlay, .bnf-select').hide();
+		}
+		
+		
+		function to_date2(date_str)
+		{
+		    var yyyyMMdd = String(date_str);
+		    var sYear = yyyyMMdd.substring(0,4);
+		    var sMonth = yyyyMMdd.substring(5,6);
+		    var sDate = yyyyMMdd.substring(7,8);
+
+		    //alert("sYear :"+sYear +"   sMonth :"+sMonth + "   sDate :"+sDate);
+		    return new Date(Number(sYear), Number(sMonth)-1, Number(sDate));
+		}
+		
+		function getDateStrDash(_val) {
+			var dd = to_date2(_val);
+			//var d = new Date(_val),
+			var d = new Date(dd),
+			month = '' + (d.getMonth() + 1) , 
+			day = '' + d.getDate(), 
+			year = d.getFullYear();
+			if (month.length < 2) month = '0' + month; 
+			if (day.length < 2) day = '0' + day; 
+			
+			return [year, month, day].join('-');
+		}
+		
+	</script>
+		
+</th:block>
+
+
+		<div class="main-content">
+			<div class="container-fluid">
+				<!-- 로케이션 & 제목 영역 추가 -->
+				<div class="page-header d-flex justify-content-between align-items-start">
+					<div>
+						<div class="location mb-2">
+							<small class="text-secondary">
+								<i class="fas fa-home me-1"></i>
+								<a href="/">홈</a>
+								>
+								<a href="/point/history/list">포인트관리</a>
+								>
+								<a href="/point/history/list">포인트 지급/차감</a>
+							</small>
+						</div>
+						<h2 class="page-title fs-4 mb-4">
+							<div>포인트 지급/차감</div>
+						</h2>
+					</div>
+					<button type="button" class="btn btn-primary btn-sm mt-3" data-bs-toggle="modal" id="bnfAddBtn">
+						<i class="fas fa-user"></i>
+						회원조회
+					</button>
+				</div>
+				
+				<form id="recordForm" th:object="${record}" method="POST" th:action="@{/point/history/historyInsert}">
+				<input type="hidden" th:field="*{id}" >
+				<input type="hidden" th:field="*{userId}" >
+				<input type="hidden" th:field="*{pointId}" >
+				<input type="hidden" th:field="*{adminGiftYn}">
+				<div class="search-section detail">
+					<div class="form-row full-width mb-3">
+						<div class="form-label mb-0">구분<span class="required">*</span>
+						</div>
+						<div class="form-control-wrap">
+							
+							<div class="form-check-group">
+								<div class="form-check">
+									<input class="form-check-input" type="radio" th:field="*{drCr}" value="CR" th:checked="${drCr eq 'CR'}" onclick="onclickDrCr(this.value)" th:disabled="${record.id != 0} ? 'disabled'">
+									<label class="form-check-label" for="drCr1">지급</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" th:field="*{drCr}" value="DR" th:checked="${drCr eq 'DR'}" onclick="onclickDrCr(this.value)" th:disabled="${record.id != 0} ? 'disabled'">
+									<label class="form-check-label" for="drCr2">차감</label>
+								</div>
+							</div>
+							<th:block th:if="${#fields.hasErrors('drCr')}" class="error"><span th:errors="*{drCr}" class="required">Field error</span></th:block>
+							
+						</div>
+					</div>
+					
+					<div class="form-row full-width">
+						<div class="form-label">회원명<span class="required">*</span></div>
+						<div class="form-control-wrap">
+							<input type="text" class="form-control"  th:field="*{username}" readonly>
+							<th:block th:if="${#fields.hasErrors('username')}" class="error"><span th:errors="*{username}" class="required">Field error</span></th:block>
+						</div>
+					</div>
+					<div class="form-row full-width">
+						<div class="form-label">카카오ID</div>
+						<div class="form-control-wrap">
+							<input type="text" class="form-control" th:field="*{kakaoUserId}" readonly>
+						</div>
+					</div>
+					<div class="form-row full-width">
+						<div class="form-label">사유<span class="required">*</span></div>
+						<div class="form-control-wrap">
+						
+							<div class="form-check-group">
+								<div class="form-check">
+									<input class="form-check-input" type="radio" th:field="*{crPointType}" value="ACT" th:checked="${crPointType eq 'ACT'}" th:disabled="${record.id != 0} ? 'disabled'">
+									<label class="form-check-label" for="crPointType1">개통</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" th:field="*{crPointType}" value="REV" th:checked="*{crPointType eq 'REV'}" th:disabled="${record.id != 0} ? 'disabled'">
+									<label class="form-check-label" for="crPointType2">후기(개통)</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" th:field="*{crPointType}" value="RET" th:checked="${crPointType eq 'RET'}" th:disabled="${record.id != 0} ? 'disabled'">
+									<label class="form-check-label" for="crPointType3">가입유지</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" th:field="*{crPointType}" value="FR" th:checked="*{crPointType eq 'FR'}" th:disabled="${record.id != 0} ? 'disabled'">
+									<label class="form-check-label" for="crPointType4">친구추천</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" th:field="*{crPointType}" value="EXR" th:checked="${crPointType eq 'EXR'}" th:disabled="${record.id != 0} ? 'disabled'">
+									<label class="form-check-label" for="crPointType5">우수후기</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" th:field="*{crPointType}" value="OTH" th:checked="${crPointType eq 'OTH'}" th:disabled="${record.id != 0} ? 'disabled'">
+									<label class="form-check-label" for="crPointType6">기타</label>
+								</div>
+								
+								<div class="form-check">
+									<input class="form-check-input" type="radio" th:field="*{crPointType}" value="DED" th:checked="${crPointType eq 'DED'}" th:disabled="${record.id != 0} ? 'disabled'">
+									<label class="form-check-label" for="crPointType7">차감</label>
+								</div>
+								
+							</div>
+							<th:block th:if="${#fields.hasErrors('crPointType')}" class="error"><span th:errors="*{crPointType}" class="required">Field error</span></th:block>
+							
+						</div>
+					</div>
+
+					<div class="form-row full-width">
+						<div class="form-label">지급/차감<br> 포인트<span class="required">*</span></div>
+						<div class="form-control-wrap">
+							<input oninput='handleOnInput(this, 5)' th:field="*{amount}" class="form-control" value="" placeholder="숫자 입력" onkeypress="return checkNumber(event)" th:disabled="${record.id != 0} ? 'disabled'">
+							<th:block th:if="${#fields.hasErrors('amount')}" class="error"><span th:errors="*{amount}" class="required">Field error</span></th:block>
+						</div>
+					</div>
+
+					<div class="form-row full-width">
+						<div class="form-label">메모</div>
+						<div class="form-control-wrap">
+							<textarea th:field="*{memo}" class="form-control" placeholder="" th:disabled="${record.id != 0} ? 'disabled'"></textarea>
+						</div>
+					</div>
+
+					<div class="form-row full-width">
+						<div class="form-label">담당자</div>
+						<div class="form-control-wrap">
+							<input type="text" class="form-control" 		th:field="*{createName}" value="담당자" disabled>
+						</div>
+					</div>
+					<div class="form-row full-width">
+						<div class="form-label">처리일</div>
+						<div class="form-control-wrap">
+							<input type="text" class="form-control" th:field="*{createDate}" disabled>
+						</div>
+					</div>
+				</div>
+				</form>
+
+				<!-- 버튼 영역 -->
+				<div class="d-flex justify-content-center gap-2 mt-4">
+					<button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">
+						닫기
+					</button>
+					<button type="button" class="btn btn-lg btn-dark px-4 btn-sm" th:if="${record.createDate == null}" onclick="saveData()">
+						등록
+					</button>
+				</div>
+			</div>
+		</div>
+		
+		
+		<!-- 회원 조회용 tmpl -->
+		<script id="user-list" type="text/x-jquery-tmpl">
+			<tr class="bnf-select__row">
+				<td class="bnf-select__td">
+					<input type="radio" name="popUserList" class="bnf-select__radio" value="${id}" data-json='{"id":"${id}", "userId":"${userId}", "username":"${username}", "kakaoUserId":"${kakaoUserId}", "birthDay":"${birthDay}", "joinDate":"${joinDate}" }'>
+					<input type="hidden" id="user-id" value="${id}"/>
+				</td>
+				<td class="bnf-select__td">{{html maskName(username)}}</td>
+				<td class="bnf-select__td">${kakaoUserId}</td>
+				<td class="bnf-select__td">{{html getDateStrDash(birthDay)}}</td>
+				<td class="bnf-select__td">{{html getDateStr(joinDate)}}</td>
+			</tr>
+		</script>
+		
+		<div class="bnf-select__overlay"></div>
+		<div class="bnf-select" style="width:1000px;">
+			<div class="bnf-select__header">
+				<div class="bnf-select__title">사용자 선택</div>
+				<span class="bnf-select__close plan-add-cls">&times;</span>
+			</div>
+			
+			<div class="bnf-select__search">
+				<select class="form-select" name="searchType" id="searchType" style="height:52px; width:120px;">
+					<option value="username"	>회원명		</option>
+					<option value="userkakao"	>카카오ID	</option>
+				</select>
+				<input type="text" class="bnf-select__input" name="keyword" id="keyword" placeholder="회원 또는 카카오ID를 입력해주세요.">
+				<button type="button" class="bnf-select__search-btn" onClick="schUserList()">검색</button>
+			</div>
+			<!-- </form> -->
+			<div class="bnf-select__table__outer">
+				<table class="bnf-select__table">
+					<thead>
+						<tr>
+							<th class="bnf-select__th" style="width: 50px">구분</th>
+							<th class="bnf-select__th" style="width: 100px">회원명</th>
+							<th class="bnf-select__th">카카오ID</th>
+							<th class="bnf-select__th">생일</th>
+							<th class="bnf-select__th">가입일</th>
+						</tr>
+					</thead>
+					<tbody id="user-area">
+					</tbody>
+				</table>
+			</div>
+			<div class="bnf-select__footer">
+				<button class="bnf-select__btn bnf-select__btn--apply plan-add-cls">닫기</button>
+				<button class="bnf-select__btn bnf-select__btn--confirm bg_blue" id="plan-add" onclick="userAdd()">등록</button>
+			</div>
+		</div>
+	

@@ -1,0 +1,156 @@
+# Spring: DB Connection Setting
+spring:
+  datasource:
+    url: ENC(6iRnEl1xtSQJE7zXIhxRhNx3gvABkZVnLmzpcZiMAU09cvtaf3+BdShtCP8mDPN6FIkHVGgcDVLVeQYRrggvsPIfeIjEHJETQIxVZ5dbGKdk2ZuM/PQHhQ==)
+    username: ENC(Rk+uQ5wPH/u+0KR87yEEQbbHeMeg1bHGWDWVZzOPXwc=)
+    password: ENC(Adzo5IfQ1LoH+ahoJ3Gj5ExK8z2y9VR/H5keTCQ7P1M=)
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+  data:
+    redis:
+      host: ENC(gURsw5RjnsEJwzR1IHreE3xU8ILlN5QGMGKUKJajbOw=)
+      port: 6380
+      password: ENC(EBzA5fEjO/SrQVy7LOAA6Y+t4SH75wF2etEi6embBM8=)
+file:
+   upload-dir: /upload_img_tb
+
+# App base URL (환경별 도메인)
+app:
+  base-url: https://tb.smtong.co.kr
+
+# Logging
+logging:
+  level:
+    jdbc:
+      audit: "off"
+      connection: "off"
+      sqlonly: "off"
+      sqltiming: "info"
+      resultset: "off"
+      resultsettable: "info"
+
+jasypt:
+  encryptor:
+    algorithm: PBEWithHMACSHA512AndAES
+    bean: jasyptStringEncryptor
+    password: ${ENCRYPTION_KEY}
+
+kakao:
+  token:
+    uri: https://kauth.kakao.com/oauth/token
+  user-info:
+    uri: https://kapi.kakao.com/v2/user/me
+  terms-info:
+    uri: https://kapi.kakao.com/v2/user/service_terms?result=app_service_terms
+  client:
+    id: ENC(P73y2VT13lK7uUkgrUaiU24UmgLWvJAILpOsPgEItlOGhtF+YBlantl3voDN1iYpbvDBuAHyM8s=)
+    akey: ENC(t2AD8/R8xlDzhxIelOaRJyILE+qmXBj7aXpsZkebuAvuEQ0z/AW+wdUjpJmILgoAu8K9Snh6H5o=)
+    redirect-uri: ${app.base-url}/auth/kakao/callback
+    scope:
+      - account_email
+      - name
+      - phone_number
+  user-drop:
+    uri: https://kapi.kakao.com/v1/user/unlink
+
+# Naver sancho:9argipQqSTYgmK3gI3pB/SUK6kQb6xZ
+naver:
+  auth:
+    uri: https://nid.naver.com/oauth2.0/authorize
+  token:
+    uri: https://nid.naver.com/oauth2.0/token
+  profile:
+    uri: https://openapi.naver.com/v1/nid/me
+  client:
+    id: ENC(pYVha/IaRU/KQZNT1+sj+PhwOGuqlp3u7RsoiLe9O0Sz+X0GMywF6Q==)
+    secret: ENC(PeQ+i2A8xZ4B/SZUsucGspqNz20Zhps62QFjbWemhtc=)
+    redirect: ${app.base-url}/auth/naver/callback
+
+# 구글 애널리틱스 & 태그매니저 아이디 (tb.smtong.co.kr)
+google:
+  analytics:
+    id: G-DE9JVBC340
+  tagManager:
+    id: GTM-PX32RKVG
+
+#road adress api
+roadjuso:
+  business:
+    url: https://business.juso.go.kr/addrlink/addrLinkApi.do
+    confmKey: U01TX0FVVEgyMDI1MDIyNDE0NTk0MTExNTQ5NjA=
+
+#coocon
+coocon:
+  ident:
+    api:
+      base-url: https://sgw.coocon.co.kr
+      client-id:
+      client-secret: VKoREzOzcvSoEZrKxHYN
+      req-cert-url: /sol/gateway/scrap_wapi_std.jsp
+  personal:
+    api:
+      base-url: https://iris.coocon.co.kr
+      client-id: B00032
+      client-secret: ohBlXERbDB8Uk75v3pSC
+      SecretKey: YspoQoTjtl8leg0wxS5W1wlZxzPQUvOMhmIlViI6zvo=
+      iv: Xfsb+wiO8SBLtht9wG/9OQ==
+      ret-url: ${app.base-url}/order/kakaoCertRes
+  account:
+    api:
+      base-url: https://gw.coocon.co.kr
+      client-id: 20056425
+      client-secret: qNqBofoOd1b5tWEcDrvF
+      req-cert-url: /sol/gateway/acctnm_rcms_wapi.jsp
+  message:
+    api:
+      base-url: https://kakaobiztalk-test.coocon.co.kr
+      client-id: K00034
+      client-secret: YK2ZS7yUXB7dGUQGAKX7
+  cardcert:
+    api:
+      license-dir: /smtong_project/cardcert_license
+      req-site-nm: 세모통
+      base-url: https://card.ok-name.co.kr:4331
+      cp-cd: V22530000094
+      ret-url: ${app.base-url}/cardcert/cardcert_res
+      target-server : PROD
+
+#host company api 
+gogo:
+  api:
+    base-url: https://api.gogofactory.co.kr
+    auth-key: 057485accc44c076e27b7fa2328232e4
+    order-req-url: /info/semo/online_order.php
+    order-state-query-url: /info/semo/online_memo.php
+minigate:
+  api:
+    base-url: https://dev.shakemobile.co.kr
+    auth-key: 570b7be77c423c81cd05dc67babe4fa0d0fd0dca46c9f952bf990758cac89c741a525be560bd82cfe533ed254accd38119c6540370185501fc27a66849c5dfd4
+    order-req-url: /M2Mobile/v1/api/partner/member/recv
+    enc-key: mMvno0105Mgm@!gm
+    vector: (byte)0x26, (byte)0x8D, (byte)0x66, (byte)0xA7, (byte)0x35, (byte)0xA8, (byte)0x1A, (byte)0x81, (byte)0x6F, (byte)0xBA, (byte)0xD9, (byte)0xFA, (byte)0x36, (byte)0x16, (byte)0x25, (byte)0x01
+    client-id: VMG0016
+#DAOU
+daou:
+  url: https://test-box-api.addcon.co.kr
+  partner-code: PAKED7
+  key:
+    api-key: SuTPg735wUypp1WttPMdpdl9t9jWdT1g
+    enc-key: wj7Z5ylj2iD7iST5tKO1JIF1Yj8eEfsz
+    iv-key : wj7Z5ylj2iD7iST5
+    
+#BIZPPURIO
+bizppurio:
+  kakao:
+    url: https://api.bizppurio.com
+    id: semotong
+    password: smtongdaebak1^^
+    fromNum: 070-5038-5883
+    senderkey: 7012483899c61b22b0832cca13a2311be0526b76
+    apikey: mxzVXEeTmbWW
+order:
+  serverSp: TB

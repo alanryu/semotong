@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='08',menuId ='01'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	
+	<script type="text/javascript">
+		function moveList() {
+			window.location.href='/pmb/plan-sales/apply?id=' + $('#bizPlanMngId').val();
+		}
+	</script>
+</th:block>
+
+<div class="main-content">
+	<div class="container-fluid">
+	<div class="page-header  d-flex justify-content-between align-items-start">
+		<div>
+			<div class="location mb-2">
+			<small class="text-secondary">
+				<i class="fas fa-home me-1"></i>
+				<a href="javascript:;">홈</a> > <a href="javascript:;">영업관리</a> > <a href="javascript:;">영업상품 관리</a>
+			</small>
+		</div>
+		<h2 class="page-title fs-4 mb-4">신청내역 상세</h2>
+		</div>
+	</div>
+		 
+	<!-- 등록 폼 섹션 -->
+		<input type="hidden" name="id" id="id" th:value="${result?.id}"/>
+		<input type="hidden" id="bizPlanMngId" th:value="${orderReq.bizPlanMngId}"/>
+		
+		<div class="search-section detail">
+			  <div class="form-row">
+                  <div class="form-label">신청번호</div>
+                  <div class="form-control-wrap" th:text="${orderReq.orderSeq}">  </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-label">현재 상태</div>
+                  <div class="form-control-wrap" th:text="${orderReq.orderStateNm}">  </div>
+              </div>
+              
+              <div class="form-row">
+                  <div class="form-label">신청일</div>
+                  <div class="form-control-wrap" th:text="${@commonUtils.formatDateTime(orderReq.orderDttm)}">  </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-label">가입유형</div>
+                  <div class="form-control-wrap" th:if="${orderReq.entrType == '01'}">신규가입</div>
+                  <div class="form-control-wrap" th:if="${orderReq.entrType == '02'}">번호이동 </div>
+              </div>
+              
+              <div class="form-row">
+                  <div class="form-label">연락처</div>
+                  <div class="form-control-wrap" th:text="${orderReq.orderPhone}">  </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-label">신분증 정보</div>
+                  <div class="form-control-wrap" th:if="${orderReq.disAuthJoinDiv =='01'}"> 주민등록증 + [[${orderReq.authOrgDt}]] </div>
+                  <div class="form-control-wrap" th:if="${orderReq.disAuthJoinDiv =='02'}"> 운전면허증 + [[${orderReq.driverNumber}]] + [[${orderReq.driverSecureNum}]] </div>
+              </div>
+              
+              <div class="form-row full-width">
+                   <div class="form-label">주소</div>
+                   <div class="form-control-wrap">
+                       [[${orderReq.orderAddr}]]
+                   </div>
+               </div>
+               <div class="form-row full-width">
+                   <div class="form-label">유심</div>
+                   <div class="form-control-wrap" th:if="${orderReq.usimPayType =='01'}"> 미보유 </div>
+                   <div class="form-control-wrap" th:if="${orderReq.usimPayType =='02'}"> 보유 </div>
+                   <div class="form-control-wrap" th:if="${orderReq.usimPayType =='03'}"> ESIM </div>
+               </div>
+               
+               <div class="form-row full-width" th:if="${orderReq.usimPayType =='01'}">
+                   <div class="form-label">유심배송지</div>
+                   <div class="form-control-wrap" th:text="${orderReq.recvAddr}">  </div>
+               </div>
+               
+               
+               <div class="form-row full-width" th:if="${orderReq.usimPayType =='02'}">
+                   <div class="form-label">유심정보</div>
+                   <div class="form-control-wrap" th:text="${orderReq.usimSerialNum}">  </div>
+               </div>
+               <div class="form-row full-width" th:if="${orderReq.usimPayType =='03'}">
+                   <div class="form-label">ESIM 단말정보</div>
+                   <div class="form-control-wrap"> 
+                      단말 모델 : [[${orderReq.esimModel}]] <br>
+                      단말 용량 : [[${orderReq.esimMemory}]] <br>
+                      일련번호 : [[${orderReq.esimNumber}]] <br>
+                      IMEI 1 : [[${orderReq.esimImei1}]] <br>
+                      IMEI 2 : [[${orderReq.esimImei2}]] <br>
+                      EID : [[${orderReq.esimEid}]] <br>
+                    </div>
+               </div>
+               
+              <div class="form-row">
+                  <div class="form-label">납부방법</div>
+                  <div class="form-control-wrap" th:if="${orderReq.settleMethod == '01'}"> 은행 계좌이체 </div>
+                  <div class="form-control-wrap" th:if="${orderReq.settleMethod == '02'}"> 신용카드 </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-label">납부정보</div>
+                  <div class="form-control-wrap" th:if="${orderReq.settleMethod == '01'}"> 
+                  	은행명 : [[${orderReq.bankNm}]]<br>
+                  	계좌번호 : [[${orderReq.bankAcctNo}]]
+                   </div>
+                  <div class="form-control-wrap" th:if="${orderReq.settleMethod == '02'}"> 
+	                  카드사 : [[${orderReq.cardNm}]]<br>
+	                  카드번호 : [[${orderReq.cardNum}]]<br>
+	                  유효기간 : [[${orderReq.cardValidDt}]] 
+                  </div>
+              </div>
+              
+              <div class="form-row">
+                  <div class="form-label">요금청구서<br>수령방법</div>
+                  <div class="form-control-wrap" th:if="${orderReq.billCd =='02'}"> 모바일</div>
+                  <div class="form-control-wrap" th:if="${orderReq.billCd =='03'}"> 이메일 </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-label">이메일</div>
+                  <div class="form-control-wrap" th:text="${orderReq.orderEmail}"> </div>
+              </div>
+		
+			  <div class="form-row">
+                  <div class="form-label">MNO</div>
+                  <div class="form-control-wrap" th:text="${orderReq.telecomCd}"> </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-label">사업자</div>
+                  <div class="form-control-wrap" th:text="${orderReq.companyNm}"> </div>
+              </div>
+    
+			  <div class="form-row full-width">
+                  <div class="form-label">요금제명</div>
+                  <div class="form-control-wrap"><a href="#"  th:text="${orderReq.planNm}" th:onclick="|openViewPlanDetail('${orderReq.planId}')|"></a> </div>
+              </div>
+              
+              
+              
+              <div class="form-row">
+                  <div class="form-label">기본료</div>
+                  <div class="form-control-wrap" th:text="${#numbers.formatInteger(orderReq.basicPrice, 0, 'COMMA') + '원'}"> </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-label">할인료</div>
+                  <div class="form-control-wrap" th:text="${#numbers.formatInteger(orderReq.eventDiscPrice, 0, 'COMMA') + '원'}"> </div>
+              </div>    
+              
+              
+              <div class="form-row">
+                  <div class="form-label">최종금액</div>
+                  <div class="form-control-wrap" th:text="${#numbers.formatInteger(orderReq.afterPrice, 0, 'COMMA') + '원'}"> </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-label">할인기간</div>
+                  <div class="form-control-wrap" th:text="${orderReq.promotionPeriod}"> </div>
+              </div>        
+				 <div class="form-row full-width">
+                   <div class="form-label">포인트 요금제<br> 여부</div>
+                   <div class="form-control-wrap" th:if="${orderReq.pointPlanYn == 0}"> N</div>
+                   <div class="form-control-wrap" th:unless="${orderReq.pointPlanYn == 0}"> Y </div>
+               </div>
+               <th:block th:unless="${orderReq.recomSp == 'N'}">
+	              <div class="form-row">
+	                  <div class="form-label">추천인 여부</div>
+	                  <div class="form-control-wrap" th:if="${orderReq.recomSp == '1'}"> 친구추천</div>
+	                  <div class="form-control-wrap" th:if="${orderReq.recomSp == '2'}"> 영업추천</div>
+	              </div>
+	              <div class="form-row">
+	                  <div class="form-label">추천인 ID</div>	                  
+	                  <div class="form-control-wrap" th:if="${orderReq.recomSp == '1'}"> [[${orderReq.recomUserWEBId}]]</div>
+	                  <div class="form-control-wrap" th:if="${orderReq.recomSp == '2'}"> [[${orderReq.recomUserAdminId}]]</div>
+	              </div>
+              </th:block>    
+              
+               <div class="form-row full-width">
+                   <div class="form-label">상태별 날짜</div>
+                   <div class="form-control-wrap" >
+                   	<th:block th:each="itm : ${orderStateList}">
+		                <p>
+							[[${#temporals.format(itm.createDate, 'yyyy.MM.dd HH:mm:ss')}]] [[${itm.orderStateNm}]]
+		                </p>
+		            </th:block>
+                   
+                    </div>
+               </div>
+               
+               <div class="form-row full-width">
+                   <div class="form-label">개통 취소 사유</div>
+                   <div class="form-control-wrap" th:text="${orderReq.orderStateSub}"> </div>
+               </div>
+              
+		</div><!-- End Detail -->
+			
+		
+	<!-- 버튼 영역 -->
+	<div class="d-flex justify-content-center gap-2 mt-4">
+		<button type="button" class="btn btn-lg btn-dark px-4 btn-sm" 		onclick="moveList()">목록</button>
+	</div>
+		 
+		 
+		
+
+	</div>
+</div>

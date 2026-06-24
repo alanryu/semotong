@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>세모통</title>
+        <link
+            href="../../css/bootstrap.min.css"
+            rel="stylesheet">
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            rel="stylesheet">
+          <link
+            href="../../css/design.css"
+            rel="stylesheet">
+    </head>
+    <body>
+        <div class="sidebarWrapper">
+            <div class="left-sidebar">
+                <div class="admin-profile">
+                    <div class="profile-letter">A</div>
+                    <div>
+                        <div class="fw-semibold text-dark">관리자 - 아무개님</div>
+                        <small class="text-muted">UPDATE -<br> 2024-12-12 18:02</small>
+                    </div>
+                </div>
+                <ul class="menu-list">
+                    <!-- 계정권한관리 -->
+                    <li class="menu-item">
+                        <a href="../account/account.html" class="menu-link">
+                            <i class="fas fa-user-cog"></i>
+                            <span>계정권한관리</span>
+                        </a>
+                    </li>
+                    <!-- 회원관리 -->
+                    <li class="menu-item">
+                        <a href="../members/members.html" class="menu-link">
+                            <i class="fas fa-users"></i>
+                            <span>회원관리</span>
+                        </a>
+                    </li>
+                    <!-- 입점사관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="#" class="menu-link">
+                            <i class="fas fa-building"></i>
+                            <span>입점사관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                                <a href="../business/list.html" class="submenu-link">사업자 목록</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../business/manage.html" class="submenu-link">입점사 관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 상품관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="#" class="menu-link">
+                            <i class="fas fa-box"></i>
+                            <span>상품관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item ">
+                                <a href="../product/rateplan.html" class="submenu-link">요금제</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../product/scraping.html" class="submenu-link">스크래핑 관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="javascript:;" class="submenu-link">인터넷</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 신청관리 -->
+                    <li class="menu-item has-submenu active open">
+                        <a href="../applications/applications.html" class="menu-link">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>신청관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item ">
+                                <a href="../product/rateplan.html" class="submenu-link">요금제 신청내역</a>
+                            </li>
+                            <li class="submenu-item active">
+                                <a href="../product/internet.html" class="submenu-link">인터넷 신청내역</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 정산관리 -->
+                    <li class="menu-item">
+                        <a href="../settlements/settlements.html" class="menu-link">
+                            <i class="fas fa-calculator"></i>
+                            <span>정산관리</span>
+                        </a>
+                    </li>
+                    <!-- 서비스관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="../services/services.html" class="menu-link">
+                            <i class="fas fa-cog"></i>
+                            <span>서비스관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                                <a href="../services/services.html" class="submenu-link">배너관리</a>
+                                <ul class="subsubmenu">
+                                    <li><a href="../services/services.html" class="submenu-link ">메인</a></li>
+                                    <li><a href="../services/services_combination.html" class="submenu-link">결합</a></li>
+                                    <li><a href="../services/services_chatbot.html" class="submenu-link">챗봇</a></li>
+                                </ul>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/board.html" class="submenu-link">게시판관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/member.html" class="submenu-link">회원관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/event.html" class="submenu-link">이벤트관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/tax.html" class="submenu-link">세무통설명서관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/after.html" class="submenu-link">후기관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/quality.html" class="submenu-link">질문진단보관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/chat.html" class="submenu-link">챗봇요금제관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/portfolio.html" class="submenu-link">포트폴리오관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <button class="toggle-sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="main-content">
+            <div class="container-fluid">
+                <div>
+                    <div class="location mb-2">
+                        <small class="text-secondary">
+                            <i class="fas fa-home me-1"></i>
+                            <a href="javascript:;">홈</a>
+                            >
+                            <a href="javascript:;">신청 관리</a>
+                            >
+                            <a href="../applications/applications.html">인터넷 신청내역</a>
+                        </small>
+                    </div>
+                    <h2 class="page-title fs-4 mb-4">
+                        인터넷 신청내역
+                    </h2>
+                </div>
+                
+                <div class="search-section">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <!-- 검색어 -->
+                            <div class="form-row full-width mb-3">
+                                <div class="form-label mb-0">검색어</div>
+                                <div class="form-control-wrap flex-grow-1">
+                                    <input type="text" class="form-control" placeholder="검색어를 입력해주세요">
+                                </div>
+                            </div>
+                    
+                            <!-- 노출여부 -->
+                            <div class="form-row full-width mb-3">
+                                <div class="form-label mb-0">상태</div>
+                                <div class="form-control-wrap">
+                                    <div class="form-check-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="exposure" id="expAll" checked>
+                                            <label class="form-check-label" for="expAll">전체</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="exposure" id="expShow">
+                                            <label class="form-check-label" for="expShow">상담신청</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="exposure" id="expCancel">
+                                            <label class="form-check-label" for="expHide">고객취소</label>
+                                        </div>
+                                        <div class="form-check">
+                                          <input class="form-check-input" type="radio" name="exposure" id="expEnd">
+                                          <label class="form-check-label" for="expHide">개통완료</label>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                    
+                            <div class="form-row full-width mb-3">
+                                <div class="form-label mb-0">MNO</div>
+                                <div class="form-control-wrap">
+                                    <div class="form-check-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="mno" id="mnoAll" checked>
+                                            <label class="form-check-label" for="mnoAll">전체</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="mno" id="mnoKT">
+                                            <label class="form-check-label" for="mnoKT">KT</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="mno" id="mnoLG">
+                                            <label class="form-check-label" for="mnoLG">LG U+</label>
+                                        </div>
+                                        
+                                        <div class="form-check">
+                                          <input class="form-check-input" type="radio" name="mno" id="mnoSK">
+                                          <label class="form-check-label" for="mnoSK">SK</label>
+                                      </div>
+                                      
+                                      <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="mno" id="mnoSky">
+                                        <label class="form-check-label" for="mnoSky">SkyLife</label>
+                                    </div>
+                                    
+                                    <div class="form-check">
+                                      <input class="form-check-input" type="radio" name="mno" id="mnoLGH">
+                                      <label class="form-check-label" for="mnoLGH">LG HelloVision</label>
+                                  </div>
+                                  
+                                  <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="mno" id="mnoSKB">
+                                    <label class="form-check-label" for="mnoSKB">SKB(알뜰)</label>
+                                </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-row full-width">
+                                    <div class="form-label mb-0">신청일</div>
+                                    <div class="form-control-wrap d-flex align-items-center gap-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="date" class="form-control" value="2024-12-18">
+                                            <span class="text-secondary">-</span>
+                                            <input type="date" class="form-control" value="2024-12-18">
+                                        </div>
+                                        <div class="period-buttons">
+                                            <div class="d-flex gap-2">
+                                                <button class="period-button">최근 1주일</button>
+                                                <button class="period-button">최근 1개월</button>
+                                                <button class="period-button">최근 3개월</button>
+                                                <button class="period-button">최근 6개월</button>
+                                                <button class="period-button">초기화</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 text-end mt-2">
+                                        <button class="btn btn-primary btn-sm me-2">
+                                            <i class="fas fa-search"></i>
+                                            검색
+                                        </button>
+                                        <button class="btn btn-light btn-sm">
+                                            <i class="fas fa-redo"></i>
+                                            초기화
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="stats-badge">
+                                <i class="fas fa-calculator me-1"></i>
+                                총 450건
+                            </div>
+                            <select class="form-select" style="width: 100px">
+                                <option>50개씩</option>
+                            </select>
+                        </div>
+                        <div class="header-actions">
+                            <div class="custom-dropdown">
+                                <button class="btn btn-success btn-sm">
+                                    <i class="fas fa-file-excel"></i>
+                                    엑셀 다운로드
+                                </button>
+                                <div id="myDropdown" class="dropdown-content">
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#downloadModal">맵핑 대상 다운로드</a>
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#uploadModal">맵핑 코드 업로드</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>상태</th>
+                                <th>MNO</th>
+                                <th>신청상품</th>
+                                <th>신청자</th>
+                                <th>전화번호</th>
+                                <th>신청일시</th>
+                                <th>완료일시</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                              <td>19</td>
+                              <td>상담신청</td>
+                              <td>SKT</td>
+                              <td>
+                                <a href="javascript:;">인터넷 베이직</a>
+                              </td>
+                              <td>
+                                <a href="javascript:;">홍길동</a>
+                              </td>
+                              <td>010-****-1234</td>
+                              <td>2023.12.18-08:21:44</td>
+                              <td></td>
+                          </tr>
+                          <tr>
+                              <td>20</td>
+                              <td>상담신청</td>
+                              <td>SKT</td>
+                              <td>
+                                <a href="javascript:;">인터넷 베이직</a>
+                              </td>
+                              <td>
+                                <a href="javascript:;">홍길동</a>
+                              </td>
+                              <td>010-****-1234</td>
+                              <td>2023.12.18-08:21:44</td>
+                              <td></td>
+                          </tr>
+                          <tr>
+                              <td>20</td>
+                              <td>상담신청</td>
+                              <td>SKT</td>
+                              <td>
+                                <a href="javascript:;">인터넷 베이직</a>
+                              </td>
+                              <td>
+                                <a href="javascript:;">홍길동</a>
+                              </td>
+                              <td>010-****-1234</td>
+                              <td>2023.12.18-08:21:44</td>
+                              <td></td>
+                          </tr>
+                          <tr>
+                              <td>20</td>
+                              <td>상담신청</td>
+                              <td>SKT</td>
+                              <td>
+                                <a href="javascript:;">인터넷 베이직</a>
+                              </td>
+                              <td>
+                                <a href="javascript:;">홍길동</a>
+                              </td>
+                              <td>010-****-1234</td>
+                              <td>2023.12.18-08:21:44</td>
+                              <td></td>
+                          </tr>
+                          <tr>
+                              <td>20</td>
+                              <td>상담신청</td>
+                              <td>SKT</td>
+                              <td>
+                                <a href="javascript:;">인터넷 베이직</a>
+                              </td>
+                              <td>
+                                <a href="javascript:;">홍길동</a>
+                              </td>
+                              <td>010-****-1234</td>
+                              <td>2023.12.18-08:21:44</td>
+                              <td>2023.12.18-08:21:44</td>
+                          </tr>
+                          <tr>
+                              <td>20</td>
+                              <td>상담신청</td>
+                              <td>SKT</td>
+                              <td>
+                                <a href="javascript:;">인터넷 베이직</a>
+                              </td>
+                              <td>
+                                <a href="javascript:;">홍길동</a>
+                              </td>
+                              <td>010-****-1234</td>
+                              <td>2023.12.18-08:21:44</td>
+                              <td>2023.12.18-08:21:44</td>
+                          </tr>
+                          <tr>
+                              <td>20</td>
+                              <td>상담신청</td>
+                              <td>SKT</td>
+                              <td>
+                                <a href="javascript:;">인터넷 베이직</a>
+                              </td>
+                              <td>
+                                <a href="javascript:;">홍길동</a>
+                              </td>
+                              <td>010-****-1234</td>
+                              <td>2023.12.18-08:21:44</td>
+                              <td></td>
+                          </tr>
+                          <tr>
+                              <td>20</td>
+                              <td>상담신청</td>
+                              <td>SKT</td>
+                              <td>
+                                <a href="javascript:;">인터넷 베이직</a>
+                              </td>
+                              <td>
+                                <a href="javascript:;">홍길동</a>
+                              </td>
+                              <td>010-****-1234</td>
+                              <td>2023.12.18-08:21:44</td>
+                              <td></td>
+                          </tr>
+                          <tr>
+                              <td>20</td>
+                              <td>상담신청</td>
+                              <td>SKT</td>
+                              <td>
+                                <a href="javascript:;">인터넷 베이직</a>
+                              </td>
+                              <td>
+                                <a href="javascript:;">홍길동</a>
+                              </td>
+                              <td>010-****-1234</td>
+                              <td>2023.12.18-08:21:44</td>
+                              <td></td>
+                          </tr>
+                          <tr>
+                              <td>20</td>
+                              <td>상담신청</td>
+                              <td>SKT</td>
+                              <td>
+                                <a href="javascript:;">인터넷 베이직</a>
+                              </td>
+                              <td>
+                                <a href="javascript:;">홍길동</a>
+                              </td>
+                              <td>010-****-1234</td>
+                              <td>2023.12.18-08:21:44</td>
+                              <td></td>
+                          </tr>
+                            
+                            
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-between mt-4 align-items-start">
+                        <ul class="pagination">
+                            <li class="page-item">
+                                <a class="page-link" href="#">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item active">
+                                <a class="page-link" href="#">1</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">2</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">3</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">4</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">5</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">6</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">7</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">8</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">9</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">10</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Modal 팝업 : 다운로드  -->
+            <div class="modal fade" id="downloadModal" tabindex="-1" aria-labelledby="downloadModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header border-0 pb-0 mb-4">
+                            <h5 class="modal-title fs-6 fw-bold" id="downloadModalLabel">맵핑 대상 다운로드</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body pt-2 pb-4">
+                            <div class="form-row-modal">
+                                <div class="form-label-modal">사업자</div>
+                                <div class="form-control-wrap-modal">
+                                    <select class="form-select">
+                                        <option selected>사업자 선택</option>
+                                        <option>KG모바일</option>
+                                        <option>고고모바일</option>
+                                        <option>쉐이크모바일</option>
+                                        <option>아이즈모바일</option>
+                                        <option>에르엘</option>
+                                        <option>에이모바일</option>
+                                        <option>이치모바일</option>
+                                        <option>인스모바일</option>
+                                        <option>티플러스</option>
+                                        <option>프리티</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-dark px-4 btm-sm">다운로드</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal 팝업 : 업로드 -->
+            <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header border-0 pb-0 mb-4">
+                            <h5 class="modal-title fs-6 fw-bold" id="uploadModalLabel">맵핑 대상 업로드</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body pt-2 pb-4">
+                            <div class="form-row-modal">
+                                <div class="form-label-modal">사업자</div>
+                                <div class="form-control-wrap-modal">
+                                    <select class="form-select">
+                                        <option selected>사업자 선택</option>
+                                        <option>KG모바일</option>
+                                        <option>고고모바일</option>
+                                        <option>쉐이크모바일</option>
+                                        <option>아이즈모바일</option>
+                                        <option>에르엘</option>
+                                        <option>에이모바일</option>
+                                        <option>이치모바일</option>
+                                        <option>인스모바일</option>
+                                        <option>티플러스</option>
+                                        <option>프리티</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn btn-secondary px-4 btm-sm" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-dark px-4 btm-sm" data-bs-toggle="modal" data-bs-target="#uploadResultModal">업로드</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal 팝업 : 업로드 결과  -->
+            <div class="modal fade" id="uploadResultModal" tabindex="-1" aria-labelledby="uploadResultModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header border-0 pb-0 mb-4">
+                            <h5 class="modal-title fs-6 fw-bold" id="uploadResultModalLabel">코드 업로드 결과</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body pt-2 pb-4">
+                            <div class="upload-result">
+                                <p class="mb-3">
+                                    업로드 NN건 중 
+                                    <span class="text-primary">성공 - NN건</span> / 
+                                    <span class="text-success">설패 - NN건</span> / 
+                                    <span class="text-danger">실패 - NN건</span>
+                                </p>
+                                <div class="uuid-list">
+                                    <p class="fw-bold mb-2">상태 UUID</p>
+                                    <ul class="list-unstyled">
+                                        <li>Amobile67085</li>
+                                        <li>Amobile67085</li>
+                                        <li>Amobile67085</li>
+                                        <li>Amobile67085</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button"  data-bs-dismiss="modal" class="btn btn-dark px-4 btm-sm">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script src="../../js/bootstrap.bundle.min.js"></script>
+            <script src="../../js/script.js"></script>
+        </body>
+    </html>

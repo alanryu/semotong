@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layout/default_layout}"
+  layout:fragment="Content"
+  th:with="menuIdGroup = '07', menuId = '0104'"
+>
+  <!-- 고유 CSS 추가 -->
+  <th:block layout:fragment="css">
+    <style>
+      /* 작은 버튼 스타일 */
+      .btn-xs {
+        padding: 2px 6px;
+        font-size: 10px;
+        line-height: 1;
+        border-radius: 3px;
+        min-width: 24px;
+        height: 24px;
+      }
+
+      .btn-xs i {
+        font-size: 8px;
+      }
+
+      /* 순서 컬럼 스타일 */
+      .order-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+      }
+    </style>
+  </th:block>
+
+  <!-- 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script type="text/javascript">
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("publishEndDt").value = "9999-12-31";
+        // 검색 버튼 클릭 이벤트
+        document.getElementById("searchBtn").addEventListener("click", function () {
+          searchPopupList(1);
+        });
+
+        // 초기화 버튼 클릭 이벤트
+        document.getElementById("resetBtn").addEventListener("click", function () {
+          resetSearchForm();
+        });
+
+        // 페이지 크기 변경 이벤트
+        document.getElementById("recordSize").addEventListener("change", function () {
+          searchPopupList(1);
+        });
+
+        // 초기 로드시 팝업 목록 조회
+        searchPopupList(1);
+      });
+
+      // 팝업 목록 조회 함수
+      function searchPopupList(currentPage = 1) {
+        const searchData = {
+          page: currentPage,
+          recordSize: document.getElementById("recordSize").value,
+          keyword: document.getElementById("keyword").value.trim(),
+          status: getSelectedStatus(),
+          searchStartDt: document.getElementById("searchStartDt").value,
+          searchEndDt: document.getElementById("searchEndDt").value,
+          publishStartDt: document.getElementById("publishStartDt").value,
+          publishEndDt: document.getElementById("publishEndDt").value,
+          useYn: "Y",
+        };
+
+        console.log(searchData);
+
+        $.ajax({
+          url: "/svc/mainbanner/popupSearch",
+          type: "POST",
+          contentType: "application/json",
+          data: JSON.stringify(searchData),
+          success: function (response) {
+            if (response.code === 200) {
+              console.log(response.data);
+              console.log(currentPage, response.totalCnt, parseInt(searchData.recordSize));
+
+              renderPopupList(response.data);
+              updateListCount(response.totalCnt);
+              renderPagination(currentPage, response.totalCnt, parseInt(searchData.recordSize));
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error("Ajax 오류:", error);
+          },
+        });
+      }
+
+      // 상태 선택값 가져오기
+      function getSelectedStatus() {
+        const checkedRadio = document.querySelector('input[name="searchDisabledYn"]:checked');
+        return checkedRadio ? checkedRadio.value : "all";
+      }
+
+      // 상태 표시 텍스트
+      function getStatusDisplay(status) {
+        switch (status) {
+          case "wait":
+            return "대기";
+          case "active":
+            return "노출";
+          case "close":
+            return "종료";
+          default:
+            return "전체";
+        }
+      }
+
+      // 상태 배지 클래스
+      function getStatusBadgeClass(status) {
+        switch (status) {
+          case "wait":
+            return "bg-warning";
+          case "active":
+            return "bg-success";
+          case "close":
+            return "bg-secondary";
+          default:
+            return "bg-info";
+        }
+      }
+
+      // 날짜 범위 포맷팅
+      function formatDateRange(startDate, endDate) {
+        const start = startDate ? moment(startDate).format("YYYY-MM-DD") : "";
+        const end = endDate ? moment(endDate).format("YYYY-MM-DD") : "";
+        return start && end ? `<div style="text-align: center; line-height: 1.2;">${start}<br>~<br>${end}</div>` : "";
+      }
+
+      // 날짜시간 포맷팅
+      function formatDateTime(dateTime) {
+        return dateTime ? moment(dateTime).format("YYYY-MM-DD HH:mm:ss") : "";
+      }
+
+      // 목록 개수 업데이트
+      function updateListCount(totalCount) {
+        document.getElementById("listCount").textContent = `총 ${totalCount}건`;
+      }
+
+      // 검색 폼 초기화
+      function resetSearchForm() {
+        document.getElementById("keyword").value = "";
+        document.querySelector('input[name="searchDisabledYn"][value="all"]').checked = true;
+        document.getElementById("recordSize").value = "10";
+        periodButtonInit();
+        document.getElementById("publishEndDt").value = "9999-12-31";
+      }
+
+      function renderPage(page) {
+        searchPopupList(page);
+      }
+
+      function popupUpdate(id) {
+        location.href = `/svc/mainbanner/popupForm?id=${id}`;
+      }
+
+      function popupInsert() {
+        location.href = `/svc/mainbanner/popupForm`;
+      }
+      function popupDelete(id) {
+        var delFlag = true;
+
+        showConfirm(
+          "삭제하시겠습니까?",
+          () => {
+            $.ajax({
+              url: "/svc/mainbanner/popupDelete",
+              type: "POST",
+              contentType: "application/json",
+              data: JSON.stringify({
+                id: id,
+              }),
+              async: false,
+              success: function (data) {
+                console.log(data);
+                if (data.code == 200) {
+                  showAlert(data.data);
+
+                  searchPopupList(1);
+                } else {
+                  showAlert(response.message || "팝업 삭제에 실패했습니다.");
+                }
+              },
+              error: function (request, status, error) {
+                console.log(error);
+                alert(error);
+              },
+              complete: function () {},
+            });
+          },
+          () => {},
+          ""
+        );
+      }
+      function showImageModal(imageUrl, title) {
+        document.getElementById("modalImage").src = imageUrl;
+        document.getElementById("imageModalTitle").textContent = title;
+
+        const modal = new bootstrap.Modal(document.getElementById("imageModal"));
+        modal.show();
+      }
+
+      // 팝업 목록 테이블 렌더링
+      function renderPopupList(popupList) {
+        const tbody = document.getElementById("searchList");
+        tbody.innerHTML = "";
+
+        if (!popupList || popupList.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4">조회된 데이터가 없습니다.</td></tr>';
+          return;
+        }
+
+        popupList.forEach((popup, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td class="text-center">${popup.id}</td>
+            <td class="text-center">
+              <button class="action-btn btn-sm" onclick="popupUpdate('${popup.id}');">
+                    <i class="fas fa-edit me-1"></i>
+                    수정
+              </button>
+              <button class="action-btn btn-sm" onclick="popupDelete('${popup.id}');">
+                    <i class="fas fa-trash me-1"></i>
+                    삭제
+              </button>
+            </td>
+            <td class="text-center"><span class="badge ${getStatusBadgeClass(
+              popup.status
+            )}" style="padding: 6px 10px; font-size: 12px;">${getStatusDisplay(popup.status)}</span></td>
+            <td class="text-center">${popup.name || ""}</td>
+            <td class="text-center">
+                ${
+                  popup.linkUrl
+                    ? `<a href="${popup.linkUrl}" target="_blank" rel="noopener noreferrer">${popup.linkUrl}</a>`
+                    : ""
+                }
+            </td>
+            <td class="text-center">
+              ${
+                popup.imagePcUrl
+                  ? `<img src="${
+                      popup.imagePcUrl
+                    }" alt="팝업이미지" style="max-width: 50px; max-height: 30px; cursor: pointer;"
+                      onclick="showImageModal('${popup.imagePcUrl}', '${popup.name || "팝업 이미지"}')">`
+                  : ""
+              }
+            </td>
+            <td class="text-center">${formatDateRange(popup.startDate, popup.endDate)}</td>
+            <td class="text-center">${popup.userName || ""}</td>
+            <td class="text-center">${formatDateTime(popup.createDate)}</td>
+            <td class="text-center">
+              <div class="d-flex justify-content-center align-items-center gap-1">
+                <button class="btn btn-outline-secondary btn-xs"
+                        onclick="moveOrder('${popup.id}', 'up')"
+                        title="위로 이동"
+                        ${index === 0 ? "disabled" : ""}>
+                  <i class="fas fa-chevron-up"></i>
+                </button>
+                <button class="btn btn-outline-secondary btn-xs"
+                        onclick="moveOrder('${popup.id}', 'down')"
+                        title="아래로 이동"
+                        ${index === popupList.length - 1 ? "disabled" : ""}>
+                  <i class="fas fa-chevron-down"></i>
+                </button>
+              </div>
+            </td>
+          `;
+
+          tbody.appendChild(row);
+        });
+      }
+
+      // 순서 이동 함수 추가
+      function moveOrder(id, direction) {
+        console.log(`Moving popup ${id} ${direction}`);
+
+        // 서버에 순서 변경 요청
+        $.ajax({
+          url: "/svc/mainbanner/popupMoveOrder",
+          type: "POST",
+          contentType: "application/json",
+          data: JSON.stringify({
+            id: id,
+            direction: direction,
+          }),
+          success: function (response) {
+            if (response.code === 200) {
+              // 성공 시 목록 새로고침
+              const currentPage = getCurrentPage(); // 현재 페이지 정보 가져오기
+              searchPopupList(currentPage);
+
+              // 성공 메시지 표시 (선택사항)
+              // alert('순서가 변경되었습니다.');
+            } else {
+              alert("순서 변경에 실패했습니다.");
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error("순서 변경 오류:", error);
+            alert("순서 변경 중 오류가 발생했습니다.");
+          },
+        });
+      }
+      function getCurrentPage() {
+        const activePage = document.querySelector(".pagination .page-item.active .page-link");
+        return activePage ? parseInt(activePage.textContent) : 1;
+      }
+    </script>
+  </th:block>
+
+  <div class="main-content">
+    <div class="container-fluid">
+      <!-- 로케이션 & 제목 영역 추가 -->
+      <div class="page-header mb-4">
+        <div class="location mb-2">
+          <small class="text-secondary">
+            <i class="fas fa-home me-1"></i>
+            <a th:href="@{/}">홈</a> > <a th:href="@{/svc/mainbanner/dealList}">서비스관리</a> >
+            <a th:href="@{/svc/mainbanner/popupList}">레이어팝업</a>
+          </small>
+        </div>
+        <h2 class="page-title fs-4 mb-4">레이어팝업</h2>
+      </div>
+
+      <div class="search-section">
+        <!-- 등록일 -->
+        <div class="row align-items-center mb-2">
+          <div class="form-row full-width">
+            <div class="d-flex align-items-center gap-3">
+              <div class="form-label mb-0">등록일</div>
+              <div class="d-flex align-items-center gap-2">
+                <input type="date" class="form-control" style="width: 150px" id="searchStartDt" />
+                <span class="text-secondary">-</span>
+                <input type="date" class="form-control" style="width: 150px" id="searchEndDt" />
+              </div>
+              <div class="d-flex gap-2">
+                <button type="button" class="period-button" value="0">오늘</button>
+                <button type="button" class="period-button" value="7">1주일</button>
+                <button type="button" class="period-button" value="30">1개월</button>
+                <button type="button" class="period-button" value="90">3개월</button>
+                <button type="button" class="period-button" value="180">6개월</button>
+                <button type="button" class="period-button" value="365">1년</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 게시기간 -->
+        <div class="row align-items-center mb-2">
+          <div class="form-row full-width">
+            <div class="d-flex align-items-center gap-3">
+              <div class="form-label mb-0">게시기간</div>
+              <div class="d-flex align-items-center gap-2">
+                <input type="date" class="form-control" style="width: 150px" id="publishStartDt" />
+                <span class="text-secondary">-</span>
+                <input type="date" class="form-control" style="width: 150px" id="publishEndDt" />
+              </div>
+              <div class="d-flex gap-2">
+                <button type="button" class="period-button" data-group="publish" value="0">오늘</button>
+                <button type="button" class="period-button" data-group="publish" value="7">1주일</button>
+                <button type="button" class="period-button" data-group="publish" value="30">1개월</button>
+                <button type="button" class="period-button" data-group="publish" value="90">3개월</button>
+                <button type="button" class="period-button" data-group="publish" value="180">6개월</button>
+                <button type="button" class="period-button" data-group="publish" value="365">1년</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row align-items-center mb-3">
+          <div class="col-12">
+            <div class="d-flex align-items-center gap-3">
+              <div class="form-label mb-0">상태</div>
+              <div class="radio-group">
+                <div class="form-check form-check-inline">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="searchDisabledYn"
+                    id="searchDisabledYn01"
+                    value="all"
+                    checked
+                  />
+                  <label class="form-check-label" for="searchDisabledYn01">전체</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="searchDisabledYn"
+                    id="searchDisabledYn02"
+                    value="wait"
+                  />
+                  <label class="form-check-label" for="searchDisabledYn02">대기</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="searchDisabledYn"
+                    id="searchDisabledYn03"
+                    value="active"
+                  />
+                  <label class="form-check-label" for="searchDisabledYn03">노출</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="searchDisabledYn"
+                    id="searchDisabledYn04"
+                    value="close"
+                  />
+                  <label class="form-check-label" for="searchDisabledYn04">종료</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 검색어 -->
+        <div class="col-12 mb-2">
+          <div class="form-row full-width">
+            <div class="form-label mb-0">검색어</div>
+            <div class="position-relative col-9">
+              <i class="fas fa-search position-absolute" style="left: 16px; top: 15.5px; color: #94a3b8"></i>
+              <input type="text" class="form-control ps-5" placeholder="검색어를 입력하세요" id="keyword" />
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 text-end mt-2">
+            <button type="button" class="btn btn-light me-2 btn-sm" id="resetBtn">
+              <i class="fas fa-redo"></i>
+              초기화
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" id="searchBtn">
+              <i class="fas fa-search"></i>
+              검색
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="d-flex align-items-center gap-3">
+            <div class="stats-badge">
+              <i class="fas fa-calculator me-1"></i>
+              <span id="listCount">총 0건</span>
+            </div>
+            <select class="form-select" style="width: 100px" id="recordSize">
+              <option value="10">10개씩</option>
+              <option value="20">20개씩</option>
+              <option value="30">30개씩</option>
+              <option value="40">40개씩</option>
+              <option value="50">50개씩</option>
+            </select>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary btn-sm" onclick="popupInsert()">
+              <i class="fas fa-plus"></i>
+              등록
+            </button>
+          </div>
+        </div>
+
+        <table class="table custom-table">
+          <caption class="visually-hidden">
+            레이어팝업
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col" class="text-center" style="width: 40px">번호</th>
+              <th scope="col" class="text-center" style="width: 160px">편집</th>
+              <th scope="col" class="text-center" style="width: 40px">구분</th>
+              <th scope="col" class="text-center" style="width: 150px">항목명</th>
+              <th scope="col" class="text-center" style="width: 200px">URL</th>
+              <th scope="col" class="text-center" style="width: 60px">이미지</th>
+              <th scope="col" class="text-center" style="width: 120px">게시기간</th>
+              <th scope="col" class="text-center" style="width: 60px">등록자</th>
+              <th scope="col" class="text-center" style="width: 120px">등록일</th>
+              <th scope="col" class="text-center" style="width: 80px">순서</th>
+            </tr>
+          </thead>
+          <tbody id="searchList"></tbody>
+        </table>
+
+        <nav aria-label="페이지 네비게이션">
+          <ul class="pagination"></ul>
+        </nav>
+      </div>
+    </div>
+
+    <div class="modal fade" id="imageModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="imageModalTitle">이미지 보기</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-center p-4">
+            <img id="modalImage" src="" alt="" style="max-width: 100%; height: auto" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</html>

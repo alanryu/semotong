@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lagn="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	  
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>세모통 Admin </title>
+	
+	<link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/design.css}" />
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+	
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdbassit/coloris@latest/dist/coloris.min.css" />
+	<script src="https://cdn.jsdelivr.net/npm/@mdbassit/coloris@latest/dist/coloris.min.js"></script>
+	
+	
+	<script th:src="@{/js/libs/jquery.min.js}"></script>
+	<script th:src="@{/js/libs/librurys.min.js}"></script>
+	<script th:src="@{/js/libs/jquery.tmpl.min.js}"></script>
+	<script th:src="@{/js/libs/bootstrap.bundle.min.js}"></script>
+	
+	<script th:src="@{/js/ui/commonUtil.js}"></script>
+	<script th:src="@{/js/ui/script.js}"></script>
+
+	<script>
+		function logoutconfirm(){
+			showConfirm( '로그아웃 하시겠습니까?',
+                    () => { logout()},
+                    () => { },
+                    '로그아웃'
+             )
+
+		}
+		
+		function logout(){
+			window.location = "/logout";	
+		}
+		
+	</script>
+	<th:block layout:fragment="css"></th:block>
+	<!-- content script -->
+	<th:block layout:fragment="script"></th:block>
+</head>
+<body>
+	<th:block th:replace="~{common/fragment/leftmenu :: leftmenuFragment}"></th:block>
+	<th:block layout:fragment="Content"></th:block>
+	
+	<!-- 공통 알림 Modal -->
+	<div class="modal fade" id="commonAlertModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+		<div class="modal-dialog modal-dialog-centered modal-sm">
+			<div class="modal-content">
+				<div class="modal-header border-0 pb-0">
+				</div>
+				<div class="modal-body text-center pb-4" id="commonAlertMessage">
+					<!-- 메시지가 여기에 동적으로 들어갑니다 -->
+				</div>
+				<div class="modal-footer border-0 pt-0 justify-content-center">
+					<button type="button" class="btn btn-dark px-4 btn-sm" id="confirm" onclick="$('#commonAlertModal').modal('hide');">확인</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- Confirm Modal -->
+	<div class="modal fade" id="commonConfirmModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-sm">
+			<div class="modal-content">
+			<div class="modal-header border-0 pb-0">
+				<h5 class="modal-title fs-6 fw-bold">확인</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body text-center pb-4" id="commonConfirmMessage">
+				<!-- 메시지가 여기에 동적으로 들어갑니다 -->
+			</div>
+			<div class="modal-footer border-0 pt-0 justify-content-center">
+				<button type="button" class="btn btn-secondary px-4 btn-sm" id="confirmModalCancelBtn">취소</button>
+				<button type="button" class="btn btn-dark px-4 btn-sm" id="confirmModalConfirmBtn">확인</button>
+			</div>
+			</div>
+		</div>
+	</div>
+	
+</body>
+</html>

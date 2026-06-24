@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>인터넷 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<!-- 페이지 스크립트 영역 -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.0.0/swiper-bundle.min.css" />
+	<script src="https://cdn.jsdelivr.net/npm/swiper@7.0.0/swiper-bundle.min.js"></script>
+	<style>
+		@media (min-width: 320px) and (max-width: 431px) {
+			html {
+				font-size: calc(100vw / 360);
+			}
+		}
+		@media (min-width: 432px) {
+			html {
+				font-size: calc((432 / 360) * 1px);
+			}
+		}
+	</style>
+	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+			// 혜택 슬라이드
+			var benefitSwiper = new Swiper(".benefit-swiper .swiper", {
+				threshold: 3,
+				slidesPerView: 'auto',
+				spaceBetween: 30,
+				autoHeight: true,
+				// 8차 수정 : 추천딜 스와이프 버튼 옵션 추가
+				navigation: {
+					nextEl: ".benefit-swiper .benefit-button-next",
+					prevEl: ".benefit-swiper .benefit-button-prev",
+				}
+			})
+
+			// Bootstrap Popover Custom
+			const myPopover = new bootstrap.Popover(document.getElementById('SecretPopover'), {
+				customClass: 'ui-popover popover-style1 popover-auto type-secretBtn',
+				trigger: 'manual',  // 자동 트리거 제거
+				container: 'body',  // body에 위치
+				html: true
+			});
+			myPopover.show(); // 페이지 로드시 바로 표시
+		})
+
+		// 희망하는 상담시간 체크 설정
+		function setSelected(option, checkId) {
+			const siblings = Array.from(option.parentNode.children);
+			const checkbox = document.getElementById(checkId);
+
+			if (option.classList.contains('is-selected')) {
+				// 이미 선택된 항목이면 해제
+				siblings.forEach(sibling => sibling.classList.remove('is-selected'));
+			} else {
+				// 새 항목 선택
+				option.classList.add('is-selected');
+
+				// 다른 항목은 선택 해제
+				siblings.forEach(sibling => {
+				if (sibling !== option) {
+					sibling.classList.remove('is-selected');
+				}
+				});
+			}
+
+			// 현재 is-selected가 살아있는 항목이 있는지 검사
+			const anySelected = siblings.some(el => el.classList.contains('is-selected'));
+
+			// 체크박스 상태 반영
+			checkbox.checked = anySelected;
+		}
+	</script>
+</head>
+
+<body>
+	<!-- 레이아웃 유형구분
+		메인: main-wrapper,
+		서브: sub-wrapper,
+		기타: [기타]-wrapper
+	 -->
+	<div class="wrapper lending-wrapper">
+		<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-I02-01-page">
+				<!-- 랜딩비주얼 영역 -->
+				<section class="lending-main-sec mint">
+					<div class="sec-inner">
+						<div class="lending-logo">
+							<img src="../../assets/images/common/img-logo-header-bk.svg" alt="세모통" />
+						</div>
+						<div class="lending-visual">
+							<img src="../../assets/images/contents/img-benefit-01.jpg" alt="" />
+						</div>
+						<div class="lending-consult">
+							<div class="lending-desc">
+								<p>가입 의무 없이! <strong>상담만 받아도 OK!</strong></p>
+							</div>
+							<div class="lending-form">
+								<div class="ui-inp-group">
+									<div class="ui-inp">
+										<input type="text" name="" id="" value="" placeholder="이름을 입력해주세요." title="" class="inp" />
+									</div>
+									<div class="ui-inp">
+										<input type="tel" name="" id="" value="" placeholder="전화번호를 입력해주세요 (‘-’없이 숫자만 입력)" title="" class="inp" oninput="onlyNumber(this)" />
+									</div>
+								</div>
+
+								<div class="ui-chk-group">
+									<label class="ui-chk chk-style1">
+										<input type="checkbox" name="secretFormCheck" id="secretFormCheck1">
+										<span class="chk"><span>(필수) 개인정보 수집 이용 동의</span></span>
+									</label>
+									<label class="ui-chk chk-style1">
+										<input type="checkbox" name="secretFormCheck" id="secretFormCheck2">
+										<span class="chk"><span>(필수) 개인정보 제3자 제공 동의</span></span>
+									</label>
+									<label class="ui-chk chk-style1">
+										<input type="checkbox" name="secretFormCheck" id="secretFormCheck3">
+										<span class="chk"><span>희망하는 상담 시간이 있으신가요?</span></span>
+									</label>
+									<button type="button" data-bs-toggle="modal" data-bs-target="#selectModal" class="ui-btn open-modal">
+										<span class="blind">희망하는 상담 시간 선택</span>
+									</button>
+								</div>
+
+								<div class="ui-btn-group">
+									<button type="button" class="btn-action primary">
+										<span id="SecretPopover" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-auto-placement="false"
+										data-bs-content="상담 종료 후 스타벅스 커피를 드려요!">
+											시크릿지원금 확인하기&nbsp;<i class="ui-icn icn-16-more-wh" aria-hidden="true"></i>
+										</span>
+									</button>
+								</div>
+
+								<div class="secret-desc">
+									<p>※ 고객님의 개인정보는 관련 법령에 따라 철저히 관리되어 상담 외 목적으로 사용되지 않습니다.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- //랜딩비주얼 영역 -->
+
+				<!-- 혜택: 인터넷바꿈 -->
+				<section class="benefit-sec">
+					<div class="sec-inner">
+						<!-- benefit-card -->
+						<div class="benefit-card">
+							<div class="benefit-header">
+								<div class="benefit-title">
+									<p class="title-20">인터넷을 바꿨는데 <br>현금을 받는데요.</p>
+								</div>
+								<div class="benefit-img">
+									<img src="../../assets/images/contents/img-internet-01.png" alt="" />
+								</div>
+							</div>
+							<div class="benefit-body">
+								<div class="benefit-cont type-a">
+									<p class="tit">이런 경험이 한 번이라도 있다면!</p>
+									<ul class="bul-check">
+										<li>사이트마다 혜택이 다 달라요.</li>
+										<li>어떤 통신사가 좋은지 모르겠어요.</li>
+										<li>쓰고 있는 인터넷 약정이 언제 끝나는지 몰라요.</li>
+									</ul>
+									<div class="msg-box">
+										<p class="msg-para">
+											<span class="msg-inline">세모통이 비교하고,</span>
+											<span class="msg-inline">혜택까지 설계해 드릴게요.</span>
+											<strong class="msg-block">고객님은 선택만 하세요.</strong>
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- //benefit-card -->
+					</div>
+				</section>
+				<!-- //혜택: 인터넷바꿈 -->
+
+				<!-- 혜택: 결합 -->
+				<section class="benefit-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">결합 시 <em>최대 125만원</em> 혜택에 <br>OTT 및 무료 콘텐츠까지!</h2>
+						</div>
+						<div class="sec-body">
+							<!-- 혜택1 -->
+							<div class="benefit-group">
+								<h2 class="sec-stit">
+									<span class="label">혜택 1</span>
+									<span class="stit">인터넷 가입하면</span>
+								</h2>
+								<ul class="benefit-card-list">
+									<li class="benefit-card-item">
+										<div class="benefit-card primary">
+											<div class="benefit-header">
+												<div class="benefit-title">
+													<p class="stit-bk">가입 축하금</p>
+													<p class="title-16">최대 <em>48만원</em> <br><em>현금 당일</em> 지급</p>
+												</div>
+												<div class="benefit-img">
+													<img src="../../assets/images/contents/img-internet-02.png" alt="" />
+												</div>
+											</div>
+											<div class="benefit-body line-t0 pad-t0">
+												<div class="benefit-cont type-b">
+													<div class="msg-box">
+														<p class="msg-para">
+															세모통 최저가 보상 적용!
+														</p>
+														<p class="msg-info">
+															현금 혜택 더 많이 주는 경우 차액 200%보상
+														</p>
+													</div>
+												</div>
+											</div>
+										</div>
+									</li>
+									<li class="benefit-card-item">
+										<div class="benefit-card">
+											<div class="benefit-header">
+												<div class="benefit-title">
+													<p class="stit-gr">인터넷 요금 할인</p>
+													<p class="title-16">인터넷 요금 <br><em>최대 396,000원</em> 할인</p>
+												</div>
+												<div class="benefit-img">
+													<img src="../../assets/images/contents/img-internet-03.png" alt="" />
+												</div>
+											</div>
+											<div class="benefit-body">
+												<p class="desc">※ KT 모바일 결합 시, 매월 최대 1.1만원 36개월 할인</p>
+											</div>
+										</div>
+									</li>
+								</ul>
+							</div>
+							<!-- //혜택1 -->
+
+							<!-- 혜택2 -->
+							<div class="benefit-group">
+								<div class="benefit-swiper">
+									<div class="swiper">
+										<div class="swiper-wrapper">
+											<!-- 혜택2: KT -->
+											<div class="swiper-slide">
+												<h2 class="sec-stit">
+													<span class="label">혜택 2</span>
+													<span class="stit">세모통 KT 유심 요금제 결합하면</span>
+												</h2>
+												<ul class="benefit-card-list">
+													<li class="benefit-card-item">
+														<div class="benefit-card only-semotong">
+															<div class="benefit-badge">
+																<img src="../../assets/images/common/badge-card-semotong.svg" alt="">
+															</div>
+															<div class="benefit-header">
+																<div class="benefit-title">
+																	<p class="stit-gr">현금처럼 바로 쓰는 혜택</p>
+																	<p class="title-16">Npay 포인트+상품권 <br>최대 <em>39만원</em></p>
+																</div>
+																<div class="benefit-img">
+																	<img src="../../assets/images/contents/img-internet-04.png" alt="" />
+																</div>
+															</div>
+															<div class="benefit-body">
+																<p class="desc">※ 가입 축하금 31만원, 중고폰 보상 5만원 , 스타벅스 3만원권</p>
+															</div>
+														</div>
+													</li>
+													<li class="benefit-card-item">
+														<div class="benefit-card">
+															<div class="benefit-header">
+																<div class="benefit-title">
+																	<p class="stit-gr">OTT 및 콘텐츠 혜택</p>
+																	<p class="title-16">인기 <em>OTT 2종 및</em> <br><em>콘텐츠 1종 2년 무료</em></p>
+																</div>
+																<div class="benefit-img">
+																	<img src="../../assets/images/contents/img-internet-05.png" alt="" />
+																</div>
+															</div>
+															<div class="benefit-body">
+																<p class="desc">※ OTT 2종 및 콘텐츠 1종 무료, 24개월 간 제공</p>
+															</div>
+														</div>
+													</li>
+													<li class="benefit-card-item">
+														<div class="benefit-card">
+															<div class="benefit-header">
+																<div class="benefit-title">
+																	<p class="stit-gr">무료 구독 혜택</p>
+																	<p class="title-16">밀리의 서재 <br><em>매월 구독권</em> 제공</p>
+																</div>
+																<div class="benefit-img">
+																	<img src="../../assets/images/contents/img-internet-06.png" alt="" />
+																</div>
+															</div>
+															<div class="benefit-body">
+																<p class="desc">※ KT 요고 69 요금제 이용 시, 12개월 간 증정</p>
+															</div>
+														</div>
+													</li>
+												</ul>
+											</div>
+											<!-- //혜택2: KT -->
+											<!-- 혜택2: U+ -->
+											<div class="swiper-slide">
+												<h2 class="sec-stit">
+													<span class="label">혜택 2</span>
+													<span class="stit">세모통 U+ 유심 요금제 결합하면</span>
+												</h2>
+												<ul class="benefit-card-list">
+													<li class="benefit-card-item">
+														<div class="benefit-card only-semotong">
+															<div class="benefit-badge">
+																<img src="../../assets/images/common/badge-card-semotong.svg" alt="">
+															</div>
+															<div class="benefit-header">
+																<div class="benefit-title">
+																	<p class="stit-gr">현금처럼 바로 쓰는 혜택</p>
+																	<p class="title-16">Npay 포인트 <br>최대 <em>24만원</em></p>
+																</div>
+																<div class="benefit-img">
+																	<img src="../../assets/images/contents/img-internet-12.png" alt="" />
+																</div>
+															</div>
+															<div class="benefit-body">
+																<p class="desc">※ 너겟 요금제 가입 시</p>
+															</div>
+														</div>
+													</li>
+													<li class="benefit-card-item">
+														<div class="benefit-card">
+															<div class="benefit-header">
+																<div class="benefit-title">
+																	<p class="stit-gr">OTT 및 콘텐츠 혜택</p>
+																	<p class="title-16">인기 <em>OTT 2종 및</em> <br><em>VIP 콕 멤버십 혜택</em></p>
+																</div>
+																<div class="benefit-img">
+																	<img src="../../assets/images/contents/img-internet-13.png" alt="" />
+																</div>
+															</div>
+															<div class="benefit-body">
+																<p class="desc">※ 티빙 베이직, 디즈니 스탠다드 구독권 기본 제공</p>
+															</div>
+														</div>
+													</li>
+													<li class="benefit-card-item">
+														<div class="benefit-card">
+															<div class="benefit-header">
+																<div class="benefit-title">
+																	<p class="stit-gr">안심 보안</p>
+																	<p class="title-16">피싱/해킹 보험<br><em>24개월 무료</em> 제공</p>
+																</div>
+																<div class="benefit-img">
+																	<img src="../../assets/images/contents/img-internet-14.png" alt="" />
+																</div>
+															</div>
+														</div>
+													</li>
+												</ul>
+											</div>
+											<!-- //혜택2: U+ -->
+											<!-- 혜택2: SKT -->
+											<div class="swiper-slide">
+												<h2 class="sec-stit">
+													<span class="label">혜택 2</span>
+													<span class="stit">세모통 SKT 유심 요금제 결합하면</span>
+												</h2>
+												<ul class="benefit-card-list">
+													<li class="benefit-card-item">
+														<div class="benefit-card only-semotong">
+															<div class="benefit-badge">
+																<img src="../../assets/images/common/badge-card-semotong.svg" alt="">
+															</div>
+															<div class="benefit-header">
+																<div class="benefit-title">
+																	<p class="stit-gr">Npay로 즉시 전환 가능</p>
+																	<p class="title-16">S캐쉬 포인트 <br><em>20만원</em></p>
+																</div>
+																<div class="benefit-img">
+																	<img src="../../assets/images/contents/img-internet-15.png" alt="" />
+																</div>
+															</div>
+															<div class="benefit-body">
+																<p class="desc">※ 가입 축하금 31만원, 중고폰 보상 5만원 , 스타벅스 3만원권</p>
+															</div>
+														</div>
+													</li>
+												</ul>
+											</div>
+											<!-- //혜택2: SKT -->
+										</div>
+									</div>
+									<!-- 8차 수정 : 추천딜 스와이프 버튼 추가 -->
+									<button type="button" class="ui-btn benefit-button-prev">
+										<i class="ui-icn icn-28-arw" aria-label="Prev"></i>
+									</button>
+									<button type="button" class="ui-btn benefit-button-next">
+										<i class="ui-icn icn-28-arw" aria-label="Next"></i>
+									</button>
+								</div>
+
+								<div class="benefit-more">
+									<button type="button" class="ui-btn btn-sub xl" data-bs-toggle="modal" data-bs-target="#consultModal">
+										<span>최대 혜택 받는 법 바로 확인하기</span>
+										<i class="ui-icn icn-16-more-pr" aria-label="true"></i>
+									</button>
+								</div>
+							</div>
+							<!-- //혜택2 -->
+						</div>
+					</div>
+				</section>
+				<!-- //혜택: 결합 -->
+
+				<!-- 혜택: 세모통가입이유 -->
+				<section class="benefit-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">세모통에서 믿고 <br>가입할 수 있는 이유</h2>
+						</div>
+						<div class="sec-body">
+							<ul class="benefit-card-list">
+								<li class="benefit-card-item">
+									<div class="benefit-card">
+										<div class="benefit-header">
+											<div class="benefit-title">
+												<p class="stit-gr">01. 최저가 보상제</p>
+												<p class="title-16">동일 조건 차액 발생시, <br><em>200%</em>를 보상해드려요.</p>
+											</div>
+											<div class="benefit-img">
+												<img src="../../assets/images/contents/img-internet-07.png" alt="" />
+											</div>
+										</div>
+										<div class="benefit-body">
+											<p class="desc">※ 동일 조건, 동일 상품 대비</p>
+										</div>
+									</div>
+								</li>
+								<li class="benefit-card-item">
+									<div class="benefit-card">
+										<div class="benefit-header">
+											<div class="benefit-title">
+												<p class="stit-gr">02. 100% 당일 지급</p>
+												<p class="title-16">인터넷 설치 당일 <br>현금으로 빠르게 드려요.</p>
+											</div>
+											<div class="benefit-img">
+												<img src="../../assets/images/contents/img-internet-08.png" alt="" />
+											</div>
+										</div>
+										<div class="benefit-body">
+											<p class="desc">※ 오후 3시 전 설치 건에 한함</p>
+										</div>
+									</div>
+								</li>
+								<li class="benefit-card-item">
+									<div class="benefit-card">
+										<div class="benefit-header">
+											<div class="benefit-title">
+												<p class="stit-gr">03. 추가 S캐쉬 제공</p>
+												<p class="title-16">후기 작성만 해도 <br><em>2만 S캐쉬</em>를 더!</p>
+											</div>
+											<div class="benefit-img">
+												<img src="../../assets/images/contents/img-internet-09.png" alt="" />
+											</div>
+										</div>
+									</div>
+								</li>
+								<li class="benefit-card-item">
+									<div class="benefit-card">
+										<div class="benefit-header">
+											<div class="benefit-title">
+												<p class="stit-gr">04. 원스톱 해지 서비스</p>
+												<p class="title-16">직접 전화하지 마세요! <br>기존 인터넷 해지는 <br>대신 처리해드릴게요.</p>
+											</div>
+											<div class="benefit-img">
+												<img src="../../assets/images/contents/img-internet-10.png" alt="" />
+											</div>
+										</div>
+									</div>
+								</li>
+								<li class="benefit-card-item">
+									<div class="benefit-card">
+										<div class="benefit-header">
+											<div class="benefit-title">
+												<p class="stit-gr">05. 전문 고객센터</p>
+												<p class="title-16">고객님에게 딱 맞는 <br>상품과 혜택을 찾아드려요.</p>
+											</div>
+											<div class="benefit-img">
+												<img src="../../assets/images/contents/img-internet-11.png" alt="" />
+											</div>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<div class="benefit-more">
+								<button type="button" class="ui-btn btn-sub xl" data-bs-toggle="modal" data-bs-target="#consultModal01">
+									<span>나의 최적 상품 확인하기</span>
+									<i class="ui-icn icn-16-more-pr" aria-label="true"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- //혜택: 세모통가입이유 -->
+
+				<!-- 가입절차 섹션 -->
+				<section class="join-steps-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">복잡한 서류 필요없이 <br>가입을 도와드려요.</h2>
+						</div>
+						<div class="sec-body">
+							<ol class="join-steps">
+								<li>
+									<em class="num">1</em>
+									<dl class="con">
+										<dt>상담 안내</dt>
+										<dd>업셀링 없이 최적요금제 추천</dd>
+									</dl>
+								</li>
+								<li>
+									<em class="num">2</em>
+									<dl class="con">
+										<dt>설치 완료</dt>
+										<dd>원하는 날짜에 설치해드릴게요</dd>
+									</dl>
+								</li>
+								<li>
+									<em class="num">3</em>
+									<dl class="con">
+										<dt>혜택 지급</dt>
+										<dd>설치 당일 현금 지급</dd>
+									</dl>
+								</li>
+							</ol>
+						</div>
+					</div>
+				</section>
+				<!-- // 가입절차 섹션 -->
+
+				<!-- 자주묻는 질문 섹션 -->
+				<section class="faq-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">자주 물어보는 질문들, <br>여기서 해결하세요.</h2>
+						</div>
+						<div class="sec-body">
+							<!-- 자주묻는 질문 아코디언 -->
+							<div class="faq-accordion" id="faqAccordion">
+								<div class="acco-item">
+									<h3 class="acco-header">
+										<button class="acco-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqAccordion1"
+											aria-expanded="true" aria-controls="faqAccordion1">
+											<strong class="part">가입문의</strong>
+											<span>통신사 직접 가입과 세모통 가입의 차이는 무엇인가요?</span>
+											<i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+										</button>
+									</h3>
+									<div id="faqAccordion1" class="acco-collapse collapse show" data-bs-parent="#faqAccordion">
+										<div class="acco-body">
+											<div class="acco-answer">
+												<p>세모통에서 가입하면 여러 통신사 상품을 함께 비교할 수 있어 회원님에게 가장 최적화된 상품을 제안해드릴 수 있어요. 가장 최신 정책을 숙지하고 법정 최대 지원금과 세모통만의 추가 지원금을 제공해드리니 통신사를 통한 가입보다는 세모통의 전문 상담사를 통한 가입이 더 많은 혜택을 받을 수 있어요.</p>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="acco-item">
+									<h3 class="acco-header">
+										<button class="acco-button collapsed" type="button" data-bs-toggle="collapse"
+											data-bs-target="#faqAccordion2" aria-expanded="false" aria-controls="faqAccordion2">
+											<strong class="part">가입문의</strong>
+											<span>인터넷만 가입할 수 있나요?</span>
+											<!-- <span><em>Q.</em>기존 통신사를 해지하고 알뜰폰 가입해야 하나요?</span> -->
+											<i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+										</button>
+									</h3>
+									<div id="faqAccordion2" class="acco-collapse collapse" data-bs-parent="#faqAccordion">
+										<div class="acco-body">
+											<div class="acco-answer">
+												<p>네, 인터넷 상품만 필요하실 경우, 인터넷 단독 상품으로 가입이 가능하십니다. 휴대폰 또는 TV와 결합시 더 많은 혜택이 있으니 고객님의 상황에 맞는 요금제가 궁금하시다면 부담없이 상담 받아보세요.</p>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="acco-item">
+									<h3 class="acco-header">
+										<button class="acco-button collapsed" type="button" data-bs-toggle="collapse"
+											data-bs-target="#faqAccordion3" aria-expanded="false" aria-controls="faqAccordion3">
+											<strong class="part">상품문의</strong>
+											<span>인터넷 품질은 믿을 수 있나요?</span>
+											<!-- <span><em>Q.</em>기존 통신사를 해지하고 알뜰폰 가입해야 하나요?</span> -->
+											<i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+										</button>
+									</h3>
+									<div id="faqAccordion3" class="acco-collapse collapse" data-bs-parent="#faqAccordion">
+										<div class="acco-body">
+											<div class="acco-answer">
+												<p>SKT, KT, U+의 망과 100% 동일합니다. 인터넷은 요금제나 각 지역 또는 건물 상황에 따라 속도 차이가 발생할 수 있지만 통신사의 인터넷망을 동일하게 사용하고 있어 동일한 품질로 이용하실 수 있어요.</p>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="acco-item">
+									<h3 class="acco-header">
+										<button class="acco-button collapsed" type="button" data-bs-toggle="collapse"
+											data-bs-target="#faqAccordion4" aria-expanded="false" aria-controls="faqAccordion4">
+											<strong class="part">개통문의</strong>
+											<span>개통까지는 얼마나 걸리나요?</span>
+											<!-- <span><em>Q.</em>기존 통신사를 해지하고 알뜰폰 가입해야 하나요?</span> -->
+											<i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+										</button>
+									</h3>
+									<div id="faqAccordion4" class="acco-collapse collapse" data-bs-parent="#faqAccordion">
+										<div class="acco-body">
+											<div class="acco-answer">
+												<p>희망하시는 날짜에 최대한 설치되도록 스케쥴을 맞춰드립니다.</p>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="acco-item">
+									<h3 class="acco-header">
+										<button class="acco-button collapsed" type="button" data-bs-toggle="collapse"
+											data-bs-target="#faqAccordion5" aria-expanded="false" aria-controls="faqAccordion5">
+											<strong class="part">가입문의</strong>
+											<span>현재 사용 중인 요금제의 위약금은 어떻게 알 수 있나요?</span>
+											<!-- <span><em>Q.</em>기존 통신사를 해지하고 알뜰폰 가입해야 하나요?</span> -->
+											<i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+										</button>
+									</h3>
+									<div id="faqAccordion5" class="acco-collapse collapse" data-bs-parent="#faqAccordion">
+										<div class="acco-body">
+											<div class="acco-answer">
+												<p>위약금은 사용 중인 통신사 홈페이지를 통해 확인할 수 있습니다. 인터넷 가입 후, 이전 통신사의 해지가 필요할 경우 세모통이 대신 해드려요.</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- // 자주묻는 질문 아코디언 -->
+						</div>
+					</div>
+				</section>
+				<!-- // 자주묻는 질문 섹션 -->
+
+				<!-- 컨설트 섹션 -->
+				<section class="consult-btm-sec">
+					<div class="sec-inner">
+						<div class="consult-action">
+							<div class="title">
+								<p>조건 비교가<br> 어렵다면?</p>
+							</div>
+							<button type="button" class="ui-btn btn-action primary" data-bs-toggle="modal" data-bs-target="#consultModal03">
+								<span>전문가에게 <br>요금 설계 받기</span>
+								<i class="ui-icn icn-20-link-wh" aria-hidden="true"></i>
+							</button>
+						</div>
+					</div>
+				</section>
+				<!-- //컨설트 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+	</div>
+
+	<!-- 희망하는 상담시간 선택모달 -->
+	<div class="modal modal-select fade" id="selectModal" tabindex="-1" role="dialog" aria-labelledby="selectModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="selectModalLabel">언제 연락드릴까요?</h3>
+					<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 콤보박스 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<!-- modal-select 공통 -->
+							<ul class="select-listbox" role="listbox">
+								<!-- setSelectValued 는 퍼블 확인용입니다. -->
+								<!-- 이미 선택목록이 있는 경우 class="is-selected" 추가 -->
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelected(this, 'secretFormCheck3')">언제든 가능해요.</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelected(this, 'secretFormCheck3')">오전에 전화주세요. (9~12시)</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelected(this, 'secretFormCheck3')">오후에 전화주세요. (14~18시)</li>
+							</ul>
+						</div>
+					</section>
+					<!-- // 콤보박스 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- //희망하는 상담시간 선택모달 -->
+
+	<!-- 최대 혜택 받는 범 확인하기 modal basic -->
+	<div class="modal modal-basic fade" id="consultModal" tabindex="-1" role="dialog" aria-labelledby="consultModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-I01-01-P01-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="consultModalLabel">얼마나 받을 수 있는지 궁금하신가요?</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 상담신청 섹션 -->
+					<section class="consult-frm-sec">
+						<div class="sec-inner">
+							<div class="consult-msg">
+								<i class="ui-icn icn-14-noti-gr" aria-hidden="true"></i>
+								<p>혜택을 최대로 받을 수 있도록 <br>전문 상담원이 도와드릴게요.</p>
+							</div>
+
+							<!-- 등록폼 -->
+							<div class="consult-frm">
+								<!-- 이름 입력 -->
+								<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label class="tit" for="frmName">이름</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="text" name="" id="frmName" value="" placeholder="이름을 입력해 주세요." title="" class="inp" />
+										</div>
+									</div>
+								</div>
+								<!-- // 이름 입력 -->
+
+								<!-- 전화번호 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmTitle" class="tit">전화번호</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="tel" name="" id="frmTitle" value="" placeholder="전화번호를 입력해 주세요." title="" class="inp" oninput="setRegularNumber(this)"/>
+										</div>
+									</div>
+								</div>
+								<!-- // 전화번호 입력 -->
+							</div>
+							<!-- // 등록폼 -->
+
+							<div class="consult-links">
+								<button type="button" class="ui-btn btn-texted"><span>개인정보 수집 이용</span></button>
+								<button type="button" class="ui-btn btn-texted"><span>개인정보 제3자 제공</span></button>
+							</div>
+						</div>
+					</section>
+					<!-- // 상담신청 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary">
+						<span>상담 신청하기</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 최대 혜택 받는 범 확인하기 modal basic -->
+
+	<!-- 나의 최적 상품 확인하기 modal basic -->
+	<div class="modal modal-basic fade" id="consultModal01" tabindex="-1" role="dialog" aria-labelledby="consultModal01Label" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-I01-01-P01-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="consultModal01Label">개인 맞춤 인터넷 상품을 알려드릴게요.</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 상담신청 섹션 -->
+					<section class="consult-frm-sec">
+						<div class="sec-inner">
+							<div class="consult-msg">
+								<i class="ui-icn icn-14-noti-gr" aria-hidden="true"></i>
+								<p>정확한 설명과 투명한 혜택 비교로 <br>쉽게 선택할 수 있도록 도와드릴게요.</p>
+							</div>
+
+							<!-- 등록폼 -->
+							<div class="consult-frm">
+								<!-- 이름 입력 -->
+								<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label class="tit" for="frmName">이름</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="text" name="" id="frmName" value="" placeholder="이름을 입력해 주세요." title="" class="inp" />
+										</div>
+									</div>
+								</div>
+								<!-- // 이름 입력 -->
+
+								<!-- 전화번호 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmTitle" class="tit">전화번호</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="tel" name="" id="frmTitle" value="" placeholder="전화번호를 입력해 주세요." title="" class="inp" oninput="setRegularNumber(this)"/>
+										</div>
+									</div>
+								</div>
+								<!-- // 전화번호 입력 -->
+							</div>
+							<!-- // 등록폼 -->
+
+							<div class="consult-links">
+								<button type="button" class="ui-btn btn-texted"><span>개인정보 수집 이용</span></button>
+								<button type="button" class="ui-btn btn-texted"><span>개인정보 제3자 제공</span></button>
+							</div>
+						</div>
+					</section>
+					<!-- // 상담신청 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary">
+						<span>상담 신청하기</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 나의 최적 상품 확인하기 modal basic -->
+
+	<!-- 전문가에게 요금 설계 받기 modal basic -->
+	<div class="modal modal-basic fade" id="consultModal03" tabindex="-1" role="dialog" aria-labelledby="consultModal03Label" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-I01-01-P01-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="consultModal03Label">인터넷 상품 비교 이제 어렵지 않아요.</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 상담신청 섹션 -->
+					<section class="consult-frm-sec">
+						<div class="sec-inner">
+							<div class="consult-msg">
+								<i class="ui-icn icn-14-noti-gr" aria-hidden="true"></i>
+								<p>쉽고 편리하게 <br>내게 가장 알맞은 인터넷 상품을 알려드려요.</p>
+							</div>
+
+							<!-- 등록폼 -->
+							<div class="consult-frm">
+								<!-- 이름 입력 -->
+								<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label class="tit" for="frmName">이름</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="text" name="" id="frmName" value="" placeholder="이름을 입력해 주세요." title="" class="inp" />
+										</div>
+									</div>
+								</div>
+								<!-- // 이름 입력 -->
+
+								<!-- 전화번호 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmTitle" class="tit">전화번호</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="tel" name="" id="frmTitle" value="" placeholder="전화번호를 입력해 주세요." title="" class="inp" oninput="setRegularNumber(this)"/>
+										</div>
+									</div>
+								</div>
+								<!-- // 전화번호 입력 -->
+							</div>
+							<!-- // 등록폼 -->
+
+							<div class="consult-links">
+								<button type="button" class="ui-btn btn-texted"><span>개인정보 수집 이용</span></button>
+								<button type="button" class="ui-btn btn-texted"><span>개인정보 제3자 제공</span></button>
+							</div>
+						</div>
+					</section>
+					<!-- // 상담신청 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary">
+						<span>상담 신청하기</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 전문가에게 요금 설계 받기 modal basic -->
+
+</body>
+
+</html>

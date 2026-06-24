@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='03',menuId ='02'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	
+	<script type="text/javascript">
+	
+	document.addEventListener('DOMContentLoaded', () => {
+			
+			var url = $(location).attr('href');
+			var searchParams = new URL(url).searchParams;
+			var type = searchParams.get('type');
+			var id = searchParams.get('id');
+			
+			var txt = '등록되었습니다.';
+			if ( type == 'create' ) {
+				showAlert(txt, goList);
+			}
+			
+			if ( type == 'update' ) {
+				txt = '수정되었습니다.';
+				showAlert(txt, goList);
+			}
+			
+			/* 수정시 아이디중복확인 버튼, 사업자선택 버튼 숨김처리 */
+			if ( id != null && id != '' ) {
+				$('#btn-select-company').hide();
+				$('#btn-id-dup').hide();
+			} 
+			
+			$("#spPasswdConfirm").hide();
+			
+			var recordId = "[[${record.id}]]";
+			if(recordId!=0) {
+				$("#userName").prop("disabled",true);
+				$("#adminId").prop("disabled",true);
+				$("#chkAdminInDup").val("Y");
+			}
+			
+			$("#adminId").keyup(function(event){ 
+				if (!(event.keyCode >=37 && event.keyCode<=40)) { 
+					var inputVal = $(this).val(); 
+					var check = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/; 
+					if(check.test(inputVal)){ 
+						$(this).val(""); 
+					} 
+				} 
+			});
+			
+			
+			document.querySelector('#companySelect').addEventListener('click', selectCompaney);
+		});
+
+		function checkAdminId() {
+			var adminId = $("#adminId").val();
+			if(adminId.length == 0) {
+				showAlert("아이디를 입력 하세요.");
+				return;
+			}
+			$("#chkAdminInDup").val("N");
+			
+			var params = {
+					searchAdminid : $("#adminId").val()
+			}
+			
+			$.ajax({
+				   url : '/mbm/companyuser/getUserById',
+				   type : 'POST',
+				   dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+				   success: function (data) {
+						console.log(data);
+						if(data.code ==200) {
+							console.log(data.data);
+							if(data.data ==null) {		
+								showAlert("아이디사용 가능합니다.");
+								$("#chkAdminInDup").val("Y");								
+							} else {
+								showAlert("아이디가 중복 됩니다.");
+							}
+						} else {
+							showAlert(data.message);
+						}
+				    },
+					error : function(request, status, error){
+						showAlert(error);
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+			});
+		}
+		
+		
+		
+		function updatePwd() {
+			if($("#password").val()=="") {
+				showAlert("비밀번호를 입력 해주세요.");
+				return;
+			}
+			
+			if($("#paswordConfirm").val() !=$("#password").val()) {
+				showAlert("비밀번호가 일치하지 않습니다.");
+				return;
+			}
+			
+			var validPass = validatePassword($("#password").val());
+			if(validPass !="sucess") {
+				showAlert(validPass);
+				return;
+			}
+			
+			showConfirm( "비밀번호를 수정하시겠습니까?",
+	                () => { updatePwdProc() },
+	                () => { },
+	                '비밀번호 수정'
+	         )
+		}
+		
+		
+		function updatePwdProc() {
+			
+			
+			var params = {
+					password : $("#password").val()
+					, id : $('#id').val()
+			}
+			
+			$.ajax({
+				   url : '/mbm/companyuser/updatePwd',
+				   type : 'POST',
+				   dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+				   success: function (data) {
+						console.log(data);
+						if(data.code ==200) {
+							showAlert("비밀번호가 수정되었습니다.");
+							$("#paswordConfirm").val(""); 
+							$("#password").val("");
+						} else {
+							showAlert(data.message);
+						}
+				    },
+					error : function(request, status, error){
+						showAlert(error);
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+			});
+		}
+		
+		
+		function goList(){
+			window.location.href="/mbm/companyuser/list";
+		}
+		
+		function saveData() {
+						
+			if($("#companyCode").val()=="") {
+				showAlert("사업자를 선택 하세요.");
+				return;
+			}
+			
+			
+			if($("#userName").val()=="") {
+				showAlert("이름을 입력 하세요.");
+				return;
+			}
+			
+			if($("#adminId").val()=="") {
+				showAlert("아이디를 확인하세요.");
+				return;
+			}
+			
+			
+			if($("#comGroup").val()=="") {
+				showAlert("소속을 확인하세요");
+				$("#comGroup").focus();
+				return;
+			}
+			
+			if($("#phoneNumber").val()=="") {
+				showAlert("전화번호를 확인하세요");
+				$("#phoneNumber").focus();
+				return;
+			}
+			
+			if($("#email").val()=="") {
+				showAlert("이메일을 확인하세요");
+				$("#email").focus();
+				return;
+			}
+			
+			
+			chkAdminInDup = $("#chkAdminInDup").val();
+			if(chkAdminInDup =="N") {
+				showAlert("아이디가 중복 체크를 해주세요.");
+				return;
+			}
+			
+
+			if($("#password").val()!="") {
+				if($("#paswordConfirm").val() !=$("#password").val()) {
+					showAlert("비밀번호가 일치하지 않습니다.");
+					return;
+				}
+				
+				var validPass = validatePassword($("#password").val());
+				if(validPass !="sucess") {
+					showAlert(validPass);
+					return;
+				}
+				
+			} else {
+				showAlert("비밀번호를 입력해주세요.");
+				return;
+			}
+			
+			/* 최소 하나의 권한 선택 */
+			var chkFlag = false;
+			$('input[type=checkbox]').each(function(){
+				if ( $(this).is(':checked') ) {
+					chkFlag = true;
+				}
+			});
+			
+			if ( !chkFlag ) {
+				showAlert("메뉴권한을 선택해주세요.");
+				return;
+			}
+			
+			var url = $(location).attr('href');
+			var searchParams = new URL(url).searchParams;
+			var id = searchParams.get('id');
+			
+			var txt = '등록하시겠습니까?';
+			if ( id != null && id != '' ) {
+				txt = '수정하시겠습니까?';
+			}
+			
+			showConfirm( txt,
+	                () => { 
+
+	        			$("#userName").prop("disabled",false);
+	        			$("#adminId").prop("disabled",false);
+	                	$("#submitForm").submit() 
+	                },
+	                () => { },
+	                '계정등록'
+	         )
+		}
+		
+		function selectCompaney() {
+			/* var modal = new bootstrap.Modal(document.getElementById('businessSelectModal'));
+			modal.dispose();  // 모달 강제로 닫기 */
+			selectCompany = $("#selectCompany").val();
+			if(selectCompany =="") {
+				alert("사업자를 선택하세요");
+			} else {
+				
+				$("#companyCode").val(selectCompany);
+				$("#dvCompanyNm").text($("#selectCompany option:selected").attr("data-cname"));
+				$("#dvBusinessNm").text($("#selectCompany option:selected").attr("data-companyNm"));
+				$("#dvBusinessCode").text($("#selectCompany option:selected").attr("data-companyCode"));
+				$("#dvCompanyMno").text($("#selectCompany option:selected").attr("data-companyMno"));
+				$('.btn-close').trigger('click');
+			}
+		}
+		
+		function chkPassConfirm() {
+			var password = $("#password").val();
+			var paswordConfirm = $("#paswordConfirm").val();
+			if(paswordConfirm == password) {
+				 $("#spPasswdConfirm").hide();
+			} else {
+				$("#spPasswdConfirm").show();
+			}
+		}
+		
+		
+		function selAuth(id) {
+			if(id=="ALL") {
+				$("#allAuthYn").prop("checked", true);
+				$("#prodMngYn").prop("checked", false);
+				$("#reqMngYn").prop("checked", false);
+				$("#settleMngYn").prop("checked", false);
+			} else {
+				$("#allAuthYn").prop("checked", false);
+			}
+		}
+		
+	</script>
+</th:block>
+
+<div class="main-content">
+         <div class="container-fluid">
+
+         	 <div class="page-header  d-flex justify-content-between align-items-start">
+                  <div>
+                      <div class="location mb-2">
+                          <small class="text-secondary">
+                              <a href="/mbm/companyuser/list">홈</a> > <a href="/mbm/companyuser/list">입점사관리</a> > <a href="/mbm/companyuser/list">입점사관리</a>
+                          </small>
+                      </div>
+                      <h2 class="page-title fs-4 mb-4" th:text="${record == null or record.id == 0} ? '입점사 등록' : '입점사 수정'"></h2>
+                  </div>
+                  <button type="button" class="btn btn-dark btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#businessSelectModal" id="btn-select-company">
+                      <i class="fas fa-user-plus me-1"></i>
+                      사업자 선택
+                  </button>
+              </div>
+             
+             <!-- 등록 폼 섹션 -->
+             <form method="POST" id="submitForm" th:object="${record}" th:action="${record.id == null or record.id == 0} ? '/mbm/companyuser/create' : '/mbm/companyuser/update'">
+             	 <input type="hidden" th:field="*{id}"/>
+             	 <input type="hidden" id="chkAdminInDup" value="N"/>
+             	 <input type="hidden" name="authType"  value="HOST">
+             	 <input type="hidden" th:field="*{companyCode}"/>
+	             <div class="search-section detail">
+	             
+	                 <!--  사업자명 -->
+	                 <div class="form-row full-width">
+	                     <div class="form-label">
+	                         사업자명
+	                     </div>
+	                     <div class="form-control-wrap" th:text="${record.companyNm}" id="dvCompanyNm"></div>
+	                 </div> 
+	                  <!--   회사 -->
+	                 <div class="form-row full-width">
+	                     <div class="form-label">
+	                         회사
+	                     </div>
+	                     <div class="form-control-wrap" th:text="${record.businessNm}" id="dvBusinessNm"></div>
+	                 </div> 
+	                  <!--   사업자코드 -->
+	                 <div class="form-row full-width">
+	                     <div class="form-label">
+	                         사업자등록번호
+	                     </div>
+	                     <div class="form-control-wrap" th:text="${record.businessCode}" id="dvBusinessCode"> </div>
+	                 </div> 
+	                 <!--   통신사구분 -->
+	                 <div class="form-row full-width">
+	                     <div class="form-label">
+	                         통신사구분
+	                     </div>
+	                     <div class="form-control-wrap" th:text="${record.companyMno}" id="dvCompanyMno"> </div>
+	                 </div> 
+	                 
+	                 <!-- 이름 -->
+	                 <div class="form-row full-width">
+	                     <div class="form-label">
+	                         이름<span class="required">*</span>
+	                     </div>
+	                     <div class="form-control-wrap">
+	                         <input type="text" class="form-control" placeholder="관리자 이름을 입력해주세요" th:field="*{userName}" maxlength="10"/>
+	                         <th:block th:if="${#fields.hasErrors('userName')}" class="error"><span th:errors="*{userName}" class="required">Field error</span></th:block>
+	                     </div>
+	                 </div>
+	
+	                 <!-- 아이디 -->
+	                 <div class="form-row full-width">
+	                     <div class="form-label">
+	                         아이디<span class="required">*</span>
+	                     </div>
+	                     <div style="display: flex; gap: 5px;">
+	                         <input type="text"  class="form-control" placeholder="관리자 id를 입력해주세요" th:field="*{adminId}" maxlength="20">
+	                         <button  type="button" class="btn btn-primary btn-sm" id="btn-id-dup" onclick="checkAdminId();"><span>아이디 중복확인</span></button>
+	                         <th:block th:if="${#fields.hasErrors('adminId')}" class="error"><span th:errors="*{adminId}" class="required">Field error</span></th:block>
+	                     </div>
+	                 </div>
+	
+	                 <!-- 비밀번호 -->
+	                 <div class="form-row full-width">
+	                     <div class="form-label">
+	                         비밀번호<span class="required">*</span>
+	                     </div>
+	                     <div class="form-control-wrap">
+	                         <input type="text"  class="form-control" placeholder="비밀번호를 등록해주세요(영문/숫자/특수문자 포함 20자까지 입력 가능)" id="password" name="password" maxlength="20">
+	                         <th:block th:if="${#fields.hasErrors('password')}" class="error"><span th:errors="*{password}" class="required">Field error</span></th:block>
+	                     </div>
+	                 </div>
+	                 
+	                 <div class="form-row full-width">
+	                     <div class="form-label">
+	                         비밀번호 확인<span class="required">*</span>
+	                     </div>
+	                     <div style="display: flex; gap: 5px;">
+	                         <input type="text"  class="form-control" placeholder="비밀번호를 확인해주세요" id="paswordConfirm" oninput="chkPassConfirm()" maxlength="20"/>
+	                         <button  type="button" class="btn btn-primary btn-sm" onclick="updatePwd();" th:unless="${record.id == null or record.id == 0}"><span>비밀번호 수정</span></button>
+	                     </div>
+	                     <br><span id="spPasswdConfirm" class="required"> * 비밀번호가 일치하지 않습니다.</span>
+	                 </div>
+	                 
+	                      
+	                 
+	                 <!-- 소속 -->
+	                 <div class="form-row full-width">
+	                     <div class="form-label">
+	                         소속<span class="required">*</span>
+	                     </div>
+	                     <div class="form-control-wrap">
+	                         <input type="text"  class="form-control" placeholder="소슥을 입력해주세요(영문/숫자/특수문자 포함 100자까지 입력 가능)" th:field="*{comGroup}" maxlength="20">
+	                         <th:block th:if="${#fields.hasErrors('comGroup')}" class="error"><span th:errors="*{comGroup}" class="required">Field error</span></th:block>
+	                     </div>
+	                 </div>                 
+	                
+	                 <!-- 전화번호 -->
+	                 <div class="form-row full-width">
+	                     <div class="form-label">
+	                         전화번호
+	                     </div>
+	                     <div class="form-control-wrap">
+	                         <input type="text"  class="form-control phonnumClass" placeholder="전화번호를 입력해주세요(숫자/특수문자 포함 50자까지 입력 가능)" th:field="*{phoneNumber}"  maxlength="50">
+	                     </div>
+	                 </div> 
+	                 
+	                 <!-- 이메일 -->
+	                 <div class="form-row full-width">
+	                     <div class="form-label">
+	                         이메일<span class="required">*</span>
+	                     </div>
+	                     <div class="form-control-wrap">
+	                         <input type="text"  class="form-control" placeholder="이메일을 입력해주세요(영문/숫자/특수문자 포함 50자까지 입력 가능)" th:field="*{email}" maxlength="50">
+	                         <th:block th:if="${#fields.hasErrors('email')}" class="error"><span th:errors="*{email}" class="required">Field error</span></th:block>
+	                     </div>
+	                 </div>                 
+	
+	                 <!-- 메뉴권한 -->
+	                 <div class="form-row full-width">
+	                     <div class="form-label">
+	                         메뉴권한<span class="required">*</span>
+	                     </div>
+	                     <div class="form-control-wrap">
+	                         <div class="form-check-group">
+								<div class="form-check">
+	                                 <input class="form-check-input" type="checkbox" id="allAuthYn" name="allAuthYn" th:checked="${record.allAuthYn eq 'Y'}" value="Y" onclick="selAuth('ALL');">
+	                                 <label class="form-check-label" for="allAuthYn">전체</label>
+	                             </div>
+	                             <div class="form-check">
+	                                 <input class="form-check-input" type="checkbox" id="prodMngYn" name="prodMngYn" th:checked="${record.prodMngYn eq 'Y'}" value="Y" onclick="selAuth('1');">
+	                                 <label class="form-check-label" for="prodMngYn">상품 관리</label>
+	                             </div>
+	                             <div class="form-check">
+	                                 <input class="form-check-input" type="checkbox" id="reqMngYn" name="reqMngYn" th:checked="${record.reqMngYn eq 'Y'}" value="Y" onclick="selAuth('2');">
+	                                 <label class="form-check-label" for="reqMngYn">신청 관리</label>
+	                             </div>
+	                             <div class="form-check">
+	                                 <input class="form-check-input" type="checkbox" id="settleMngYn" name="settleMngYn" th:checked="${record.settleMngYn eq 'Y'}" value="Y" onclick="selAuth('3');">
+	                                 <label class="form-check-label" for="settleMngYn">실적 관리</label>
+	                             </div>
+	                         </div>
+	                     </div>
+	                 </div>
+	                 
+	                 <!--  회원구분	 -->
+	                 <div class="form-row full-width">
+	                     <div class="form-label">
+	                         회원구분
+	                     </div>
+	                     <div class="form-control-wrap">
+	                         <div class="form-check-group">
+	                             <div class="form-check">
+	                                 <input class="form-check-input" type="radio" id="disable01" name="disable"  th:checked="${record.disable eq 'Y' or  (record.id == 0 or  record.id == '')}" value="Y">
+	                                 <label class="form-check-label" for="disable01">활동</label>
+	                             </div>
+	                             <div class="form-check">
+	                                 <input class="form-check-input" type="radio" id="disable02" name="disable" th:checked="${record.disable eq 'N'}" value="N">
+	                                 <label class="form-check-label" for="disable02">정지</label>
+	                             </div>
+	                         </div>
+	                     </div>
+	                 </div>        
+	             </div>
+             </form>
+             <!-- 버튼 영역 -->
+             <div class="d-flex justify-content-center gap-2 mt-4">
+                 <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">닫기</button>
+                 <button type="button" class="btn btn-lg btn-dark px-4 btn-sm" onclick="saveData();">저장</button>
+             </div>
+             
+             
+                 <!-- Modal 팝업 -->
+                <div class="modal fade" id="businessSelectModal" tabindex="-1" aria-labelledby="businessSelectModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header border-0 pb-0 mb-4">
+                                <h5 class="modal-title fs-6 fw-bold" id="businessSelectModalLabel">사업자 불러오기</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body pt-2 pb-4">
+                                <div class="form-row-modal">
+                                    <div class="form-label-modal">사업자</div>
+                                    <div class="form-control-wrap-modal">
+                                        <select class="form-select" id="selectCompany">
+                                         	<option selected value="">사업자 선택</option>
+                                        	<th:block th:each="item,index : ${compnyList}">    
+                                            	<option th:value="${item.id}"  th:text="${item.name}" th:attr="data-cname=${item.name} , data-companyNm=${item.companyNm}, data-companyCode=${item.companyCode}, data-companyMno=${item.companyMno}">KG모바일</option>
+                                            </th:block>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0 pt-0">
+                                <button type="button" class="btn btn-secondary px-4 btn-sm" data-bs-dismiss="modal">취소</button>
+                                <button type="button" class="btn btn-dark px-4 btm-sm" id="companySelect">확인</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+         </div>
+         
+         
+         
+</div>

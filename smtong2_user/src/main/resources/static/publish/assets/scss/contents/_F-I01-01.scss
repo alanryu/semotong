@@ -1,0 +1,479 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 인터넷 홈
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 인터넷 페이지
+.F-I01-01-page {
+
+	// 페이지 여백
+	padding-top: 10rem;
+	--sec-outer-margin: 50rem;
+	@include bottom-spacer;
+
+	// s: 인터넷 소개 섹션
+	// .internet-intro-sec {
+	// 	.intro-box {
+	// 		display: flex;
+	// 		align-items: center;
+	// 		gap: 8rem;
+	// 		padding: 16rem;
+	// 		/* padding-left: 0; 2차 수정 : 캐릭터 이미지 교체 여백수정 */
+	// 		border-radius: 10rem;
+	// 		background-color: #F4F5F8;
+	// 		.intro-img {
+	// 			flex: none;
+	// 			width: 80rem;
+	// 			height: 80rem;
+	// 			img {
+	// 				width: 100%;
+	// 				height: 100%;
+	// 			}
+	// 		}
+	// 		.intro-con {
+	// 			flex:1 1 auto;
+	// 			.tit {
+	// 				font-weight: 700;
+	// 				font-size: 14rem;
+	// 				line-height: 20rem;
+	// 				word-break: keep-all;
+	// 				color: #2A2B2D;
+	// 				em {
+	// 					color: $color-primary;
+	// 				}
+	// 			}
+	// 			.txt {
+	// 				margin-top: 10rem;
+	// 				font-weight: 500;
+	// 				font-size: 14rem;
+	// 				line-height: 20rem;
+	// 				color: #5A5D60;
+	// 			}
+	// 		}
+	// 	}
+	// }
+	// e: 인터넷 소개 섹션
+
+	// s: 이벤트 섹션
+	.event-sec {
+		.event-swiper { /* 8차 수정 : 인벤트 섹션 추가(여기부터) */
+			@include event-swiper;
+		}
+
+		.event-bnr { /* 8차 수정 : 인벤트 섹션 추가(여기까지) */
+			@include event-bnr;
+		}
+	}
+	// e: 이벤트 섹션
+
+	// s: 통신사 선택 섹션
+	.telecom-choice-sec {
+		margin-top: var(--sec-outer-margin);
+		@include sec-basic;
+
+		.telecom-list {
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+			gap: 8rem;
+			@include media-mobile-xl {
+				gap: 20rem;
+			}
+			@include media-tablet-xs {
+				grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+				gap: 8rem;
+			}
+		}
+		.telecom-rdo {
+			position: relative;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			aspect-ratio: 1/1;
+			border-radius: 50%;
+			background-color: #F4F5F8;
+			input {
+				position: absolute;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				border-radius: 50%;
+			}
+			.telecom-con,
+			.ui-icn {
+				width: 100%;
+				height: 100%;
+			}
+			input:checked + .telecom-con .ui-icn {
+				&::before {
+					transform: translateY(110%);
+				}
+
+				&::after {
+					transform: translateY(0%);
+				}
+
+			}
+		}
+	}
+	// e: 통신사 선택 섹션
+
+	// s: 상품 선택 섹션
+	.product-choice-sec {
+		margin-top: var(--sec-outer-margin);
+		overflow: hidden;
+		@include sec-basic;
+		.sec-body { /* 4차 수정 : 상품 스와이프 추가(여기부터) */
+			position: relative;
+			.choice-button-prev,
+			.choice-button-next {
+				position: absolute;
+				top: 50%;
+				right: 0;
+				z-index: 10;
+				transform: translate(50%, -50%);
+				width: 28rem;
+				height: 28rem;
+			}
+			.choice-button-prev {
+				right: auto;
+				left: 0;
+				transform: translate(-50%, -50%) rotate(180deg);
+			}
+			.swiper-button-disabled { /* 4차 수정 : 상품 스와이프 추가(여기까지) */
+				display: none;
+			}
+		}
+
+		.choice-swiper { /* 2024-12-23 조찬기 상품 Swiper 적용 및 list 수정 */
+			overflow: visible;
+			@include media-tablet-xs {
+				overflow: hidden;
+			}
+			.choice-list {
+				@include choice-swiper;
+			}
+		}
+		.choice-rdo {
+			@include choice-rdo;
+
+			.choice-con { /* 2024-12-23 조찬기 상품 내용 수정 */
+				// .icons {
+				// 	display: flex;
+				// 	align-items: center;
+				// }
+				.tit {
+					display: flex;
+					align-items: flex-start;
+					min-height: 48rem;
+				}
+				.txt {
+					margin-top: 4rem;
+					font-weight: 600;
+					color: $color-primary;
+				}
+
+			}
+		}
+	}
+	// e: 상품 선택 섹션
+
+	// s: 인터넷 선택 섹션
+	.internet-choice-sec {
+		margin-top: var(--sec-outer-margin);
+		overflow: hidden;
+		@include sec-basic;
+		.sec-body { /* 4차 수정 : 인터넷 스와이프 추가(여기부터) */
+			position: relative;
+			.choice-button-prev,
+			.choice-button-next {
+				position: absolute;
+				top: 50%;
+				right: 0;
+				z-index: 10;
+				transform: translate(50%, -50%);
+				width: 28rem;
+				height: 28rem;
+			}
+			.choice-button-prev {
+				right: auto;
+				left: 0;
+				transform: translate(-50%, -50%) rotate(180deg);
+			}
+			.swiper-button-disabled { /* 4차 수정 : 인터넷 스와이프 추가(여기까지) */
+				display: none;
+			}
+		}
+
+		.choice-swiper { /* 2024-12-23 조찬기 인터넷 Swiper 적용 및 list 수정 */
+			overflow: visible;
+			@include media-tablet-xs {
+				overflow: hidden;
+			}
+			.choice-list {
+				@include choice-swiper;
+			}
+		}
+		.choice-rdo {
+			@include choice-rdo;
+
+			.choice-con {
+				position: relative;
+				.ui-icn {
+					margin-top: 36rem;
+					width: 40rem;
+					height: 20rem;
+				}
+				.txt + .txt {
+					margin-top: 2rem;
+				}
+			}
+		}
+	}
+	// e: 인터넷 선택 섹션
+
+	// s: 요금제 한눈에 보기 섹션
+	.plan-view-sec {
+		margin-top: var(--sec-outer-margin);
+		@include sec-basic;
+
+		&.is-hide {
+			display: none;
+		}
+
+		.sec-inner {
+			padding-top: var(--sec-outer-margin);
+			border-top: 1px solid #EFF0F0;
+		}
+
+		.plan-table {
+			width: 100%;
+			overflow-x: auto;
+			overscroll-behavior:auto;
+
+			table {
+				width: $pc-inner-content;
+				table-layout: fixed;
+				border-collapse: collapse;
+				border-spacing: 0;
+				td {
+					padding: 8rem;
+					border:1px solid #dddddd;
+					font-weight: 500;
+					font-size: 14rem;
+					line-height: 22rem;
+					color: #2a2b2d;
+					word-break: keep-all;
+					vertical-align: middle;
+					text-align: center;
+				}
+				thead {
+					td {
+						font-weight: 600;
+						background-color: #f1eefb;
+						&:first-child {
+							width: 125rem;
+						}
+						p.info {
+							margin-top: 4rem;
+							font-size: 12px;
+							font-weight: 400;
+							line-height: 16rem;
+							color: #333;
+						}
+					}
+					tr:first-child td[rowspan='2'] {
+						border-bottom: 1px solid $color-primary;
+					}
+					tr:last-child td {
+						border-bottom: 1px solid $color-primary;
+					}
+				}
+				tbody {
+					tr:nth-child(odd) {
+						td {
+							color: #888b8e;
+						}
+					}
+					td.product {
+						font-weight: 600;
+						color: #2a2b2d !important;
+						.chenel {
+							display: inline-block;
+							margin-top: 4rem;
+							padding: 2rem 8rem;
+							background-color: $color-primary;
+							border-radius: 4rem;
+							font-weight: 600;
+							font-size: 12rem;
+							color: #fff;
+							vertical-align: top;
+						}
+					}
+					td.price {
+						font-weight: 600;
+						color: $color-primary !important;
+					}
+				}
+				&.table-small {
+					tbody td {
+						font-size: 12rem;
+					}
+				}
+			}
+		}
+	}
+	// e: 요금제 한눈에 보기 섹션
+
+	// s: 인터넷 가입절차 섹션
+	.join-steps-sec {
+		margin-top: var(--sec-outer-margin);
+		margin-bottom: var(--sec-outer-margin);
+		@include sec-basic;
+
+		.join-steps {
+			li {
+				display: flex;
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #46484B;
+				& + li {
+					margin-top: 26rem;
+					.num::after {
+						content:'';
+						position: absolute;
+						left: calc(50% - 1px);
+						bottom: 100%;
+						display: block;
+						width: 2rem;
+						height: 46rem;
+						background-color: #EAE6FB;
+					}
+				}
+				.num {
+					position: relative;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					width: 24rem;
+					height: 24rem;
+					margin-right: 10rem;
+					border-radius: 2rem;
+					background-color: #EAE6FB;
+					font-weight: 700;
+					font-size: 14rem;
+					line-height: 20rem;
+					color: #542FDD;
+				}
+				.con  {
+					dt {
+						font-weight: 600;
+						font-size: 16rem;
+						line-height: 24rem;
+						color: #2A2B2D;
+					}
+					dd {
+						color: #63666A;
+					}
+				}
+			}
+		}
+
+	}
+	// e: 인터넷 가입절차 섹션
+
+	// s: 요금제 신청 섹션
+	.payment-noti-sec {
+		position: sticky;
+		bottom: 0;
+		left: 0;
+		z-index: 100;
+		margin-top: auto;
+		padding-top: 24rem;
+		padding-bottom: 24rem;
+		margin-bottom: calc(#{$mobile-bottom-spacer} * -1);
+		background-color: #fff;
+		border-radius: 20rem 20rem 0 0;
+		box-shadow: 0 -4rem 20rem 0 rgba(0,0,0,0.1);
+
+		.payment-noti {
+			.payment-tit {
+				padding: 0 4rem;
+				.charge {
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					font-weight: 700;
+					font-size: 20rem;
+					line-height: 28rem;
+					color: #000;
+				}
+				.merge {
+					display: flex;
+					align-items: center;
+					justify-content: flex-end;
+					margin-top: 2rem;
+					font-weight: 700;
+					font-size: 18rem;
+					line-height: 26rem;
+					color: $color-primary;
+					em {
+						font-size: 12rem;
+						line-height: 16rem;
+						margin-right: 4rem;
+					}
+				}
+				.freeGift {
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					margin-top: 6rem;
+					strong {
+						font-weight: 600;
+						color: $color-primary;
+					}
+				}
+				.explan {
+					display: flex;
+					align-items: center;
+					gap: 4rem;
+					margin-top: 8rem;
+					padding-top: 8rem;
+					border-top: 1px solid #EFF0F0;
+					font-weight: 400;
+					font-size: 14rem;
+					line-height: 16rem;
+					color: #63666A;
+				}
+			}
+			.payment-btn {
+				margin-top: 20rem;
+			}
+		}
+
+		@include media-tablet-xs {
+			border-top: 1px solid #EFF0F0;
+			box-shadow: none;
+			border-radius: 0;
+			bottom: 0;
+			margin-bottom: calc(#{$pc-bottom-spacer} * -1);
+
+			.payment-noti {
+				display: flex;
+				gap: 24rem;
+				.payment-tit {
+					flex: 1 1 auto;
+				}
+				.payment-btn {
+					flex: none;
+					width: 200rem;
+					margin-top: 0;
+				}
+			}
+		}
+	}
+	// e: 요금제 신청 섹션
+}
+// e: 인터넷 페이지

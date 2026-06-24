@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='09',menuId ='03'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<!--	<link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script type="text/javascript">
+
+	
+		document.addEventListener('DOMContentLoaded', () => {
+			
+			//저장 후 메세지
+			var procMsg			= "[[${procMsg}]]";
+			var procMsgDetail	= "[[${procMsgDetail}]]";
+			if(procMsg != "") {
+				if(procMsg == "success") {
+					showAlert("취소되었습니다.",moveList);
+				} else {
+					//alert(procMsg);
+					showAlert(procMsgDetail, moveList);
+				}
+			}
+			
+			
+			
+		});
+		
+		
+		// Go to List
+		function moveList() {
+			window.location.href="/point/cash/list";
+		}
+		// 그래도 갈꺼니?
+		function goList() {
+			showConfirm( '입력한 내용이 저장되지 않습니다. 목록으로 돌아가시겠습니까?',
+					() => { 
+						moveList(); 
+					},
+					() => { },
+					'네이버페이 교환관리'
+			 )
+		}
+		
+		
+		//[등록] 클릭
+		function saveData() {
+			showConfirm( '저장 하시겠습니까?',
+					() => { 
+						checkSaveProc();
+					},
+					() => { },
+					'캐시백 교환관리'
+			 )
+		}
+		function checkSaveProc() {
+			
+			var abc = $("input[name='status']:checked").val();
+			var memostr = $("#memo").val();
+			
+			if(abc == "REQ"){
+				showAlert("처리완료나 반려를 선택해 주세요.");
+				return;
+			}else if ( abc == "REJ" && (!memostr || memostr.trim() === "") ){		//반려만, 사유 입력
+				showAlert("사유를 입력해 주세요.");
+				return;
+			}else{
+				saveProc();
+			}
+		}
+		function saveProc() {
+			$("#recordForm").submit();
+		}
+		
+		//숫자 입력란 제한 
+		function handleOnInput(el, maxlength) {
+			if(el.value.length > maxlength)  {
+				el.value = el.value.substr(0, maxlength);
+			}
+		}
+		
+	</script>
+		
+</th:block>
+
+
+		<div class="main-content">
+			<div class="container-fluid">
+				<!-- 로케이션 & 제목 영역 추가 -->
+				<div class="page-header d-flex justify-content-between align-items-start">
+					<div>
+						<div class="location mb-2">
+							<small class="text-secondary">
+								<i class="fas fa-home me-1"></i>
+								<a href="/">홈</a> > <a href="/point/cash/list">포인트관리</a> > <a href="/point/cash/list">캐시백 신청 관리</a> >
+							</small>
+						</div>
+						<h2 class="page-title fs-4 mb-4">
+							<div>캐쉬백 신청 상세</div>
+						</h2>
+					</div>
+				</div>
+				
+				<form id="recordForm" th:object="${record}" method="POST" th:action="@{/point/cash/cancelInsert}">
+				<input type="hidden" th:field="*{id}" >
+				<input type="hidden" th:field="*{userId}" >
+				<input type="hidden" th:field="*{pointId}" >
+				
+				<input type="hidden" th:field="*{phoneNumber}" >
+				
+				
+				
+				
+				<div class="search-section detail">
+					
+					<div class="form-row full-width">
+						<div class="form-label">회원명</span></div>
+						<div class="form-control-wrap">
+							<input type="text" class="form-control"  th:field="*{username}" readonly>
+						</div>
+					</div>
+					
+					<div class="form-row full-width">
+						<div class="form-label">카카오ID</div>
+						<div class="form-control-wrap">
+							<input type="text" class="form-control" th:field="*{kakaoUserId}" readonly>
+						</div>
+					</div>
+					
+					<div class="form-row full-width">
+						<div class="form-label">은행</div>
+						<div class="form-control-wrap">
+							<input type="text" class="form-control" th:field="*{bankName}" readonly>
+						</div>
+					</div>
+					<div class="form-row full-width">
+						<div class="form-label">계좌번호</div>
+						<div class="form-control-wrap">
+							<input type="text" class="form-control" th:field="*{accountNo}" readonly>
+						</div>
+					</div>
+					
+					<div class="form-row full-width">
+						<div class="form-label">전환금액</div>
+						<div class="form-control-wrap">
+							<input type="text" class="form-control" th:field="*{amount}" readonly>
+						</div>
+					</div>
+					
+					<div class="form-row full-width">
+						<div class="form-label">전환/취소 일시</div>
+						<div class="form-control-wrap">
+							<input type="text" class="form-control" th:field="*{createDate}" readonly>
+						</div>
+					</div>
+					
+					<div class="form-row full-width mb-3">
+						<div class="form-label mb-0">구분<span class="required">*</span>
+						</div>
+						<div class="form-control-wrap">
+							
+
+							<div class="form-check-group">
+								<div class="form-check">
+									<input class="form-check-input" type="radio" th:field="*{status}" value="REQ" th:checked="${status eq 'REQ'}" readonly>
+									<label class="form-check-label" for="status1">신청</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" th:field="*{status}" value="COM" th:checked="${status eq 'COM'}" th:readonly="${not(record.status eq 'REQ')}">
+									<label class="form-check-label" for="status2">처리완료</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" th:field="*{status}" value="REJ" th:checked="${status eq 'REJ'}" th:readonly="${not(record.status eq 'REQ')}">
+									<label class="form-check-label" for="status3">반려</label>
+								</div>
+							</div>
+
+							
+						</div>
+					</div>
+					
+					<div class="form-row full-width">
+						<div class="form-label">사유<span class="required">*</span></div>
+						<div class="form-control-wrap">
+							<textarea th:field="*{memo}" class="form-control" placeholder="반려 시 사용자에게 전송 될 사유 입력" th:readonly="${not(record.status eq 'REQ')}"></textarea>
+						</div>
+					</div>
+
+					<div class="form-row full-width">
+						<div class="form-label">담당자</div>
+						<div class="form-control-wrap">
+							<input type="text" class="form-control" 		th:field="*{modifiedName}" value="담당자" readonly>
+							<!-- <input type="text" class="form-control" 		th:if="${not(record.status eq 'REQ')}"		th:field="*{createName}" value="담당자" disabled>
+							<input type="text" class="form-control" 		th:unless="${not(record.status eq 'REQ')}"	th:field="*{createName}" value="담당자" disabled> -->
+						</div>
+					</div>
+					<div class="form-row full-width">
+						<div class="form-label">처리일</div>
+						<div class="form-control-wrap">
+							<input type="text" class="form-control" 		th:field="*{modifiedDate}" readonly>
+							<!-- <input type="text" class="form-control" 		th:if="${not(record.status eq 'REQ')}"			th:field="*{createDate}" disabled>
+							<input type="text" class="form-control" 		th:th:unless="${not(record.status eq 'REQ')}"	th:field="*{createDate}" disabled> -->
+						</div>
+					</div>
+				</div>
+				</form>
+
+				<!-- 버튼 영역 -->
+				<div class="d-flex justify-content-center gap-2 mt-4">
+					<button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">
+						닫기
+					</button>
+					<button type="button" class="btn btn-lg btn-dark px-4 btn-sm" th:if="${record.status eq 'REQ'}" onclick="saveData()">
+						등록
+					</button>
+				</div>
+			</div>
+		</div>
+	

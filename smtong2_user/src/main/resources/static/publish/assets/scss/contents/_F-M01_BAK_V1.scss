@@ -1,0 +1,675 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 메인
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 메인 페이지
+.F-M01-page {
+	// 페이지별 섹션 여백 설정
+	padding-top: 0 !important;
+	--sec-outer-margin: 50rem;
+	--sec-inner-padding: 40rem;
+
+	// Type2 Bg
+	// &.type2 section {
+	// 	width: 100%;
+	// 	max-width: 1020rem;
+	// 	margin-right: auto;
+	// 	margin-left: auto;
+	// }
+
+	// TypeA Bg
+	// &.typeA {
+	// 	.sec-outer {
+	// 		width: 100%;
+	// 		max-width: 1020rem;
+	// 		margin-right: auto;
+	// 		margin-left: auto;
+	// 	}
+	// 	.visual-sec {
+	// 		padding: 0;
+	// 		background: #F2F5FB;
+	// 		.sec-outer {
+	// 			@include out-sec;
+	// 			padding-top: var(--sec-inner-padding);
+	// 			background: linear-gradient(314.82deg, #3C239A 4.99%, #7B56FF 95.96%);
+	// 			background-color: #3C239A;
+	// 		}
+	// 	}
+	// 	.deal-sec {
+	// 		padding: 0;
+	// 		background: #F2F5FB;
+	// 		.sec-outer {
+	// 			@include out-sec;
+	// 			background-color: #CDC2F5;
+	// 			padding-top: var(--sec-inner-padding);
+	// 			padding-bottom: var(--sec-inner-padding);
+	// 		}
+	// 	}
+	// }
+
+	// TypeB Bg
+	// &.typeB {
+	// 	.visual-sec {
+	// 		// padding: 0;
+	// 		padding-top: var(--sec-inner-padding);
+	// 	}
+	// }
+	.sec-outer { /* 3차 수정 : 메인 레이아웃 변경 추가 */
+		width: 100%;
+		max-width: 1020rem;
+		margin-right: auto;
+		margin-left: auto;
+	}
+
+	// s: 비주얼 섹션
+	.visual-sec {
+		position: relative;
+		margin-top: calc(-1 * #{$mobile-height-header});
+		padding: 0; /* 3차 수정 : 메인 레이아웃 변경 추가 */
+		background: #F2F5FB; /* 3차 수정 : 메인 레이아웃 변경 추가 */
+		/* background: linear-gradient(to left, #3C239A 4.99%, #7B56FF 95.96%); 3차 수정 : 메인 레이아웃 변경 삭제 */
+		/* background-color: #3C239A; 3차 수정 : 메인 레이아웃 변경 삭제 */
+		overflow: hidden;
+		color: #fff;
+		.sec-outer { /* 3차 수정 : 메인 레이아웃 변경 추가 */
+			@include out-sec;
+			padding-top: var(--sec-inner-padding);
+			background: linear-gradient(314.82deg, #3C239A 4.99%, #7B56FF 95.96%);
+			background-color: #3C239A;
+		}
+		.sec-body {
+			position: relative;
+			height: calc(220rem + #{$mobile-height-header});
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+			padding-bottom: 30rem;
+			&::after {
+				content:'';
+				display: block;
+				position: absolute;
+				right: 0;
+				bottom: 0;
+				width: 338rem;
+				height: 291rem;
+				border-radius: 50%;
+				transform: translate(50%, 50%);
+				background-color: rgba(255,255,255,0.1);
+			}
+
+			.sec-tit {
+				font-weight: 700;
+				font-size: 22rem;
+				line-height: 30rem;
+			}
+
+			.sec-img {
+				position: absolute;
+				right: 12rem; /* 2차 수정 : 봇 이미지 위치 수정 */
+				bottom: 76rem;
+				width: 140rem;
+				height: 122rem;
+			}
+
+			.sec-btn {
+				margin-top: 16rem;
+				.ui-btn {
+					width: 100%;
+					height: 50rem;
+					padding: 2rem;
+					border-radius: 30rem;
+					font-weight: 600;
+					font-size: 16rem;
+					line-height: 22rem;
+					color: #0D173F;
+					box-shadow: 0px 4px 17.6px rgba(255, 255, 255, 0.28);
+					background: linear-gradient(90deg, #6B43FF 0%, #B433FF 100%);
+					&::before {
+						content:'';
+						display: block;
+						position: absolute;
+						left: 2rem;
+						top: 2rem;
+						right: 2rem;
+						bottom: 2rem;
+						background-color: #fff;
+						border-radius: 30rem;
+					}
+					span {
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						width: 100%;
+						height: 100%;
+						border-radius: 30rem;
+						background: linear-gradient(91.41deg, #6B43FF 9.18%, #B433FF 98.8%);
+						-webkit-background-clip: text;
+						-webkit-text-fill-color: transparent;
+						background-clip: text;
+						text-fill-color: transparent;
+						color: transparent;
+						// background-color: #fff;
+					}
+				}
+			}
+		}
+		@include media-tablet-xs {
+			margin-top: calc(-1 * #{$pc-height-header});
+			.sec-body {
+				height: calc(220rem + #{$pc-height-header});
+			}
+		}
+	}
+	// e: 비주얼 섹션
+
+	// s: 추천딜 섹션
+	.deal-sec {
+		overflow: hidden;
+		padding-top: var(--sec-inner-padding);
+		padding-bottom: var(--sec-inner-padding);
+		padding: 0; /* 3차 수정 : 메인 레이아웃 변경 추가 */
+		background: #F2F5FB; /* 3차 수정 : 메인 레이아웃 변경 추가 */
+		/* background-color: #CDC2F5; 3차 수정 : 메인 레이아웃 변경 삭제 */
+		@include sec-basic;
+		.sec-outer { /* 3차 수정 : 메인 레이아웃 변경 추가 */
+			@include out-sec;
+			background-color: #CDC2F5;
+			padding-top: var(--sec-inner-padding);
+			padding-bottom: var(--sec-inner-padding);
+		}
+		.sec-header {
+			display: flex;
+			.sec-tit {
+				color: #000000;
+				.ui-icn {
+					margin-left: 4rem;
+				}
+			}
+			.btn-more {
+				color: $color-primary;
+				font-weight: 600;
+			}
+		}
+
+		.sec-body {
+			position: relative;
+		}
+
+		.deal-timer {
+			.timer-txt {
+				margin-bottom: 10rem;
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 16rem;
+				color: $color-primary;
+			}
+			.timer-labels {
+				display: flex;
+				align-items: center;
+				margin-bottom: 30rem;
+				gap: 6rem;
+				.label-num {
+					position: relative;
+					width: 32rem;
+					height: 42rem;
+					overflow: hidden;
+					border:1px solid $color-primary;
+					border-radius: 6px;
+					background-color: #fff;
+					font-weight: 700;
+					font-size: 26rem;
+					line-height: 30rem;
+					color: #000;
+					&::before {
+						content:'';
+						display: block;
+						width: 100%;
+						height: 21rem;
+						background: linear-gradient(180deg, rgba(244, 245, 248, 1) 47.83%, rgba(205, 197, 241, 1) 100%);
+						border-bottom: 1px solid rgba(172, 159, 233, 0.4);
+					}
+					> span {
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						position: absolute;
+						left: 0;
+						top: 0;
+						width: 100%;
+						height: 100%;
+					}
+				}
+				.label-split {
+					display: flex;
+					flex-direction: column;
+					width: 4rem;
+					height: 14rem;
+					justify-content: space-between;
+					margin: 0 1rem;
+					&::before,
+					&::after {
+						content:'';
+						display: block;
+						width: 4rem;
+						height: 4rem;
+						background-color: #fff;
+						border-radius: 50%;
+					}
+				}
+			}
+		}
+		.deal-swiper { /* 8차 수정 : 추천딜 스와이프 버튼 추가(여기부터) */
+			overflow: visible;
+			width: 100%;
+			.swiper-slide {
+				width: 248rem;
+				opacity: 0.5;
+				transition: opacity 0.2s ease;
+				&-active {
+					opacity: 1;
+				}
+			}
+			&.no-scroll {
+				.swiper-slide {
+					opacity: 1;
+				}
+			}
+			@include media-tablet-xs {
+				overflow: hidden;
+				.swiper-slide {
+					opacity: 1;
+					width: 233rem;
+				}
+			}
+		}
+		.deal-button-prev,
+		.deal-button-next {
+			position: absolute;
+			bottom: 71rem;
+			right: 0;
+			z-index: 10;
+			transform: translate(50%, 50%);
+			width: 28rem;
+			height: 28rem;
+		}
+		.deal-button-prev {
+			right: auto;
+			left: 0;
+			transform: translate(-50%, 50%) rotate(180deg);
+		}
+		.swiper-button-disabled { /* 8차 수정 : 추천딜 스와이프 버튼 추가(여기까지) */
+			display: none;
+		}
+
+		.deal-card {
+			position: relative;
+			width: 100%;
+			padding: 16rem;
+			padding-top: 20rem;
+			box-sizing: border-box;
+			background-color: #fff;
+			.card-body {
+				border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+				padding-bottom: 6rem;
+
+				.card-label {
+					position: absolute;
+					top: 0;
+					right: 16rem;
+					em {
+						display: inline-flex;
+						padding: 4rem 8rem;
+						border-radius: 0 0 10rem 10rem;
+						background-color: $color-primary;
+						font-weight: 600;
+						font-size: 12rem;
+						line-height: 14rem;
+						color: #fff;
+					}
+				}
+				.card-info {
+					font-weight: 500;
+					font-size: 12rem;
+					line-height: 14rem;
+					color: #63666A;
+					@include ellipsis1;
+				}
+				.card-tit {
+					margin-top: 4rem;
+					font-weight: 700;
+					font-size: 16rem;
+					line-height: 20rem;
+					color: #000;
+					height: 40rem;
+					white-space: pre-line;
+					@include ellipsis2;
+				}
+			}
+			.card-footer {
+				display: flex;
+				align-items: flex-end;
+				justify-content: space-between;
+				padding-top: 17rem;
+				padding-bottom: 0rem;
+
+				.card-partner {
+					display: flex;
+					position: relative;
+					flex:1 1 auto;
+					width: 100%;
+					// height: 14rem;
+					// padding-right: 4rem;
+					max-height: 18rem;
+					max-width: 70rem;
+					padding: 1rem 0;
+					img {
+						max-width: 100%;
+						// height: 100%;
+					}
+				}
+				.card-charge-wrap {
+					flex: none;
+				}
+				.card-charge {
+					font-weight: 700;
+					font-size: 20rem;
+					line-height: 24rem;
+					color: $color-primary;
+					text-align: right;
+				}
+				.card-point {
+					width: 100%;
+					text-align: right;
+					font-weight: 700;
+					font-size: 15rem;
+					line-height: 18rem;
+					color: $color-point;
+					letter-spacing: -0.1em;
+					.tit {
+						display: block;
+						text-align: right;
+						// margin-right: 4rem;
+						font-size: 12rem;
+					}
+				}
+
+				&.has-point {
+					align-items: flex-end;
+					padding-top: 5rem;
+					padding-bottom: 0;
+					.card-charge {
+						display: none;
+						font-size: 12rem;
+						line-height: 18rem;
+					}
+				}
+			}
+		}
+	}
+	// e: 추천딜 섹션
+
+	// s: 추천딜 섹션 (오픈전 추가)
+	.deal-sec { /* 추천딜 섹션 (오픈전 추가) */
+		position: relative;
+
+		.deal-before,
+		.deal-before .sec-inner,
+		.deal-before .sec-inner .sec-body {
+			@include flex-fill-height;
+		}
+
+		.deal-before {
+			position: absolute;
+			left: 50%;
+			top: 0;
+			height: 100%;
+			z-index: 20;
+			transform: translate(-50%, 0%);
+			background-color: rgba(54, 56, 58, 0.8);
+			backdrop-filter: blur(10px);
+
+			.sec-header {
+				display: block;
+				margin-bottom: 12rem;
+				.sec-tit {
+					color: #fff;
+				}
+				.sec-explain {
+					margin-top: 0;
+					color: #CDC2F5;
+					font-size: 20rem;
+					line-height: 28rem;
+					font-weight: 700;
+				}
+			}
+
+			// 타이머 스킨변경
+			.deal-timer {
+				margin-bottom: 0;
+				.timer-labels {
+					flex-wrap: wrap;
+					.label-num {
+						border: 0;
+						color: $color-primary;
+						&::before {
+							display: none;
+						}
+					}
+					.label-text {
+						font-weight: 600;
+						font-size: 20rem;
+						line-height: 40rem;
+						color: #fff;
+					}
+				}
+			}
+
+			// 공유하기
+			.deal-share {
+				position: absolute;
+				left: 0;
+				bottom: 0;
+				width: 100%;
+				margin-top: 0;
+				padding-top: 88rem;
+				.deal-share-char {
+					position: absolute;
+					right: 0;
+					top: 0;
+					width: 80rem;
+					height: 80rem;
+					img {
+						width: 100%;
+						height: 100%;
+					}
+				}
+				.deal-share-box {
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					padding: 10rem 16rem;
+					background-color: #F4F5F8;
+					border-radius: 2rem;
+					.tit {
+						font-weight: 600;
+						font-size: 12rem;
+						line-height: 16rem;
+						color: #000;
+						em {
+							color: $color-primary;
+						}
+					}
+				}
+			}
+		}
+	}
+	// s: 추천딜 섹션 (오픈전 추가)
+
+	// s: 나에게 맞는 요금제 섹션
+	.ratePlanA-sec {
+		@include sec-basic;
+		padding-top: var(--sec-inner-padding);
+		padding-bottom: var(--sec-inner-padding);
+		background-color: #F2F5FB;
+		.sec-body {
+			position: relative;
+		}
+		.ratePlanA-list {
+			@include ratePlanA-list;
+		}
+
+		@include ratePlanA-swiper;
+
+		.ratePlanA-card {
+			@include ratePlanA-card;
+			box-shadow: none;
+		}
+	}
+	// e: 나에게 맞는 요금제 섹션
+
+	// s: 요금제 추천 섹션
+	.recom-sec {
+		@include sec-basic;
+		margin-top: var(--sec-outer-margin);
+
+		.recom-list {
+			@include recom-list;
+
+			.recom-bnr {
+				@include recom-bnr;
+			}
+		}
+	}
+	// e: 요금제 추천 섹션
+
+	// e: 특별한 이벤트 섹션
+	.special-event-sec {
+		@include sec-basic;
+		margin-top: var(--sec-outer-margin);
+
+		.special-event-list {
+			@include event-list;
+
+			.special-event-bnr {
+				@include event-bnr;
+			}
+		}
+	}
+	// e: 특별한 이벤트 섹션
+
+	// s: 서비스 리뷰 섹션
+	.review-sec {
+		@include sec-basic;
+		margin-top: var(--sec-outer-margin);
+
+		.review-swiper {
+			.swiper-slide {
+				width: 270rem;
+			}
+			@include media-tablet-xs {
+				overflow: hidden;
+			}
+		}
+
+		.review-card {
+			display: flex;
+			flex-wrap: wrap;
+			padding: 20rem;
+			border-radius: 2rem;
+			border:1px solid #EFF0F0;
+
+			.card-telecom {
+				display: flex;
+				align-items: center;
+				height: 28rem;
+				margin-right: 12rem;
+			}
+			.card-rating {
+				display: flex;
+				align-items: center;
+
+				.val {
+					margin-left: 7rem;
+					padding-top: 1rem;
+					font-weight: 700;
+					font-size: 24rem;
+					line-height: 26rem;
+				}
+			}
+
+			.card-name {
+				margin-left: auto;
+				padding: 5rem 0;
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 18rem;
+				color: #828588;
+			}
+
+			.card-cont {
+				width: 100%;
+				margin-top: 10rem;
+				height: 60rem; /* 2025-02-03 조찬기 : 리뷰 높이값 3줄 고정 */
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				@include ellipsis3;
+			}
+		}
+	}
+	// e: 서비스 리뷰 섹션
+
+	// s: 이벤트 섹션
+	.event-sec {
+		margin-top: var(--sec-outer-margin);
+
+		.event-list { /* 7차 수정 : 이벤트 목록 구조 적용 */
+			@include event-list;
+		}
+		.event-bnr {
+			@include event-bnr;
+		}
+	}
+	// e: 이벤트 섹션
+
+	// s: 파트너사 섹션
+	.partner-sec {
+		overflow: hidden;
+		@include sec-basic;
+		margin-top: var(--sec-outer-margin);
+		padding-top: var(--sec-inner-padding);
+		padding-bottom: var(--sec-inner-padding);
+		background-color: #F2F5FB;
+
+		.partner-swiper {
+			overflow: visible;
+			.swiper-wrapper {
+				transition-timing-function: linear !important;
+			}
+			.swiper-slide {
+				width: 88rem;
+			}
+		}
+		.partner-link {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 88rem;
+			height: 88rem;
+			border-radius: 50%;
+			background-color: #fff;
+			img {
+				max-height: 32rem;
+				max-width: 80rem;
+			}
+		}
+		@include media-tablet-xs {
+			.sec-inner {
+				overflow: hidden;
+			}
+		}
+	}
+	// e: 파트너사 섹션
+}
+// e: 메인 페이지

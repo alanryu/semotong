@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>간편개통 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<script>
+		function tabHandler(targetId, element) {
+			document.querySelectorAll("[id$='-pane']").forEach(el => el.classList.remove("active"));
+
+			const targetElement = document.getElementById(targetId);
+			if (targetElement) {
+				targetElement.classList.add("active");
+			}
+
+			// 라디오 버튼 체크 여부 확인 (선택 사항)
+			if (element) {
+				element.checked = true;
+			}
+		};
+	</script>
+</head>
+
+<body>
+	<!-- 레이아웃이 없는 경우  -->
+	<div class="wrapper only-container">
+		<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-QU-page F-QU01-12-01-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">요금 청구서 수령 방법을 선택해 주세요.</h2>
+							<p class="sec-explain">신청 후에도 고객센터에서 변경할 수 있어요.</p>
+						</div>
+						<div class="sec-body">
+							<!-- 등록폼 -->
+							<div class="basic-frm">
+								<!-- 수령 방법 선택 -->
+								<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label class="tit" for="frmFiled11">수령 방법</label>
+									</div>
+									<div class="frm-content">
+										<ul class="frm-group">
+											<label class="ui-rdo rdo-style2">
+												<input type="radio" name="frmSurvey" id="FQU0112-01" aria-controls="FQU0112-01-pane" checked onchange="tabHandler('FQU0112-01-pane', this)" />
+												<span class="rdo"><span>모바일로 받을래요</span></span>
+											</label>
+											<label class="ui-rdo rdo-style2">
+												<input type="radio" name="frmSurvey" id="FQU0112-02" aria-controls="FQU0112-02-pane" onchange="tabHandler('FQU0112-02-pane', this)" />
+												<span class="rdo"><span>이메일로 받을래요</span></span>
+											</label>
+										</ul>
+									</div>
+								</div>
+								<!-- // 수령 방법 선택 -->
+
+								<div class="tab-content">
+									<!-- 이메일로 받을래요 패널 -->
+									<div class="tab-pane active" id="FQU0112-01-pane" role="tabpanel" aria-labelledby="FQU0112-01" tabindex="0"></div>
+									<!-- //모바일로 받을래요 패널 -->
+
+									<!-- 이메일로 받을래요 패널 -->
+									<div class="tab-pane" id="FQU0112-02-pane" role="tabpanel" aria-labelledby="FQU0112-02" tabindex="0">
+										<div class="frm-field-group">
+											<div class="frm-field-group">
+												<!-- 이메일 -->
+												<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+												<div class="frm-field">
+													<div class="frm-title">
+														<label class="tit" for="frmFiled22">이메일</label>
+													</div>
+													<div class="frm-content">
+														<div class="ui-inp">
+															<input type="text" name="" id="frmFiled22" value="" placeholder="이메일을 등록해주세요." title="" class="inp" />
+														</div>
+													</div>
+												</div>
+												<!-- // 이메일 -->
+											</div>
+										</div>
+									</div>
+									<!-- 이메일로 받을래요 패널 -->
+								</div>
+							</div>
+							<!-- // 등록폼 -->
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" disabled>
+							<span>다음</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 플로팅 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+	</div>
+</body>
+
+</html>

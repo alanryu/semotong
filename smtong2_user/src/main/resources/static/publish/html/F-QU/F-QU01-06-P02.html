@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>간편개통 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<!-- 페이지 스크립트 영역 -->
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			// 모달 바로 볼 수 있도록 호출
+			var FQU0106P02_KT_Modal = new bootstrap.Modal(document.getElementById('FQU0106P02_KT_Modal'));
+			FQU0106P02_KT_Modal.show();
+		});
+	</script>
+</head>
+
+<body>
+	<!-- 레이아웃이 없는 경우  -->
+	<div class="wrapper only-container">
+		<div style="padding: 30rem;">
+			<!-- 트리거로 모달 띄우기 -->
+			<button type="button" class="ui-btn btn-sub xs primary" data-bs-toggle="modal" data-bs-target="#FQU0106P02_KT_Modal">
+				KT 알뜰폰
+			</button>
+
+			<button type="button" class="ui-btn btn-sub xs primary" data-bs-toggle="modal" data-bs-target="#FQU0106P02_LGU_Modal">
+				LGU 알뜰폰
+			</button>
+
+			<button type="button" class="ui-btn btn-sub xs primary" data-bs-toggle="modal" data-bs-target="#FQU0106P02_SKT_Modal">
+				SKT 알뜰폰
+			</button>
+		</div>
+	</div>
+
+	<!--
+		[모달 가이드]
+		모달 효과 : fade (공통)
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+		// 1차 수정 : fade-pc 사용안함, fade 공통으로 사용
+	-->
+	<!-- KT 알뜰폰 -->
+	<div class="modal modal-select fade" id="FQU0106P02_KT_Modal" tabindex="-1" role="dialog" aria-labelledby="FQU0106P02_KT_ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FQU0106P02_KT_ModalLabel">KT 알뜰폰</h3>
+					<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 콤보박스 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<!-- modal-select 공통 -->
+							<ul class="select-partner-list" role="listbox">
+								<!-- 이미 선택목록이 있는 경우 class="is-selected" 추가 -->
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-hellomobile.svg" alt="" aria-hidden="true">
+										<strong class="name">헬로모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">씨앤컴</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-amobile.svg" alt="" aria-hidden="true">
+										<strong class="name">에이모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-freet.svg" alt="" aria-hidden="true">
+										<strong class="name">프리티</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-egmobile.svg" alt="" aria-hidden="true">
+										<strong class="name">이지모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">아이디스파워텔</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">에스로밍</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-winerstel.svg" alt="" aria-hidden="true">
+										<strong class="name">위너스텔</strong>
+									</div>
+								</li>
+								<!-- 비노출 <li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-.svg" alt="" aria-hidden="true">
+										<strong class="name">씨제이헬로비젼</strong>
+									</div>
+								</li> -->
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-snowman.svg" alt="" aria-hidden="true">
+										<strong class="name">스노우맨</strong>
+									</div>
+								</li>
+								<!-- 비노출 <li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-.svg" alt="" aria-hidden="true">
+										<strong class="name">홈플러스KT</strong>
+									</div>
+								</li> -->
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">플래시모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-ntelecom.svg" alt="" aria-hidden="true">
+										<strong class="name">앤텔레콤</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">착한통신</strong>
+									</div>
+								</li>
+								<!-- 비노출 <li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-.svg" alt="" aria-hidden="true">
+										<strong class="name">케이티스</strong>
+									</div>
+								</li> -->
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-ansimmobile.svg" alt="" aria-hidden="true">
+										<strong class="name">안심모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">장성모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-eyes.svg" alt="" aria-hidden="true">
+										<strong class="name">아이즈모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-myworld.svg" alt="" aria-hidden="true">
+										<strong class="name">마이월드(토스모바일)</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">제이티씨</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-ktmmobile.svg" alt="" aria-hidden="true">
+										<strong class="name">KT엠모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-mobing.svg" alt="" aria-hidden="true">
+										<strong class="name">모빙</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-shakemobile.svg" alt="" aria-hidden="true">
+										<strong class="name">쉐이크모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-iplusu.svg" alt="" aria-hidden="true">
+										<strong class="name">아이플러스유</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-pindirect.svg" alt="" aria-hidden="true">
+										<strong class="name">핀다이렉트</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">파인디지털</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-dreammobile.svg" alt="" aria-hidden="true">
+										<strong class="name">드림모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-tplus.svg" alt="" aria-hidden="true">
+										<strong class="name">티플러스</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">이비카드</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-yytelecom.svg" alt="" aria-hidden="true">
+										<strong class="name">여유모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-eyagi.svg" alt="" aria-hidden="true">
+										<strong class="name">이야기모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">니즈모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-ktskylife.svg" alt="" aria-hidden="true">
+										<strong class="name">KT스카이라이프</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-asiammobile.svg" alt="" aria-hidden="true">
+										<strong class="name">아시아모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-valuecomm.svg" alt="" aria-hidden="true">
+										<strong class="name">밸류컴</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-smartel.svg" alt="" aria-hidden="true">
+										<strong class="name">스마텔</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-kbliivm.svg" alt="" aria-hidden="true">
+										<strong class="name">KB리브모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">포인트파크</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-ins.svg" alt="" aria-hidden="true">
+										<strong class="name">인스모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-gogofactory.svg" alt="" aria-hidden="true">
+										<strong class="name">고고모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">퍼스트모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-erel.svg" alt="" aria-hidden="true">
+										<strong class="name">에르엘</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">핀샷</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-opasmobile.svg" alt="" aria-hidden="true">
+										<strong class="name">오파스모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">친구모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">한패스모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-sptiz-mobile.svg" alt="" aria-hidden="true">
+										<strong class="name">스피츠모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">KCT(티플러스)</strong>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</section>
+					<!-- // 콤보박스 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // KT 알뜰폰 -->
+
+	<!-- LGU 알뜰폰 -->
+	<div class="modal modal-select fade" id="FQU0106P02_LGU_Modal" tabindex="-1" role="dialog" aria-labelledby="FQU0106P02_LGU_ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FQU0106P02_LGU_ModalLabel">LGU+ 알뜰폰</h3>
+					<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 콤보박스 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<!-- modal-select 공통 -->
+							<ul class="select-partner-list" role="listbox">
+								<!-- 이미 선택목록이 있는 경우 class="is-selected" 추가 -->
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-freet.svg" alt="" aria-hidden="true">
+										<strong class="name">프리티</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-tossmobile.svg" alt="" aria-hidden="true">
+										<strong class="name">토스모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">몬티스타텔레콤</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">대성홀딩스</strong>
+									</div>
+								</li>
+								<!-- 비노출 <li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-.svg" alt="" aria-hidden="true">
+										<strong class="name">(주)알뜰폰</strong>
+									</div>
+								</li> -->
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-uplusumobile.svg" alt="" aria-hidden="true">
+										<strong class="name">U+유모바일</strong>
+									</div>
+								</li>
+								<!-- 비노출 <li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-.svg" alt="" aria-hidden="true">
+										<strong class="name">홈플러스LG</strong>
+									</div>
+								</li> -->
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">이마트알뜰폰</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-scsmobile.svg" alt="" aria-hidden="true">
+										<strong class="name">서경모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">울산방송</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">푸른방송</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">남인천방송</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">금강방송</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-kctvjeju.svg" alt="" aria-hidden="true">
+										<strong class="name">KCTV</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-yytelecom.svg" alt="" aria-hidden="true">
+										<strong class="name">여유모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">플래시모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-egmobile.svg" alt="" aria-hidden="true">
+										<strong class="name">이지모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-mobing.svg" alt="" aria-hidden="true">
+										<strong class="name">모빙</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-eyagi.svg" alt="" aria-hidden="true">
+										<strong class="name">이야기모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-smartel.svg" alt="" aria-hidden="true">
+										<strong class="name">스마텔</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-amobile.svg" alt="" aria-hidden="true">
+										<strong class="name">에이모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">온국민폰</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">KDDI</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-siwolmobile.svg" alt="" aria-hidden="true">
+										<strong class="name">시월모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">조이텔</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-eyes.svg" alt="" aria-hidden="true">
+										<strong class="name">아이즈모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">핀플레이</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-ansimmobile.svg" alt="" aria-hidden="true">
+										<strong class="name">안심모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">원텔레콤</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-kbliivm.svg" alt="" aria-hidden="true">
+										<strong class="name">KB리브모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-hellomobile.svg" alt="" aria-hidden="true">
+										<strong class="name">헬로모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">핀샷</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">화인통신</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-valuecomm.svg" alt="" aria-hidden="true">
+										<strong class="name">밸류컴</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">엔티온텔레콤</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-ins.svg" alt="" aria-hidden="true">
+										<strong class="name">인스모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">도시락모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">엔페이넷</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-snowman.svg" alt="" aria-hidden="true">
+										<strong class="name">스노우맨</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-ntelecom.svg" alt="" aria-hidden="true">
+										<strong class="name">앤텔레콤</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-asiammobile.svg" alt="" aria-hidden="true">
+										<strong class="name">아시아모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-mona.svg" alt="" aria-hidden="true">
+										<strong class="name">모나</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-sugar.svg" alt="" aria-hidden="true">
+										<strong class="name">슈가모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-tplus.svg" alt="" aria-hidden="true">
+										<strong class="name">티플러스</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-erel.svg" alt="" aria-hidden="true">
+										<strong class="name">에르엘</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-winerstel.svg" alt="" aria-hidden="true">
+										<strong class="name">위너스텔</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">한패스모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">사람과연결</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">폰마블</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-kgmobile.svg" alt="" aria-hidden="true">
+										<strong class="name">KG모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">GMELG</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">친구모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-chance.svg" alt="" aria-hidden="true">
+										<strong class="name">찬스모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-wooriwowm.png" alt="" aria-hidden="true">
+										<strong class="name">우리WON모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-snowman.svg" alt="" aria-hidden="true">
+										<strong class="name">스노우맨</strong>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</section>
+					<!-- // 콤보박스 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // LGU 알뜰폰 -->
+
+	<!-- SK 알뜰폰 -->
+	<div class="modal modal-select fade" id="FQU0106P02_SKT_Modal" tabindex="-1" role="dialog" aria-labelledby="FQU0106P02_SKT_ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FQU0106P02_SKT_ModalLabel">SKT 알뜰폰</h3>
+					<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 콤보박스 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<!-- modal-select 공통 -->
+							<ul class="select-partner-list" role="listbox">
+								<!-- 이미 선택목록이 있는 경우 class="is-selected" 추가 -->
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-eyes.svg" alt="" aria-hidden="true">
+										<strong class="name">아이즈모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-mobing.svg" alt="" aria-hidden="true">
+										<strong class="name">모빙</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-eyagi.svg" alt="" aria-hidden="true">
+										<strong class="name">이야기모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-smartel.svg" alt="" aria-hidden="true">
+										<strong class="name">스마텔</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-sk7mobile.svg" alt="" aria-hidden="true">
+										<strong class="name">SK 7mobile</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">이마트</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">KCT</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-ansimmobile.svg" alt="" aria-hidden="true">
+										<strong class="name">안심모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-freet.svg" alt="" aria-hidden="true">
+										<strong class="name">프리티</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-lghellovision.svg" alt="" aria-hidden="true">
+										<strong class="name">LG헬로모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-amobile.svg" alt="" aria-hidden="true">
+										<strong class="name">에이모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-semotong.svg" alt="" aria-hidden="true">
+										<strong class="name">조이텔</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-myworld.svg" alt="" aria-hidden="true">
+										<strong class="name">마이월드(토스모바일)</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-kbliivm.svg" alt="" aria-hidden="true">
+										<strong class="name">KB리브모바일</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-pindirect.svg" alt="" aria-hidden="true">
+										<strong class="name">핀다이렉트</strong>
+									</div>
+								</li>
+								<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal">
+									<div class="select-partner">
+										<img src="../../assets/images/partner/logo-snowman.svg" alt="" aria-hidden="true">
+										<strong class="name">스노우맨</strong>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</section>
+					<!-- // 콤보박스 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // SK 알뜰폰 -->
+</body>
+
+</html>

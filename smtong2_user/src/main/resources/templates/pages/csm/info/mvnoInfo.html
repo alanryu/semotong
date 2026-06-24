@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='알뜰폰이란?', layoutSubTitleYN='N', layoutFooterYn='Y', menuId='01' ">
+	  
+	  <!-- index.html 고유 CSS 추가 -->
+	  <th:block layout:fragment="css">
+	      <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+	  </th:block>
+	  <!-- index.html 고유 스크립트 추가 -->
+	  <th:block layout:fragment="script">
+	   <!--    <script th:src="@{/js/page/home.js}"></script>-->
+	   <script>
+	  	
+	  	function goDetailPage(id,nm) {
+	  		window.location="/mbm/company/companeyInfo?id="+id+"&companyNm="+nm;
+	  	}
+	  	$( document ).ready(function() {
+	  	
+	  		/*
+			const iframe = document.getElementById('frmContent');
+	
+		    // 콘텐츠 로드 후 크기 조정
+		    iframe.onload = function () {
+		        var contentHeight = iframe.contentWindow.document.body.scrollHeight;
+		        var contentWidth = iframe.contentWindow.document.body.scrollWidth;
+		        
+		        contentHeight = contentHeight +10;
+		        contentWidth = contentWidth +10;
+		        
+		        iframe.style.height = contentHeight + 'px';
+		        iframe.style.width = contentWidth + 'px';
+		    };
+			*/
+	  	});
+	    
+	  	
+	  	
+	   </script>
+	  </th:block>
+
+	  <!-- Container -->
+	  <main role="main" class="container">
+	  	<!-- content -->
+	  	<div class="content">
+	  		<div class="ui-tab tab-style1">
+	  			<ul class="tab-list" role="tablist">
+					<!-- <li class="tab-item" role="presentation">
+						<button class="tab-link active" id="tab-11" data-bs-toggle="tab" data-bs-target="#tab-11-pane" type="button" role="tab" aria-controls="tab-11-pane" aria-selected="true">세모통이란?</button>
+					</li> -->
+					<li class="tab-item" role="presentation">
+						<button class="tab-link" id="tab-12" data-bs-toggle="tab" data-bs-target="#tab-12-pane" type="button" role="tab" aria-controls="tab-12-pane" aria-selected="false" onclick="navigateTo('/csm/baekseo/baekseoList');">세모통 백서</button>
+					</li>					
+	  				<li class="tab-item" role="presentation">
+	  					<button class="tab-link" id="tab-13" data-bs-toggle="tab" data-bs-target="#tab-13-pane" type="button" role="tab" aria-controls="tab-13-pane" aria-selected="false" onclick="navigateTo('/cms/faq/faqlist');">자주묻는 질문</button>
+	  				</li>
+	  			</ul>
+	  		</div>
+	  		
+	  		
+	  		
+	  		<div class="tab-content">
+				<!-- 알뜰폰 탭 -->
+				<div class="F-G01-01-page tab-pane fade show active" id="tab-11-pane" role="tabpanel" aria-labelledby="tab-11" tabindex="0">
+					<!-- 알뜰폰 섹션 -->
+					<!-- 2025-01-08 조찬기 : 알뜰폰이란 추가 -->
+					<section class="intro-sec">
+						<div class="sec-inner">
+							<div class="data-view" id="preview" th:utext="${detail.content}">
+							</div>
+							<!-- <iframe id="frmContent" scrolling="no" th:srcdoc="여기에 컨텐츠, 논의 중 자꾸 변경" sandbox="allow-scripts allow-same-origin" data-alloy-tabstop="true" tabindex="-1" class="tox-dialog__iframe tox-dialog__iframe--opaque"></iframe> -->
+						</div>
+					</section>
+					<!-- // 알뜰폰 섹션 -->
+	  			</div>
+		  	</div>
+	  	<!-- // content -->
+	  	</div>
+	  </main>
+	  <!-- // Container -->

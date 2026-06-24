@@ -1,0 +1,228 @@
+@charset "utf-8";
+
+/*-------------------------------------------------------------------
+	분류그룹 : 텍스트박스
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------
+	@@ Varialbles
+-------------------------------------------------------------------*/
+@mixin input-placeholder {
+	&.is-placeholder,
+	&::placeholder {
+		color: #828588;
+		word-break: keep-all;
+	}
+}
+@mixin input-style {
+	height: 52rem;
+	width: 100%;
+	padding: 15rem 17rem;
+	border:1px solid #CFD0D1;
+	border-radius: 4rem;
+	font-size: 16rem;
+	line-height: 22rem;
+	font-weight: 500;
+	color: #000000;
+}
+
+@mixin input-h-36 {
+	height: 36rem;
+	width: 100%;
+	padding: 7rem 9rem;
+	font-weight: 500;
+	font-size: 14rem;
+	line-height: 20rem;
+	color: #36383A;
+}
+
+@mixin input-errored {
+	&.is-errored {
+		.sel,
+		.inp {
+			border-color: $color-error;
+		}
+	}
+}
+
+/*-------------------------------------------------------------------
+	@@ Input
+-------------------------------------------------------------------*/
+/* 스타일1 */
+.ui-inp {
+	display: inline-block;
+	position: relative;
+	width: 100%;
+	@include input-errored;
+
+	.inp {
+		@include input-style;
+		@include input-placeholder;
+
+		// 입력상태 인터렉션
+		&:not(:placeholder-shown) + .on-right .btn-clear {
+			display: block;
+		}
+
+		&:not(:placeholder-shown):disabled + .on-right .btn-clear {
+			display: none;
+		}
+
+		&:not(:placeholder-shown):read-only + .on-right .btn-clear {
+			display: none;
+		}
+	}
+
+	.inp-txt {
+		@include input-style;
+		border:0;
+		background-color: #f5f5f5;
+
+	}
+
+	.on-right {
+		display: flex;
+		align-items: center;
+		gap: 4rem;
+		position: absolute;
+		right: 0;
+		top: 0;
+		height: 100%;
+	}
+
+	.btn-clear {
+		display: none;
+	}
+
+	.btn-srch {
+		padding: 15rem;
+	}
+
+	&.fluid {
+		width: 100%;
+	}
+}
+
+
+
+/*-------------------------------------------------------------------
+	@@ Textarea
+-------------------------------------------------------------------*/
+/* 스타일 */
+.ui-textarea {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	@include input-style;
+	height: 140rem;
+	width: 100%;
+	&:focus-within {
+		outline:2px solid #000;
+		outline-offset: -1px;
+	}
+
+	.textarea {
+		flex: 1 1 auto;
+		@include input-placeholder;
+
+		&:focus {
+			outline: none;
+		}
+	}
+	.bytes {
+		display: flex;
+		margin-top: 8rem;
+		font-weight: 500;
+		font-size: 12rem;
+		line-height: 16rem;
+		color: #828588;
+		.count {
+			color: #36383A;
+		}
+	}
+}
+
+
+/*-------------------------------------------------------------------
+	@@ Select
+-------------------------------------------------------------------*/
+/* 스타일 */
+.ui-sel {
+	width: 100%;
+	@include input-errored;
+
+	.sel {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 2rem;
+		@include input-style;
+		@include input-placeholder;
+
+		// 파트너사인 경우
+		.partner-option {
+			width: 100%;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding-right: 12rem;
+			.partner-img {
+				display: flex;
+				justify-content: flex-end;
+				height: 22rem;
+				img {
+					height: 100%;
+				}
+			}
+		}
+	}
+	&.fluid {
+		width: 100%;
+	}
+
+	&.is-selected {
+		.sel {
+			border-color: $color-primary;
+			background-color: #EAE6FB;
+			color: $color-primary !important;
+			&:focus {
+				outline-color: transparent;
+			}
+		}
+	}
+
+	&.h-36 {
+		.sel {
+			@include input-h-36;
+		}
+	}
+}
+
+/*-------------------------------------------------------------------
+	@@ File
+-------------------------------------------------------------------*/
+/* File Attach */
+.ui-file {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	font-weight: 500;
+	font-size: 14rem;
+	line-height: 20rem;
+	color: #36383A;
+}
+
+.frm-file input.file {
+	position: absolute;
+	width: 0;
+	height: 0;
+	overflow: hidden;
+}
+
+.frm-file input.inp {
+	display: inline-table;
+}
+
+.frm-file .btn-file {
+	display: inline-table;
+}

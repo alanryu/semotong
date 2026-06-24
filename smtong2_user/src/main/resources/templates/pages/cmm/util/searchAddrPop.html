@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/popup_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='카드본인인증'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ 
+
+
+<script id="addrListTmpl" type="text/x-jquery-tmpl">
+	 <li class="address-item" onclick="selAddr(this)">
+		<div class="address-wrap">
+			<p class="address-zipcode" id="zipCode">${zipNo}</p>
+			<div class="address-cont">
+				<div class="address-row">
+					<p class="address-label new" id="roadAddr">도로명</p>
+					<address class="address-name">${roadAddr} </address>
+				</div>
+				<div class="address-row">
+					<p class="address-label old" id="jibunAddr">지번</p>
+					<address class="address-name">${jibunAddr}</address>
+				</div>
+			</div>
+		</div>
+	</li>
+</script>
+
+ <script>
+	
+ var pageSize  = 10;
+	$( document ).ready(function() {
+		 
+		// 모달 바로 볼 수 있도록 호출
+		var addressModal = new bootstrap.Modal(document.getElementById('addressModal'));
+		addressModal.show();
+		$('#readMoreBtn').hide();
+		$("#viewpage").val(1);
+		
+		$("#frmAddress").on("keydown", function(event) {
+			
+			console.log(event.keyCode);
+	        // 엔터키가 눌렸는지 확인
+	        if (event.keyCode == 13) {
+	        	$("#viewpage").val(1);
+	        	searchAddr();
+	        }
+	      });
+		
+		
+	});
+	
+	
+	//Read More
+	function getMoreList() {
+		var page = $("#viewpage").val();
+		page = parseInt(page) +1;
+		$("#viewpage").val(page);
+		searchAddr();
+	}
+	
+
+	function searchAddr() {
+			var page = $("#viewpage").val();
+			var params = {
+					currentPage : parseInt(page),
+					countPerPage : pageSize,
+					keyword : $("#frmAddress").val()
+			}
+			console.log(params);
+			
+			$.ajax({
+				   url : '/api/roadAdress/getAddrApi',
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+				   beforeSend: function(xhr){
+				       xhr.setRequestHeader(header,token);
+				    },
+					success: function (data) {
+						var results = data.data.resultBody.results;
+						var totCnt = results.common.totalCount;
+						var errorCode = results.common.errorCode;
+						if(params.currentPage == 1) {
+							$('#addrList').empty();	
+						}
+						;
+						if(totCnt > 0 && errorCode ==0) {
+							$('#addrListTmpl').tmpl(results.juso).appendTo('#addrList');								
+						}
+						
+						if(page * pageSize >= totCnt){
+							$('#readMoreBtn').hide();
+						}else{
+							$('#readMoreBtn').show();
+						}
+						
+	 					
+				    },
+					error : function(request, status, error){
+						alertModalShow("주소 검색중 오류가 발생하였습니다.");
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+				});
+		
+		}
+		
+	
+	function selAddr(el) {
+        var zipCode = $(el).find(".address-zipcode").text().trim(); // 우편번호
+        var roadAddr = $(el).find(".address-row .address-label.new + .address-name").text().trim(); // 도로명 주소
+        var jibunAddr = $(el).find(".address-row .address-label.old + .address-name").text().trim(); // 지번 주소
+        
+        
+        if (window.opener && !window.opener.closed) {
+            window.opener.setAddr(zipCode,roadAddr,jibunAddr);
+        } 
+        
+        window.close();
+        self.close();
+        
+        
+	}
+		
+	
+ </script>
+</th:block>
+
+<!-- Container -->
+<main role="main" class="container">
+
+	 	<!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+	-->
+	<!-- modal 인터넷 결합 여부 선택 -->
+	<div class="modal modal-full fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel" aria-hidden="true">
+		<input type="hidden" id="viewpage"/>
+		<div class="modal-dialog">
+			<div class="modal-content address-srch-page">
+				<div class="modal-header">
+					<button type="button" class="ui-btn">
+						<i class="ui-icn icn-32-back-bk" aria-label="뒤로가기"></i>
+					</button>
+					<h3 class="modal-title blind" id="addressModalLabel">주소검색</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 모통봇 소개 섹션 -->
+					<section class="address-srch-sec">
+						<div class="sec-inner">
+							<div class="sec-header">
+								<h2 class="sec-tit">주소를 입력해주세요.</h2>
+								<p class="sec-explain">도로명이나 지역명을 이용해서 검색해 보세요. 건물번호, 번지를 함께 입력하시면 더욱 정확한 결과가 검색됩니다.</p>
+							</div>
+							<div class="sec-body">
+								<!-- 등록폼 -->
+								<div class="basic-frm">
+									<!-- 일련번호 입력 -->
+									<div class="frm-field">
+										<div class="frm-title">
+											<label for="frmAddress" class="tit">주소</label>
+										</div>
+										<div class="frm-content">
+											<div class="ui-inp">
+												<input type="text" id="frmAddress" value="" placeholder="예) 영동대로 517, 삼성동 519" title="" class="inp"/>
+											</div>
+										</div>
+									</div>
+									<!-- // 일련번호 입력 -->
+								</div>
+								<!-- // 등록폼 -->
+
+								<!-- 조회목록 -->
+								<div class="address-list-wrap">
+									<ul class="address-list" id="addrList">
+										
+									</ul>
+								</div>
+								<!-- //조회목록 -->
+							</div>
+							<!-- Case 목록이 많은 경우 더보기 -->
+							<button type="button" class="ui-btn btn-more-list" onclick="getMoreList();" id="readMoreBtn">
+								<i class="ui-icn icn-16-more-list-gr" aria-hidden="true"></i>
+								<span>더보기</span>
+							</button>
+						</div>
+					</section>
+					<!-- // 모통봇 소개 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal default -->
+	 
+</main>
+
+	
+</html>

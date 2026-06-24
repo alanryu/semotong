@@ -1,0 +1,52 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 유심 정보 입력
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 유심 정보 입력
+.F-QU01-07-01-page {
+	.usim-image {
+		max-width: 50%;
+		min-width: 225rem;
+		padding: 10rem;
+		margin: 0 auto 40rem auto;
+		img {
+			width: 100%;
+		}
+	}
+	.help-msg {
+		margin-top: 10rem;
+		// padding: 8rem 14rem;
+		// background-color: #F4F5F8;
+		// border-radius: 10rem;
+
+		.help-msg-tit {
+			display: flex;
+			align-items: flex-start;
+			gap: 6rem;
+			font-weight: 500;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: #000;
+			.ui-icn {
+				top: 2rem;
+			}
+		}
+
+		.help-msg-list {
+			margin-top: 12rem;
+			li {
+				font-size: 12rem;
+				line-height: 16rem;
+				word-break: keep-all;
+				color: #5A5D60;
+				em {
+					flex: none;
+					font-weight: 500;
+				}
+			}
+		}
+	}
+
+}
+// e: 유심 정보 입력

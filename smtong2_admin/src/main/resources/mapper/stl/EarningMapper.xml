@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.ucomp.web.stl.mapper.EarningMapper">
+	
+	<sql id="listWhere">
+		<where>
+			<if test="searchEarningId != null and searchEarningId != ''">
+				AND id = #{searchEarningId}
+			</if>
+			<if test="searchCompanyId != null and searchCompanyId != ''">
+				AND company_id = #{searchCompanyId}
+			</if>
+			<if test="searchGenerateDate != null and searchGenerateDate != ''">
+				AND generate_date = #{searchGenerateDate}
+			</if>
+			
+			<if test='searchCompanyList != null and searchCompanyList !=""'>
+	    		AND company_id IN
+		        <foreach item="company" index="index" collection="_parameter.searchCompanyList.split(',')" open="(" separator="," close=")">
+		            #{company}
+		        </foreach>
+	    	</if>
+	    	
+	    	<if test="searchStartDt != null and searchStartDt != ''">
+	    		AND generate_date <![CDATA[>=]]> ${searchStartDt}
+	    	</if>
+	    	
+	    	<if test="searchEndDt != null and searchEndDt != ''">
+	    		AND generate_date <![CDATA[<=]]> ${searchEndDt}
+	    	</if>
+		</where>
+	</sql>
+	
+	<sql id="Base_Column_list">
+		  a.id
+		, a.company_id
+		, GET_COMPANY_NM(a.company_id) company_name
+		, (SELECT COUNT(1) FROM tb_stl_earning_list WHERE earning_id = a.id) AS cnt
+		, a.create_id
+		, GET_ADMIN_USER_NM(a.create_id) create_name
+		, a.generate_date
+		, a.create_date
+	</sql>
+	
+	<select id="listCount" parameterType="kr.co.ucomp.web.stl.dto.EarningSearchDto" resultType="Long">
+		SELECT count(1)
+		FROM
+			tb_stl_earning_mng
+		<include refid="listWhere" />
+	</select>
+	
+	<select id="list" parameterType="kr.co.ucomp.web.stl.dto.EarningSearchDto" resultType="kr.co.ucomp.web.stl.entity.EarningEntity">
+		SELECT * FROM (
+			SELECT
+				<include refid="Base_Column_list" />
+			FROM
+				tb_stl_earning_mng a
+		) T
+		<include refid="listWhere"/>
+		ORDER BY generate_date DESC, id DESC
+	    LIMIT #{offset}, #{recordSize}
+	</select>
+	
+	<select id="selectEarning" parameterType="kr.co.ucomp.web.stl.dto.EarningSearchDto" resultType="kr.co.ucomp.web.stl.entity.EarningEntity">
+		SELECT    
+			<include refid="Base_Column_list"/>
+		FROM 
+			tb_stl_earning_mng a
+		<include refid="listWhere" />
+	</select>
+	
+	<insert id="createEarning" parameterType="kr.co.ucomp.web.stl.entity.EarningEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO tb_stl_earning_mng (
+			  company_id
+			, generate_date
+			, create_date
+			, create_id
+		) VALUES (
+			  #{companyId}
+			, #{generateDate}
+			, NOW()
+			, #{createId}
+		)
+	</insert>
+	
+	<delete id="deleteEarningList" parameterType="Long">
+		DELETE FROM
+			tb_stl_earning_list
+		WHERE earning_id = #{earningId}
+	</delete>
+	
+	<insert id="createEarningList" parameterType="kr.co.ucomp.web.stl.entity.EarningListEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO tb_stl_earning_list (
+			  earning_id
+			, agency_name
+			, app_date
+			, open_date
+			, mno
+			, contract_num
+			, acc_type
+			, phone_num
+			, acc_name
+			, plan_name
+			, status
+			, create_date
+			, create_id
+		) VALUES (
+			  #{earningId}
+			, #{agencyName}
+			, #{appDate}
+			, #{openDate}
+			, #{mno}
+			, #{contractNum}
+			, #{accType}
+			, #{phoneNum}
+			, #{accName}
+			, #{planName}
+			, #{status}
+			, NOW()
+			, #{createId}
+		)
+	</insert>
+	
+	<select id="detailListCount" parameterType="kr.co.ucomp.web.stl.dto.EarningSearchDto" resultType="Long">
+		SELECT count(1)
+		FROM 
+			tb_stl_earning_list
+		WHERE earning_id = #{searchEarningId}
+	</select>
+	
+	<select id="detailList" parameterType="kr.co.ucomp.web.stl.dto.EarningSearchDto" resultType="kr.co.ucomp.web.stl.entity.EarningListEntity">
+		SELECT 
+			  id
+			, earning_id
+			, agency_name
+			, app_date
+			, open_date
+			, mno
+			, contract_num
+			, acc_type
+			, phone_num
+			, acc_name
+			, plan_name
+			, status
+			, create_date
+			, create_id
+		FROM 
+			tb_stl_earning_list
+		WHERE earning_id = #{searchEarningId}
+		ORDER BY id
+		LIMIT #{offset}, #{recordSize}
+	</select>
+	
+	<select id="detailListWithoutLimit" parameterType="kr.co.ucomp.web.stl.dto.EarningSearchDto" resultType="kr.co.ucomp.web.stl.entity.EarningListEntity">
+		SELECT 
+			  id
+			, earning_id
+			, agency_name
+			, app_date
+			, open_date
+			, mno
+			, contract_num
+			, acc_type
+			, phone_num
+			, acc_name
+			, plan_name
+			, status
+			, create_date
+			, create_id
+		FROM 
+			tb_stl_earning_list
+		WHERE earning_id = #{searchEarningId}
+		ORDER BY id
+	</select>
+</mapper>

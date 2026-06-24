@@ -1,0 +1,784 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 요금제 상세
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 요금제 상세 페이지
+.F-P02-01-page {
+	// 페이지별 섹션 여백 설정
+	--sec-outer-margin: 50rem;
+
+	// 페이시 여백
+	.tab-content {
+		@include bottom-spacer;
+	}
+
+	// s: 요금제 상품 섹션
+	.ratePlanC-sec {
+		padding-top: 20rem;
+
+		// 요금제 상품 카드
+		.ratePlanC-card {
+			@include ratePlanC-card;
+		}
+
+		+ .ui-tab { /* 7차 수정 : 결합배너 미노출시 여백 대응 */
+			margin-top: 34rem;
+		}
+	}
+	// e: 요금제 상품 섹션
+
+	// s: 요금제 결합
+	.ratePlan-combi-sec { /* 2차 수정 : 체크박스 삭제, 간격 수정 */
+		// margin-top: 50rem;
+		// margin-bottom: 34rem;
+		@include sec-basic;
+
+		.combi-swiper { /* 7차 수정 : 결합배너 스와이프로 변경 */
+			@include event-swiper;
+		}
+
+		.combi-bnr { /* 7차 수정 : 결합배너 스와이프로 변경 */
+			@include event-bnr;
+		}
+
+		/* .ui-chk {
+		 	margin-top: 14rem;
+		} */
+
+		.noti-box {
+			margin-top: 14rem;
+			@include noti-box;
+		}
+	}
+	// e: 요금제 결합 섹션
+
+	// s: 이런 혜택을 받을 수 있어요 섹션
+	.benefit-sec {
+		@include sec-basic;
+		margin-top: var(--sec-outer-margin);
+
+		.benefit-box {
+			padding: 16rem;
+			background-color: #F4F5F8;
+			border-radius: 4rem;
+			&.primary {
+				background-color: #EAE6FB;
+				.benefit-tit {
+					color: $color-primary;
+				}
+			}
+			+ .benefit-box {
+				margin-top: 10rem;
+			}
+
+			.benefit-tit {
+				font-size: 16rem;
+				font-weight: 600;
+				line-height: 24rem;
+				margin-bottom: 8rem;
+			}
+			.benefit-list {
+				display: flex;
+				flex-direction: column;
+				gap: 8rem;
+
+				.benefit-item {
+					width: 100%;
+
+					.benefit-card {
+						display: flex;
+						align-items: center;
+						gap: 10rem;
+						height: 82rem;
+						padding: 12rem;
+						border-radius: 4rem;
+						background-color: #fff;
+
+						.benefit-card-img {
+							flex: none;
+							width: 36rem;
+							height: 36rem;
+							img {
+								width: 100%;
+								height: 100%;
+							}
+						}
+
+						.benefit-card-con {
+							flex: 1 1 auto;
+							overflow: hidden;
+							.tit {
+								display: flex;
+								align-items: center;
+								font-weight: 500;
+								font-size: 14rem;
+								line-height: 20rem;
+								color: #36383A;
+								.ui-btn {
+									display: block;
+									width: auto;
+									flex:0 1 auto;
+									text-align: left;
+									white-space: nowrap;
+									text-overflow: ellipsis;
+									overflow: hidden;
+								}
+							}
+							.txt {
+								margin-top: 4rem;
+								font-weight: 500;
+								font-size: 12rem;
+								line-height: 18rem;
+								color: #828588;
+								@include ellipsis2;
+							}
+						}
+					}
+				}
+			}
+		}
+
+	}
+	// e: 이런 혜택을 받을 수 있어요 섹션
+
+	// s: 요금제 상세 정보 섹션
+	.ratePlan-detail-sec {
+		@include sec-basic;
+		margin-top: var(--sec-outer-margin);
+
+		// 요금제 상세 카드
+		.ratePlan-detail-card {
+			border: 1px solid #EFF0F0;
+			@include box-shadow-16;
+			padding: 16rem;
+
+			.card-header {
+				padding-top: 4rem;
+				.card-tit {
+					font-weight: 700;
+					font-size: 18rem;
+					line-height: 26rem;
+					color: #36383A;
+					@include ellipsis1;
+				}
+				.card-explain {
+					margin-top: 4rem;
+					color: #828588;
+					font-size: 13rem;
+					line-height: 18rem;
+					word-break: keep-all;
+				}
+			}
+			.card-body {
+				margin-top: 14rem;
+
+				// 통신비 정보
+				.price-info {
+					margin-bottom: 20rem;
+					padding: 12rem 16rem 20rem 16rem;
+					border:1px solid #EFF0F0;
+
+					.price-desc {
+						margin-bottom: 8rem;
+						color: #96989B;
+						text-align: right;
+						font-size: 14rem;
+						line-height: 20rem;
+						font-weight: 500;
+					}
+					.price-item-group {
+						display: flex;
+						flex-direction: column;
+						gap: 12rem;
+
+						.price-item {
+							display: flex;
+							align-items: center;
+							justify-content: space-between;
+							gap: 16rem;
+							width: 100%;
+
+							.price-label {
+								display: flex;
+								align-items: center;
+								flex: none;
+								width: 70rem;
+								height: 20rem;
+								gap: 8rem;
+								img {
+									height: 100%;
+								}
+							}
+
+							.price-progress {
+								flex: 1 1 auto;
+								.progress {
+									display: flex;
+									align-items: center;
+									justify-content: center;
+									height: 22rem;
+									width: 100%;
+									border-radius: 4rem;
+									overflow: hidden;
+									.progress-label {
+										display: flex;
+										align-items: center;
+										justify-content: center;
+										width: 100%;
+										height: 100%;
+										font-size: 12rem;
+										line-height: 16rem;
+										font-weight: 500;
+										text-align: center;
+									}
+								}
+							}
+
+							&.type-a {
+								.price-progress {
+									.progress {
+										.progress-label {
+											background-color: #D1EBE4;
+											color: #6F948A;
+										}
+									}
+								}
+							}
+							&.type-b {
+								.price-progress {
+									.progress {
+										.progress-label {
+											background-color: #EAE6FB;
+											color: #8C85A9;
+										}
+										.progress-label:nth-child(2) {
+											background-color: $color-primary;
+											color: #fff;
+											font-weight: 700;
+										}
+									}
+								}
+							}
+						}
+						.price-divider {
+							width: 100%;
+							height: 1px;
+							background-color: #eff0f0;
+						}
+					}
+				}
+
+				// 요금제 정보
+				.card-info {
+					display: grid;
+					grid-template-columns: 1fr 1fr 1fr 1fr;
+					gap: 20rem 12rem;
+					padding: 16rem 12rem;
+					border-radius: 4rem;
+					background-color: #F4F5F8;
+					text-align: center;
+					.tit {
+						display: block;
+						font-weight: 500;
+						font-size: 14rem;
+						line-height: 20rem;
+						color: #96989B;
+					}
+					.txt {
+						display: block;
+						margin-top: 2rem;
+						font-weight: 700;
+						font-size: 14rem;
+						line-height: 16rem;
+						color: #36383A;
+					}
+					+ .card-info {
+						margin-top: 10rem;
+					}
+				}
+			}
+		}
+
+		// 요금제 상세 아코디언
+		.ratePlan-detail-acco {
+			margin-top: 30rem;
+			border-top: 1px solid #EFF0F0;
+
+			.collapsing {
+				height: 0;
+				overflow: hidden;
+				transition: height .35s ease;
+			}
+			.collapse:not(.show) {
+				display: none;
+			}
+			.acco-button .ui-icn {
+				transition: transform .35s ease;
+			}
+			.acco-button[aria-expanded='true'] .ui-icn {
+				transform: rotate(180deg);
+			}
+
+			// 아코디언 스타일
+			.acco-item {
+				padding: 14rem 0;
+				border-bottom: 1px solid #EFF0F0;
+			}
+			.acco-header {
+				position: relative;
+
+				.acco-button {
+					display: flex;
+					align-items: center;
+					width: 100%;
+					text-align: left;
+					> span {
+						position: relative;
+						display: block;
+						padding-right: 12rem;
+						font-weight: 500;
+						font-size: 14rem;
+						line-height: 20rem;
+						max-height: 40rem;
+						@include ellipsis2;
+					}
+					.ui-icn {
+						margin-left: auto;
+					}
+				}
+			}
+
+			.acco-body {
+				margin-top: 16rem;
+				.acco-answer { /* 8차 수정 : 요금제 상세 정보 수정(여기부터) */
+					display: flex;
+					flex-direction: column;
+					gap: 8rem;
+					font-weight: 500;
+					font-size: 14rem;
+					line-height: 20rem;
+					color: #46484B;
+
+					h3 {
+						font-weight: 700;
+						color: #2A2B2D;
+					}
+					div {
+						margin-top: 16rem;
+						margin-bottom: 4rem;
+						&:first-child {
+							margin-top: 0;
+						}
+						&:last-child {
+							margin-bottom: 0;
+						}
+					}
+					ol {
+						font-size: 14rem;
+						line-height: 22rem;
+						margin-top: 8rem;
+						margin-bottom: 8rem;
+						&:first-child {
+							margin-top: 0;
+						}
+						&:last-child {
+							margin-bottom: 0;
+						}
+						li {
+							position: relative;
+							counter-increment: item;
+							margin-top: 8rem;
+							padding-left: 12rem;
+							padding-bottom: 8rem;
+							border-bottom: 1px solid #ddd;
+							font-weight: 400;
+							&::before {
+								content: counter(item) ". ";
+								position: absolute;
+								left: 0;
+								top: 0;
+							}
+							&:last-child {
+								border-bottom: 0;
+								padding-bottom: 0;
+								margin-bottom: 0;
+							}
+						}
+					}
+					small { /* 8차 수정 : 요금제 상세 정보 수정(여기까지) */
+						font-weight: 500;
+						font-size: 12rem;
+						line-height: 16rem;
+					}
+				}
+			}
+
+			@include media-tablet-xs {
+				margin-left: 0;
+				margin-right: 0;
+			}
+		}
+	}
+	// e: 요금제 상세 정보 섹션
+
+	// s: 통신사 리뷰 섹션
+	.review-sec {
+		@include sec-basic;
+		margin-top: var(--sec-outer-margin);
+
+		// 통신사 리뷰 평점
+		.review-brand-sat {
+			.ui-btn {
+				display: flex;
+				width: 100%;
+				padding: 16rem;
+				border-radius: 4rem;
+				background-color: #F4F5F8;
+				> .brand {
+					display: flex;
+					align-items: center;
+					height: 28rem;
+					gap: 6rem;
+					img {
+						height: 100%;
+					}
+					.brand-rating {
+						display: inline-flex;
+						align-items: center;
+						padding: 3rem 8rem 3rem 4rem;
+						border:1px solid #CDC2F5;
+						border-radius: 15rem;
+						color: $color-primary;
+						font-weight: 500;
+						font-size: 12rem;
+						line-height: 14rem;
+					}
+				}
+				> .ui-icn {
+					margin-left: auto;
+				}
+			}
+		}
+
+		// 이용자 리뷰 평점
+		.review-user-sat {
+			margin-top: 10rem;
+			.review-list {
+				@include review-list-02;
+			}
+
+			.review-card {
+				@include review-card-02;
+			}
+		}
+	}
+	// e: 통신사 리뷰 섹션
+
+	// s: 자주묻는 질문 섹션
+	.faq-sec {
+		@include sec-basic;
+		margin-top: var(--sec-outer-margin);
+
+		// 자주묻는 질문 아코디언
+		.faq-accordion {
+			@include faq-accordion;
+		}
+		// 자주묻는 질문 아코디언
+	}
+	// e: 자주묻는 질문 섹션
+
+	// s: 알뜰폰 개통 방법
+	.account-sol-sec {
+		@include account-sol-sec;
+	}
+	// e: 알뜰폰 개통 방법
+
+	// s: 비슷한 요금제 섹션
+	.similar-plan-sec {
+		margin-bottom: 30rem;
+		@include sec-basic;
+		margin-top: var(--sec-outer-margin);
+
+		.similar-plan-swiper {
+			.swiper-wrapper {
+				.swiper-slide {
+					width: 240rem;
+					@include media-tablet-xs {
+						width: 233rem;
+					}
+				}
+			}
+		}
+
+		.similar-plan-card {
+			width: 100%;
+			.card-body {
+				position: relative;
+				padding: 16rem;
+				border-radius: 2rem;
+				background-color: #F4F5F8;
+				.card-tit {
+					font-weight: 500;
+					font-size: 14rem;
+					line-height: 20rem;
+					color: #000000;
+					@include ellipsis1;
+				}
+				.card-con {
+					display: flex;
+					flex-wrap: wrap;
+					gap: 2rem 0;
+					margin-top: 15rem;
+					font-weight: 500;
+					font-size: 12rem;
+					line-height: 16rem;
+					dt {
+						flex: none;
+						width: 60rem;
+						color: #000;
+					}
+					dd {
+						width: calc(100% - 60rem);
+						color: #5A5D60;
+						text-align: right;
+						@include ellipsis1;
+					}
+				}
+				.card-charge {
+					margin-top: 14rem;
+					padding-top: 10rem;
+					border-top: 1px solid #CFD0D1;
+					text-align: right;
+					font-weight: 700;
+					font-size: 16rem;
+					line-height: 22rem;
+					color: #000;
+				}
+				.card-point {
+					display: flex;
+					justify-content: flex-end;
+					align-items: center;
+					margin-bottom: 2rem;
+					font-weight: 600;
+					font-size: 18rem;
+					line-height: 24rem;
+					color: $color-point;
+					.tit {
+						font-size: 12rem;
+						line-height: 24rem;
+						margin-right: 4rem;
+						font-weight: 700;
+					}
+				}
+				.card-button {
+					position: absolute;
+					left: 0;
+					top: 0;
+					width: 100%;
+					height: 100%;
+				}
+			}
+		}
+	}
+	// e: 비슷한 요금제 섹션
+
+	// s: 요금제 신청 섹션
+	.payment-noti-sec {
+		position: sticky;
+		bottom: 0;
+		left: 0;
+		z-index: 100;
+		margin-top: auto;
+		padding-top: 20rem;
+		background-color: #fff;
+		border-radius: 20rem 20rem 0 0;
+		box-shadow: 0 -4rem 20rem 0 rgba(0,0,0,0.1);
+
+		.payment-noti {
+			.payment-tit {
+				padding: 0 4rem;
+				.charge {
+					font-weight: 700;
+					font-size: 20rem;
+					line-height: 28rem;
+					color: #000;
+				}
+				.charge-sale {
+					display: none;
+				}
+				.charge-point {
+					display: flex;
+					align-items: center;
+					margin-bottom: 2rem;
+					font-weight: 700;
+					font-size: 18rem;
+					line-height: 24rem;
+					color: $color-point;
+					.tit {
+						font-size: 12rem;
+						line-height: 24rem;
+						margin-right: 4rem;
+					}
+				}
+				.explan {
+					margin-top: 1rem;
+					font-weight: 500;
+					font-size: 14rem;
+					line-height: 20rem;
+					color: #828588;
+					em {
+						font-weight: 700;
+						&.price {
+							color: #000;
+						}
+					}
+				}
+			}
+			.payment-con {
+				margin-top: 13rem;
+				padding: 8rem 12rem;
+				border-radius: 4rem;
+				background-color: #F4F5F8;
+				.item {
+					display: flex;
+					justify-content: space-between;
+					font-size: 12rem;
+					line-height: 16rem;
+					.tit {
+						display: block;
+						font-weight: 500;
+					}
+					.charge {
+						display: block;
+						font-weight: 700;
+						text-align: right;
+					}
+					& + .item {
+						margin-top: 2rem;
+					}
+				}
+			}
+			.payment-btn {
+				margin-top: 20rem;
+				padding-bottom: 32rem;
+			}
+
+			// 인터넷 결합 시 할인 금액 보기
+			&.is-sale {
+				.payment-tit {
+					.charge {
+						display: none;
+					}
+					.charge-sale {
+						display: flex;
+						align-items: center;
+						strong {
+							font-weight: 700;
+							font-size: 20rem;
+							line-height: 28rem;
+							color: #000;
+							color: $color-primary;
+						}
+						span {
+							margin-left: 4rem;
+							font-weight: 500;
+							font-size: 14rem;
+							line-height: 20rem;
+							color: #828588;
+						}
+					}
+				}
+			}
+		}
+
+		@include media-tablet-xs {
+			border-top: 1px solid #EFF0F0;
+			box-shadow: none;
+			border-radius: 0;
+		}
+	}
+	// e: 요금제 신청 섹션
+
+	// s: 섹션 펼쳐보기 토글
+	.expand-sec-group {
+		position: relative;
+		overflow: hidden;
+		height: 368rem;
+
+		.expand-sec-btn {
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			width: 100%;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 104px;
+			background: linear-gradient(360deg, #FFFFFF 0%, rgba(255, 255, 255, 0.4) 100%);
+
+			.btn-expand {
+				height: 48rem;
+				gap: 4rem;
+				padding: 10rem 16rem;
+				background-color: #131414;
+				border-radius: 30rem;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #fff;
+				span::after {
+					content:' 펼쳐보기';
+				}
+			}
+		}
+
+		&.is-expanded {
+			height: auto;
+
+			.expand-sec-btn {
+				position: static;
+
+				.btn-expand {
+					span::after {
+						content:' 접어보기';
+					}
+					.ui-icn {
+						transform: rotate(180deg);
+					}
+				}
+			}
+		}
+	}
+	// e: 섹션 펼쳐보기 토글
+
+}
+// e: 요금제 상세 페이지
+
+// s: 혜택 상세 페이지
+.benefit-modal-page {
+	.benefit-detail-sec {
+		padding-top: 10rem;
+
+		.benefit-image + .benefit-text {
+			margin-top: 20rem;
+		}
+		.benefit-text {
+			padding: 16rem;
+			background-color: #F4F5F8;
+			border-radius: 4rem;
+
+			.tit {
+				margin-bottom: 10rem;
+				font-weight: 700;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #36383A;
+			}
+
+			.bul {
+				@include bul-basic;
+			}
+		}
+	}
+}
+// e: 혜택 상세 페이지

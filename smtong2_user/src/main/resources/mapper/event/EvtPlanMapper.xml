@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.event.mapper.EvtPlanMapper">
+	
+	<select id="evtList" parameterType="kr.co.ucomp.web.event.dto.EvtPlanSearchDTO" resultType="kr.co.ucomp.web.event.entity.EvtPlanEntity">
+		SELECT
+			id, event_id, plan_id
+		FROM tb_evt_plan_list
+		WHERE 1 = 1
+		<if test=" searchId != null and searchId != 0 ">
+			AND id = #{searchId}
+		</if>
+		<if test=" searchEventId != null and searchEventId != 0 ">
+			AND event_id = #{searchEventId}
+		</if>
+		<if test=" searchPlanId != null and searchPlanId != 0 ">
+			AND plan_id = #{searchPlanId}
+		</if>
+		ORDER BY order_no
+		LIMIT #{offset}, #{recordSize}
+	</select>
+	
+	<select id="evtCount" parameterType="kr.co.ucomp.web.event.dto.EvtPlanSearchDTO" resultType="java.lang.Long">
+		SELECT COUNT(1)
+		FROM tb_evt_plan_list
+		WHERE 1 = 1	
+		<if test=" searchId != null and searchId != 0 ">
+			AND id = #{searchId}
+		</if>
+		<if test=" searchEventId != null and searchEventId != 0 ">
+			AND event_id = #{searchEventId}
+		</if>
+		<if test=" searchPlanId != null and searchPlanId != 0 ">
+			AND plan_id = #{searchPlanId}
+		</if>
+	</select>
+	
+	
+	<select id="evtById" parameterType="kr.co.ucomp.web.event.dto.EvtPlanSearchDTO" resultType="kr.co.ucomp.web.event.entity.EvtPlanEntity">
+		SELECT
+			id, event_id, plan_id
+		FROM tb_evt_plan_list
+		WHERE 1 = 1	
+		<if test=" searchId != null and searchId != 0 ">
+			AND id = #{searchId}
+		</if>
+		<if test=" searchEventId != null and searchEventId != 0 ">
+			AND event_id = #{searchEventId}
+		</if>
+		<if test=" searchPlanId != null and searchPlanId != 0 ">
+			AND plan_id = #{searchPlanId}
+		</if>
+	</select>
+	
+	
+	<insert id="create"  parameterType="kr.co.ucomp.web.event.entity.EvtPlanEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+		INSERT INTO tb_evt_plan_list (event_id, plan_id) 
+		VALUES(	
+				 #{eventId}
+				,#{planId}
+		);
+	</insert>
+	
+	<update id="update"  parameterType="kr.co.ucomp.web.event.entity.EvtPlanEntity" >
+		UPDATE tb_evt_plan_list 
+		SET		event_id		=#{eventId}
+				,plan_id		=#{planId}
+		WHERE id = #{id}
+	
+	</update>
+	
+	<delete id="delete" parameterType="kr.co.ucomp.web.event.entity.EvtPlanEntity">
+		DELETE FROM tb_evt_plan_list
+		WHERE id = #{id}
+	</delete>
+	
+</mapper>

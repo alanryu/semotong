@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layout/default_layout}"
+  layout:fragment="Content"
+  th:with="menuIdGroup ='04',menuId ='01'"
+>
+  <!-- index.html 고유 CSS 추가 -->
+  <th:block layout:fragment="css">
+	<script th:src="|https://cdn.tiny.cloud/1/${@environment.getProperty('tinymce.apikey')}/tinymce/7/tinymce.min.js|"  referrerpolicy="origin" ></script>
+  </th:block>
+  <!-- index.html 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+    <script id="benefitListTmpl" type="text/x-jquery-tmpl">
+      <tr class="bnf-select__row">
+      	<input type="hidden" id="hndBemefitTile" value="${title}">
+      	 <input type="hidden" id="hndBemefitId" value="${id}">
+      	 <input type="hidden" id="hndProvidet" value="${provider}">
+      	 <input type="hidden" id="hndCate01" value="${majorCategoryId}">
+      	 <input type="hidden" id="hndCate02" value="${minorCategoryId}">
+           <td class="bnf-select__td"><input type="radio" name="benefit" class="bnf-select__radio" value="${id}"></td>
+           <td class="bnf-select__td">{{html getBenefitProvidor(provider)}}</td>
+           <td class="bnf-select__td">${majorCategoryName}</td>
+           <td class="bnf-select__td">${minorCategoryName}</td>
+           <td class="bnf-select__td">${title}</td>
+           <td class="bnf-select__td">${createDate}</td>
+       </tr>
+    </script>
+	
+	
+	<script id="popTagListTmpl" type="text/x-jquery-tmpl">
+		<div class="form-check form-check-inline">
+			{{if isselect == true}}
+				<input class="form-check-input" type="checkbox" name="popCateCode" id="popTagCode${code}" value="${code}"  data-tagname="${codeName}" checked>
+			{{else}}
+				<input class="form-check-input" type="checkbox" name="popCateCode" id="popTagCode${code}" value="${code}"  data-tagname="${codeName}">
+			{{/if}}
+		 	<label class="form-check-label" for="popTagCode${code}">${codeName}</label>
+		</div>		
+	</script>
+
+    <script type="text/javascript">
+      $(document).ready(function () {});
+
+      // 화면 로드 시
+      document.addEventListener("DOMContentLoaded", function () {
+        var procMsg = "[[${procMsg}]]";
+
+        if (procMsg != "" || procMsg != "") {
+          if (procMsg == "sucess") {
+            showAlert("저장되었습니다.", goList);
+          } else {
+            alert(procMsg);
+          }
+        }
+
+        initTinyEditor("edt_suppContent"); // 지원 정보 에디터 초기화
+        initTinyEditor("edt_noSuppContent"); // 미지원 정보 에디터 초기화
+        initTinyEditor("edt_noticeContent"); // 미지원 정보 에디터 초기화
+        getPlanBenefitList();
+        getBenefitInfoList();
+
+        showDataAddInput();
+      });
+
+      var bnfSys;
+      var bfsm;
+
+      function goList() {
+        window.location.href = "/pbm/plan/list";
+      }
+
+      function savePlanData() {
+        $("#suppContent").val(tinymce.get("edt_suppContent").getContent()); // 지원 정보 에디터 값 저장용 textarea 로 전달
+        $("#noSuppContent").val(tinymce.get("edt_noSuppContent").getContent()); // 미지원 정보 에디터 값 저장용 textarea 로 전달
+        $("#noticeContent").val(tinymce.get("edt_noticeContent").getContent()); // 미지원 정보 에디터 값 저장용 textarea 로 전달
+
+        var txt = "등록하시겠습니까?";
+
+        showConfirm(
+          txt,
+          () => {
+            $("#submitForm").submit();
+          },
+          () => {},
+          "요금제등록"
+        );
+      }
+
+      // =============================== 혜택 정보 관리
+
+      function handleRowSelectionBF() {
+        const rows = document.querySelectorAll(".bnf-select__row");
+        rows.forEach((row) => {
+          row.addEventListener("click", () => {
+            rows.forEach((r) => r.classList.remove("bnf-select__row--selected"));
+            row.classList.add("bnf-select__row--selected");
+            const radio = row.querySelector(".bnf-select__radio");
+            if (radio) radio.checked = true;
+          });
+        });
+      }
+
+      // 혜택정보 수정
+      function modifyBenefit() {
+        if ($("#modifyBenefitTitle").val() == "") {
+          showAlert("제목을 입력해주세요.");
+          return false;
+        }
+
+        if ($("#modifyBenefitContent").val() == "") {
+          showAlert("툴팁 내용을 입력해주세요.");
+          return false;
+        }
+
+        var params = {
+          id: $("#modifyBenefitId").val(),
+          displayYn: $("input[name='modifyBenefitDispYn']:checked").val(),
+          title: $("#modifyBenefitTitle").val(),
+          content: $("#modifyBenefitContent").val(),
+        };
+
+        $.ajax({
+          url: "/pbm/planbenefit/info/update",
+          type: "POST",
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(params),
+          success: function (data) {
+            initBenefitInfoList();
+            const modal = document.querySelector("#bnfModifyModal");
+            if (modal) modal.style.display = "none";
+          },
+          error: function (request, status, error) {
+            showAlert(error);
+          },
+          complete: function () {
+            // $('#loading').addClass('display-none');
+          },
+        });
+      }
+      // 혜택정보 추가
+      function createBenefit() {
+        if ($("#benefitTitle").val() == "") {
+          showAlert("제목을 입력해주세요.");
+          return false;
+        }
+
+        if ($("#benefitContent").val() == "") {
+          showAlert("툴팁 내용을 입력해주세요.");
+          return false;
+        }
+
+        var params = {
+          displayYn: $("input[name='benefitDispYn']:checked").val(),
+          title: $("#benefitTitle").val(),
+          content: $("#benefitContent").val(),
+        };
+
+        $.ajax({
+          url: "/pbm/planbenefit/info/create",
+          type: "POST",
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(params),
+          success: function (data) {
+            initBenefitInfoList();
+            const modal = document.querySelector("#bnfAddModal");
+            if (modal) modal.style.display = "none";
+          },
+          error: function (request, status, error) {
+            showAlert(error);
+          },
+          complete: function () {
+            // $('#loading').addClass('display-none');
+          },
+        });
+      }
+
+      // 혜택 정보 선택을 위한 모달에 혜택 리스트 정보조회
+      function getBenefitInfoList() {
+        var searchBenefitTitle = $("#searchBenefitTitle").val();
+        var displayYn = "Y";
+
+        var params;
+
+        params = {
+          displayYn: displayYn,
+          keyword: searchBenefitTitle,
+          planId: "[[${record.id}]]",
+          page: 1,
+          recordSize: 100,
+        };
+
+        $.ajax({
+          url: "/pbm/planbenefit/info/list",
+          type: "POST",
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(params),
+          success: function (data) {
+            $("#benefitDataList").empty();
+
+            if (data.code == 200 && data.totalCnt > 0) {
+              $("#benefitListTmpl").tmpl(data.data).appendTo("#benefitDataList");
+
+              if (bnfSys == null) {
+                bnfSys = new BenefitManagerSystem();
+              }
+              handleRowSelectionBF();
+            }
+          },
+          error: function (request, status, error) {
+            showAlert(error);
+          },
+          complete: function () {
+            // $('#loading').addClass('display-none');
+          },
+        });
+      }
+
+      // 현재 요금제에 설정된 혜택 정보 조회
+      function getPlanBenefitList() {
+        var params = {
+          displayYn: "Y",
+          planId: "[[${record.id}]]",
+          page: 1,
+          recordSize: 100,
+        };
+        $.ajax({
+          url: "/pbm/planbenefit/map/list",
+          type: "POST",
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(params),
+          success: function (data) {
+            if (data.code == 200 && data.totalCnt > 0) {
+              var res = data.data;
+              if (bnfSys == null) {
+                bnfSys = new BenefitManagerSystem();
+              }
+              $.each(res, function (index, item) {
+                let data = {
+                  text: item.benefitTitle,
+                  value: item.planBenefitsId,
+                  mapId: item.id,
+                  provider: item.provider,
+                  cate01: item.majorCategoryId,
+                  cate02: item.minorCategoryId,
+                };
+                bnfSys.benefits.push(data);
+                bnfSys.renderInputs();
+              });
+            }
+          },
+          error: function (request, status, error) {
+            alert(error);
+          },
+          complete: function () {
+            // $('#loading').addClass('display-none');
+          },
+        });
+      }
+
+      // 현재 요금제에 혜택 정보 추가 설정
+      function setPlanBenefit(benefitId, orderNo) {
+        var resdata = "";
+        var params = {
+          planBenefitsId: benefitId,
+          planListId: "[[${record.id}]]",
+          orderNo: orderNo,
+        };
+        $.ajax({
+          url: "/pbm/planbenefit/map/create",
+          type: "POST",
+          async: false,
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(params),
+          success: function (data) {
+            if (data.code == 201) {
+              resdata = data.data.id;
+              return resdata;
+            }
+          },
+          error: function (request, status, error) {
+            alert(error);
+          },
+          complete: function () {
+            // $('#loading').addClass('display-none');
+          },
+        });
+        return resdata;
+      }
+
+      // 현재 요금제에 사은품 순서 설정
+      function setPlanBenefitOrder() {
+        $("input[id^='txtBenefit']").each(function (index, element) {
+          var mngId = $(element).attr("data-benefitmapid");
+          updatePlanBenefitOrder(mngId, index);
+        });
+      }
+      function updatePlanBenefitOrder(mngId, orderNo) {
+        var params = {
+          id: mngId,
+          orderNo: orderNo,
+        };
+        $.ajax({
+          url: "/pbm/planbenefit/map/updatemapOrder",
+          type: "POST",
+          async: false,
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(params),
+          success: function (data) {
+            console.log(data);
+          },
+          error: function (request, status, error) {
+            alert(error);
+          },
+          complete: function () {
+            // $('#loading').addClass('display-none');
+          },
+        });
+      }
+
+      // 현재 요금제에 혜택 정보 삭제
+      function deletePlanBenefit(mngId) {
+        $.ajax({
+          url: "/pbm/planbenefit/map/delete/" + mngId,
+          type: "DELETE",
+          success: function (data) {
+            if (data.code == 200 && data.totalCnt > 0) {
+              console.log(data);
+            }
+          },
+          error: function (request, status, error) {
+            alert(error);
+          },
+          complete: function () {
+            // $('#loading').addClass('display-none');
+          },
+        });
+      }
+
+      // 에디터 초기화 완료 후 callback 함수
+      function customInitEditor(editor, targer) {
+        // You can access the editor instance here and manipulate it
+
+        // 지원정보 에디터 db 값 세팅
+        if ("edt_suppContent" == targer) {
+          editor.setContent($("#suppContent").val());
+        }
+
+        // 미지원정보 에디터 db 값 세팅
+        if ("edt_noSuppContent" == targer) {
+          editor.setContent($("#noSuppContent").val());
+        }
+
+        // 미지원정보 에디터 db 값 세팅
+        if ("edt_noticeContent" == targer) {
+          editor.setContent($("#noticeContent").val());
+        }
+      }
+
+      function initBenefitInfoList() {
+        $("#searchBenefitTitle").val("");
+        getBenefitInfoList();
+      }
+
+      function registerPlanCode() {
+        var params = {
+          uuid: "[[${record.uuid}]]",
+          planCode: $("#planCode").val(),
+        };
+        $.ajax({
+          url: "/pbm/plan/ajaxUpdate",
+          type: "POST",
+          async: false,
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(params),
+          success: function (data) {
+            var updateErrYn = data.data.updateErrYn;
+            if (updateErrYn == "D") {
+              showAlert("기존에 사용중인 요금제 코드입니다. 다른 코드를 입력하세요.");
+            } else {
+              showAlert("요금제 코드를 업데이트 하였습니다.");
+              $("#btn-plan-code").html("수정");
+            }
+          },
+          error: function (request, status, error) {
+            showAlert(error);
+          },
+          complete: function () {
+            // $('#loading').addClass('display-none');
+          },
+        });
+      }
+
+      function showDataAddInput() {
+        const checkbox = document.getElementById("imageBadgeAddData");
+        if (checkbox.checked) {
+          $("#imageBadgeAddDataNm").show();
+          // 추가 동작
+        } else {
+          $("#imageBadgeAddDataNm").hide();
+          // 추가 동작
+        }
+      }
+
+      function goEditOrg() {
+        var uuid = "[[${record.uuid}]]";
+        window.location.href = "/pbm/plan/editOrg?searchUUid=" + uuid;
+      }
+	  
+	  
+	  function openTagMngPop() {
+		var params = {
+			codeGroup : "plan_tag_code",
+			userYn : "Y",
+			page : 1,
+			recordSize : 999
+		}
+		$.ajax({
+		   url : '/cmm/cmmcode/code/list',
+	       type : 'POST',
+	       dataType : "json",
+	       contentType:"application/json",
+		   data : JSON.stringify(params),
+			success: function (data) {
+				
+				$('#popTagList').empty();
+				if(data.totalCnt > 0) {
+					
+					$.each(data.data, function(idx, obj){
+						obj.isselect = false;
+						
+						if($("#planTag1").val().trim() !="" && obj.code.trim() == $("#planTag1").val().trim()) {
+							obj.isselect = true;	
+						}
+						
+						if($("#planTag2").val().trim() !="" && obj.code.trim() == $("#planTag2").val().trim()) {
+							obj.isselect = true;	
+						}
+						if($("#planTag3").val().trim() !="" && obj.code.trim() == $("#planTag3").val().trim()) {
+							obj.isselect = true;	
+						}
+						if($("#planTag4").val().trim() !="" && obj.code.trim() == $("#planTag4").val().trim()) {
+							obj.isselect = true;	
+						}
+						if($("#planTag5").val().trim() !="" && obj.code.trim() == $("#planTag5").val().trim()) {
+							obj.isselect = true;	
+						}
+						
+					});
+					
+					$('#popTagListTmpl').tmpl(data.data).appendTo('#popTagList');
+				}
+				
+				
+				var myModal = new bootstrap.Modal(document.getElementById('regEditTagModal'));
+				myModal.show();
+		    },
+			error : function(request, status, error){
+	            alert(error);
+	        },
+	        complete:function(){
+	           // $('#loading').addClass('display-none');
+	        }
+		});
+	  }
+	  
+	  function setPlanTag() {
+		
+			const checkedTags = document.querySelectorAll('input[name="popCateCode"]:checked');
+			
+			const count = checkedTags.length; // 체크된 체크박스의 개수
+			if(count >5) {
+				showAlert("tag는 5개까지만 선택 가능합니다.");
+				return;
+			}
+			
+			
+			for(i=1;i<6;i++) {
+				$("#planTag"+i).val("");
+				$("#planTag"+i+"Name").text("");
+				$("#planTag"+i+"Name").hide();	
+			}
+			
+			// for 문으로 checkedTags 순회
+			checkedTags.forEach(tag => {
+				if($("#planTag1").val() =="")  {
+					$("#planTag1").val(tag.value);
+					$("#planTag1Name").text("#" + tag.dataset.tagname);
+					$("#planTag1Name").show();
+				} else {
+					if($("#planTag2").val() =="")  {
+						$("#planTag2").val(tag.value);
+						$("#planTag2Name").text("#" + tag.dataset.tagname);
+						$("#planTag2Name").show();
+					} else {
+						if($("#planTag3").val() =="") {
+							$("#planTag3").val(tag.value);
+							$("#planTag3Name").text("#" + tag.dataset.tagname);
+							$("#planTag3Name").show();
+						} else {
+							if($("#planTag4").val() =="") {
+								$("#planTag4").val(tag.value);
+								$("#planTag4Name").text("#" + tag.dataset.tagname);
+								$("#planTag4Name").show();
+							} else {
+								if($("#planTag5").val() =="") {
+									$("#planTag5").val(tag.value);
+									$("#planTag5Name").text("#" + tag.dataset.tagname);
+									$("#planTag5Name").show();
+								}
+							}
+						}
+					}
+				}
+			});
+			
+			
+			var params = {
+	          id: "[[${record.id}]]",
+	          planTag1: $("#planTag1").val(),
+			  planTag2: $("#planTag2").val(),
+			  planTag3: $("#planTag3").val(),
+			  planTag4: $("#planTag4").val(),
+			  planTag5: $("#planTag5").val()
+			};
+	        $.ajax({
+	          url: "/pbm/plan/ajaxTagUpdate",
+	          type: "POST",
+	          async: false,
+	          dataType: "json",
+	          contentType: "application/json",
+	          data: JSON.stringify(params),
+	          success: function (data) {
+	            $("#btClosePopTag").click();
+	          },
+	          error: function (request, status, error) {
+	            alert(error);
+	          },
+	          complete: function () {
+	            // $('#loading').addClass('display-none');
+	          },
+	        });
+			
+			
+	  }
+	 
+		
+    </script>
+  </th:block>
+
+  <div class="main-content">
+    <div class="container-fluid">
+      <!-- 로케이션 & 제목 영역 추가 -->
+      <div class="page-header mb-4">
+        <div class="location mb-2">
+          <small class="text-secondary">
+            <i class="fas fa-home me-1"></i>
+            <a href="javascript:;">홈</a> > <a href="/pbm/plan/list">상품관리</a> > <a href="/pbm/plan/list">요금제</a>
+          </small>
+        </div>
+        <h2 class="page-title fs-4 mb-4">요금제 상세</h2>
+      </div>
+
+      <form
+        method="POST"
+        id="submitForm"
+        th:object="${record}"
+        th:action="@{/pbm/plan/update}"
+        enctype="multipart/form-data"
+      >
+        <input type="hidden" name="id" th:value="${record.id}" />
+
+        <div class="search-section detail">
+          <div class="form-row">
+            <div class="form-label">최초 생성일</div>
+            <div class="form-control-wrap">[[${#temporals.format(record.createDate, 'yyyy-MM-dd HH:mm:ss')}]]</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">최근 수정일</div>
+            <div class="form-control-wrap">[[${#temporals.format(record.modifiedDate, 'yyyy-MM-dd HH:mm:ss')}]]</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">노출 여부</div>
+            <div class="form-check-group">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  id="dispYn01"
+                  name="dispYn"
+                  th:checked="${record.dispYn}"
+                  value="1"
+                />
+                <label class="form-check-label" for="dispYn01">노출</label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  id="dispYn02"
+                  name="dispYn"
+                  th:checked="${!record.dispYn}"
+                  value="0"
+                />
+                <label class="form-check-label" for="dispYn02">미노출</label>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">포인트 요금제 구분</div>
+            <div class="form-check-group">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  id="pointPlanYn01"
+                  name="pointPlanYn"
+                  th:checked="${record.pointPlanYn eq '1'}"
+                  value="1"
+                />
+                <label class="form-check-label" for="pointPlanYn01">Y</label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  id="pointPlanYn02"
+                  name="pointPlanYn"
+                  th:checked="${record.pointPlanYn eq '0' || record.pointPlanYn == null}"
+                  value="0"
+                />
+                <label class="form-check-label" for="pointPlanYn02">N</label>
+              </div>
+            </div>
+          </div>
+
+          <!--/*<div class="form-row">
+                        <div class="form-label">간편개통 구분</div>
+                        <div class="form-check-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="imageBadgeSimpleOpen01" name="imageBadgeSimpleOpen" th:checked="${record.imageBadgeSimpleOpen}" value="1">
+                                <label class="form-check-label" for="imageBadgeSimpleOpen01">Y</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="imageBadgeSimpleOpen02" name="imageBadgeSimpleOpen" th:checked="${record.imageBadgeSimpleOpen == null or !record.imageBadgeSimpleOpen}" value="0">
+                                <label class="form-check-label" for="imageBadgeSimpleOpen02">N</label>
+                            </div>
+                        </div>
+                    </div> */-->
+
+          <div class="form-row">
+            <div class="form-label">판매상태</div>
+            <div class="form-control-wrap">
+              <th:block th:if="${record.saleStatus}">판매중</th:block>
+              <th:block th:if="${!record.saleStatus}">판매중지</th:block>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">신규여부</div>
+            <div class="form-control-wrap">
+              <th:block th:if="${record.newYn}">Y</th:block>
+              <th:block th:if="${!record.newYn}">N</th:block>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-label">수집 UUID</div>
+            <div class="form-control-wrap">[[${record.uuid}]]</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">요금제 코드</div>
+            <div class="form-control-wrap">
+              <div style="display: flex; gap: 5px">
+                <input type="text" class="form-control" placeholder="요금제 코드 입력" th:field="*{planCode}" />
+                <button type="button" class="btn btn-primary btn-sm" onclick="registerPlanCode()">
+                  <span id="btn-plan-code" th:if="${record.planCode == '' or record.planCode == null}">등록</span>
+                  <span id="btn-plan-code" th:unless="${record.planCode == '' or record.planCode == null}">수정</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">MNO</div>
+            <div class="form-control-wrap">[[${record.mno}]]</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">사업자</div>
+            <div class="form-control-wrap">[[${record.hostNm}]]</div>
+          </div>
+
+          <div class="form-row full-width">
+            <div class="form-label">네트워크</div>
+            <div class="form-control-wrap">[[${record.planType}]]</div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-label">요금제명</div>
+            <div class="form-control-wrap">[[${record.planName}]]</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">대체 요금제명</div>
+            <div class="form-control-wrap">
+              <input type="text" class="form-control" value="" th:field="*{planNameSmt}" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">요금제명2</div>
+            <div class="form-control-wrap">
+              <th:block th:if="${record.supDataVal == 10238976}"> 무제한 </th:block>
+              <th:block th:unless="${record.supDataVal == 10238976}"> 
+				월<span th:text="${#numbers.formatDecimal(record.supDataVal / 1024.0, 0, (record.supDataVal % 1024 == 0) ? 0 : 1)}"></span>GB
+			  </th:block>
+              <th:block th:if="${record.dailyData gt 0}"> + 매일 [[${record.dailyData / 1024}]]GB </th:block>
+              <th:block th:if="${record.intQos gt 0}"> + [[${record.intQos}]]Mbps </th:block>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">대체 요금제명2</div>
+            <div class="form-control-wrap">
+              <input type="text" class="form-control" value="" th:field="*{planNameSmtSub}" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">기본료</div>
+            <div class="form-control-wrap">[[${#numbers.formatInteger(record.normalPrice, 0, 'COMMA') + '원'}]]</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">할인금액</div>
+            <div class="form-control-wrap">[[${#numbers.formatInteger(record.salePrice, 0, 'COMMA') + '원'}]]</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">최종금액</div>
+            <div class="form-control-wrap">[[${#numbers.formatInteger(record.afterPrice, 0, 'COMMA') + '원'}]]</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">할인기간</div>
+            <div class="form-control-wrap">[[${record.promotionPeriod}]]</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">데이터</div>
+            <div class="form-control-wrap">
+              <th:block th:if="${record.supDataVal eq 10238976}">무제한</th:block>
+              <th:block th:if="${record.supDataVal >= 1024}">
+			     <span th:text="${#numbers.formatDecimal(record.supDataVal / 1024.0, 0, (record.supDataVal % 1024 == 0) ? 0 : 1)}"></span>GB
+			   </th:block>
+              <th:block th:unless="${record.supDataVal >= 1024}">[[${record.supDataVal}]]MB</th:block>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Qos</div>
+            <div class="form-control-wrap">
+              <th:block th:if="${record.intQos > 0}">[[${record.intQos}]]MBps</th:block>
+              <th:block th:unless="${record.intQos > 0}">[[${record.supQos}]]KBps</th:block>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">전화</div>
+            <div class="form-control-wrap">
+              <th:block th:if="${record.supCallVal eq 9999}">무제한</th:block>
+              <th:block th:unless="${record.supCallVal eq 9999}">[[${record.supCallVal}]]분</th:block>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">메시지</div>
+            <div class="form-control-wrap">
+              <th:block th:if="${record.supSmsVal eq 9999}">무제한</th:block>
+              <th:block th:unless="${record.supSmsVal eq 9999}">[[${record.supSmsVal}]]건</th:block>
+            </div>
+          </div>
+		  
+		  
+		  
+		  <div class="form-row full-width">
+		    <div class="form-label">부가음성</div>
+		    <div class="form-control-wrap">
+				<th:block th:if="${record.isProtected eq '1' or record.dataCreateSp eq '1'  }">
+					<input type="text" class="form-control" placeholder="부가음성 입력" th:field="*{supCallBugaVal}" />
+				</th:block>
+				<th:block th:unless="${record.isProtected eq '1' or record.dataCreateSp eq '1'  }">
+					[[${record.supCallBugaVal}]]
+				</th:block>
+		    </div>
+		  </div>
+          <div class="form-row">
+            <div class="form-label">URL(단순랜딩)</div>
+            <div class="form-control-wrap">
+              <a th:href="${record.linkUrl}" target="_blank">[[${record.linkUrl}]]</a>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">URL(아웃링크)</div>
+            <div class="form-control-wrap">
+              <input type="text" class="form-control" placeholder="요금제 코드 입력" th:field="*{urlSmt}" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">신규가입 URL</div>
+            <div class="form-control-wrap">
+              <input type="text" class="form-control" placeholder="신규가입 URL 입력" th:field="*{newNumReqUrl}" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">번호이동 URL</div>
+            <div class="form-control-wrap">
+              <input type="text" class="form-control" placeholder="번호이동 URL 입력" th:field="*{numMoveReqUrl}" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-label">URL(PC)</div>
+            <div class="form-control-wrap">
+              <input type="text" class="form-control" placeholder="URL(PC) 입력" th:field="*{pcUrl}" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">URL(모바일)</div>
+            <div class="form-control-wrap">
+              <input type="text" class="form-control" placeholder="URL(모바일) 입력" th:field="*{moUrl}" />
+            </div>
+          </div>
+
+          <div class="form-row full-width">
+            <div class="form-label">실제 체감가</div>
+            <div class="form-control-wrap">
+              <input type="text" class="form-control" placeholder="실제 체감가 입력" th:field="*{secondPrice}" />
+              <span class="c_red">※ 천의 자리 쉼표와 "원"까지 입력해주세요.</span>
+            </div>
+          </div>
+          <div class="form-row full-width">
+            <div class="form-label">혜택</div>
+            <div class="form-control-wrap">[[${record.benefit}]]</div>
+          </div>
+          <div class="form-row full-width">
+            <div class="form-label">사은품</div>
+            <div class="form-control-wrap">[[${record.freebies}]]</div>
+          </div>
+
+          <div class="form-row full-width">
+            <div class="form-label">이미지 뱃지</div>
+            <div class="form-check-group">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="imageBadgeSpecial"
+                  name="imageBadgeSpecial"
+                  th:checked="${record.imageBadgeSpecial}"
+                  value="1"
+                />
+                <label class="form-check-label" for="imageBadgeSpecial">세모통 Only</label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="imageBadgeItComb"
+                  name="imageBadgeItComb"
+                  th:checked="${record.imageBadgeItComb}"
+                  value="1"
+                />
+                <label class="form-check-label" for="imageBadgeItComb">인터넷 결합</label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="imageBadgeSimpleOpen"
+                  name="imageBadgeSimpleOpen"
+                  th:checked="${record.imageBadgeSimpleOpen}"
+                  value="1"
+                />
+                <label class="form-check-label" for="imageBadgeSimpleOpen">간편개통</label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="imageBadgeAddData"
+                  name="imageBadgeAddData"
+                  th:checked="${record.imageBadgeAddData}"
+                  value="1"
+                  onclick="showDataAddInput()"
+                />
+                <label class="form-check-label" for="imageBadgeAddData">추가데이터제공</label>
+              </div>
+              <input
+                type="text"
+                class="form-control"
+                id="imageBadgeAddDataNm"
+                name="imageBadgeAddDataNm"
+                th:value="${record.imageBadgeAddDataNm}"
+                style="min-width: 80px !important; max-width: 80px !important"
+                maxlength="8"
+              />
+            </div>
+            <div class="form-check">
+              <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="imageBadgeLowest"
+                      name="imageBadgeLowest"
+                      th:checked="${record.imageBadgeLowest}"
+                      value="1"
+              />
+              <label class="form-check-label" for="imageBadgeLowest">최저가보상</label>
+            </div>
+          </div>
+
+		  <div class="form-row full-width">
+		    <div class="form-label">요금제 태그</div>
+		    <div class="form-control-wrap">
+				<div class="form-check-group" style="gap:2px">
+					<input type="hidden" th:field="*{planTag1}"/>
+					<input type="hidden" th:field="*{planTag2}"/>
+					<input type="hidden" th:field="*{planTag3}"/>
+					<input type="hidden" th:field="*{planTag4}"/>
+					<input type="hidden" th:field="*{planTag5}"/>
+					
+			      <span th:text="'#' + ${record.planTag1Name}" id="planTag1Name" th:attr="style=${record.planTag1Name.isEmpty() ? 'display:none;' : 'margin-left:5px;'}"></span>
+				  <span th:text="'#' + ${record.planTag2Name}" id="planTag2Name" th:attr="style=${record.planTag2Name.isEmpty() ? 'display:none;' : 'margin-left:5px;'}"></span>
+				  <span th:text="'#' + ${record.planTag3Name}" id="planTag3Name" th:attr="style=${record.planTag3Name.isEmpty() ? 'display:none;' : 'margin-left:5px;'}"></span>
+				  <span th:text="'#' + ${record.planTag4Name}" id="planTag4Name" th:attr="style=${record.planTag4Name.isEmpty() ? 'display:none;' : 'margin-left:5px;'}"></span>
+				  <span th:text="'#' + ${record.planTag5Name}" id="planTag5Name" th:attr="style=${record.planTag5Name.isEmpty() ? 'display:none;' : 'margin-left:5px;'}"></span>
+				  &nbsp;&nbsp;<a href="javascript:void(0)" onclick="openTagMngPop()">설정</a>
+				  
+			  </div>
+		    </div>
+		  </div>
+
+          <div class="form-row full-width">
+            <div class="form-label">
+              혜택
+              <button type="button" class="bnf-manager__btn" id="bnfAddBtn" onclick="initBenefitInfoList();">
+                추가
+              </button>
+            </div>
+            <div class="bnf-manager">
+              <div class="bnf-manager__container">
+                <div class="bnf-manager_item-group">
+                  <div class="form-label" style="font-weight: 700">통신사 혜택</div>
+                  <div id="bnfInputs-telecom" class="bnf-manager__inputs"></div>
+                </div>
+
+                <div class="bnf-manager_item-group">
+                  <div class="form-label" style="font-weight: 700">세모통혜택</div>
+                  <div id="bnfInputs-semo" class="bnf-manager__inputs"></div>
+                </div>
+                <div class="bnf-manager_item-group">
+                  <div class="form-label" style="font-weight: 700">인터넷혜택</div>
+                  <div id="bnfInputs-internet" class="bnf-manager__inputs"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 	                 사은품
+                    <div class="form-row full-width">
+                        <div class="form-label">사은품</div>
+                        <div class="gift-manager">
+                            <div class="gift-manager__container">
+                                <div id="giftInputs" class="gift-manager__inputs">
+
+                                </div>
+                                <div class="gift-manager__btn-container">
+                                    <button type="button" class="gift-manager__btn bg_green" id="giftManageBtn" onclick="initFreebieInfoList('1')">사은품관리</button>
+                                    <button type="button" class="gift-manager__btn" id="giftAddBtn" onclick="initFreebieInfoList('2')">추가</button>
+                                </div>
+                            </div>
+                        </div>
+	                </div> -->
+
+          <div class="form-row full-width">
+            <div class="form-label">
+              지원
+              <p class="c_red">※ 미입력시 미노출</p>
+            </div>
+            <div class="form-control-wrap">
+              <div class="form-check-group">
+                <textarea placeholder="내용을 입력하세요." id="edt_suppContent"></textarea>
+                <textarea style="display: none" th:field="*{suppContent}"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="form-row full-width">
+            <div class="form-label">
+              미지원
+              <p class="c_red">※ 미입력시 미노출</p>
+            </div>
+            <div class="form-control-wrap">
+              <div class="form-check-group">
+                <textarea class="form-control" placeholder="내용을 입력하세요." id="edt_noSuppContent"></textarea>
+                <textarea style="display: none" th:field="*{noSuppContent}"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="form-row full-width">
+            <div class="form-label">
+              유의사항
+              <p class="c_red">※ 미입력시 미노출</p>
+            </div>
+            <div class="form-control-wrap">
+              <div class="form-check-group">
+                <textarea class="form-control" placeholder="내용을 입력하세요." id="edt_noticeContent"></textarea>
+                <textarea style="display: none" th:field="*{noticeContent}"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="form-row full-width" style="display: none">
+            <div class="form-label">
+              이벤트 배너 설정
+              <p class="c_red">※ 미입력시 미노출</p>
+            </div>
+            <div class="form-control-wrap">
+              <div class="form-check-group">
+                <!-- Image Upload Section -->
+                <div class="event-banner">
+                  <!-- PC Banner -->
+                  <div class="event-banner__section">
+                    <div class="event-banner__uploader uploader">
+                      <div class="uploader__header">
+                        <span class="uploader__title">PC 배너*</span>
+                      </div>
+                      <div class="uploader__content">
+                        <div class="uploader__input-group">
+                          <input
+                            type="file"
+                            class="uploader__input"
+                            name="filePc"
+                            id="filePc"
+                            accept=".jpg,.png,.jpeg"
+                            onchange="BannerUploader.preview(this, 'pcPreview')"
+                          />
+                          <button type="button" class="uploader__button" onclick="BannerUploader.trigger('filePc')">
+                            찾기
+                          </button>
+                        </div>
+                        <p class="uploader__guide">
+                          *이미지 형식의 파일만 업로드 가능합니다. (jpg, png, jpeg) / 권장 사이즈 : 720x160
+                        </p>
+                      </div>
+                      <div class="uploader__preview" id="pcPreview">
+                        <img th:src="@{${record?.eventBannerImagePcUrl}}" class="uploader__preview-image" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Mobile Banner -->
+                  <div class="event-banner__section">
+                    <div class="event-banner__uploader uploader">
+                      <div class="uploader__header">
+                        <span class="uploader__title">모바일 배너*</span>
+                      </div>
+                      <div class="uploader__content">
+                        <div class="uploader__input-group">
+                          <input
+                            type="file"
+                            class="uploader__input"
+                            name="fileMo"
+                            id="fileMo"
+                            accept=".jpg,.png,.jpeg"
+                            onchange="BannerUploader.preview(this, 'mobilePreview')"
+                          />
+                          <button type="button" class="uploader__button" onclick="BannerUploader.trigger('fileMo')">
+                            찾기
+                          </button>
+                        </div>
+                        <p class="uploader__guide">
+                          *이미지 형식의 파일만 업로드 가능합니다. (jpg, png, jpeg) / 권장 사이즈 : 328x140
+                        </p>
+                      </div>
+                      <div class="uploader__preview" id="mobilePreview">
+                        <img th:src="@{${record?.eventBannerImageMoUrl}}" class="uploader__preview-image" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-row full-width" style="display: none">
+            <div class="form-label"></div>
+            <div class="form-control-wrap">
+              <div class="form-check-group">
+                <div class="link-form">
+                  <div class="link-form__input-wrap">
+                    <input
+                      type="text"
+                      class="link-form__input"
+                      placeholder="https://www.naver.com/"
+                      value="https://www.naver.com/"
+                      th:field="*{eventBannerImageUrl}"
+                    />
+                  </div>
+                  <div class="link-form__options">
+                    <div class="link-form__radio-item">
+                      <input
+                        type="radio"
+                        class="link-form__radio"
+                        id="eventBannerImageTarget01"
+                        name="eventBannerImageTarget"
+                        th:checked="${record.eventBannerImageTarget eq  'S'}"
+                        value="S"
+                      />
+                      <label for="eventBannerImageTarget01" class="link-form__label"> 현재 이동 (_self) </label>
+                    </div>
+                    <div class="link-form__radio-item">
+                      <input
+                        type="radio"
+                        class="link-form__radio"
+                        id="eventBannerImageTarget02"
+                        name="eventBannerImageTarget"
+                        th:checked="${record.eventBannerImageTarget eq  'P'}"
+                        value="P"
+                      />
+                      <label for="eventBannerImageTarget02" class="link-form__label"> 새창 이동 (_blank) </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="d-flex justify-content-center gap-2 mt-4 w-100 mb-5">
+        <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">닫기</button>
+        <button type="button" class="btn btn-lg btn-dark px-4 btn-sm" onclick="savePlanData();">등록</button>
+        <button
+          type="button"
+          class="btn btn-lg btn-secondary px-4 btn-sm"
+          onclick="goEditOrg();"
+          th:if="${record.isProtected eq '1' or record.dataCreateSp eq '1'  }"
+        >
+          원본수정
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!--==================================== 모달 팝업-->
+
+  <!-- 혜택 팝업 -->
+  <div class="bnf-select__overlay"></div>
+  <div class="bnf-select">
+    <div class="bnf-select__header">
+      <div class="bnf-select__title">혜택 선택</div>
+      <span class="bnf-select__close">&times;</span>
+    </div>
+
+    <div class="bnf-select__search">
+      <input type="text" class="bnf-select__input" placeholder="제목을 검색하세요." id="searchBenefitTitle" />
+      <button class="bnf-select__search-btn" onclick="getBenefitInfoList();">검색</button>
+    </div>
+
+    <div class="bnf-select__table__outer">
+      <table class="bnf-select__table">
+        <thead>
+          <tr>
+            <th class="bnf-select__th" style="width: 50px">구분</th>
+            <th class="bnf-select__th" style="width: 120px">제공처</th>
+            <th class="bnf-select__th" style="width: 130px">카테고리(대)</th>
+            <th class="bnf-select__th" style="width: 130px">카테고리(중)</th>
+            <th class="bnf-select__th">제목</th>
+            <th class="bnf-select__th" style="width: 150px">등록일</th>
+          </tr>
+        </thead>
+        <tbody id="benefitDataList"></tbody>
+      </table>
+    </div>
+    <div class="bnf-select__footer">
+      <button class="bnf-select__btn bnf-select__btn--apply" onclick="initBenefitInfoList();">닫기</button>
+      <button class="bnf-select__btn bnf-select__btn--confirm bg_blue" onclick="initBenefitInfoList();">
+        혜택선택
+      </button>
+    </div>
+  </div>
+  
+  
+  
+  <!-- tag 관리 -->
+  <div class="modal fade" id="regEditTagModal" tabindex="-1" aria-labelledby="regEditTagModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content" style="min-width:700px;">
+              <div class="modal-header border-0 pb-0 mb-4">
+                  <h5 class="modal-title fs-6 fw-bold" id="regEditModalTitle">요금제 태그 관리</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btClosePopTag"></button>
+              </div>
+              <div class="bnf-select__table__outer otherH mb-3">
+                <table class="bnf-select__table">
+                  <colgroup>
+                    <col style="width: 10%">
+                    <col style="width: 90%">
+                  </colgroup>
+                  <tr>
+                    <td class="bnf-select__th">tag*</td>
+                    <td class="bnf-select__td">
+  					<div class="tag-container" id="popTagList">
+  					</div>
+  				  </td>
+                  </tr>
+                </table>
+              </div>
+  			<div class="modal-footer border-0 pt-0 justify-content-center">
+  				<button type="button" class="btn btn-dark px-4 btm-sm" onclick="setPlanTag()">등록</button>
+                  <button type="button" class="btn btn-secondary px-4 btn-sm" data-bs-dismiss="modal">취소</button>
+              </div>
+          </div>
+      </div>
+  </div>	
+  
+</html>
+
+

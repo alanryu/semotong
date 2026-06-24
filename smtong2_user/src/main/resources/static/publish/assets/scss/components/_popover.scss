@@ -1,0 +1,108 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 토스트
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------
+	@@ 공통
+-------------------------------------------------------------------*/
+// 본본
+.ui-popover {
+	z-index: 9999;
+}
+.popover-arrow {
+	display: block;
+	position: absolute;
+	&::before {
+		content:'';
+		display: block;
+		background: no-repeat center center / contain;
+	}
+}
+[data-popper-placement^=top] {
+		.popover-arrow {
+			top: 100%
+		}
+}
+[data-popper-placement^=bottom] {
+		.popover-arrow {
+			bottom: 99%;
+		}
+}
+[data-popper-placement^=right] {
+		.popover-arrow {
+			right: 100%;
+		}
+}
+[data-popper-placement^=left] {
+		.popover-arrow {
+			left: 100%;
+		}
+}
+
+/*-------------------------------------------------------------------
+	@@ 유형
+-------------------------------------------------------------------*/
+/* 스타일1 */
+.popover-style1 {
+	width: 180rem;
+	background-color: #111;
+	color: #fff;
+	border-radius: 4rem;
+	.popover-body {
+		padding: 8rem 12rem;
+		font-weight: 500;
+		font-size: 12rem;
+		line-height: 16rem;
+		text-align: center;
+		word-break: keep-all;
+	}
+	.popover-arrow::before {
+		width: 14rem;
+		height: 7rem;
+		background-image: url('../images/common/icn-14-popover-arw-b.svg');
+		transform-origin: center center;
+	}
+	&[data-popper-placement^=top] {
+		.popover-arrow {
+			width: 14rem;
+			height: 7rem;
+			&::before {
+				transform: rotate(180deg);
+			}
+		}
+	}
+	&[data-popper-placement^=bottom] {
+		.popover-arrow {
+			width: 14rem;
+			height: 7rem;
+			&::before {
+				transform: rotate(0deg);
+			}
+		}
+	}
+	&[data-popper-placement^=right] {
+		.popover-arrow {
+			width: 7rem;
+			height: 14rem;
+			&::before {
+				transform:translate(-3px, 3px) rotate(270deg);
+			}
+		}
+	}
+	&[data-popper-placement^=left] {
+		.popover-arrow {
+			width: 7rem;
+			height: 14rem;
+			&::before {
+				transform:translate(-4px, 3px) rotate(90deg);
+			}
+		}
+	}
+
+	&.popover-auto {
+		width: auto;
+	}
+
+}
+/* 스타일2 */

@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.csm.banner.mapper.DealBannerMapper">
+
+    <!-- =============================== Main Deal Mst SQL ===============================  -->
+
+    <resultMap id="MstResultMap" type="kr.co.ucomp.web.csm.banner.entity.MainDealMstEntity">
+        <id property="id" column="id"/>
+        <result property="start_date" column="start_date"/>
+        <result property="end_date" column="end_date"/>
+        <result property="create_date" column="create_date"/>
+        <result property="create_id" column="create_id"/>
+        <result property="modified_date" column="modified_date"/>
+        <result property="modified_id" column="modified_id"/>
+        <result property="title" column="title"/>
+        <result property="btn_type" column="btn_type"/>
+        <result property="exposure_time" column="exposure_time"/>
+		<result property="pop_image" column="pop_image"/>
+		<result property="dim_title" column="dim_title"/>
+		<result property="link_url" column="link_url"/>
+		<result property="link_type" column="link_type"/>        
+    </resultMap>
+
+    <sql id="mstDateCondition">
+        <choose>
+            <when test='start_date != null and  end_date != null'>
+                AND NOW() BETWEEN #{start_date} AND #{end_date}
+            </when>
+            <when test='start_date != null'>
+                <![CDATA[ AND start_date >= #{start_date} ]]>
+            </when>
+            <when test='end_date != null'>
+                <![CDATA[ AND end_date <= #{end_date} ]]>
+            </when>
+        </choose>
+    </sql>
+
+    <select id="mainDealMstList" parameterType="kr.co.ucomp.web.csm.banner.dto.MainDealMstDto" resultMap="MstResultMap">
+        SELECT
+            id,
+            start_date,
+            end_date,
+            create_date,
+            create_id,
+            modified_date,
+            modified_id
+        FROM
+            tb_svc_main_deal_mst
+        WHERE 1=1
+        <include refid="mstDateCondition"/>
+    </select>
+
+    <select id="mainDealMst" parameterType="kr.co.ucomp.web.csm.banner.dto.MainDealMstDto" resultMap="MstResultMap">
+        SELECT
+            id,
+            start_date,
+            end_date,
+            create_date,
+            create_id,
+            modified_date,
+            modified_id
+        FROM
+            tb_svc_main_deal_mst
+        WHERE id = #{id}
+    </select>
+    
+    <select id="mainDealMstRec" parameterType="kr.co.ucomp.web.csm.banner.dto.MainDealMstDto" resultMap="MstResultMap">
+    	SELECT
+            id,
+            title,
+            dim_title,
+            start_date,
+            end_date,
+            btn_type,
+            exposure_time,
+            pop_image,
+            create_date,
+            create_id,
+            modified_date,
+            modified_id,
+            DATE_SUB(start_date, INTERVAL exposure_time MINUTE) AS exposure_date,
+            link_url,
+            link_type
+        FROM
+            tb_svc_main_deal_mst
+        WHERE 1 = 1
+        AND type = #{type}
+        
+        <!-- 노출(게시)중인것만 가져온다 -->
+        <if test="type != null and type !='' and type.equals('08')">
+        	AND DATE_SUB(start_date, INTERVAL exposure_time MINUTE) <![CDATA[<=]]> Now()
+        </if>
+        
+        <if test="type != null and type !='' and type.equals('07')">
+        	AND start_date <![CDATA[<=]]> Now()
+        </if>
+		AND end_date <![CDATA[>=]]> Now()         
+        
+        ORDER BY id DESC
+        LIMIT 1
+    </select>
+
+    <insert id="insertMainDealMst" parameterType="kr.co.ucomp.web.csm.banner.entity.MainDealMstEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_svc_main_deal_mst (start_date, end_date, create_id)
+        VALUES (
+             #{start_date},
+             #{end_date},
+             #{create_id}
+         )
+    </insert>
+
+    <update id="updateMainDealMst" parameterType="kr.co.ucomp.web.csm.banner.entity.MainDealMstEntity">
+        UPDATE tb_svc_main_deal_mst
+        SET
+            start_date = #{start_date},
+            end_date = #{end_date},
+            create_id = #{create_id},
+            modified_id = #{modified_id}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteMainDealMst" parameterType="Long">
+        DELETE FROM tb_svc_main_deal_mst
+        WHERE id = #{id}
+    </delete>
+
+    <!-- ============================================================================== -->
+
+
+
+    <!-- ============================ Main Deal Banner SQL ============================ -->
+
+    <resultMap id="bannerResultMap" type="kr.co.ucomp.web.csm.banner.entity.MainDealBannerEntity">
+        <id property="id" column="id"/>
+        <result property="main_deal" column="main_deal"/>
+        <result property="type" column="type"/>
+        <result property="plan_content" column="plan_content"/>
+        <result property="plan_mno" column="plan_mno"/>
+        <result property="plan_id" column="plan_id"/>
+        <result property="link_url" column="link_url"/>
+        <result property="create_date" column="create_date"/>
+        <result property="create_id" column="create_id"/>
+        <result property="modified_date" column="modified_date"/>
+        <result property="modified_id" column="modified_id"/>
+        <result property="plan_name" column="plan_name"/>
+        <result property="sale_price" column="sale_price"/>        
+        <result property="sup_data_val" column="sup_data_val"/>
+        <result property="sup_qos" column="sup_qos"/>
+        <result property="plan_name_smt" column="plan_name_smt"/>
+        <result property="plan_name_smt_sub" column="plan_name_smt_sub"/>
+        <result property="daily_data" column="daily_data"/>        
+        <result property="logo_img" column="logo_img"/>
+        <result property="company_nm" column="company_nm"/>
+        <result property="second_price" column="second_price"/>
+    </resultMap>
+
+    <sql id="bannerDateCondition">
+        <if test='type != null and type !=""'>
+            AND type = #{type}
+        </if>
+
+        <if test='main_deal != null and main_deal !=""'>
+            AND main_deal = #{main_deal}
+        </if>
+
+        <if test='plan_mno != null and plan_mno !=""'>
+            AND plan_mno = #{plan_mno}
+        </if>
+
+        <if test='plan_id != null and plan_id !=""'>
+            AND plan_id = #{plan_id}
+        </if>
+    </sql>
+
+    <select id="mainDealBannerList" parameterType="kr.co.ucomp.web.csm.banner.dto.MainDealBannerDto" resultMap="bannerResultMap">
+        SELECT
+            id,
+            main_deal,
+            type,
+            plan_mno,
+            plan_id,
+            link_url,
+            create_date,
+            create_id,
+            modified_date,
+            modified_id
+        FROM
+            tb_svc_main_deal_banner
+        WHERE 1=1
+        <include refid="bannerDateCondition"/>
+    </select>
+
+    <select id="mainDealBanner" parameterType="kr.co.ucomp.web.csm.banner.dto.MainDealBannerDto" resultMap="bannerResultMap">
+        SELECT
+            id,
+            main_deal,
+            type,
+            plan_mno,
+            plan_id,
+            link_url,
+            create_date,
+            create_id,
+            modified_date,
+            modified_id
+        FROM
+            tb_svc_main_deal_banner
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insertMainDealBanner" parameterType="kr.co.ucomp.web.csm.banner.entity.MainDealBannerEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_svc_main_deal_banner (main_deal, type, plan_mno, plan_id, create_id)
+        VALUES (
+                   #{main_deal},
+                   #{type},
+                   #{plan_mno},
+                   #{plan_id},
+                   #{create_id}
+               )
+    </insert>
+
+    <update id="updateMainDealBanner" parameterType="kr.co.ucomp.web.csm.banner.entity.MainDealBannerEntity">
+        UPDATE tb_svc_main_deal_banner
+        SET
+            main_deal = #{main_deal},
+            type = #{type},
+            plan_mno = #{plan_mno},
+            plan_id = #{plan_id},
+            modified_id = #{modified_id}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteMainDealBanner" parameterType="Long">
+        DELETE FROM tb_svc_main_deal_banner
+        WHERE id = #{id}
+    </delete>
+    
+    <select id="mainPageDealBanner" parameterType="kr.co.ucomp.web.csm.banner.entity.MainDealBannerEntity" resultMap="bannerResultMap">
+    	SELECT
+		      a.id,
+		      a.main_deal,
+			  a.type,
+			  a.plan_content,
+		      a.plan_mno,
+		      a.plan_id,
+		      a.link_url,
+		      a.create_date,
+		      a.create_id,
+		      a.modified_date,
+		      a.modified_id,
+		      b.plan_name,
+		      b.sup_data_val,
+		      b.sup_qos,		      
+		      b.plan_name_smt,
+		      b.plan_name_smt_sub,
+		      b.daily_data,		      
+		      b.sale_price,
+		      c.logo_img,
+		      c.company_nm,
+		      b.second_price
+		FROM
+		      tb_svc_main_deal_banner a
+		LEFT JOIN tb_pmb_plan_list b
+		ON a.plan_id = b.id
+		LEFT JOIN tb_mbm_company_list c
+		ON a.plan_mno = c.id
+		WHERE 1 = 1
+			<if test='main_deal != null and main_deal !=""'>
+	            AND a.main_deal = #{main_deal}
+	        </if>
+	        
+	        <if test="searchOrderType != null and searchOrderType !=''">
+	        	ORDER BY a.order_no
+	        </if>
+    </select>
+    <!-- ============================================================================== -->
+
+</mapper>

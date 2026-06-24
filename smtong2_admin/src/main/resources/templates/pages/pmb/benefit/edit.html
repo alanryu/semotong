@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layout/default_layout}"
+  layout:fragment="Content"
+  th:with="menuIdGroup ='04',menuId ='05'"
+>
+  <!-- index.html 고유 CSS 추가 -->
+  <th:block layout:fragment="css">
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui-color-picker/latest/tui-color-picker.css" />
+    <link
+      rel="stylesheet"
+      href="https://uicdn.toast.com/editor-plugin-color-syntax/latest/toastui-editor-plugin-color-syntax.css"
+    />
+    <style>
+      .toastui-editor-contents {
+        white-space: pre-wrap; /* 연속 공백 보존 */
+      }
+    </style>
+  </th:block>
+  <!-- index.html 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+    <script src="https://uicdn.toast.com/tui-color-picker/latest/tui-color-picker.js"></script>
+    <script
+      src="https://uicdn.toast.com/editor-plugin-color-syntax/latest/toastui-editor-plugin-color-syntax.js"
+    ></script>
+
+    <script th:inline="javascript">
+      var planListFromServer = /*[[${planList}]]*/ [];
+    </script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        /* 요금제 추가 레이어팝업 등록 버튼 */
+        $("#plan-add").on("click", function () {
+          var id = $("input[name=popPlanList]:checked").val();
+          var jsonStr = $("input[name=popPlanList]:checked").data("json");
+
+          // Parse the JSON string into an object
+          var jsonObj = typeof jsonStr === "string" ? JSON.parse(jsonStr) : jsonStr;
+
+          if (id != undefined) {
+            // 중복 체크 - 이미 추가된 요금제인지 확인
+            var isDuplicate = false;
+            $("#plan-add-chk")
+              .find('input[name="planList"]')
+              .each(function () {
+                if ($(this).val() === id) {
+                  isDuplicate = true;
+                  return false;
+                }
+              });
+
+            // 중복된 경우 alert 표시하고 리턴
+            if (isDuplicate) {
+              showAlert("이미 추가된 요금제 입니다.(" + jsonObj.planName + ")");
+              return;
+            }
+
+            var html = "";
+            html += '<tr class="bnf-select__row">';
+            html += '    <td class="bnf-select__td">';
+            html += '        <input type="hidden" name="planList" value="' + id + '">';
+            html += '        <input type="checkbox" name="planChk" class="bnf-select__radio" value="Y">';
+            html += "    </td>";
+            html += '    <td class="bnf-select__td">' + (jsonObj.dispYn === "true" ? "노출" : "미노출") + "</td>";
+            html +=
+              '    <td class="bnf-select__td">' + (jsonObj.saleStatus === "true" ? "판매중" : "판매중지") + "</td>";
+            html += '    <td class="bnf-select__td">' + jsonObj.planMno + "</td>";
+            html += '    <td class="bnf-select__td">' + jsonObj.hostNm + "</td>";
+            html += '    <td class="bnf-select__td">';
+            html +=
+              '        <a href="javascript:;" onclick="openViewPlanDetail(' + id + ')">' + jsonObj.planName + "</a>";
+            html += "    </td>";
+            html += '    <td class="bnf-select__td">' + getPriceStr(jsonObj.planAfterPrice) + "</td>";
+            html += '    <td class="bnf-select__td">' + getPriceStr(jsonObj.planSalePrice) + "</td>";
+            html += '    <td class="bnf-select__td">' + jsonObj.planPromotionPeriod + "</td>";
+            html += '    <td class="bnf-select__td">' + getDataStr(jsonObj.planSupDataVal) + "</td>";
+            html += '    <td class="bnf-select__td">' + getQosStr(jsonObj.planSupQos) + "</td>";
+
+            html += "</tr>";
+
+            $("#plan-add-chk").append(html);
+            $("#selectPlanPopupOverlay, #selectPlanPopup").hide();
+            $("#selectBenefitPopupOverlay, #selectBenefitPopup").hide();
+          }
+        });
+
+        initPlanTable();
+
+        function initPlanTable() {
+          if (planListFromServer && planListFromServer.length > 0) {
+            planListFromServer.forEach(function (plan) {
+              var html = "";
+              html += '<tr class="bnf-select__row">';
+              html += '    <td class="bnf-select__td">';
+              html += '        <input type="hidden" name="planList" value="' + plan.planListId + '">';
+              html += '        <input type="checkbox" name="planChk" class="bnf-select__radio" value="Y">';
+              html += "    </td>";
+              html += '    <td class="bnf-select__td">' + (plan.dispYn === "1" ? "노출" : "미노출") + "</td>";
+              html += '    <td class="bnf-select__td">' + (plan.saleStatus === "1" ? "판매중" : "판매중지") + "</td>";
+              html += '    <td class="bnf-select__td">' + plan.mno + "</td>";
+              html += '    <td class="bnf-select__td">' + plan.hostNm + "</td>";
+              html += '    <td class="bnf-select__td">';
+              html +=
+                '        <a href="javascript:;" onclick="openViewPlanDetail(' +
+                plan.planListId +
+                ')">' +
+                plan.planName +
+                "</a>";
+              html += "    </td>";
+              html += '    <td class="bnf-select__td">' + getPriceStr(plan.afterPrice || 0) + "</td>";
+              html += '    <td class="bnf-select__td">' + getPriceStr(plan.salePrice || 0) + "</td>";
+              html += '    <td class="bnf-select__td">' + plan.promotionPeriod + "</td>";
+              html += '    <td class="bnf-select__td">' + getDataStr(plan.supDataTotal || 0) + "</td>";
+              html += '    <td class="bnf-select__td">' + getQosStr(plan.supQos || 0) + "</td>";
+              html += "</tr>";
+
+              $("#plan-add-chk").append(html);
+            });
+          }
+        }
+
+        /* 요금제 추가 버튼 */
+        $("#bnfAddBtn").on("click", function () {
+          $("#selectPlanPopupOverlay, #selectPlanPopup").show();
+        });
+
+        /* 요금제 닫기 버튼 */
+        $(".plan-add-cls").on("click", function () {
+          $("#selectPlanPopupOverlay, #selectPlanPopup").hide();
+        });
+
+        /* 요금제 검색 enter */
+        $("#keyword").on("keyup", function (key) {
+          if (key.keyCode == 13) {
+            schPlanList();
+          }
+        });
+
+        /* 요금제 등록 체크박스 */
+        $("#chkall").on("change", function () {
+          if ($(this).is(":checked")) {
+            $("input[name=planChk]").each(function () {
+              $(this).prop("checked", true);
+            });
+          } else {
+            $("input[name=planChk]").each(function () {
+              $(this).prop("checked", false);
+            });
+          }
+        });
+      });
+
+      // 카테고리 데이터 정의
+      const categoryData = {
+        service: {
+          text: "서비스",
+          value: "1",
+          subCategories: [
+            { value: "7", text: "유심무료" },
+            { value: "8", text: "추가데이터" },
+            { value: "9", text: "포인트" },
+            { value: "10", text: "데이터 쿠폰" },
+            { value: "11", text: "카드할인" },
+          ],
+        },
+        cafe: {
+          text: "카페",
+          value: "2",
+          subCategories: [
+            { value: "12", text: "메가커피" },
+            { value: "13", text: "빽다방" },
+            { value: "14", text: "스타벅스" },
+          ],
+        },
+        giftcard: {
+          text: "상품권",
+          value: "3",
+          subCategories: [
+            { value: "15", text: "신세계" },
+            { value: "16", text: "네이버페이포인트" },
+            { value: "17", text: "이마트24" },
+            { value: "18", text: "CU" },
+            { value: "19", text: "마트상품권" },
+            { value: "20", text: "다이소/올리브영" },
+            { value: "21", text: "기프티콘" },
+          ],
+        },
+        life: {
+          text: "생활",
+          value: "4",
+          subCategories: [
+            { value: "22", text: "OTT" },
+            { value: "23", text: "밀리의서재" },
+            { value: "24", text: "블라이스" },
+            { value: "25", text: "지니뮤직" },
+            { value: "26", text: "영화관람권" },
+            { value: "27", text: "구독권" },
+          ],
+        },
+        internet: {
+          text: "인터넷결합",
+          value: "5",
+          subCategories: [
+            { value: "28", text: "요금할인" },
+            { value: "29", text: "추가 데이터" },
+          ],
+        },
+        etc: {
+          text: "기타",
+          value: "6",
+          subCategories: [{ value: "30", text: "기타" }],
+        },
+      };
+      // value로 key를 찾는 함수 생성
+      function findKeyByValue(obj, value) {
+        return Object.keys(obj).find((key) => obj[key].value === value);
+      }
+      function categoryInit() {
+        // 대분류 옵션 생성
+        const majorSelect = document.getElementById("majorCategoryId");
+        majorSelect.innerHTML = '<option value="">대분류</option>';
+
+        // 중분류 옵션 초기화
+        const minorSelect = document.getElementById("minorCategoryId");
+        minorSelect.innerHTML = '<option value="">중분류</option>';
+
+        // 기존 값 가져오기
+        const existingMajorValue = $("#id").length > 0 ? $("[name='majorCategorySelect']").val() : "";
+        const existingMinorValue = $("#id").length > 0 ? $("[name='minorCategorySelect']").val() : "";
+
+        // 대분류 옵션 추가
+        for (const key in categoryData) {
+          const option = document.createElement("option");
+          option.value = categoryData[key].value;
+          option.textContent = categoryData[key].text;
+
+          // 기존 값과 일치하면 선택
+          if (categoryData[key].value === existingMajorValue) {
+            option.selected = true;
+          }
+
+          majorSelect.appendChild(option);
+        }
+
+        // 대분류 선택 시 중분류 업데이트
+        majorSelect.addEventListener("change", function () {
+          updateMinorCategories(this.value);
+        });
+
+        // 초기 중분류 값 설정 (페이지 로드 시)
+        if (existingMajorValue) {
+          updateMinorCategories(existingMajorValue, existingMinorValue);
+        }
+      }
+      function updateMinorCategories(selectedMajor, selectedMinorValue = null) {
+        const minorSelect = document.getElementById("minorCategoryId");
+        minorSelect.options.length = 0;
+        minorSelect.innerHTML = '<option value="">중분류</option>';
+
+        // 선택된 value로 키 찾기
+        const selectedKey = findKeyByValue(categoryData, selectedMajor);
+
+        // 대분류가 선택된 경우 해당하는 중분류 옵션 추가
+        if (selectedKey && categoryData[selectedKey]) {
+          categoryData[selectedKey].subCategories.forEach(function (item) {
+            const option = document.createElement("option");
+            option.value = item.value;
+            option.textContent = item.text;
+
+            // 기존 값과 일치하면 선택
+            if (selectedMinorValue && item.value === selectedMinorValue) {
+              option.selected = true;
+            }
+
+            minorSelect.appendChild(option);
+          });
+        }
+      }
+
+      // 화면 로드 시
+      document.addEventListener("DOMContentLoaded", function () {
+        initToastEditor("edt_content", "benefitContent");
+
+        categoryInit();
+
+        document.getElementById("keywordBenefit").addEventListener("keydown", function (event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            searchBenefit();
+          }
+        });
+
+        document.getElementById("keyword").addEventListener("keydown", function (event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            schPlanList();
+          }
+        });
+      });
+
+      // 에디터 초기화 완료 후 callback 함수
+      function customInitEditor(editor, targer) {
+        if ("edt_content" == target && toastEditor) {
+          const content = $("#benefitContent").val();
+          if (content) {
+            toastEditor.setHTML(content);
+          }
+        }
+      }
+
+      function validationCheck() {
+        const majorCategory = document.getElementById("majorCategoryId"); //대분류
+        const minorCategory = document.getElementById("minorCategoryId"); //소분류
+        const provider = document.getElementById("provider"); //제공처
+        const name = document.getElementById("name"); //항목명
+        const title = document.getElementById("title"); //타이틀
+        const content = document.getElementById("content"); //설명문구
+        const displayPeriodStart = document.getElementById("displayPeriodStart"); //노출기간
+        const displayPeriodEnd = document.getElementById("displayPeriodEnd"); //노출기간
+
+        const majorCategoryValue = majorCategory.value;
+        const minorCategoryValue = minorCategory.value;
+        const providerValue = provider.value;
+        const nameValue = name.value;
+        const titleValue = title.value;
+        const contentValue = content.value;
+        const displayPeriodStartValue = displayPeriodStart.value;
+        const displayPeriodEndValue = displayPeriodEnd.value;
+
+        if (majorCategoryValue == "" || minorCategoryValue == "") {
+          showAlert("카테고리 확인");
+          return false;
+        }
+
+        if (providerValue == "") {
+          showAlert("제공처 확인");
+          return false;
+        }
+
+        if (nameValue == "") {
+          showAlert("항목명 확인");
+          return false;
+        }
+        if (titleValue == "") {
+          showAlert("타이틀 확인");
+          return false;
+        }
+        if (contentValue == "") {
+          showAlert("설명문구 확인");
+          return false;
+        }
+
+        if (displayPeriodStartValue == "" || displayPeriodEndValue == "") {
+          showAlert("노출기간 확인");
+          return false;
+        }
+
+        if (displayPeriodStartValue && displayPeriodEndValue) {
+          const startDate = new Date(displayPeriodStartValue);
+          const endDate = new Date(displayPeriodEndValue);
+
+          if (startDate > endDate) {
+            showAlert("종료일은 시작일 이후로 설정해야 합니다.");
+            return false;
+          }
+        }
+
+        return true;
+      }
+      function insupdProc() {
+        var isValid = validationCheck();
+
+        if (isValid) {
+          let content = toastEditor.getHTML();
+
+          // 빈 태그들을 빈값으로 치환
+          content = content.replace(/<p><br\s*\/?><\/p>/gi, "");
+          content = content.replace(/<p>\s*<\/p>/gi, "");
+          content = content.replace(/<br\s*\/?>/gi, "");
+          content = content.trim();
+
+          // 추가적인 빈 태그 패턴들도 처리
+          content = content.replace(/<p>(\s|&nbsp;)*<\/p>/gi, "");
+          content = content.replace(/^(\s|&nbsp;)*$/gi, "");
+
+          content = convertSpacesToNbsp(content);
+          console.log(content);
+
+          $("#benefitContent").val(content);
+          var formData = new FormData($("#form")[0]);
+
+          const planData = [];
+
+          // 테이블의 각 행 반복
+          $("#plan-add-chk tr").each(function () {
+            // 각 행에서 planlist 값 가져오기
+            const planId = $(this).find('input[name="planList"]').val();
+
+            // 값이 있는 경우 배열에 추가
+            if (planId) {
+              planData.push(planId);
+            }
+          });
+
+          formData.append("planIdList", JSON.stringify(planData));
+
+          $.ajax({
+            url: "/pbm/benefit/insupdProc",
+            type: "post",
+            enctype: "multipart/form-data",
+            data: formData,
+            async: false,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+              if (data.code == 200) {
+                var alertTxt = "수정 되었습니다.";
+                if ($(location).attr("href").indexOf("insert") != -1) {
+                  alertTxt = "등록 되었습니다";
+                } else if ($(location).attr("href").indexOf("copy") != -1) {
+                  alertTxt = "복사 되었습니다";
+                }
+                showAlert(alertTxt, goList);
+              }
+            },
+            error: function (request, status, error) {
+              alert(error);
+            },
+            complete: function () {},
+          });
+        }
+
+        return true;
+      }
+
+      function convertSpacesToNbsp(html) {
+        return html.replace(/  +/g, (match) => {
+          return "&nbsp;".repeat(match.length);
+        });
+      }
+      /* 요금제 검색 */
+      function schPlanList() {
+        var params = {
+          searchMno: $("#searchMno").val(),
+          searchNetrok: $("#searchPlanType").val(),
+          searchCompany: $("#searchHost").val(),
+          keyword: $("#keyword").val(),
+        };
+
+        $.ajax({
+          url: "/svc/mainbanner/planlist",
+          type: "post",
+          data: JSON.stringify(params),
+          dataType: "json",
+          contentType: "application/json",
+          async: false,
+          success: function (data) {
+            console.log(data);
+
+            $("#plan-area").empty();
+
+            $("#plan-list").tmpl(data.data).appendTo("#plan-area");
+
+            $(document).on("click", ".bnf-select__row", function (e) {
+              $(this).find('input[type="radio"]').prop("checked", true);
+            });
+          },
+          error: function (request, status, error) {
+            alert(error);
+          },
+          complete: function () {},
+        });
+      }
+
+      /* 요금제 상품 삭제 */
+      function planDelete() {
+        const checkedItems = $("input[name=planChk]:checked");
+
+        if (checkedItems.length > 0) {
+          showConfirm(
+            "삭제하시겠습니까?",
+            () => {
+              // 체크된 행들 제거
+              checkedItems.each(function () {
+                $(this).closest("tr").remove();
+              });
+            },
+            () => {},
+            ""
+          );
+        } else {
+          showConfirm("삭제할 항목을 선택해주세요.");
+        }
+      }
+
+      function openViewPlanDetail(planId) {
+        window.open("/pbm/plan/view?searchId=" + planId);
+      }
+
+      function goList() {
+        window.location.href = "/pbm/benefit/list";
+      }
+
+      function deleteFile1() {
+        // 파일 입력 초기화
+        document.getElementById("fileInput1").value = "";
+
+        // 파일명 텍스트 초기화
+        document.getElementById("fileText1").value = "";
+
+        // hidden input 초기화
+        document.getElementById("benefitThumbnail").value = "";
+
+        // 미리보기 이미지 숨기기
+        const preview = document.getElementById("preview1");
+        preview.src = "";
+        preview.style.display = "none";
+
+        const fileInfo = document.querySelector("#req-benefitThumbnail .file-info");
+        if (fileInfo) {
+          fileInfo.textContent = "";
+        }
+      }
+
+      function loadBenefit() {
+        $("#benefit-area").empty();
+        $("#keywordBenefit").val("");
+
+        $("#selectBenefitPopupOverlay, #selectBenefitPopup").show();
+      }
+      function searchBenefit() {
+        var params = {
+          keyword: $("#keywordBenefit").val(),
+        };
+
+        $.ajax({
+          url: "/pbm/benefit/ajaxList",
+          type: "post",
+          data: JSON.stringify(params),
+          dataType: "json",
+          contentType: "application/json",
+          async: false,
+          success: function (data) {
+            console.log(data);
+
+            $("#benefit-area").empty();
+
+            $("#benefit-list").tmpl(data.data).appendTo("#benefit-area");
+
+            $(document).on("click", ".bnf-select__row", function (e) {
+              $(this).find('input[type="radio"]').prop("checked", true);
+            });
+          },
+          error: function (request, status, error) {
+            alert(error);
+          },
+          complete: function () {},
+        });
+      }
+      function closeBenefitPopup() {
+        $("#selectBenefitPopupOverlay, #selectBenefitPopup").hide();
+      }
+      function addBenefitPopup() {
+        $("#selectBenefitPopupOverlay, #selectBenefitPopup").hide();
+
+        var id = $("input[name=popBenefitList]:checked").val();
+
+        window.location.href = "/pbm/benefit/copy/" + id;
+      }
+    </script>
+  </th:block>
+
+  <div class="main-content">
+    <div class="container-fluid">
+      <!-- 로케이션 & 제목 영역 추가 -->
+      <div class="page-header mb-4">
+        <div class="location mb-2">
+          <small class="text-secondary">
+            <i class="fas fa-home me-1"></i>
+            <a href="javascript:;">홈</a> > <a href="/pbm/plan/list">상품관리</a> >
+            <a href="/pbm/benefit/list">혜택</a>
+          </small>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+          <h2
+            class="page-title fs-4 mb-0"
+            th:text="${result.id < 1 ? '혜택 등록' : (isCopy != null && isCopy ? '혜택 복사' : '혜택 수정')}"
+          ></h2>
+          <button type="button" class="btn btn-primary" style="min-width: 70px" onclick="loadBenefit()">
+            불러오기
+          </button>
+        </div>
+      </div>
+
+      <form method="POST" id="form" th:object="${result}">
+        <input type="hidden" name="id" id="id" th:field="*{id}" />
+        <input type="hidden" name="majorCategorySelect" id="majorCategorySelect" th:value="*{majorCategoryId}" />
+        <input type="hidden" name="minorCategorySelect" id="minorCategorySelect" th:value="*{minorCategoryId}" />
+
+        <div class="search-section detail">
+          <div class="form-row">
+            <div class="form-label">카테고리<span class="required">*</span></div>
+            <div class="form-control-wrap d-flex gap-2">
+              <select class="form-select" style="width: 120px" name="majorCategoryId" id="majorCategoryId"></select>
+              <select class="form-select" style="width: 140px" name="minorCategoryId" id="minorCategoryId"></select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-label">제공처<span class="required">*</span></div>
+            <select class="form-select" style="width: 120px" id="provider" th:field="*{provider}">
+              <option value="telecom">통신사</option>
+              <option value="semo">세모통</option>
+              <option value="internet">인터넷</option>
+            </select>
+          </div>
+
+          <div class="form-row full-width">
+            <div class="form-label">항목명<span class="required">*</span></div>
+            <div class="form-control-wrap">
+              <input type="text" class="form-control" placeholder="항목 입력" th:field="*{name}" maxlength="500" />
+            </div>
+          </div>
+
+          <div class="form-row full-width">
+            <div class="form-label">타이틀<span class="required">*</span></div>
+            <div class="form-control-wrap col-9">
+              <input type="text" class="form-control" placeholder="타이틀 입력" th:field="*{title}" maxlength="500" />
+            </div>
+          </div>
+
+          <div class="form-row full-width">
+            <div class="form-label">설명문구<span class="required">*</span></div>
+            <div class="form-control-wrap col-9">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="설명문구 입력"
+                th:field="*{content}"
+                maxlength="1000"
+              />
+            </div>
+          </div>
+
+          <!-- 아이콘 -->
+          <div class="form-row full-width">
+            <div class="form-label">아이콘 이미지</div>
+            <div class="form-control-wrap" id="req-benefitThumbnail">
+              <div class="file-input-wrap">
+                <input type="hidden" id="benefitThumbnail" name="benefitThumbnail" th:value="*{icon}" />
+                <input
+                  type="file"
+                  class="file-input"
+                  id="fileInput1"
+                  name="benefitThumbnailU"
+                  style="display: none"
+                  accept="image/*"
+                />
+                <input type="text" class="form-control" style="min-width: 500px" id="fileText1" readonly />
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  style="min-width: 70px"
+                  onclick="document.getElementById('fileInput1').click()"
+                >
+                  찾기
+                </button>
+                <button type="button" class="btn btn-danger" style="min-width: 70px" onclick="deleteFile1()">
+                  삭제
+                </button>
+              </div>
+              <div class="file-info c_red"></div>
+              <div class="preview-wrap">
+                <img id="preview1" class="preview-image" th:src="*{icon}" style="display: none" />
+              </div>
+              <p class="c_red">* 이미지 미등록 시, 기본 이미지가 노출됩니다.</p>
+            </div>
+          </div>
+          <!-- 노출기간 -->
+          <div class="form-row full-width">
+            <div class="form-label mb-0">노출기간<span class="required">*</span></div>
+            <div class="form-control-wrap d-flex align-items-center gap-2" id="req-date">
+              <div class="d-flex align-items-center gap-2">
+                <input
+                  type="date"
+                  class="form-control"
+                  name="displayPeriodStart"
+                  id="displayPeriodStart"
+                  th:value="*{displayPeriodStart != null ? displayPeriodStart.substring(0, 10) : #temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+                />
+                <span class="text-secondary">-</span>
+                <input
+                  type="date"
+                  class="form-control"
+                  name="displayPeriodEnd"
+                  id="displayPeriodEnd"
+                  th:value="*{displayPeriodEnd != null ? displayPeriodEnd.substring(0, 10) : ''}"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- 메모 -->
+          <div class="form-row full-width">
+            <div class="form-label">메모</div>
+            <div class="form-control-wrap" style="width: 100%">
+              <div class="form-check-group">
+                <textarea
+                  placeholder="내용을 입력하세요."
+                  class="form-control"
+                  name="memo"
+                  id="memo"
+                  th:text="*{memo}"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- 랜딩URL(팝업) -->
+          <div class="form-row full-width">
+            <div class="form-label">랜딩</div>
+            <div class="form-control-wrap col-9">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="랜딩URL 입력"
+                th:field="*{benefitUrl}"
+                maxlength="500"
+              />
+            </div>
+          </div>
+          <!-- 상세(팝업) -->
+          <div class="form-row full-width">
+            <div class="form-label">상세<br />(팝업)</div>
+
+            <div class="form-control-wrap" id="req-eventImage">
+              <div class="file-input-wrap">
+                <input type="hidden" id="eventImage" name="benefitImage" th:value="*{benefitImage}" />
+                <input
+                  type="file"
+                  class="file-input"
+                  id="fileInput2"
+                  name="benefitImage"
+                  style="display: none"
+                  accept="image/*"
+                />
+                <input type="text" class="form-control" id="fileText2" readonly />
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  onclick="document.getElementById('fileInput2').click()"
+                  style="min-width: 70px"
+                >
+                  찾기
+                </button>
+              </div>
+              <div class="file-info c_red"></div>
+              <div class="preview-wrap">
+                <img id="preview2" class="preview-image" th:src="*{benefitImage}" style="display: none" />
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="form-row full-width">
+            <div class="form-label">본문</div>
+            <div class="form-control-wrap" id="req-content">
+              <div class="form-check-group">
+                <textarea placeholder="내용을 입력하세요." id="edt_content"></textarea>
+                <textarea style="display: none" th:field="*{benefitContent}"></textarea>
+              </div>
+            </div>
+          </div> -->
+
+          <div class="form-row full-width">
+            <div class="form-label">본문2</div>
+            <div class="form-control-wrap" id="req-content">
+              <div class="form-check-group">
+                <div id="edt_content"></div>
+                <textarea
+                  style="display: none"
+                  id="benefitContent"
+                  name="benefitContent"
+                  th:field="*{benefitContent}"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row full-width">
+            <div class="form-label">대상 요금제</div>
+            <div>
+              <div class="mb-2">
+                <button type="button" class="btn btn-primary" id="bnfAddBtn">추가</button>
+                <button type="button" class="btn btn-primary" id="bnfDelBtn" onClick="planDelete();">선택삭제</button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table custom-table table-bordered">
+                  <colgroup>
+                    <col style="width: 80px" />
+                    <col style="width: 100px" />
+                    <col style="width: 100px" />
+                    <col style="width: 100px" />
+                    <col style="width: 120px" />
+                    <col style="width: 220px" />
+                    <col style="width: 120px" />
+                    <col style="width: 120px" />
+                    <col style="width: 120px" />
+                    <col style="width: 120px" />
+                    <col style="width: 120px" />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th>선택</th>
+                      <th>노출여부</th>
+                      <th>상태</th>
+                      <th>통신망</th>
+                      <th>통신사</th>
+                      <th>요금제명</th>
+                      <th>기본료</th>
+                      <th>할인금액</th>
+                      <th>할인기간</th>
+                      <th>데이터</th>
+                      <th>QoS</th>
+                    </tr>
+                  </thead>
+                  <tbody id="plan-add-chk"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="d-flex justify-content-center gap-2 mt-4 w-100 mb-5">
+        <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">닫기</button>
+        <button
+          type="button"
+          class="btn btn-lg btn-dark px-4 btn-sm"
+          onclick="insupdProc();"
+          th:text="${id < 1 ? '등록' : (isCopy != null && isCopy ? '복사' : '수정')}"
+        ></button>
+      </div>
+    </div>
+  </div>
+
+  <script id="plan-list" type="text/x-jquery-tmpl">
+
+    <tr class="bnf-select__row">
+           <td class="bnf-select__td">
+               <input type="radio" name="popPlanList" class="bnf-select__radio" value="${id}" data-json='
+               {
+                "uuid":"${uuid}"
+               , "planMno":"${mno}"
+               , "planName":"${planNameSmt || planName}"
+               , "planAfterPrice":"${afterPrice}"
+               , "planSalePrice":"${salePrice}"
+               , "planPromotionPeriod":"${promotionPeriod}"
+               , "planSupDataVal":"${supDataVal}"
+               , "planSupQos":"${supQos}"
+               , "hostNm":"${hostNm}"
+               , "dispYn":"${dispYn}"
+               , "saleStatus":"${saleStatus}"
+              }
+               '>
+    		<input type="hidden" id="plan-uuid" value="${uuid}"/>
+           </td>
+           <td class="bnf-select__td">${dispYn === true ? '노출' : '미노출'}</td>
+           <td class="bnf-select__td">${saleStatus === true ? '판매중' : '판매중지'}</td>
+           <td class="bnf-select__td">${mno}</td>
+           <td class="bnf-select__td">${planType}</td>
+           <td class="bnf-select__td">${hostNm}</td>
+           <td class="bnf-select__td">
+               <a href="javascript:;" onclick="openViewPlanDetail('${id}')">${planNameSmt || planName}</a>
+           </td>
+           <td class="bnf-select__td">{{html getPriceStr(afterPrice)}}</td>
+           <td class="bnf-select__td">{{html getPriceStr(salePrice)}}</td>
+           <td class="bnf-select__td">${promotionPeriod}</td>
+           <td class="bnf-select__td">{{html getDataStr(supDataVal)}}</td>
+           <td class="bnf-select__td">{{html getQosStr(supQos)}}</td>
+           <td class="bnf-select__td">{{html getDateStr(modifiedDate)}}</td>
+       </tr>
+  </script>
+
+  <!-- 요금제 팝업 -->
+  <div class="bnf-select__overlay" id="selectPlanPopupOverlay"></div>
+  <div class="bnf-select" id="selectPlanPopup" style="width: 1000px">
+    <div class="bnf-select__header">
+      <div class="bnf-select__title">요금제 선택</div>
+      <span class="bnf-select__close plan-add-cls">&times;</span>
+    </div>
+
+    <!-- <form name="schform" id="schform"> -->
+    <div class="bnf-select__search">
+      <select class="form-select" name="searchMno" id="searchMno" style="height: 52px; width: 120px">
+        <option value="">MNO 전체</option>
+        <option value="KT">KT</option>
+        <option value="SKT">SKT</option>
+        <option value="U+">LGU</option>
+      </select>
+      <select class="form-select" name="searchPlanType" id="searchPlanType" style="height: 52px; width: 120px">
+        <option value="">네트워크 전체</option>
+        <option value="LTE">LTE</option>
+        <option value="5G">5G</option>
+      </select>
+      <select class="form-select" name="searchHost" id="searchHost" style="height: 52px; width: 120px">
+        <option value="">사업자 전체</option>
+        <option th:each="list : ${companyList}" th:value="${list.id}" th:utext="${list.name}">통신사 선택</option>
+      </select>
+      <input type="text" class="bnf-select__input" name="keyword" id="keyword" placeholder="요금제명을 입력해주세요." />
+      <button type="button" class="bnf-select__search-btn" onClick="schPlanList()">검색</button>
+    </div>
+    <!-- </form> -->
+    <div class="bnf-select__table__outer">
+      <table class="bnf-select__table">
+        <thead>
+          <tr>
+            <th class="bnf-select__th" style="width: 50px">구분</th>
+            <th class="bnf-select__th" style="width: 80px">노출여부</th>
+            <th class="bnf-select__th" style="width: 100px">상태</th>
+            <th class="bnf-select__th" style="width: 100px">MNO</th>
+            <th class="bnf-select__th">네트워크</th>
+            <th class="bnf-select__th">사업자</th>
+            <th class="bnf-select__th">요금제명</th>
+            <th class="bnf-select__th">기본료</th>
+            <th class="bnf-select__th">할인금액</th>
+            <th class="bnf-select__th">할인기간</th>
+            <th class="bnf-select__th">데이터</th>
+            <th class="bnf-select__th">QoS</th>
+            <th class="bnf-select__th">최근 수정일</th>
+          </tr>
+        </thead>
+        <tbody id="plan-area"></tbody>
+      </table>
+    </div>
+    <div class="bnf-select__footer">
+      <button class="bnf-select__btn bnf-select__btn--apply plan-add-cls">닫기</button>
+      <button class="bnf-select__btn bnf-select__btn--confirm bg_blue" id="plan-add">등록</button>
+    </div>
+  </div>
+
+  <script id="benefit-list" type="text/x-jquery-tmpl">
+    <tr class="bnf-select__row">
+      <td class="bnf-select__td">
+        <input type="radio" name="popBenefitList" class="bnf-select__radio" value="${id}">
+      </td>
+
+      <td class="bnf-select__td">${id}</td>
+      <td class="bnf-select__td">
+        {{if provider == 'telecom'}}
+          통신사
+        {{else provider == 'semo'}}
+          세모통
+        {{else provider == 'internet'}}
+          인터넷
+        {{else}}
+          ${provider}
+        {{/if}}
+      </td>
+      <td class="bnf-select__td">${name}</td>
+      <td class="bnf-select__td">${title}</td>
+      <td class="bnf-select__td">${planCount}</td>
+      <td class="bnf-select__td">
+        {{html getDateStrYYYYmmdd(displayPeriodStart)}} ~ {{html getDateStrYYYYmmdd(displayPeriodEnd)}}
+      </td>
+
+    </tr>
+  </script>
+
+  <!-- 불러오기 팝업 -->
+  <div class="bnf-select__overlay" id="selectBenefitPopupOverlay">
+    <div class="bnf-select" id="selectBenefitPopup" style="width: 1000px">
+      <div class="bnf-select__header">
+        <div class="bnf-select__title">혜택 선택</div>
+        <span class="bnf-select__close plan-add-cls" onclick="closeBenefitPopup()">&times;</span>
+      </div>
+
+      <!-- <form name="schform" id="schform"> -->
+      <div class="bnf-select__search">
+        <input
+          type="text"
+          class="bnf-select__input"
+          name="keyword"
+          id="keywordBenefit"
+          placeholder="혜택명을 입력해주세요."
+        />
+        <button type="button" class="bnf-select__search-btn" onClick="searchBenefit()">검색</button>
+      </div>
+      <!-- </form> -->
+      <div class="bnf-select__table__outer">
+        <table class="bnf-select__table">
+          <thead>
+            <tr>
+              <th class="bnf-select__th">구분</th>
+              <th class="bnf-select__th">번호</th>
+              <th class="bnf-select__th">제공처</th>
+              <th class="bnf-select__th">항목명</th>
+              <th class="bnf-select__th">타이틀</th>
+              <th class="bnf-select__th">제공요금제</th>
+              <th class="bnf-select__th">노출기간</th>
+            </tr>
+          </thead>
+          <tbody id="benefit-area"></tbody>
+        </table>
+      </div>
+      <div class="bnf-select__footer">
+        <button
+          class="bnf-select__btn bnf-select__btn--apply plan-add-cls"
+          id="closeBenefitPopup"
+          onclick="closeBenefitPopup()"
+        >
+          닫기
+        </button>
+        <button
+          class="bnf-select__btn bnf-select__btn--confirm bg_blue"
+          id="addBenefitPopup"
+          onclick="addBenefitPopup()"
+        >
+          등록
+        </button>
+      </div>
+    </div>
+  </div>
+</html>

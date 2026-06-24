@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>데이터 서칭 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<!-- 페이지 스크립트 영역 -->
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			// 모달 바로 볼 수 있도록 호출
+			var FCB0305Modal = new bootstrap.Modal(document.getElementById('FCB0305Modal'));
+			FCB0305Modal.show();
+		});
+	</script>
+</head>
+
+<body>
+	<div class="wrapper">
+		<div style="padding: 30rem;">
+			<!-- 트리거로 모달 띄우기 -->
+			<button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#FCB0305Modal">
+				MODAL OPEN
+			</button>
+		</div>
+	</div>
+
+	<!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+	-->
+	<!-- modal 데이터 서칭 -->
+	<div class="modal modal-full fade" id="FCB0305Modal" tabindex="-1" role="dialog" aria-labelledby="FCB0305ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-CB03-05-page">
+				<div class="modal-header">
+					<button type="button" class="ui-btn">
+						<i class="ui-icn icn-32-back-bk" aria-label="뒤로가기"></i>
+					</button>
+					<h3 class="modal-title blind" id="FCB0305ModalLabel">데이터 서칭</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 모통봇 소개 섹션 -->
+					<section class="cb-intro-sec">
+						<div class="sec-inner">
+							<div class="intro-img">
+								<i class="ui-icn icn-62-motong" aria-hidden="true"></i>
+							</div>
+							<div class="intro-con">
+								<p>고객님께 딱 맞는 요금을<br>찾고 있어요!</p>
+							</div>
+						</div>
+					</section>
+					<!-- // 모통봇 소개 섹션 -->
+
+					<!-- 챗봇 검색중 -->
+					<section class="cb-searching-sec">
+						<div class="sec-inner">
+							<div class="searching-data">
+								<div class="searching" role="text" aria-label="검색중">
+									<div class="img-list">
+										<img src="../../assets/images/common/img-130-srch-list.svg" alt="" />
+									</div>
+									<div class="img-zoom">
+										<img src="../../assets/images/common/img-130-srch-zoom.svg" alt="" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+					<!-- // 챗봇 검색중 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal default -->
+</body>
+
+</html>

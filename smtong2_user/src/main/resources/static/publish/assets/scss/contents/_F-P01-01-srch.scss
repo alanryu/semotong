@@ -1,0 +1,258 @@
+@charset "utf-8";
+
+/*-------------------------------------------------------------------
+	분류그룹 : 요금제
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 요금제 페이지
+.F-P01-01-srch-page {
+
+	// 페이시 여백
+	@include bottom-spacer;
+
+	// 공통
+	.ratePlan-search-title {
+		display: flex;
+		justify-content: space-between;
+
+		.tit {
+			margin-bottom: 8rem;
+			font-weight: 700;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: #000;
+		}
+
+		.info {
+			font-weight: 500;
+			font-size: 12rem;
+			line-height: 16rem;
+			color: #B7B9BA;
+		}
+	}
+
+	.divider-sec {
+		margin: 32rem 0;
+	}
+	// 공통
+
+	// s: 요금제 검색 섹션
+	.ratePlan-search-sec {
+		padding-top: 20rem;
+
+		.ratePlan-search {
+
+			@include media-tablet-xs {
+				margin: 0;
+			}
+
+			.ratePlan-search-form {
+				display: flex;
+				gap: 8rem;
+
+				.filter-btn {
+					display: flex;
+					align-items: center;
+					position: relative;
+					flex: none;
+					gap: 2rem;
+					height: 52rem;
+					width: 52rem;
+					padding: 0;
+					border-radius: 4rem;
+					background-color: #fff;
+					border: 1px solid #CFD0D1;
+
+					>span {
+						display: block;
+						padding-right: 4rem;
+					}
+
+					&.is-setting {
+						border-color: #36383A;
+
+						&::after {
+							content: '';
+							position: absolute;
+							top: 6rem;
+							left: 25rem;
+							z-index: 2;
+							display: block;
+							width: 5rem;
+							height: 5rem;
+							border-radius: 50%;
+							background-color: #EA2A2A;
+						}
+					}
+				}
+			}
+
+			.ratePlan-search-cont {
+				margin-top: 32rem;
+
+				.ratePlan-keyword-list {
+					display: flex;
+					gap: 8rem;
+					width: 100%;
+					overflow: auto;
+					li {
+						flex: none;
+						display: flex;
+						width: auto;
+						box-sizing: border-box;
+
+						.ratePlan-keyword {
+							flex: none;
+							display: flex;
+							justify-content: center;
+							align-items: center;
+							gap: 4rem;
+							height: 36rem;
+							background-color: #EFF0F0;
+							padding: 4rem 6rem 4rem 10rem;
+							border-radius: 6rem;
+							font-weight: 500;
+							font-size: 14rem;
+							line-height: 20rem;
+							color: #36383A;
+						}
+					}
+
+					@include media-tablet-xs {
+						flex-wrap: wrap;
+						overflow: hidden;
+					}
+				}
+
+				.ratePlan-chip-list {
+					display: flex;
+					flex-wrap: wrap;
+					gap: 8rem;
+
+					&::-webkit-scrollbar {
+						height: 0;
+					}
+
+					li {
+						flex: none;
+						display: flex;
+						width: auto;
+						box-sizing: border-box;
+
+						.ratePlan-chip {
+							flex: none;
+							display: flex;
+							justify-content: center;
+							align-items: center;
+							gap: 2rem;
+							height: 36rem;
+							background-color: #fff;
+							padding: 4rem 10rem;
+							border-radius: 6rem;
+							font-weight: 500;
+							font-size: 14rem;
+							line-height: 20rem;
+							color: #828588;
+							border: 1px solid transparent;
+
+							&.primary {
+								background-color: #EAE6FB;
+								color: $color-primary;
+							}
+						}
+					}
+
+					@include media-tablet-xs {
+						margin: 0;
+						padding: 0;
+
+						li {
+							&:first-child {
+								margin-left: 0;
+							}
+
+							&:last-child {
+								margin-right: 0;
+							}
+						}
+					}
+				}
+
+			}
+		}
+	}
+	// e: 요금제 검색 섹션
+
+	// s: 인기 요금제
+	.ratePlan-vogue-sec {
+		padding-bottom: 20rem;
+
+		.ratePlan-search-cont {
+			.ratePlan-vogue-list {
+				margin-top: 16rem;
+
+				li+li {
+					margin-top: 16rem;
+				}
+
+				li {
+					opacity: 0;
+					animation: slideInUp, fadeIn forwards;
+					animation-duration: 1s;
+
+					&:nth-child(1) {
+						animation-delay: 0.3s;
+					}
+					&:nth-child(2) {
+						animation-delay: 1.1s;
+					}
+					&:nth-child(3) {
+						animation-delay: 1.9s;
+					}
+					&:nth-child(4) {
+						animation-delay: 2.7s;
+					}
+					&:nth-child(5) {
+						animation-delay: 3.5s;
+					}
+				}
+
+				.ratePlan-vogue-link {
+					display: flex;
+					align-items: center;
+					overflow: hidden;
+					width: 100%;
+
+					b {
+						flex: none;
+						padding-left: 2rem;
+						margin-right: 12rem;
+						font-weight: 700;
+						font-size: 14rem;
+						line-height: 20rem;
+						color: $color-primary;
+					}
+
+					span {
+						display: block;
+						flex: 1 1 auto;
+						overflow: hidden;
+						white-space: nowrap;
+						text-overflow: ellipsis;
+						font-size: 14rem;
+						line-height: 20rem;
+						font-weight: 500;
+						color: #000;
+					}
+
+					.ui-icn {
+						flex: none;
+						margin-left: 12rem;
+					}
+				}
+			}
+		}
+	}
+
+	// e: 인기 요금제
+}

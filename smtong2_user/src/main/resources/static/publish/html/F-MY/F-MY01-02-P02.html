@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>추천 내역 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<!-- 페이지 스크립트 영역 -->
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			// 모달 바로 볼 수 있도록 호출
+			var FMY0102P02Modal = new bootstrap.Modal(document.getElementById('FMY0102P02Modal'));
+			FMY0102P02Modal.show();
+		});
+	</script>
+</head>
+
+<body>
+	<div class="wrapper">
+		<div style="padding: 30rem;">
+			<!-- 트리거로 모달 띄우기 -->
+			<button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#FMY0102P02Modal">
+				MODAL OPEN
+			</button>
+		</div>
+	</div>
+
+	<!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+	-->
+	<!-- modal default -->
+	<div class="modal modal-full fade" id="FMY0102P02Modal" tabindex="-1" role="dialog" aria-labelledby="FMY0102P02ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-MY01-02-P02-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FMY0102P02ModalLabel">추천 내역</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 탭 목록 -->
+					<div class="ui-tab tab-style1">
+						<ul class="tab-list" role="tablist">
+							<li class="tab-item" role="presentation">
+								<button class="tab-link active" id="tab-11" data-bs-toggle="tab" data-bs-target="#tab-11-pane" type="button" role="tab" aria-controls="tab-11-pane" aria-selected="true">내가 추천한 친구</button>
+							</li>
+							<li class="tab-item" role="presentation">
+								<button class="tab-link" id="tab-12" data-bs-toggle="tab" data-bs-target="#tab-12-pane" type="button" role="tab" aria-controls="tab-12-pane" aria-selected="false">나를 추천한 친구</button>
+							</li>
+						</ul>
+					</div>
+					<!-- // 탭 목록 -->
+
+					<!-- 탭 패널 -->
+					<div class="tab-content">
+						<!-- 탭 패널: 내가 추천한 친구 -->
+						<div class="tab-pane fade show active" id="tab-11-pane" role="tabpanel" aria-labelledby="tab-11" tabindex="0">
+							<!-- 추천내역 섹션 -->
+							<section class="recom-history-sec">
+								<div class="sec-inner">
+									<!-- 추천내역 목록 -->
+									<ul class="recom-history-list">
+										<li class="recom-history-item">
+											<div class="recom-history-card">
+												<div class="card-body">
+													<p class="card-name">
+														<span class="num">01.</span>
+														<strong class="name">일이삼사오육칠팔</strong>
+													</p>
+													<p class="card-date">
+														<span class="txt">추천일자</span>
+														<em class="date">2024.10.11</em>
+													</p>
+													<dl class="card-title">
+														<dt class="type">유형</dt>
+														<dd class="title">요금제 신청 친구추천</dd>
+													</dl>
+												</div>
+											</div>
+										</li>
+										<li class="recom-history-item">
+											<div class="recom-history-card">
+												<div class="card-body">
+													<p class="card-name">
+														<span class="num">01.</span>
+														<strong class="name">최*웅</strong>
+													</p>
+													<p class="card-date">
+														<span class="txt">추천일자</span>
+														<em class="date">2024.10.11</em>
+													</p>
+													<dl class="card-title">
+														<dt class="type">유형</dt>
+														<dd class="title">요금제 신청 친구추천</dd>
+													</dl>
+												</div>
+											</div>
+										</li>
+										<li class="recom-history-item">
+											<div class="recom-history-card">
+												<div class="card-body">
+													<p class="card-name">
+														<span class="num">01.</span>
+														<strong class="name">유*순</strong>
+													</p>
+													<p class="card-date">
+														<span class="txt">추천일자</span>
+														<em class="date">2024.10.11</em>
+													</p>
+													<dl class="card-title">
+														<dt class="type">유형</dt>
+														<dd class="title">요금제 신청 친구추천</dd>
+													</dl>
+												</div>
+											</div>
+										</li>
+										<li class="recom-history-item">
+											<div class="recom-history-card">
+												<div class="card-body">
+													<p class="card-name">
+														<span class="num">01.</span>
+														<strong class="name">유*순</strong>
+													</p>
+													<p class="card-date">
+														<span class="txt">추천일자</span>
+														<em class="date">2024.10.11</em>
+													</p>
+													<dl class="card-title">
+														<dt class="type">유형</dt>
+														<dd class="title">요금제 신청 친구추천</dd>
+													</dl>
+												</div>
+											</div>
+										</li>
+										<li class="recom-history-item">
+											<div class="recom-history-card">
+												<div class="card-body">
+													<p class="card-name">
+														<span class="num">01.</span>
+														<strong class="name">유*순</strong>
+													</p>
+													<p class="card-date">
+														<span class="txt">추천일자</span>
+														<em class="date">2024.10.11</em>
+													</p>
+													<dl class="card-title">
+														<dt class="type">유형</dt>
+														<dd class="title">요금제 신청 친구추천</dd>
+													</dl>
+												</div>
+											</div>
+										</li>
+										<li class="recom-history-item">
+											<div class="recom-history-card">
+												<div class="card-body">
+													<p class="card-name">
+														<span class="num">01.</span>
+														<strong class="name">유*순</strong>
+													</p>
+													<p class="card-date">
+														<span class="txt">추천일자</span>
+														<em class="date">2024.10.11</em>
+													</p>
+													<dl class="card-title">
+														<dt class="type">유형</dt>
+														<dd class="title">요금제 신청 친구추천</dd>
+													</dl>
+												</div>
+											</div>
+										</li>
+										<li class="recom-history-item">
+											<div class="recom-history-card">
+												<div class="card-body">
+													<p class="card-name">
+														<span class="num">01.</span>
+														<strong class="name">유*순</strong>
+													</p>
+													<p class="card-date">
+														<span class="txt">추천일자</span>
+														<em class="date">2024.10.11</em>
+													</p>
+													<dl class="card-title">
+														<dt class="type">유형</dt>
+														<dd class="title">요금제 신청 친구추천</dd>
+													</dl>
+												</div>
+											</div>
+										</li>
+										<li class="recom-history-item">
+											<div class="recom-history-card">
+												<div class="card-body">
+													<p class="card-name">
+														<span class="num">01.</span>
+														<strong class="name">유*순</strong>
+													</p>
+													<p class="card-date">
+														<span class="txt">추천일자</span>
+														<em class="date">2024.10.11</em>
+													</p>
+													<dl class="card-title">
+														<dt class="type">유형</dt>
+														<dd class="title">요금제 신청 친구추천</dd>
+													</dl>
+												</div>
+											</div>
+										</li>
+									</ul>
+								</div>
+							</section>
+							<!-- // 추천내역 섹션 -->
+						</div>
+						<!-- // 탭 패널: 내가 추천한 친구 -->
+
+						<!-- 탭 패널: 나를 추천한 친구 -->
+						<div class="tab-pane fade" id="tab-12-pane" role="tabpanel" aria-labelledby="tab-12" tabindex="0">
+							<!-- nodata 섹션 -->
+							<section class="nodata-sec">
+								<div class="sec-inner">
+									<!-- Case 추천내역 없음 -->
+									<div class="nodata">
+										<i class="ui-icn icn-100-nodata-recom" aria-hidden="true"></i>
+										<p class="nodata-tit"><strong>아직 추천한 내역이 없어요.</strong></p>
+									</div>
+									<!-- // Case 추천내역 없음 -->
+								</div>
+							</section>
+							<!-- // nodata 섹션 -->
+						</div>
+						<!-- // 탭 패널: 나를 추천한 친구 -->
+					</div>
+					<!-- // 탭 패널 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal default -->
+</body>
+
+</html>

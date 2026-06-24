@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Fontset | 세모통 스타일가이드</title>
+	<meta http-equiv="X-UA-Compatible" content="ie=edge chrome=1" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="프로젝트가이드, 세모통 스타일가이드" />
+	<meta name="description" content="프로젝트가이드, 세모통 스타일가이드" />
+	<link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 인크루드 설정용도(개발적용안함) -->
+	<link rel="stylesheet" type="text/css" href="css/guide.css" /><!-- 가이드전용 -->
+	<script>
+		$(function () {
+			var setFontsize = function () {
+				var $eleNum, $eleFont, $eleSize, valNum;
+				function init() {
+					$eleNum = $('.js-fontsize-set');
+					$eleFont = $('.js-fontsize');
+					$eleSize = $eleFont.find('.js-size');
+					valNum = $eleNum.val();
+				}
+				function event() {
+					$eleNum.on('change', function () {
+						valNum = $(this).val();
+						action();
+					})
+				}
+				function action() {
+					$eleFont.css('font-size', valNum + 'px');
+					$eleSize.text('Font Weight');
+					// $eleSize.text(valNum + 'px');
+				}
+				init();
+				event();
+				action();
+			}
+			setFontsize();
+		})
+	</script>
+</head>
+
+<body>
+	<div class="wrapper sub_page">
+		<!-- Header -->
+		<div data-include="include_header.html"></div>
+		<!-- // Header -->
+
+		<!-- Container -->
+		<div class="container">
+			<main id="content" class="content" role="main">
+				<div class="content-head">
+					<div class="in-sec">
+						<h1 class="g-h1">Fontset</h1>
+					</div>
+				</div>
+				<div class="content-body">
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">
+								폰트사이즈&nbsp;&nbsp;
+								<input type="number" name="" id="" value="20" placeholder="" title=""
+									class="js-fontsize-set"
+									style="width:60px; text-align:center; border:1px solid #ddd; font-size:20px">
+							</h2>
+						</div>
+						<div class="g-section-body">
+							<div class="js-fontsize" style="line-height:1.6; margin-right:20px;">
+								<p style="font-weight:100"><span class="js-size"></span> - 200 NotoSans Thin</p>
+								<p style="font-weight:100">
+									ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>1234567890
+									가나다라마바사아자차카타파하</p>
+								<br>
+								<p style="font-weight:300"><span class="js-size"></span> - 300 NotoSans Light</p>
+								<p style="font-weight:300">
+									ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>1234567890
+									가나다라마바사아자차카타파하</p>
+								<br>
+								<p style="font-weight:400"><span class="js-size"></span> - 400 NotoSans Reguler</p>
+								<p style="font-weight:400">
+									ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>1234567890
+									가나다라마바사아자차카타파하</p>
+								<br>
+								<p style="font-weight:500"><span class="js-size"></span> - 500 NotoSans Medium</p>
+								<p style="font-weight:500">
+									ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>1234567890
+									가나다라마바사아자차카타파하</p>
+								<br>
+								<p style="font-weight:700"><span class="js-size"></span> - 700 NotoSans Bold</p>
+								<p style="font-weight:700">
+									ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>1234567890
+									가나다라마바사아자차카타파하</p>
+							</div>
+						</div>
+					</section>
+					<!-- // Section -->
+				</div>
+				<div class="content-foot">
+				</div>
+			</main>
+		</div>
+		<!-- // Container -->
+
+		<!-- Footer (include_footer.html) -->
+		<div data-include="include_footer.html"></div>
+		<!-- // Footer -->
+	</div>
+</body>
+
+</html>

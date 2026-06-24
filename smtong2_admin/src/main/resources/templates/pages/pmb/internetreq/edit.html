@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='05',menuId =${'02' + siteSp}">
+
+	  
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<!--	<link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script type="text/javascript">
+		document.addEventListener('DOMContentLoaded', () => {
+			var reqState = "[[${record.reqState}]]";
+			
+			if(reqState=="CANCEL" || reqState=="COMPLET") {
+				//$("#counselContent").prop("disabled",true);
+				//$("#procContent").prop("disabled",true);
+				$("#btnComplet").hide();
+				$("#btnCancel").hide();
+				//$("#btnSave").hide();
+			}
+		});
+		function saveData(procSp) {
+			if(procSp =="SAVE") {
+				procSp = $("input[name='searcState']:checked").val();
+			}
+			
+			
+			if(procSp =="COMPLET") {
+				
+				if($("#counselContent").val().length ==0) {
+					showAlert("상담내용을 입력하세요",$("#counselContent"));
+					return;
+				}
+			
+				if($("#procContent").val().length ==0) {
+					showAlert("처리내용을 입력하세요",$("#procContent"));
+					return;
+				}
+			}
+		
+			var procNm = "";
+			if(procSp =="REQ") {
+				procNm = "신청";
+			} else if(procSp =="CALL") {
+				procNm = "해피콜";
+			} else if(procSp =="DEFER") {
+				procNm = "보류";
+			} else if(procSp =="REQCOMP") {				
+				procNm = "접수완료";				
+			} else if(procSp =="ABS") {
+				 procNm = "부재";
+			} else if(procSp =="COMPLET") {
+				 procNm = "개통완료";				 
+			} else if(procSp =="CANCEL") {
+				 procNm = "취소";				 
+			}
+		
+			var curState = "[[${record.reqState}]]";
+						
+			if ( curState == "REQ" && procSp != "REQ" ) {
+				showConfirm( 
+					'변경된 내용은 되돌릴 수 없습니다.<br> 상태를 변경하시겠습니까?'
+					, () => {
+						//console.log('확인 클릭');
+						saveProc(procSp);
+					}
+					,() => {
+						//console.log('취소 클릭');
+						// 취소 시 실행할 로직
+					}
+					,procNm
+				)
+			} else {
+				saveProc(procSp);
+			}
+		}
+		
+		function saveProc(procSp) { 
+			
+			
+			
+			var params = {
+					id : $("#reqId").val(),
+					counselContent :$("#counselContent").val(),
+					procContent :  $("#procContent").val(),
+					reqState : procSp
+			}
+			$.ajax({
+				url : '/pmb/internetreq/update',
+				type : 'POST',
+				async : false,
+				dataType : "json",
+				contentType:"application/json",
+				data : JSON.stringify(params),
+				success: function (data) {
+					if(data.code ==200) {
+						//console.log(data);
+						if ( params.reqState != 'REQ' ) {
+							showAlert("처리되었습니다.",goList);
+						} else {
+							showAlert("저장되었습니다.");
+						}
+					} else {
+						
+						showAlert(data.code);
+					}
+				},
+				error : function(request, status, error){
+					alert(error);
+				},
+				complete:function(){
+					// $('#loading').addClass('display-none');
+				}
+			});
+		}
+		
+		function refreshView(){
+			window.location.href="/pmb/internetreq/edit/"+$("#siteSp").val()+"?searchId="+$("#reqId").val();
+		}
+		
+		function goList(){
+			window.location.href="/pmb/internetreq/list/"+$("#siteSp").val();
+		}
+	</script>
+		
+</th:block>
+
+<div class="main-content">
+	<div class="container-fluid">
+		<div class="location mb-2">
+			<small class="text-secondary">
+				<i class="fas fa-home me-1"></i>
+				<a href="/mbm/adminuser/list">홈</a> > <a href="/pmb/plan-request/list">신청관리</a> > <a th:href="@{/pmb/internetreq/list/{siteSp}(siteSp=${siteSp})}">인터넷 신청내역</a>
+															
+			</small>
+		</div>
+		<h2 class="page-title fs-4 mb-4">
+			인터넷 신청내역 상세
+			<th:block th:if="${siteSp eq '01'}">(세모통)</th:block>
+			<th:block th:if="${siteSp eq '02'}">(오늘에통신)</th:block>
+		</h2>
+
+	   		<input type="hidden" th:value="${record.id}" id="reqId">
+	   		<input type="hidden" th:value="${siteSp}" id="siteSp">
+			<div class="search-section detail">
+				<!-- 신청일시 -->
+				<div class="form-row">
+					<div class="form-label"> 신청일시 </div>
+					<div class="form-control-wrap" th:text="${#temporals.format(record.createDate, 'yyyy-MM-dd HH:mm:ss')}"> </div>
+				</div>
+	  			<!-- 완료일시 -->
+				<div class="form-row">
+					<div class="form-label"> 완료일시 </div>
+					<th:block th:if="${record.reqState =='REQ'}">
+						<div class="form-control-wrap"> </div>
+					</th:block>
+					<th:block th:unless="${record.reqState =='REQ'}">
+						<div class="form-control-wrap" th:text="${#temporals.format(record.modifiedDate, 'yyyy-MM-dd HH:mm:ss')}"> </div>
+					</th:block>
+					
+				</div>
+				
+				<!-- 신청자 -->
+				 <div class="form-row">
+					<div class="form-label"> 신청자 </div>
+					<div class="form-control-wrap" th:text="${record.inputName}"> </div>
+				</div>
+				<!-- 전화번호 -->
+				 <div class="form-row">
+					<div class="form-label"> 전화번호 </div>
+					<div class="form-control-wrap" th:text="${record.inputNumber}"> </div>
+				</div>
+				
+				<!-- 상태 -->
+				<div class="form-row full-width">
+					<div class="form-label"> 상태 </div>
+					<div class="form-check form-check-inline" th:each="item,index : ${stateList}">
+						<input class="form-check-input" type="radio" name="searcState" th:id="|searcState0${index.index +1}|" th:value="${item.code}" th:checked="${item.code} == ${record.reqState}">
+						<label class="form-check-label" th:for="|searcState0${index.index +1}|" th:text="${item.codeName}">상담신청</label>
+					</div>
+				</div>
+				
+				
+				<!-- MNO -->
+				<div class="form-row">
+					<div class="form-label"> MNO </div>
+					<div class="form-control-wrap" th:text="${record.internetPlanMno}"> </div>
+				</div>
+	  			<!-- 인터넷 -->
+				<div class="form-row">
+					<div class="form-label"> 인터넷 </div>
+					<div class="form-control-wrap" th:if="${record.internetSpeed =='S100'}"> 100M</div>
+					<div class="form-control-wrap" th:if="${record.internetSpeed =='S200'}"> 200M</div>
+					<div class="form-control-wrap" th:if="${record.internetSpeed =='S500'}"> 500M</div>
+					<div class="form-control-wrap" th:if="${record.internetSpeed =='S1000'}"> 1G</div>
+				</div>
+				
+				<!-- 상품명 -->
+				 <div class="form-row">
+					<div class="form-label"> 상품명 </div>
+					<div class="form-control-wrap" th:text="${record.internetPlanNm}"> </div>
+				</div>
+				<!-- TV채널 -->
+				 <div class="form-row">
+					<div class="form-label"> TV채널 </div>
+					<div class="form-control-wrap" th:text="${record.channelCount + '채널'}"> </div>
+				</div>
+				<!-- 미결합금액 -->
+				 <div class="form-row">
+					<div class="form-label"> 미결합금액 </div>
+					<div class="form-control-wrap" th:text="${#numbers.formatInteger(record.normalPrice, 0, 'COMMA') + '원'}" th:if="${record.inputPlanId ne 0}"> </div>
+					<div class="form-control-wrap" th:if="${record.inputPlanId eq 0}"> 미선택</div>
+															
+				</div>
+				<!-- 결합금액 -->
+				 <div class="form-row">
+					<div class="form-label"> 결합금액 </div>
+					<div class="form-control-wrap" th:text="${#numbers.formatInteger(record.combinationPrice, 0, 'COMMA') + '원'}" th:if="${record.inputPlanId ne 0}"> </div>
+					<div class="form-control-wrap" th:if="${record.inputPlanId eq 0}"> 미선택</div>							
+				</div>
+				
+				<!-- 사은품 -->
+				<div class="form-row full-width">
+					<div class="form-label"> 사은품 </div>
+					<div class="form-control-wrap" th:text="${#numbers.formatInteger(record.normalFreeblePrice, 0, 'COMMA') + '원'}" th:if="${record.inputPlanId ne 0}"> </div>
+					<div class="form-control-wrap" th:if="${record.inputPlanId eq 0}"> 미선택</div>					
+				</div>
+				
+				<!-- 유입경로 -->
+				<div class="form-row">
+					<div class="form-label"> 유입경로 </div>
+					<div class="form-control-wrap" th:text="${record.incomSp == '01' ? '홈페이지' : (record.incomSp == '02' ? '랜딩 페이지' : '수동등록 / ' + record.relComp)}"> </div>
+				</div>
+				
+				<!-- 유입Url -->
+				<div class="form-row">
+					<div class="form-label"> 유입Url </div>
+					<div class="form-control-wrap" th:text="${record.incomUrl}"> </div>
+				</div>							
+				
+				<div class="form-row full-width">
+					<div class="form-label">상담내용 </div>
+					<div class="form-control-wrap" style="width:100%;">
+						<div class="form-check-group">
+							<textarea  placeholder="상담내용을 입력하세요." class="form-control" id="counselContent" th:text="${record.counselContent}"></textarea>
+						</div>
+					</div>
+				</div>  
+				
+				
+				
+				
+				<div class="form-row full-width">
+					<div class="form-label">처리내용 </div>
+					<div class="form-control-wrap" style="width:100%;">
+						<div class="form-check-group">
+							<textarea  placeholder="처리내용을 입력하세요." class="form-control" id="procContent" th:text="${record.procContent}"></textarea>
+						</div>
+					</div>
+				</div>									   
+		</div>
+		
+		<!-- 버튼 영역 -->
+		<div class="d-flex justify-content-center gap-2 mt-4">
+			<button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">
+				닫기
+			</button>
+			<button type="button" class="btn btn-lg btn-dark px-4 btn-sm" onclick="saveData('SAVE');" id="btnSave">
+				저장
+			</button>
+			<button type="button" class="btn btn-lg btn-dark px-4 btn-sm" onclick="saveData('CANCEL');" id="btnCancel">
+				고객취소
+			</button>
+			<button type="button" class="btn btn-lg btn-dark px-4 btn-sm" onclick="saveData('COMPLET');" id="btnComplet">
+				개통완료
+			</button>			
+		</div>
+	</div>
+</div>

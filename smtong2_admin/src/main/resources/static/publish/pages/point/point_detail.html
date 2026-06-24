@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>세모통</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            rel="stylesheet">
+        <link href="../../css/design.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="sidebarWrapper">
+            <div class="left-sidebar">
+                <div class="admin-profile">
+                    <div class="profile-letter">A</div>
+                    <div>
+                        <div class="fw-semibold text-dark">관리자 - 아무개님</div>
+                        <small class="text-muted">UPDATE -<br>
+                            2024-12-12 18:02</small>
+                    </div>
+                </div>
+                <ul class="menu-list">
+                    <!-- 계정권한관리 -->
+                    <li class="menu-item">
+                        <a href="../account/account.html" class="menu-link">
+                            <i class="fas fa-user-cog"></i>
+                            <span>계정권한관리</span>
+                        </a>
+                    </li>
+                    <!-- 회원관리 -->
+                    <li class="menu-item">
+                        <a href="../members/members.html" class="menu-link">
+                            <i class="fas fa-users"></i>
+                            <span>회원관리</span>
+                        </a>
+                    </li>
+                    <!-- 입점사관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="#" class="menu-link">
+                            <i class="fas fa-building"></i>
+                            <span>입점사관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                                <a href="../business/list.html" class="submenu-link">사업자 목록</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../business/manage.html" class="submenu-link">입점사 관리</a>
+                            </li>
+                            <li class="submenu-item ">
+                                <a href="../point/cashback.html" class="submenu-link">캐시백 신청목록</a>
+                            </li>
+                            <li class="submenu-item ">
+                                <a href="../point/apply.html" class="submenu-link">포인트 요금제 신청목록</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 포인트관리 -->
+                    <li class="menu-item has-submenu active open">
+                        <a href="#" class="menu-link">
+                            <i class="fas fa-box"></i>
+                            <span>포인트관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item active">
+                                <a href="../point/point.html" class="submenu-link">포인트내역</a>
+                            </li>
+                            <li class="submenu-item ">
+                                <a href="../point/naverpay.html" class="submenu-link">네이버페이 교환목록</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 상품관리 -->
+                    <li class="menu-item has-submenu ">
+                        <a href="#" class="menu-link">
+                            <i class="fas fa-box"></i>
+                            <span>상품관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item ">
+                                <a href="../product/rateplan.html" class="submenu-link">요금제</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../product/scraping.html" class="submenu-link">스크래핑 관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="javascript:;" class="submenu-link">인터넷</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 신청관리 -->
+                    <li class="menu-item">
+                        <a href="../applications/applications.html" class="menu-link">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>신청관리</span>
+                        </a>
+                    </li>
+                    <!-- 정산관리 -->
+                    <li class="menu-item">
+                        <a href="../settlements/settlements.html" class="menu-link">
+                            <i class="fas fa-calculator"></i>
+                            <span>정산관리</span>
+                        </a>
+                    </li>
+                    <!-- 서비스관리 -->
+                    <li class="menu-item">
+                        <a href="../services/services.html" class="menu-link">
+                            <i class="fas fa-cog"></i>
+                            <span>서비스관리</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <button class="toggle-sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="main-content">
+            <div class="container-fluid">
+                <!-- 로케이션 & 제목 영역 추가 -->
+                <div class="page-header d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="location mb-2">
+                            <small class="text-secondary">
+                                <i class="fas fa-home me-1"></i>
+                                <a href="javascript:;">홈</a>
+                                >
+                                <a href="javascript:;">포인트관리</a>
+                                >
+                                <a href="../point/point.html">포인트 지급/차감</a>
+                            </small>
+                        </div>
+                        <h2 class="page-title fs-4 mb-4">
+                            <div>포인트 지급/차감</div>
+                        </h2>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm mt-3" data-bs-toggle="modal">
+                        <i class="fas fa-user"></i>
+                        회원조회
+                    </button>
+                </div>
+
+                
+                <div class="search-section detail">
+                    <div class="form-row full-width mb-3">
+                        <div class="form-label mb-0">구분<span class="required">*</span>
+                        </div>
+                        <div class="form-control-wrap">
+                            <div class="form-check-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="pointdiv" id="pointPlus" checked="">
+                                    <label class="form-check-label" for="pointPlus">지급</label>
+                                </div>
+                                <div class="form-check">
+                                  <input class="form-check-input" type="radio" name="pointdiv" id="pointMinus">
+                                  <label class="form-check-label" for="pointMinus">차감</label>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-label">회원명<span class="required">*</span></div>
+                        <div class="form-control-wrap">
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="회원명"
+                                readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-label">카카오ID</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="카카오ID" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row full-width">
+                        <div class="form-label">사유<span class="required">*</span></div>
+                        <div class="form-control-wrap">
+                            <div class="form-check-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="serviceType" id="serviceActivation" checked="">
+                                    <label class="form-check-label" for="serviceActivation">개통</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="serviceType" id="serviceMaintenance">
+                                    <label class="form-check-label" for="serviceMaintenance">가입유지</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="serviceType" id="friendReferral">
+                                    <label class="form-check-label" for="friendReferral">친구추천</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="serviceType" id="excellentReview">
+                                    <label class="form-check-label" for="excellentReview">우수후기</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="serviceType" id="otherService">
+                                    <label class="form-check-label" for="otherService">기타</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-label">지급/차감<br> 포인트<span class="required">*</span></div>
+                        <div class="form-control-wrap">
+                            <input
+                                type="number"
+                                class="form-control"
+                                value=""
+                                placeholder="숫자 입력"
+                                >
+                        </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-label">메모</div>
+                        <div class="form-control-wrap">
+                            <textarea name="" id="" class="form-control" placeholder=""></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-label">담당자</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="담당자" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row full-width">
+                        <div class="form-label">처리일</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="처리일" readonly="readonly">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 버튼 영역 -->
+                <div class="d-flex justify-content-center gap-2 mt-4">
+                    <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="window.history.back();">
+                        닫기
+                    </button>
+                    <button type="button" class="btn btn-lg btn-dark px-4 btn-sm">
+                        등록
+                    </button>
+                </div>
+                <script src="../../js/bootstrap.bundle.min.js"></script>
+                <script src="../../js/script.js"></script>
+            </body>
+        </html>

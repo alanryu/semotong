@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>S캐쉬 전환하기 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<!-- 페이지 스크립트 영역 -->
+	<!-- Swiper Librarys -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+	<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+			// 이벤트 스와이프
+		    var eventSwiper = new Swiper(".event-swiper", {
+				threshold: 3,
+				spaceBetween: 10,
+				pagination: {
+					el: ".swiper-pagination",
+				},
+				autoplay: {
+					delay: 2500,
+					disableOnInteraction: false,
+				},
+			});
+		})
+
+		function tabHandler(targetId, element) {
+			document.querySelectorAll("[id$='-pane']").forEach(el => el.classList.remove("active"));
+
+			const targetElement = document.getElementById(targetId);
+			if (targetElement) {
+				targetElement.classList.add("active");
+			}
+
+			// 라디오 버튼 체크 여부 확인 (선택 사항)
+			if (element) {
+				element.checked = true;
+			}
+		};
+
+	</script>
+</head>
+
+<body>
+	<!-- 레이아웃이 없는 경우  -->
+ 	<div class="wrapper only-container">
+		<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-SC02-page">
+				<!-- S캐쉬 섹션 -->
+				<section class="sCash-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h1 class="sec-tit">S캐쉬 충전하기</h1>
+						</div>
+						<div class="sec-body">
+							<!-- 내 S캐쉬 -->
+							<div class="sCash-box">
+								<p class="sCash-tit">내 S캐쉬</p>
+								<p class="sCash-val">15,000 캐쉬</p>
+							</div>
+							<!-- //내 S캐쉬 -->
+
+							<!-- 등록폼 -->
+							<div class="sCash-frm">
+								<div class="sCash-frm-field">
+									<label class="ui-rdo rdo-style1 has-icn">
+										<input type="radio" name="FSC02Radio" id="FSC02-01" checked onchange="tabHandler('FSC02-01-pane', this)">
+										<span class="rdo"><span><i class="ui-icn icn-26-npay"></i>네이버 포인트 전환</span></span>
+									</label>
+
+									<!-- 네이버 포인트 전환 선택 -->
+									<div class="tab-pane active" id="FSC02-01-pane" role="tabpanel" aria-labelledby="FSC02-01" tabindex="0">
+										<div class="basic-frm">
+											<div class="frm-field">
+												<div class="frm-content">
+													<div class="frm-group">
+														<div class="ui-sel">
+															<!-- 선택전 is-placeholder, (선택후 삭제) -->
+															<button type="button" id="frmSelect" class="sel is-placeholder" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#selectModal">
+																<span>선택</span>
+																<i class="ui-icn icn-20-select-arw" aria-hidden="true"></i>
+															</button>
+														</div>
+														<button type="button" class="ui-btn btn-sub xl"><span>신청</span></button>
+													</div>
+													<div class="frm-group">
+														<label class="ui-chk chk-style1">
+															<input type="checkbox" name="sCheck1" id="sCheck12">
+															<span class="chk"><span>(필수) 개인정보 수집 및 이용 동의</span></span>
+														</label>
+														<!-- 2025-03-19 조찬기 : 약관 보기 버튼 추가 -->
+														<button type="button" class="ui-btn btn-more" data-bs-toggle="modal" data-bs-target="#termsModal">
+															<span>보기</span>
+															<i class="ui-icn icn-16-more-gr" aria-hidden="true"></i>
+														</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<!-- // 네이버 포인트 전환 선택 -->
+								</div>
+
+								<div class="sCash-frm-field">
+									<!-- 캐쉬백 신청 선택 -->
+									<!-- 2025-03-19 조찬기 : 캐쉬백 신청 설명 추가 -->
+									<label class="ui-rdo rdo-style1 has-icn">
+										<input type="radio" name="FSC02Radio" id="FSC02-02" onchange="tabHandler('FSC02-02-pane', this)">
+										<span class="rdo"><span><i class="ui-icn icn-26-cash"></i>캐쉬백 신청 (10,000캐쉬 이상 보유시 신청가능)</span></span>
+									</label>
+
+									<div class="tab-pane" id="FSC02-02-pane" role="tabpanel" aria-labelledby="FSC02-02" tabindex="0">
+										<div class="basic-frm">
+											<!-- 은행 선택 -->
+											<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+											<div class="frm-field">
+												<div class="frm-title">
+													<label class="tit" for="frmFiled01">은행</label>
+												</div>
+												<div class="frm-content">
+													<div class="ui-sel">
+														<!-- 선택전 is-placeholder, (선택후 삭제) -->
+														<button type="button" id="frmFiled01" class="sel is-placeholder" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#FQU011101P02Modal">
+															<span>선택</span>
+															<i class="ui-icn icn-20-select-arw" aria-hidden="true"></i>
+														</button>
+													</div>
+												</div>
+											</div>
+											<!-- // 은행 선택 -->
+											<!-- 계좌번호 입력 -->
+											<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+											<div class="frm-field">
+												<div class="frm-title">
+													<label class="tit" for="frmFiled02">계좌번호</label>
+												</div>
+												<div class="frm-content">
+													<div class="ui-inp">
+														<input type="tel" name="" id="frmFiled02" value="" placeholder="숫자만 입력해주세요." title="" class="inp" oninput="setRegularNumber(this)" />
+													</div>
+												</div>
+											</div>
+											<!-- // 계좌번호 선택 -->
+											<!-- 이름 입력 -->
+											<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+											<div class="frm-field">
+												<div class="frm-title">
+													<label class="tit" for="frmFiled03">이름</label>
+												</div>
+												<div class="frm-content">
+													<div class="ui-inp">
+														<input type="tel" name="" id="frmFiled03" value="" placeholder="홍길동" title="" class="inp" oninput="setRegularNumber(this)"/>
+													</div>
+												</div>
+											</div>
+											<!-- // 이름 입력 -->
+											<!-- 전환금액 입력 -->
+											<div class="frm-field">
+												<div class="frm-title">
+													<label for="frmFiled04" class="tit">전환금액</label>
+												</div>
+												<div class="frm-content">
+													<div class="frm-group">
+														<div class="ui-inp">
+															<input type="tel" name="" id="frmFiled04" value="" placeholder="0원" title="" class="inp" />
+														</div>
+														<button type="button" class="ui-btn btn-sub xl"><span>신청</span></button>
+													</div>
+												</div>
+											</div>
+											<!-- // 전환금액 입력 -->
+										</div>
+									</div>
+									<!-- // 캐쉬백 신청 선택 -->
+								</div>
+							</div>
+							<!-- //등록폼 -->
+
+							<!-- 캐쉬가이드 -->
+							<div class="sChash-guide">
+								<ul>
+									<li>※ 전환 신청한 S캐쉬는 취소가 불가해요.</li>
+									<li>※ S캐쉬 네이버 포인트 전환은 1,000원부터 가능해요.</li>
+									<li>※ 캐쉬백은 본인 명의의 계좌로만 신청 가능해요.</li>
+									<li>※ 캐쉬백 신청은 10,000원부터 가능해요.</li>
+									<li>※ 캐쉬백은 확인 과정을 거친 후 순차적으로 지급해 드려요.</li><!-- 2025-03-19 조찬기 : 유의사항 설명 추가 -->
+								</ul>
+							</div>
+							<!-- //캐쉬가이드 -->
+						</div>
+					</div>
+				</section>
+				<!-- // S캐쉬 섹션 -->
+ 			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+	</div>
+
+	<!-- 정렬 modal select -->
+	<div class="modal modal-select fade" id="selectModal" tabindex="-1" role="dialog" aria-labelledby="selectModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="selectModalLabel">교환 금액</h3>
+					<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 콤보박스 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<!-- modal-select 공통 -->
+							<ul class="select-listbox" role="listbox">
+								<!-- 이미 선택목록이 있는 경우 class="is-selected" 추가 -->
+								<li role="option" tabindex="0" data-bs-dismiss="modal">1,000원</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal">3,000원</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal">5,000원</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal">10,000원</li>
+							</ul>
+						</div>
+					</section>
+					<!-- // 콤보박스 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 정렬 modal select -->
+
+	<!-- 은행선택 Modal -->
+	<div class="modal modal-select fade" id="FQU011101P02Modal" tabindex="-1" role="dialog" aria-labelledby="FQU011101P02ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FQU011101P02ModalLabel">은행을 선택하세요.</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+
+				</div>
+				<div class="modal-body">
+					<!-- 상담신청 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<ul class="select-listbox has-img" role="listbox">
+								<!-- 선택된 상태 is-selected 클래스 추가 -->
+								<li class="select-item is-selected" role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<!-- 2025-03-06 조찬기 : icn-34-bank-kb 으로 변경 -->
+									<i class="ui-icn icn-34-bank-kb" aria-hidden="true"></i>
+									<strong>KB국민은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-sc" aria-hidden="true"></i>
+									<strong>SC제일은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-bnk" aria-hidden="true"></i>
+									<strong>경남은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-kjb" aria-hidden="true"></i>
+									<strong>광주은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-ibk" aria-hidden="true"></i>
+									<strong>기업은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-nh" aria-hidden="true"></i>
+									<strong>NH농협</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-nh" aria-hidden="true"></i>
+									<strong>지역농축협</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-dgb" aria-hidden="true"></i>
+									<strong>대구은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-bnk" aria-hidden="true"></i>
+									<strong>부산은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-kdb" aria-hidden="true"></i>
+									<strong>산업은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-kfcc" aria-hidden="true"></i>
+									<strong>새마을금고</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-suhyup" aria-hidden="true"></i>
+									<strong>수협</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-sb" aria-hidden="true"></i>
+									<strong>신한은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-shinhyup" aria-hidden="true"></i>
+									<strong>신협</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-hb" aria-hidden="true"></i>
+									<strong>하나(외환)은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-wb" aria-hidden="true"></i>
+									<strong>우리은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-wo" aria-hidden="true"></i>
+									<strong>우체국</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-kjb" aria-hidden="true"></i>
+									<strong>전북은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-nh" aria-hidden="true"></i>
+									<strong>축협</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-kakao" aria-hidden="true"></i>
+									<strong>카카오뱅크</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-kbank" aria-hidden="true"></i>
+									<strong>케이뱅크</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-citi" aria-hidden="true"></i>
+									<strong>한국씨티은행</strong>
+								</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmFiled23', this)">
+									<i class="ui-icn icn-34-bank-toss" aria-hidden="true"></i>
+									<strong>토스뱅크</strong>
+								</li>
+							</ul>
+						</div>
+					</section>
+					<!-- // 상담신청 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 은행선택 Modal -->
+
+	<!-- 이용동의 Modal -->
+	<!-- 2025-03-19 조찬기 : 이용동의 Modal 추가 -->
+	<div class="modal fade modal-full" id="termsModal" tabindex="-1" role="dialog" aria-labelledby="termsModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-TM-page">
+				<div class="modal-header">
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 컨텐츠 섹션 -->
+					<section>
+						<div class="terms-content">
+							<div class="terms-title">
+								<h2 id="termsModalLabel">네이버 포인트 전환 개인정보 수집 및 이용 동의</h2>
+							</div>
+
+							<h3>1. 수집 및 이용 목적</h3>
+							<p>- 세모통 포인트(통칭 ‘S캐쉬’)를 네이버페이 포인트 전환 시 이용</p>
+
+							<h3>2. 수집 항목</h3>
+							<p>- CI, 네이버페이 회원번호</p>
+
+							<h3>3. 보유기간</h3>
+							<p>- 회원탈퇴 시까지 보관 <br>(단, 관계 법령에 따라 고객님의 개인정보를 보존하여야 하는 경우, 회사는 해당 법령에서 정한 기간동안 보관합니다.)</p>
+						  	<p>- 웹사이트 방문기록 : 3개월 (통신비밀보호법)</p>
+						  	<p>- 계약 또는 청약철회 등에 관한 기록 : 5년(전자상거래법)</p>
+						  	<p>- 대금결제 및 재화 등의 공급에 관한 기록 : 5년(전자상거래법)</p>
+						  	<p>- 소비자의 불만 또는 분쟁처리에 관한 기록 : 3년(전자상거래법)</p>
+						  	<p>- 신용정보의 수집·처리 및 이용 등에 관한 기록 : 3년(신용정보의 이용 및 보호에 관한 법률)</p>
+						 	<p>* 유효기간이라 함은 일정기간(1년) 서비스를 이용하지 않은 경우로써, 탈퇴 등의 조치가 적용됩니다.</p>
+						</div>
+					</section>
+					<!-- // 컨텐츠 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary" data-bs-dismiss="modal">
+						<span>확인</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 이용동의 Modal -->
+</body>
+
+</html>

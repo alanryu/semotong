@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='내 계정', layoutSubTitleYN='Y'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<!--	<link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+<script>
+		document.addEventListener("DOMContentLoaded", () => {
+			// 이벤트 스와이프
+			var eventSwiper = new Swiper(".event-swiper", {
+				threshold: 3,
+				spaceBetween: 10,
+				pagination: {
+					el: ".swiper-pagination",
+				},
+				autoplay: {
+					delay: 2500,
+					disableOnInteraction: false,
+				},
+			});
+			
+			//Npay 최종 확인 사라질 때 화면 리프레쉬
+			$('#completeModalB').on('hidden.bs.modal', function () {
+				location.reload();
+			});
+			$('#completeModalD').on('hidden.bs.modal', function () {
+				location.reload();
+			});
+			
+			
+			
+		})
+		function tabHandler(targetId, element) {
+			document.querySelectorAll("[id$='-pane']").forEach(el => el.classList.remove("active"));
+			const targetElement = document.getElementById(targetId);
+			if (targetElement) {
+				targetElement.classList.add("active");
+			}
+			// 라디오 버튼 체크 여부 확인 (선택 사항)
+			if (element) {
+				element.checked = true;
+			}
+		};
+</script>
+
+<!-- order by 가 이래서 etc1에 값 넣어 사용. ORDER BY code_group,code,order_no-->
+<script id="npayAmountListTmpl" type="text/x-jquery-tmpl">
+	<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValuBankAmount('${etc1}', this)">${codeName}</li>
+</script>
+
+<script id="bankListTmpl" type="text/x-jquery-tmpl">
+	<li class="select-bank-item" role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValuBank('${code}', this)">
+		<div class="select-bank">
+			<i class="ui-icn icn-34-bank-${etc1}" aria-hidden="true"></i>
+			<strong class="name">${codeName}</strong>
+		</div>
+	</li>
+</script>
+
+<script>
+	$( document ).ready(function() {
+		
+		// *** 현재 페이지까지 왔다면 카카오로그인은 완료 된 상태로 본다. *** //
+		//1. Naver 로그인
+		//2. 토큰 발급 후 통신 - 적립
+		//3. cacel 구현
+		//4. Naver 에러 시 망 취소 
+		//5. 적립 이력 조회
+		
+		
+		
+		getMyPoint();
+		getCodeList();
+		getAmountCodeList();
+		
+		init();
+		
+		// Cash 관련
+		function toggleButtonState() {
+			// 모든 입력 필드의 값이 채워졌는지 확인
+			let allFilled = $("#frmFiled02").val().trim() !== "" &&
+							$("#frmFiled03").val().trim() !== "" &&
+							$("#frmFiled04").val().trim() !== "";
+			// 버튼 활성화 또는 비활성화
+			$("#cashConfirmBtn").prop("disabled", !allFilled);
+		}
+		
+		// 모든 입력 필드에서 입력이 변경될 때마다 검사
+		$("#frmFiled02, #frmFiled03, #frmFiled04").on("input", toggleButtonState);
+		
+	})
+	
+	// Npay 동의 버튼
+	function init(){
+		$('input[name=sCheck1]').change(function() {
+			if ($(this).is(':checked')) {
+				//console.log("Checkbox is checked..")
+				$("#NpayBtn").attr("disabled",false); 
+			} else {
+				//console.log("Checkbox is not checked..")
+				$("#NpayBtn").attr("disabled",true);
+			}
+		});
+	}
+	
+	function confirmNaver(){
+		//session naverid 
+		var naverId = '[[${session.naverId}]]';
+		if(naverId != null && naverId != ''){
+			$("#hNaverId").val(naverId);
+			confirmNaverAfter();
+		}else{
+			isNaverLogin();
+		}
+	}
+	
+	//Naver login 젤 먼저.
+	function isNaverLogin(){
+		alertModalShow("포인트 전환을 위해 Naver 로그인을 진행해 주세요.", "", goNaverLogin);
+	}
+	function goNaverLogin(){
+		navigateTo('/scash/naverlogin');
+	}
+	
+	// [신청] 클릭
+	function confirmNaverAfter(){
+		var isNid = $("#hNaverId").val();
+		if(isNid == 'N' || isNid == ''){
+			isNaverLogin();
+		}else{
+			
+			var vMyPoint 		= $("#hMyPoint").val();
+			var vNPayAmount 	= $("#nPayAmount").val();
+			var vNaverId 		= $("#hNaverId").val();
+			//alert(vMyPoint - vNPayAmount);	//OK
+			if(vNPayAmount == null || vNPayAmount == "" ){
+				alertModalShow("포인트로 전환할 금액을 선택해 주세요.");
+				return;
+			}
+			
+			if( (vMyPoint - vNPayAmount) < 0 ){					//var 변수는 가변적이라 (문자, 숫자, obj,...)  if( vMyPoint < vNPayAmount ) 이렇게는 예외가 많다. 현재 식 처럼, 아예 계산을 해버리면, 숫자로 인식 된다.
+				alertModalShow("내S캐쉬가 모자랍니다.");
+				return;
+			}else{
+				var vCompleteModalA = new bootstrap.Modal(document.getElementById('completeModalA'));
+				vCompleteModalA.show();
+			}
+		}
+	}
+	
+	// Npay API : /point (적립 수행) 
+	function nPayTranjaction() {
+		
+		var vNPayAmount 	= $("#nPayAmount").val();
+		var vNaverId 		= $("#hNaverId").val();
+		
+		var params = {
+			point 		: vNPayAmount
+			,nid		: vNaverId
+		}
+		
+		$.ajax({
+			url : '/scash/pointNpay'
+			,type : 'POST'
+			,dataType : "json"
+			,contentType:"application/json"
+			,data : JSON.stringify(params)
+			,beforeSend: function(xhr){
+				xhr.setRequestHeader(header,token);
+			}
+			,success: function (data) {
+				console.log(data);
+				if(data.data.resultStatus == "200"){
+					$("#RemainingPoint").html(data.data.resultMessage + " 캐쉬");
+					$("#completeModalABtn").trigger('click');
+					
+					var vCompleteModalB = new bootstrap.Modal(document.getElementById('completeModalB'));
+					vCompleteModalB.show();
+				}else if(data.data.resultStatus == "997"){
+					alertModalShow(data.data.resultMessage);	
+				}else if(data.data.resultStatus == "998"){
+					alertModalShow(data.data.resultMessage);
+				}else if(data.data.resultStatus == "999"){
+					alertModalShow(data.data.resultMessage, "");
+				}else{
+					alertModalShow(data.data.resultMessage, "");
+				}
+			}
+			,error : function(request, status, error){
+				alertModalShow(error,"");
+			}
+			,complete:function(){
+			}
+		});
+	}
+	
+	
+	
+	
+	// Cash 전환 클릭
+	/*
+	신청 버튼
+	은행/계좌번호/전환금액 모두 입력 시 [신청] 버튼 활성화
+	버튼 클릭 시, 
+		전환금액 validation check
+		1) 성공 : 캐쉬백 신청 완료 안내 팝업 호출
+		2) 실패 (최대 2건까지 노출)
+		- Case 1 : 입력 금액<=10,000원 			> 안내 문구 "전환 금액은 10,000원보다 큰 금액을 입력해주세요"
+		- Case 2 : 입력 금액>=보유 캐쉬액		> 안내 문구 "캐쉬백 신청은 보유캐쉬만큼 신청할 수 있어요."
+		- Case 3 : 계좌정보 유효성 체크 시 오류 > 안내 문구 "계좌 정보를 확인해주세요"
+	*/
+
+	function confirmCash(){
+		//bankCd - 모두 입력해야 [신청] 버튼 활성화 여기는 체크 필요 없음.
+		//var bcd = $("#bankCd").val();
+		//var accYn = callAccCert();
+		//alert(accYn);	//OK
+		//$("#frmFiled02").val().trim() !== "" && //$("#frmFiled03").val().trim() !== "" && //("#frmFiled04").val().trim() !== "";
+		
+		var excAmountStr = $("#frmFiled04").val();
+		var excAmount = parseFloat(excAmountStr.replace(/,/g, ''));
+		if(excAmount < 10000){
+			alertModalShow("전환 금액은 10,000원보다 큰 금액을 입력해주세요.");
+			return;
+		}
+		var vMyPoint = $("#hMyPoint").val();
+		if(vMyPoint < excAmount){
+			alertModalShow("캐쉬백 신청은 보유캐쉬만큼 신청할 수 있어요.");
+			return;
+		}
+		
+		cashTranjaction();
+	}
+
+	// 계좌 정합성 체크
+	function callAccCert() {
+		//var rtnYn = 'N';
+		var params = {
+				bankCd : $("#bankCd").val(),
+				bankNum : $("#frmFiled02").val()
+		}
+		
+		$.ajax({
+			url : '/order/bankNumCert',
+			type : 'POST',
+			dataType : "json",
+			contentType:"application/json",
+			data : JSON.stringify(params),
+			beforeSend: function(xhr){
+			xhr.setRequestHeader(header,token);
+			},
+			success: function (data) {
+				console.log(data.data.resbody);
+				if(data.data.resbody.RSLT_CD == "000") {
+					//rtnYn = 'Y';
+					confirmCash();
+				} else {
+					//alertModalShow("계좌 정보를 확인해주세요.(" + data.data.resbody.RSLT_MSG + ")");		//, data.data.resbody.RSLT_MSG
+					alertModalShow("계좌번호가 일치하지 않아요.<br/>계좌 정보를 다시 확인해주세요.");
+				}
+			},
+			error : function(request, status, error){
+				alertModalShow("계좌 정보를 확인하는 중 오류가 발생했습니다.");
+			},
+			complete:function(){
+				// $('#loading').addClass('display-none');
+			}
+		});
+		
+		//return rtnYn;
+	}
+	
+	// Cash 전환 신청 
+	function cashTranjaction() {
+		
+		var params = {
+			bankCode 		: $("#bankCd").val()
+			,accountNo		: $("#frmFiled02").val()
+			,accountName	: $("#frmFiled03").val()
+			//,amount			: $("#frmFiled04").val()
+			,amount			: $("#frmFiled04").attr("data-raw-value")
+		}
+		
+		$.ajax({
+			url : '/scash/pointCash'
+			,type : 'POST'
+			,dataType : "json"
+			,contentType:"application/json"
+			,data : JSON.stringify(params)
+			,beforeSend: function(xhr){
+				xhr.setRequestHeader(header,token);
+			}
+			,success: function (data) {
+				console.log(data);
+				if(data.data.resultStatus == "200"){
+					
+					$("#RemainingPointCash").html(data.data.resultMessage + " 캐쉬");
+					var vCompleteModalD = new bootstrap.Modal(document.getElementById('completeModalD'));
+					vCompleteModalD.show();
+					
+				}else if(data.data.resultStatus == "998"){
+					alertModalShow(data.data.resultMessage);		//"내S캐쉬가 모자랍니다."  // 위에서 보유량 보다 많은 전환 1차 막고, controller 내 또 막는다.
+				}
+			}
+			,error : function(request, status, error){
+				alertModalShow(error,"");
+			}
+			,complete:function(){
+			}
+		});
+	}
+	
+	
+	
+	
+	// --------------------------- 기본 동작 모음 ---------------------------------------------------------------------
+	
+	//MyPoint 조회
+	function getMyPoint() {
+		
+		var params = {test : 'test'}
+		$.ajax({
+			url : '/scash/getMyPoint',
+			type : 'POST',
+			dataType : "json",
+			contentType:"application/json",
+			data : JSON.stringify(params),
+			beforeSend: function(xhr){
+				xhr.setRequestHeader(header,token);
+			},
+			success: function (data) {
+				console.log(data);
+				$("#hMyPoint").val(data.data.balance);
+				$("#myBalance").text(addCommas(data.data.balance));
+			},
+			error : function(request, status, error){
+				
+			},
+			complete:function(){
+			}
+		});
+	}
+	//교환가금액 조회
+	function getAmountCodeList() {
+		var params = {codeGroup : 'npay_ex_amount',userYn : "Y",page : 1,recordSize : 99}
+		$.ajax({
+			url : '/cmm/cmmcode/code/list',
+			type : 'POST',
+			dataType : "json",
+			contentType:"application/json",
+			data : JSON.stringify(params),
+			beforeSend: function(xhr){
+				xhr.setRequestHeader(header,token);
+			},
+			success: function (data) {
+				console.log(data);
+				$('#npayAmountList').empty();
+				$('#npayAmountListTmpl').tmpl(data.data).appendTo('#npayAmountList');
+			},
+			error : function(request, status, error){
+				
+			},
+			complete:function(){
+			}
+		});
+	}
+	//function setSelectValued(buttonId, option, selected, callback) {
+	function setSelectValuBankAmount(cdVal,element) {
+		$("#nPayAmount").val(cdVal);
+		
+		$('#selBankList li').removeClass('is-selected');
+		Array.from(element.parentNode.children).forEach(sibling => {
+			sibling.classList.remove('is-selected');
+		});
+		
+		$(element).addClass('is-selected');
+		var dispName = element.textContent;
+		$('#spExAmount').html(dispName);
+	}
+	
+	//은행 조회
+	function getCodeList() {
+		//var params = {codeGroup : 'bank_code',userYn : "Y",page : 1,recordSize : 99}
+		var params = {codeGroup : 'bank_co_cd',userYn : "Y",page : 1,recordSize : 99}
+		
+		$.ajax({
+			url : '/cmm/cmmcode/code/list',
+			type : 'POST',
+			dataType : "json",
+			contentType:"application/json",
+			data : JSON.stringify(params),
+			beforeSend: function(xhr){
+				xhr.setRequestHeader(header,token);
+			},
+			success: function (data) {
+				console.log(data);
+				$('#selBankList').empty();
+				$('#bankListTmpl').tmpl(data.data).appendTo('#selBankList');
+			},
+			error : function(request, status, error){
+				
+			},
+			complete:function(){
+			}
+		});
+	}
+	//은행 선택
+	function setSelectValuBank(bkCd,element) {
+		$("#bankCd").val(bkCd);
+		
+		$('#selBankList li').removeClass('is-selected');
+		$(element).addClass('is-selected');
+		var banknm = element.querySelector('.name').textContent;
+		$('#spSelBank').html(banknm);
+	}
+	
+	
+		
+</script>
+</th:block>
+	
+
+<input type="hidden" id="hMyPoint" 		name="hMyPoint" 		value="0" >
+<input type="hidden" id="hNaverId" 		name="hNaverId" 		value="N" >
+<input type="hidden" id="nPayAmount" 	name="nPayAmount" 		value="" >
+
+<input type="hidden" id="bankCd" 		name="bankCd" 			value="" >
+
+<!-- Container -->
+<main role="main" class="container">
+	
+	<!-- content -->
+	<div class="content F-SC02-page">
+		<!-- S캐쉬 섹션 -->
+		<section class="sCash-sec">
+			<div class="sec-inner">
+				<div class="sec-header">
+					<h1 class="sec-tit">S캐쉬 충전하기</h1>
+				</div>
+				<div class="sec-body">
+					<!-- 내 S캐쉬 -->
+					<div class="sCash-box">
+						<p class="sCash-tit">내 S캐쉬</p>
+						<p class="sCash-val" id="myBalance"></p>
+						
+					</div>
+					<!-- //내 S캐쉬 -->
+
+					<!-- 등록폼 -->
+					<div class="sCash-frm">
+						<div class="sCash-frm-field">
+							<label class="ui-rdo rdo-style1 has-icn">
+								<input type="radio" name="FSC02Radio" id="FSC02-01" checked onchange="tabHandler('FSC02-01-pane', this)">
+								<span class="rdo"><span><i class="ui-icn icn-26-npay"></i>네이버 포인트 전환</span></span>
+							</label>
+
+							<!-- 네이버 포인트 전환 선택 -->
+							<div class="tab-pane active" id="FSC02-01-pane" role="tabpanel" aria-labelledby="FSC02-01" tabindex="0">
+								<div class="basic-frm">
+									<div class="frm-field">
+										<div class="frm-content">
+											<div class="frm-group">
+												<div class="ui-sel">
+													<!-- 선택전 is-placeholder, (선택후 삭제) -->
+													<button type="button" class="sel is-placeholder" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#selectModal">
+														<span id="spExAmount">선택</span>
+														<i class="ui-icn icn-20-select-arw" aria-hidden="true"></i>
+													</button>
+												</div>
+												<button type="button" class="ui-btn btn-sub xl" id="NpayBtn" onclick="confirmNaver()" disabled><span>신청</span></button>
+											</div>
+											<div class="frm-group">
+												<label class="ui-chk chk-style1">
+													<input type="checkbox" name="sCheck1" id="sCheck1">
+													<span class="chk"><span>(필수) 개인정보 수집 및 이용 동의</span></span>
+												</label>
+												<!-- 2025-03-19 조찬기 : 약관 보기 버튼 추가 -->
+												<button type="button" class="ui-btn btn-more" data-bs-toggle="modal" data-bs-target="#termsModal">
+													<span>보기</span>
+													<i class="ui-icn icn-16-more-gr" aria-hidden="true"></i>
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- // 네이버 포인트 전환 선택 -->
+						</div>
+
+						<div class="sCash-frm-field">
+							<!-- 캐쉬백 신청 선택 -->
+							<label class="ui-rdo rdo-style1 has-icn">
+								<input type="radio" name="FSC02Radio" id="FSC02-02" onchange="tabHandler('FSC02-02-pane', this)">
+								<span class="rdo"><span><i class="ui-icn icn-26-cash"></i>캐쉬백 신청 (10,000캐쉬 이상 보유시 신청가능)</span></span>
+							</label>
+
+							<div class="tab-pane" id="FSC02-02-pane" role="tabpanel" aria-labelledby="FSC02-02" tabindex="0">
+								<div class="basic-frm">
+									<!-- 은행 선택 -->
+									<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+									<div class="frm-field">
+										<div class="frm-title">
+											<label class="tit" for="frmFiled01">은행</label>
+										</div>
+										<div class="frm-content">
+											<div class="ui-sel">
+												<!-- 선택전 is-placeholder, (선택후 삭제) -->
+												<button type="button" id="frmFiled01" class="sel is-placeholder" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#FQU011101P02Modal">
+													<span id="spSelBank">선택</span>
+													<i class="ui-icn icn-20-select-arw" aria-hidden="true"></i>
+												</button>
+											</div>
+										</div>
+									</div>
+									<!-- // 은행 선택 -->
+									<!-- 계좌번호 입력 -->
+									<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+									<div class="frm-field">
+										<div class="frm-title">
+											<label class="tit" for="frmFiled02">계좌번호</label>
+										</div>
+										<div class="frm-content">
+											<div class="ui-inp">
+												<input type="tel" name="" id="frmFiled02" value="" placeholder="숫자만 입력해주세요." title="" class="inp" oninput="setRegularNumber(this)" maxlength="14"/>
+											</div>
+										</div>
+									</div>
+									<!-- // 계좌번호 선택 -->
+									<!-- 이름 입력 -->
+									<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+									<div class="frm-field">
+										<div class="frm-title">
+											<label class="tit" for="frmFiled03">이름</label>
+										</div>
+										<div class="frm-content">
+											<div class="ui-inp">
+												<input type="tel" name="" id="frmFiled03" value="" placeholder="홍길동" title="" class="inp" />
+											</div>
+										</div>
+									</div>
+									<!-- // 이름 입력 -->
+									<!-- 전환금액 입력 -->
+									<div class="frm-field">
+										<div class="frm-title">
+											<label for="frmFiled04" class="tit">전환금액(원)</label>
+										</div>
+										<div class="frm-content">
+											<div class="frm-group">
+												<div class="ui-inp">
+													<input type="tel" name="" id="frmFiled04" value="" placeholder="0" title="" class="inp" oninput="setWonRegularNumber(this)" maxlength="6"/>
+												</div>
+												<button type="button" class="ui-btn btn-sub xl" id="cashConfirmBtn" onclick="callAccCert()" disabled><span>신청</span></button>
+											</div>
+										</div>
+									</div>
+									<!-- // 전환금액 입력 -->
+								</div>
+							</div>
+							<!-- // 캐쉬백 신청 선택 -->
+						</div>
+					</div>
+					<!-- //등록폼 -->
+
+					<!-- 캐쉬가이드 -->
+					<div class="sChash-guide">
+						<ul>
+							<li>※ 전환 신청한 S캐쉬는 취소가 불가해요.</li>
+							<li>※ S캐쉬 네이버 포인트 전환은 1,000원부터 가능해요.</li>
+							<li>※ 캐쉬백은 본인 명의의 계좌로만 신청 가능해요.</li>
+							<li>※ 캐쉬백 신청은 10,000원부터 가능해요.</li>
+							<li>※ 캐쉬백은 확인 과정을 거친 후 순차적으로 지급해 드려요.</li><!-- 2025-03-19 조찬기 : 유의사항 설명 추가 -->
+						</ul>
+					</div>
+					<!-- //캐쉬가이드 -->
+				</div>
+			</div>
+		</section>
+		<!-- // S캐쉬 섹션 -->
+		</div>
+	<!-- // content -->
+		
+</main>
+	
+	
+	<!-- 정렬 modal select -->
+	<div class="modal modal-select fade" id="selectModal" tabindex="-1" role="dialog" aria-labelledby="selectModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="selectModalLabel">교환 금액</h3>
+					<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 콤보박스 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<!-- modal-select 공통 -->
+							<ul class="select-listbox" role="listbox" id="npayAmountList">
+								<!-- tb_cmm_code 에 정의 -->
+								<!-- 이미 선택목록이 있는 경우 class="is-selected" 추가
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#exAmount', this)">1,000원</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#exAmount', this)">3,000원</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#exAmount', this)">5,000원</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#exAmount', this)">10,000원</li>
+								-->
+							</ul>
+						</div>
+					</section>
+					<!-- // 콤보박스 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 정렬 modal select -->
+	
+	<!-- 전환 최종 확인 modal -->
+	<div class="modal modal-basic fade" id="completeModalA" tabindex="-1" role="dialog" aria-labelledby="completeModalLabelA" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-SC02-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="completeModalLabelA"></h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close" id="completeModalABtn" >
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+
+				</div>
+				<div class="modal-body">
+					<!-- 완료 섹션 -->
+					<section class="complete-sec">
+						<div class="sec-inner">
+							<div class="complete-wrap">
+								<i class="ui-icn icn-140-change" aria-hidden="true"></i>
+								<strong>포인트를 전환하시겠어요?</strong>
+							</div>
+						</div>
+					</section>
+					<!-- // 완료 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary" onclick="nPayTranjaction()">
+						<span>네, 전환할게요</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 전환 최종 확인 modal -->
+	
+	<!-- 전환 성공  -->
+	<div class="modal modal-basic fade" id="completeModalB" tabindex="-1" role="dialog" aria-labelledby="completeModalLabelB" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-SC02-page">
+				<div class="modal-header">
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close" location.reload();>
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+
+				</div>
+				<div class="modal-body">
+					<!-- 완료 섹션 -->
+					<section class="complete-sec">
+						<div class="sec-inner">
+							<div class="complete-wrap">
+								<i class="ui-icn icn-140-complete" aria-hidden="true"></i>
+								<strong id="completeModalLabelB">포인트 전환에 성공했어요!</strong>
+							</div>
+
+							<!-- 보유 S캐쉬 -->
+							<div class="sCash-box">
+								<p class="sCash-tit">보유 S캐쉬</p>
+								<p class="sCash-val" id="RemainingPoint">15,000 캐쉬</p>
+							</div>
+							<!-- //보유 S캐쉬 -->
+						</div>
+					</section>
+					<!-- // 완료 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary" onclick="location.reload();">
+						<span>확인</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 전환 성공  -->
+	
+	<!-- 전환 실패  -->
+	<div class="modal modal-basic fade" id="completeModalC" tabindex="-1" role="dialog" aria-labelledby="completeModalLabelC" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-SC02-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="completeModalLabelC"></h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+
+				</div>
+				<div class="modal-body">
+					<!-- 완료 섹션 -->
+					<section class="complete-sec">
+						<div class="sec-inner">
+							<div class="complete-wrap">
+								<i class="ui-icn icn-140-fail" aria-hidden="true"></i>
+								<strong>포인트 전환에 실패했어요!</strong>
+								<p class="msg-fail">서버에 연결할 수 없습니다. <br>잠시 후 다시 시도해주세요.</p>
+							</div>
+						</div>
+					</section>
+					<!-- // 완료 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary" onclick="location.reload();">
+						<span>확인</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 전환 실패  -->
+	
+	
+	
+	<!-- 은행선택 Modal -->
+	<div class="modal modal-basic fade" id="FQU011101P02Modal" tabindex="-1" role="dialog" aria-labelledby="FQU011101P02ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FQU011101P02ModalLabel">은행을 선택하세요.</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+
+				</div>
+				<div class="modal-body">
+					<!-- 상담신청 섹션 -->
+					<section class="select-bank-sec">
+						<div class="sec-inner">
+							<ul class="select-bank-list" role="listbox"  id="selBankList">
+								<!-- 선택된 상태 is-selected 클래스 추가 -->
+								
+							</ul>
+						</div>
+					</section>
+					<!-- // 상담신청 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 은행선택 Modal -->
+	
+	<!-- Cash 신청 완료 -->
+	<div class="modal modal-basic fade" id="completeModalD" tabindex="-1" role="dialog" aria-labelledby="completeModalLabelD" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-SC02-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="completeModalLabelD"></h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="location.reload();">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+
+				</div>
+				<div class="modal-body">
+					<!-- 완료 섹션 -->
+					<section class="complete-sec">
+						<div class="sec-inner">
+							<div class="complete-wrap">
+								<i class="ui-icn icn-140-complete" aria-hidden="true"></i>
+								<strong>캐쉬백 신청이 완료되었어요!</strong>
+								<p class="msg-complete">
+									* 신청한 캐쉬백은 <br><em>매월 1일, 16일</em>에 입금해 드릴게요.
+								</p>
+							</div>
+							<!-- 보유 S캐쉬 -->
+							<div class="sCash-box">
+								<p class="sCash-tit">보유 S캐쉬</p>
+								<p class="sCash-val" id="RemainingPointCash">>15,000 캐쉬</p>
+							</div>
+							<!-- //보유 S캐쉬 -->
+						</div>
+					</section>
+					<!-- // 완료 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary" onclick="location.reload();">
+						<span>확인</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // Cash 신청 완료 -->
+	<!-- 이용동의 Modal 추가 -->
+	<div class="modal fade modal-full" id="termsModal" tabindex="-1" role="dialog" aria-labelledby="termsModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-TM-page">
+				<div class="modal-header">
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 컨텐츠 섹션 -->
+					<section>
+						<div class="terms-content">
+							<div class="terms-title">
+								<h2 id="termsModalLabel">네이버 포인트 전환 개인정보 수집 및 이용 동의</h2>
+							</div>
+
+							<h3>1. 수집 및 이용 목적</h3>
+							<p>- 세모통 포인트(통칭 ‘S캐쉬’)를 네이버페이 포인트 전환 시 이용</p>
+
+							<h3>2. 수집 항목</h3>
+							<p>- CI, 네이버페이 회원번호</p>
+
+							<h3>3. 보유기간</h3>
+							<p>- 회원탈퇴 시까지 보관 <br>(단, 관계 법령에 따라 고객님의 개인정보를 보존하여야 하는 경우, 회사는 해당 법령에서 정한 기간동안 보관합니다.)</p>
+						  	<p>- 웹사이트 방문기록 : 3개월 (통신비밀보호법)</p>
+						  	<p>- 계약 또는 청약철회 등에 관한 기록 : 5년(전자상거래법)</p>
+						  	<p>- 대금결제 및 재화 등의 공급에 관한 기록 : 5년(전자상거래법)</p>
+						  	<p>- 소비자의 불만 또는 분쟁처리에 관한 기록 : 3년(전자상거래법)</p>
+						  	<p>- 신용정보의 수집·처리 및 이용 등에 관한 기록 : 3년(신용정보의 이용 및 보호에 관한 법률)</p>
+						 	<p>* 유효기간이라 함은 일정기간(1년) 서비스를 이용하지 않은 경우로써, 탈퇴 등의 조치가 적용됩니다.</p>
+						</div>
+					</section>
+					<!-- // 컨텐츠 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary" data-bs-dismiss="modal">
+						<span>확인</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 이용동의 Modal -->	
+		
+</html>

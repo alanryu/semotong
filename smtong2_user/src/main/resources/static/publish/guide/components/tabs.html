@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Tabs | 세모통 스타일가이드</title>
+	<meta http-equiv="X-UA-Compatible" content="ie=edge chrome=1" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="프로젝트가이드, 세모통 스타일가이드" />
+	<meta name="description" content="프로젝트가이드, 세모통 스타일가이드" />
+	<link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 인크루드 설정용도(개발적용안함) -->
+	<link rel="stylesheet" type="text/css" href="css/guide.css" /><!-- 가이드전용 -->
+
+	<!-- Swiper Librarys -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+	<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+	<script>
+		// DOMContentLoaded
+		document.addEventListener("DOMContentLoaded", function() {
+			const tabSwiper = new Swiper(".tab-swiper", {
+				threshold: 3,
+				spaceBetween: 16,
+				slidesPerView: 'auto',
+				freeMode: true,
+				freeModeMomentum: true,
+				resistance: true,
+				resistanceRatio: 0
+			});
+		});
+	</script>
+</head>
+
+<body>
+	<div class="wrapper sub_page">
+		<!-- Header -->
+		<div data-include="include_header.html"></div>
+		<!-- // Header -->
+
+		<!-- Container -->
+		<div class="container">
+			<main id="content" class="content" role="main">
+				<div class="content-body">
+					<div class="out-sec in-sec">
+						<h1 class="g-h1">Tabs</h1>
+					</div>
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">기본 구조</h2>
+						</div>
+						<div class="g-section-body">
+							<ul class="g-desc">
+								<li><a href="https://getbootstrap.com/docs/5.3/components/navs-tabs/#javascript-behavior" target="_blank" class="g-link">https://getbootstrap.com/docs/5.3/components/navs-tabs/</a></li>
+								<li>탭 기능 : data-bs-toggle="tab" data-bs-target="#패널아이디"</li>
+							</ul>
+							<xmp>
+<div class="ui-tab tab-유형">
+	<ul class="tab-list" id="myTab" role="tablist">
+		<li class="tab-item" role="presentation">
+			<button class="tab-link active" id="tab-11" data-bs-toggle="tab" data-bs-target="#tab-11-pane" type="button" role="tab" aria-controls="tab-11-pane" aria-selected="true">Home Tab</button>
+		</li>
+		<li class="tab-item" role="presentation">
+			<button class="tab-link" id="tab-12" data-bs-toggle="tab" data-bs-target="#tab-12-pane" type="button" role="tab" aria-controls="tab-12-pane" aria-selected="false">Profile Tab</button>
+		</li>
+		<li class="tab-item" role="presentation">
+			<button class="tab-link" id="tab-13" data-bs-toggle="tab" data-bs-target="#tab-13-pane" type="button" role="tab" aria-controls="tab-13-pane" aria-selected="false">Contact Tab</button>
+		</li>
+	</ul>
+</div>
+<div class="tab-content" id="myTabContent">
+	<div class="tab-pane fade show active" id="tab-11-pane" role="tabpanel" aria-labelledby="tab-11" tabindex="0">
+			Home Tabpanel
+	</div>
+	<div class="tab-pane fade" id="tab-12-pane" role="tabpanel" aria-labelledby="tab-12" tabindex="0">
+		Profile Tabpanel
+	</div>
+	<div class="tab-pane fade" id="tab-13-pane" role="tabpanel" aria-labelledby="tab-13" tabindex="0">
+		Contact Tabpanel
+	</div>
+</div>
+							</xmp>
+						</div>
+					</section>
+					<!-- // Section -->
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">Style 1</h2>
+						</div>
+						<div class="g-section-body">
+							<div class="ui-tab tab-style1">
+								<ul class="tab-list" role="tablist">
+									<li class="tab-item" role="presentation">
+										<button class="tab-link active" id="tab-11" data-bs-toggle="tab" data-bs-target="#tab-11-pane" type="button" role="tab" aria-controls="tab-11-pane" aria-selected="true">Tab 1</button>
+									</li>
+									<li class="tab-item" role="presentation">
+										<button class="tab-link" id="tab-12" data-bs-toggle="tab" data-bs-target="#tab-12-pane" type="button" role="tab" aria-controls="tab-12-pane" aria-selected="false">Tab 2</button>
+									</li>
+									<li class="tab-item" role="presentation">
+										<button class="tab-link" id="tab-13" data-bs-toggle="tab" data-bs-target="#tab-13-pane" type="button" role="tab" aria-controls="tab-13-pane" aria-selected="false">Tab 3</button>
+									</li>
+								</ul>
+							</div>
+							<div class="tab-content">
+								<div class="tab-pane fade show active" id="tab-11-pane" role="tabpanel" aria-labelledby="tab-11" tabindex="0">
+									Tabpanel 1
+								</div>
+								<div class="tab-pane fade" id="tab-12-pane" role="tabpanel" aria-labelledby="tab-12" tabindex="0">
+									Tabpanel 2
+								</div>
+								<div class="tab-pane fade" id="tab-13-pane" role="tabpanel" aria-labelledby="tab-13" tabindex="0">
+									Tabpanel 3
+								</div>
+							</div>
+						</div>
+					</section>
+					<!-- // Section -->
+
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">Style 2</h2>
+						</div>
+						<div class="g-section-body">
+							<div class="ui-tab tab-style2">
+								<div class="swiper tab-swiper">
+									<div class="swiper-wrapper" role="tablist">
+										<div class="swiper-slide" role="presentation">
+											<button class="tab-link active" id="tab-01" data-bs-toggle="tab" data-bs-target="#tab-21-pane" type="button" role="tab" aria-controls="tab-21-pane" aria-selected="true">요금제 상세 정보</button>
+										</div>
+										<div class="swiper-slide" role="presentation">
+											<button class="tab-link" id="tab-02" data-bs-toggle="tab" data-bs-target="#tab-22-pane" type="button" role="tab" aria-controls="tab-22-pane" aria-selected="false">사은품</button>
+										</div>
+										<div class="swiper-slide" role="presentation">
+											<button class="tab-link" id="tab-03" data-bs-toggle="tab" data-bs-target="#tab-23-pane" type="button" role="tab" aria-controls="tab-23-pane" aria-selected="false">통신사 리뷰</button>
+										</div>
+										<div class="swiper-slide" role="presentation">
+											<button class="tab-link" id="tab-04" data-bs-toggle="tab" data-bs-target="#tab-24-pane" type="button" role="tab" aria-controls="tab-24-pane" aria-selected="false">자주묻는 질문</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="tab-content">
+								<div class="tab-pane fade show active" id="tab-21-pane" role="tabpanel" aria-labelledby="tab-21" tabindex="0">
+									Tabpanel 1
+								</div>
+								<div class="tab-pane fade" id="tab-22-pane" role="tabpanel" aria-labelledby="tab-22" tabindex="0">
+									Tabpanel 2
+								</div>
+								<div class="tab-pane fade" id="tab-23-pane" role="tabpanel" aria-labelledby="tab-23" tabindex="0">
+									Tabpanel 3
+								</div>
+								<div class="tab-pane fade" id="tab-24-pane" role="tabpanel" aria-labelledby="tab-24" tabindex="0">
+									Tabpanel 4
+								</div>
+							</div>
+						</div>
+					</section>
+					<!-- // Section -->
+
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">Style 3</h2>
+						</div>
+						<div class="g-section-body">
+							<div class="ui-tab tab-style3">
+								<ul class="tab-list" role="tablist">
+									<li class="tab-item" role="presentation">
+										<button class="tab-link active" id="tab-31" data-bs-toggle="tab" data-bs-target="#tab-31-pane" type="button" role="tab" aria-controls="tab-31-pane" aria-selected="true">쓰던 번호로 개통</button>
+									</li>
+									<li class="tab-item" role="presentation">
+										<button class="tab-link" id="tab-32" data-bs-toggle="tab" data-bs-target="#tab-32-pane" type="button" role="tab" aria-controls="tab-32-pane" aria-selected="false">새 번호 사용</button>
+									</li>
+								</ul>
+							</div>
+							<div class="tab-content">
+								<div class="tab-pane fade show active" id="tab-31-pane" role="tabpanel" aria-labelledby="tab-31" tabindex="0">
+									쓰던 번호로 개통
+								</div>
+								<div class="tab-pane fade" id="tab-32-pane" role="tabpanel" aria-labelledby="tab-32" tabindex="0">
+									새 번호 사용
+								</div>
+							</div>
+						</div>
+					</section>
+					<!-- // Section -->
+				</div>
+			</main>
+		</div>
+		<!-- // Container -->
+
+		<!-- Footer (include_footer.html) -->
+		<div data-include="include_footer.html"></div>
+		<!-- // Footer -->
+	</div>
+</body>
+
+</html>

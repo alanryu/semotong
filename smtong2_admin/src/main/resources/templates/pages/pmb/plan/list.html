@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='04',menuId ='01'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+<!-- list 템플릿 -->
+
+
+<script id="planListTmpl" type="text/x-jquery-tmpl">
+		<tr>
+		     <td>${id}</td>
+		     <td>{{if dispYn}} 노출 {{else}} 비노출{{/if}}</td>
+		     <td>{{if saleStatus}} 판매중 {{else}} 판매정지{{/if}}</td>
+		     <td class="c_red">{{if newYn}} Y {{else}} N{{/if}}</td>
+		     <td>${mno}</td>
+		     <td>${planType}</td>
+		     <td>${hostNm}</td>
+		     <td>
+		         <a href="/pbm/plan/edit?searchId=${id}">{{html getPlanNm(planName, planNameSmt)}}</a>
+		     </td>
+		     <td>{{html getPriceStr(normalPrice)}}</td>
+		     <td>{{html getPriceStr(salePrice)}}</td>
+		     <td>${promotionPeriod}</td>
+		     <td>{{html getDataStr(supDataVal)}}</td>
+		     <td>{{html getQosStr(supQos)}}</td>
+		     <td>{{html getDateStr(modifiedDate)}}</td>
+		 </tr>
+</script>
+<script type="text/javascript">
+var authType = "";
+document.addEventListener('DOMContentLoaded', function () {
+
+	authType = "[[${session.loginUser.authType}]]";
+	if(authType =="HOST") {
+		var authCompany = "[[${session.loginUser.companyCode}]]";
+		checkCompanyList(authCompany);
+		$("#searchDvCompay").hide();
+	}
+
+	searchListInit();
+
+	document.getElementById("recordSize").addEventListener("change", function () {
+		currentPage =1;
+		searchList();
+	});
+
+	toggleDetailSearch();
+
+	const detailArea = document.getElementById('detailSearchArea');
+    const button = document.getElementById('btnDetailSearch');
+    const icon = button.querySelector('i');
+
+	detailArea.style.display = 'block';
+    icon.classList.remove('fa-chevron-down');
+    icon.classList.add('fa-chevron-up');
+
+
+});
+
+function changeCombo(){
+	currentPage = 1;
+	searchList()
+}
+
+function searchListInit() {
+	currentPage = 1;
+	searchList();
+}
+
+function renderPage(page) {
+	currentPage = page;
+	searchList();
+}
+
+
+
+function downloadMapFile() {
+	var downLoadId = $("#selCompMapDown").val();
+	if(downLoadId =="") {
+		alert("사업자를 선택해 주세요");
+	} else {
+		windowOpen('/pbm/plan/excel/downPlanMap?id='+downLoadId);
+	}
+}
+
+
+function uploadMapExcel(){
+
+
+	if($("#hostId").val() =="") {
+		showAlert("사업자를 선택 하세요.",$("#hostId"));
+		return;
+	}
+
+	if($("#mapFile").val() =="") {
+		showAlert("업로드 파일을 선택 하세요.");
+		return;
+	}
+	var formData = new FormData($('#uploadform')[0]);
+
+	console.log(formData);
+
+	$.ajax({
+		url 		: '/pbm/plan/excel/uploadPlanMap',
+		type 		: 'post',
+		enctype 	: 'multipart/form-data',
+		data 		: formData,
+		async 		: false,
+		contentType : false,
+		processData : false,
+		success 	: function (data) {
+			console.log(data);
+			$("#uploadCnt").html("업로드 - "+data.data.totCnt+"건");
+			$("#sucessCnt").html("성공 - "+data.data.saveCnt+"건");
+			$("#failCnt").html("실패 - "+data.data.failCnt+"건");
+
+			//failUUidList
+			var myModal = new bootstrap.Modal(document.getElementById('uploadResultModal'));
+			myModal.show();
+			$("#hostId").val("");
+		},
+		error 		: function(request, status, error){
+			alert(error);
+		},
+		complete 	: function(){
+		}
+	});
+
+}
+
+
+function selCompany(id) {
+
+	if(id=="") {
+		$("input[id^='searchCompanyList']").prop("checked", false);
+		$("#searchCompanyListALL").prop("checked", true);
+	} else {
+		$("#searchCompanyListALL").prop("checked", false);
+	}
+
+}
+
+function selMno(id) {
+
+	if(id=="") {
+		$("input[id^='searchMno']").prop("checked", false);
+		$("#searchMnoAll").prop("checked", true);
+	} else {
+		$("#searchMnoAll").prop("checked", false);
+	}
+}
+
+function selNetrok(id) {
+
+	if(id=="") {
+		$("input[id^='searchNetrok']").prop("checked", false);
+		$("#searchNetrokAll").prop("checked", true);
+	} else {
+		$("#searchNetrokAll").prop("checked", false);
+	}
+}
+
+
+
+function searchList() {
+	var page = currentPage;
+	if(page =="" || page == null) page =1;
+
+	var _recordSize =  parseInt($("#recordSize").val());
+
+	var searchDataTermFrom = '';
+	var searchDataTermTo = '';
+	if ( $("#searchDataTermFrom").val() != '' ) {
+		searchDataTermFrom = parseInt($("#searchDataTermFrom").val()) * 1024;
+	}
+
+	if ( $("#searchDataTermTo").val() != '' ) {
+		searchDataTermTo = parseInt($("#searchDataTermTo").val()) * 1024;
+	}
+
+	var params = {
+	     keyword : $("#keyword").val(),
+	     searchDataTermFrom : searchDataTermFrom,
+	     searchDataTermTo : searchDataTermTo,
+	     searchQosTermFrom : $("#searchQosTermFrom").val(),
+	     searchQosTermTo : $("#searchQosTermTo").val(),
+		 searchStartDt : $("#searchStartDt").val(),
+		 searchEndDt : $("#searchEndDt").val(),
+		 searchDispYn : $("input[name='searchDispYn']:checked").val(),
+		 searchSaleSp : $("input[name='searchSaleSp']:checked").val(),
+		 searchNewSp : $("input[name='searchNewSp']:checked").val(),
+		 searchMno : getCheckedCompanies("searchMno"),
+		 searchNetrok : getCheckedCompanies("searchNetrok"),
+		 searchCompanyList : getCheckedCompanies("searchCompanyList"),
+		 searchImageBadgeSimpleOpen : $("input[name='searchImageBadgeSimpleOpen']:checked").val(),
+		 searchPointPlanYn : $('input[name=searchPointPlanYn]:checked').val(),
+         searchSecondPrice : $('input[name=searchSecondPrice]:checked').val(),
+		 page : page,
+		 recordSize : _recordSize
+	}
+
+	if ( $('input[name=searchBasicPrice]:checked').attr('id') != 'searchBasicPriceAll' ) {
+
+		if ( $('input[name=searchBasicPrice]:checked').attr('id') == 'searchBasicPrice01' ) {
+			params.searchBasicPriceTermFrom = 10000;
+			params.searchBasicPriceTermTo = 20000;
+		} else if ( $('input[name=searchBasicPrice]:checked').attr('id') == 'searchBasicPrice02' ) {
+			params.searchBasicPriceTermFrom = 20000;
+			params.searchBasicPriceTermTo = 30000;
+		} else if ( $('input[name=searchBasicPrice]:checked').attr('id') == 'searchBasicPrice03' ) {
+			params.searchBasicPriceTermFrom = 30000;
+			params.searchBasicPriceTermTo = 40000;
+		} else if ( $('input[name=searchBasicPrice]:checked').attr('id') == 'searchBasicPrice04' ) {
+			params.searchBasicPriceTermTo = 10000;
+		}
+	}
+	$.ajax({
+			   url : '/pbm/plan/ajaxList',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+				success: function (data) {
+					$('#searchList').empty();
+
+					$('#listCount').html("총 " + data.totalCnt +"건" );
+					$('#planListTmpl').tmpl(data.data).appendTo('#searchList');
+
+					renderPagination(page,data.totalCnt,_recordSize);
+			    },
+				error : function(request, status, error){
+		            alert(error);
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+			});
+	}
+
+
+
+
+function toggleSearchInit(){
+	$("#keyword").val('');
+	$("#searchDataTermFrom").val('');
+	$("#searchDataTermTo").val('');
+	$("#searchQosTermFrom").val('');
+	$("#searchQosTermTo").val('');
+
+	$("#searchDispYn01").prop('checked', true); // 노출여부
+	$("#searchSaleSp01").prop('checked', true); // 상태
+	$("#searchNewSp01").prop('checked', true); // 신규여부
+	$("#searchBasicPriceAll").prop('checked', true); // 기본료
+
+	$('#searchImageBadgeSimpleOpenAll').prop('checked', true);	//간편개통 구분
+	$('#searchPointPlanYnAll').prop('checked', true);	//포인트 요금제 구분
+
+	if(authType !="HOST") selCompany("");
+	selMno("");
+	selNetrok("");
+
+	$('.period-button[value="180"]').trigger("click");
+    $('#searchSecondPriceAll').prop('checked', true);	//실제 체감가 값 존재 여부
+
+
+	currentPage = 1;
+
+}
+
+
+function uploadCancel() {
+	$("#filenameDv").empty();
+	$('#mapFile').val('');
+}
+function closeUploadConfirm() {
+
+	$("#filenameDv").empty();
+	$('#mapFile').val('');
+	$("#btncloseUpload").click();
+}
+
+
+
+//02.03 - sancho
+function downloadExcel() {
+	var page = 1;
+	var _recordSize = 9999;
+
+	var searchDataTermFrom = '';
+	var searchDataTermTo = '';
+	if ( $("#searchDataTermFrom").val() != '' ) {
+		searchDataTermFrom = parseInt($("#searchDataTermFrom").val()) * 1024;
+	}
+
+	if ( $("#searchDataTermTo").val() != '' ) {
+		searchDataTermTo = parseInt($("#searchDataTermTo").val()) * 1024;
+	}
+
+	var params = {
+	     keyword : $("#keyword").val(),
+	     searchDataTermFrom : searchDataTermFrom,
+	     searchDataTermTo : searchDataTermTo,
+	     searchQosTermFrom : $("#searchQosTermFrom").val(),
+	     searchQosTermTo : $("#searchQosTermTo").val(),
+		 searchStartDt : $("#searchStartDt").val(),
+		 searchEndDt : $("#searchEndDt").val(),
+		 searchDispYn : $("input[name='searchDispYn']:checked").val(),
+		 searchSaleSp : $("input[name='searchSaleSp']:checked").val(),
+		 searchNewSp : $("input[name='searchNewSp']:checked").val(),
+		 searchMno : getCheckedCompanies("searchMno"),
+		 searchNetrok : getCheckedCompanies("searchNetrok"),
+		 searchCompanyList : getCheckedCompanies("searchCompanyList"),
+		 page : page,
+		 recordSize : _recordSize
+	}
+
+	if ( $('input[name=searchBasicPrice]:checked').attr('id') != 'searchBasicPriceAll' ) {
+
+		if ( $('input[name=searchBasicPrice]:checked').attr('id') == 'searchBasicPrice01' ) {
+			params.searchBasicPriceTermFrom = 10000;
+			params.searchBasicPriceTermTo = 20000;
+		} else if ( $('input[name=searchBasicPrice]:checked').attr('id') == 'searchBasicPrice02' ) {
+			params.searchBasicPriceTermFrom = 20000;
+			params.searchBasicPriceTermTo = 30000;
+		} else if ( $('input[name=searchBasicPrice]:checked').attr('id') == 'searchBasicPrice03' ) {
+			params.searchBasicPriceTermFrom = 30000;
+			params.searchBasicPriceTermTo = 40000;
+		} else if ( $('input[name=searchBasicPrice]:checked').attr('id') == 'searchBasicPrice04' ) {
+			params.searchBasicPriceTermTo = 10000;
+		}
+	}
+
+	var _url = '/pbm/plan/exceldownlist';
+
+	downloadExcelProc(params,_url,"PlanList");
+
+}
+
+
+
+
+function checkCompanyList(valueToCheck) {
+    // 모든 체크박스를 선택
+    const checkboxes = document.querySelectorAll('input[type="checkbox"][name="searchCompanyList"]');
+
+    // 값이 동일한 체크박스를 찾아 체크
+    checkboxes.forEach(checkbox => {
+        if (checkbox.value == valueToCheck) {
+            checkbox.checked = true;
+            checkbox.disabled = false; //
+        } else {
+        	checkbox.checked = false; // 체크 해제
+            checkbox.disabled = true; // 비활성화
+        }
+    });
+}
+
+
+
+
+
+function uploadTagMapExcel(){
+
+
+	if($("#tagmapFile").val() =="") {
+		showAlert("업로드 파일을 선택 하세요.");
+		return;
+	}
+	var formData = new FormData($('#uploadTagform')[0]);
+
+	alert(1);
+
+	$.ajax({
+		url 		: '/pbm/plan/excel/uploadPlanTag',
+		type 		: 'post',
+		enctype 	: 'multipart/form-data',
+		data 		: formData,
+		async 		: false,
+		contentType : false,
+		processData : false,
+		success 	: function (data) {
+			console.log(data);
+			$("#uploadCnt").html("업로드 - "+data.data.totCnt+"건");
+			$("#sucessCnt").html("성공 - "+data.data.saveCnt+"건");
+			$("#failCnt").html("실패 - "+data.data.failCnt+"건");
+			$("#btncloseTagUpload").click();
+			//failUUidList
+			var myModal = new bootstrap.Modal(document.getElementById('uploadResultModal'));
+			myModal.show();
+		},
+		error 		: function(request, status, error){
+			alert(error);
+		},
+		complete 	: function(){
+		}
+	});
+
+
+}
+
+
+function uploadTagCancel() {
+	$("#filenameDv").empty();
+	$('#mapFile').val('');
+}
+
+
+</script>
+</th:block>
+
+        <div class="main-content">
+            <div class="container-fluid">
+                 <!-- 로케이션 & 제목 영역 추가 -->
+                <div class="page-header mb-4">
+                    <div class="location mb-2">
+                        <small class="text-secondary">
+                            <i class="fas fa-home me-1"></i>
+                            <a href="javascript:;">홈</a> > <a href="/pbm/plan/list">상품관리</a> > <a href="/pbm/plan/list">요금제</a>
+                        </small>
+                    </div>
+                    <h2 class="page-title fs-4 mb-4">
+                        요금제
+                    </h2>
+                </div>
+
+                <div class="search-section">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <!-- 검색어 -->
+                            <div class="form-row full-width mb-3">
+                                <div class="form-label mb-0">검색어</div>
+                                <div class="form-control-wrap flex-grow-1">
+                                    <input type="text" class="form-control" placeholder="검색어를 입력해주세요" id="keyword">
+                                </div>
+                            </div>
+
+                            <!-- 노출여부 -->
+                            <div class="form-row full-width mb-3">
+                                <div class="form-label mb-0">노출여부</div>
+                                <div class="form-control-wrap">
+                                    <div class="form-check-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="searchDispYn" id="searchDispYn01" value="" checked>
+                                            <label class="form-check-label" for="searchDispYn01">전체</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="searchDispYn" id="searchDispYn02" value="1">
+                                            <label class="form-check-label" for="searchDispYn02">노출</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="searchDispYn" id="searchDispYn03" value="0">
+                                            <label class="form-check-label" for="searchDispYn03">비노출</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 상태 및 신규 여부 -->
+                            <div class="form-row full-width mb-3">
+                                <div class="form-label mb-0">상태</div>
+                                <div class="form-control-wrap">
+                                    <div class="form-check-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="searchSaleSp" id="searchSaleSp01" checked value="">
+                                            <label class="form-check-label" for="searchSaleSp01">전체</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="searchSaleSp" id="searchSaleSp02" value="SALE">
+                                            <label class="form-check-label" for="searchSaleSp02">판매중</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="searchSaleSp" id="searchSaleSp03" value="DROP">
+                                            <label class="form-check-label" for="searchSaleSp03">판매정지</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-label ms-5 mb-0">신규 여부</div>
+                                <div class="form-control-wrap">
+                                    <div class="form-check-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="searchNewSp" id="searchNewSp01" checked value="">
+                                            <label class="form-check-label" for="searchNewSp01">전체</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="searchNewSp" id="searchNewSp02" value="1">
+                                            <label class="form-check-label" for="searchNewSp02">Y</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="searchNewSp" id="searchNewSp03" value="0">
+                                            <label class="form-check-label" for="searchNewSp03">N</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 최근 수정일 -->
+                            <div class="col-12">
+                                <div class="form-row full-width">
+                                    <div class="form-label mb-0">최근 수정일</div>
+                                    <div class="form-control-wrap d-flex align-items-center gap-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="date" class="form-control"  id="searchStartDt">
+                                            <span class="text-secondary">-</span>
+                                            <input type="date" class="form-control"  id="searchEndDt">
+                                        </div>
+                                        <div class="period-buttons">
+                                            <div class="d-flex gap-2">
+                                                <button class="period-button" value="0">오늘</button>
+			                                    <button class="period-button" value="7">1주일</button>
+			                                    <button class="period-button" value="30">1개월</button>
+			                                    <button class="period-button" value="90">3개월</button>
+			                                    <button class="period-button" value="180">6개월</button>
+			                                    <button class="period-button" value="365">1년</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 상세검색 영역 -->
+                                <div id="detailSearchArea" class="col-12" style="display: none;">
+                                    <!-- MNO -->
+                                    <div class="form-row mb-3">
+                                        <div class="form-label mb-0">MNO</div>
+                                        <div class="form-control-wrap">
+                                            <div class="form-check-group">
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" id="searchMnoAll" value="" checked onclick="selMno('');">
+                                                    <label class="form-check-label" for="searchMnoAll">전체</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" id="searchMno01" name="searchMno" value="SKT" onclick="selMno('SKT');" >
+                                                    <label class="form-check-label" for="searchMno01">SKT</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" id="searchMno02" name="searchMno" value="KT" onclick="selMno('KT');" >
+                                                    <label class="form-check-label" for="searchMno02">KT</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" id="searchMno03" name="searchMno" value="LGU" onclick="selMno('LGU');" >
+                                                    <label class="form-check-label" for="searchMno03">U+</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 네트워크 -->
+                                    <div class="form-row mb-3">
+                                        <div class="form-label mb-0">네트워크</div>
+                                        <div class="form-control-wrap">
+                                            <div class="form-check-group">
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" id="searchNetrokAll" value="" checked onclick="selNetrok('');">
+                                                    <label class="form-check-label" for="searchNetrokAll">전체</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" id="searchNetrok01" name="searchNetrok" value="LTE" onclick="selNetrok('LTE');">
+                                                    <label class="form-check-label" for="searchNetrok01">LTE</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" id="searchNetrok02" name="searchNetrok" value="3G" onclick="selNetrok('3G');">
+                                                    <label class="form-check-label" for="searchNetrok02">3G</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" id="searchNetrok03"  name="searchNetrok" value="5G" onclick="selNetrok('5G');">
+                                                    <label class="form-check-label" for="searchNetrok03">5G</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 사업자 -->
+                                    <div class="form-row mb-3" id="searchDvCompay">
+                                        <div class="form-label mb-0">사업자</div>
+                                        <div class="form-control-wrap">
+                                            <div class="form-check-group">
+       											<!-- 관리자 권한 사용자 -->
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" id="searchCompanyListALL" value="" onclick="selCompany('');" checked>
+                                                    <label class="form-check-label" for="searchCompanyListALL">전체</label>
+                                                </div>
+                                            	<th:block th:each="item,index : ${compnyList}">
+	                                                <div class="form-check form-check-inline">
+	                                                    <input class="form-check-input" type="checkbox" name="searchCompanyList" th:id="${'searchCompanyList' + index.index}"  th:value="${item.id}" th:onclick="|selCompany(${item.id});|">
+	                                                    <label class="form-check-label" th:for="${'searchCompanyList' + index.index}" th:text="${item.name}">KG모바일</label>
+	                                                </div>
+                                                </th:block>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 간편개통 구분 -->
+                                    <div class="form-row mb-3">
+                                        <div class="form-label mb-0">간편개통 구분</div>
+                                        <div class="form-control-wrap">
+                                            <div class="form-check-group">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="searchImageBadgeSimpleOpen" id="searchImageBadgeSimpleOpenAll" checked value="">
+                                                    <label class="form-check-label" for="searchImageBadgeSimpleOpenAll">전체</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="searchImageBadgeSimpleOpen" id="searchImageBadgeSimpleOpen01" value="1">
+                                                    <label class="form-check-label" for="searchImageBadgeSimpleOpen01">Y</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="searchImageBadgeSimpleOpen" id="searchImageBadgeSimpleOpen02" value="0">
+                                                    <label class="form-check-label" for="searchImageBadgeSimpleOpen02">N</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 포인트 요금제 구분 -->
+                                    <div class="form-row mb-3">
+                                        <div class="form-label mb-0">포인트 요금제 구분</div>
+                                        <div class="form-control-wrap">
+                                            <div class="form-check-group">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="searchPointPlanYn" id="searchPointPlanYnAll" checked value="">
+                                                    <label class="form-check-label" for="searchPointPlanYnAll">전체</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="searchPointPlanYn" id="searchPointPlanYn01" value="1">
+                                                    <label class="form-check-label" for="searchPointPlanYn01">Y</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="searchPointPlanYn" id="searchPointPlanYn02" value="0">
+                                                    <label class="form-check-label" for="searchPointPlanYn02">N</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 기본료 -->
+                                    <div class="form-row mb-3">
+                                        <div class="form-label mb-0">기본료</div>
+                                        <div class="form-control-wrap">
+                                            <div class="form-check-group">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="searchBasicPrice" id="searchBasicPriceAll" checked>
+                                                    <label class="form-check-label" for="searchBasicPriceAll">전체</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="searchBasicPrice" id="searchBasicPrice01">
+                                                    <label class="form-check-label" for="searchBasicPrice01">1-2만원</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="searchBasicPrice" id="searchBasicPrice02">
+                                                    <label class="form-check-label" for="searchBasicPrice02">2-3만원</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="searchBasicPrice" id="searchBasicPrice03">
+                                                    <label class="form-check-label" for="searchBasicPrice03">3-4만원</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="searchBasicPrice" id="searchBasicPrice04">
+                                                    <label class="form-check-label" for="searchBasicPrice04">1만원 언더</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 데이터 -->
+                                    <div class="form-row mb-3">
+                                        <div class="form-label mb-0">데이터</div>
+                                        <div class="form-control-wrap d-flex align-items-center gap-2">
+                                            <input type="text" class="form-control otherW numberonly" placeholder="숫자를 입력하세요" id="searchDataTermFrom"> GB
+                                            <span class="mx-2">~</span>
+                                            <input type="text" class="form-control otherW numberonly" placeholder="숫자를 입력하세요" id="searchDataTermTo"> GB
+                                        </div>
+                                    </div>
+
+                                    <!-- QoS -->
+                                    <div class="form-row mb-3">
+                                        <div class="form-label mb-0">QoS</div>
+                                        <div class="form-control-wrap d-flex align-items-center gap-2">
+                                            <input type="text" class="form-control otherW numberonly" placeholder="숫자를 입력하세요" id="searchQosTermFrom"> Mbps
+                                            <span class="mx-2">~</span>
+                                            <input type="text" class="form-control otherW numberonly" placeholder="숫자를 입력하세요" id="searchQosTermTo"> Mbps
+                                        </div>
+                                    </div>
+
+                                    <!-- 실체 체감가 -->
+                                    <div class="form-row mb-3">
+                                        <div class="form-label mb-0">실제 체감가</div>
+                                        <div class="form-control-wrap">
+                                            <div class="form-check-group">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="searchSecondPrice" id="searchSecondPriceAll" checked value="">
+                                                    <label class="form-check-label" for="searchSecondPriceAll">전체</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="searchSecondPrice" id="searchSecondPrice01" value="1">
+                                                    <label class="form-check-label" for="searchSecondPrice01">입력</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="searchSecondPrice" id="searchSecondPrice02" value="0">
+                                                    <label class="form-check-label" for="searchSecondPrice02">미입력</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 text-end mt-2">
+                                        <button class="btn btn-primary btn-sm me-2" onclick="searchListInit();">
+                                            <i class="fas fa-search"></i>
+                                            검색
+                                        </button>
+                                        <button class="btn btn-primary btn-sm me-2" onclick="toggleDetailSearch()"  id="btnDetailSearch">
+                                            <i class="fas fa-chevron-down"></i>
+                                            상세검색
+                                        </button>
+                                        <button class="btn btn-light btn-sm" onclick="toggleSearchInit()">
+                                            <i class="fas fa-redo"></i>
+                                            초기화
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="stats-badge">
+                                <i class="fas fa-calculator me-1"></i>
+                                <span id="listCount"></span>
+                            </div>
+                            <select class="form-select" style="width: 100px" id="recordSize" onchange="changeCombo()">
+                                <option value="10">10개씩</option>
+                                <option value="20">20개씩</option>
+                                <option value="30">30개씩</option>
+                                <option value="40">40개씩</option>
+                                <option value="50">50개씩</option>
+                            </select>
+                        </div>
+                        <div class="header-actions">
+							<button class="btn btn-primary btn-sm" onclick="location.href='/pmb/plan_cate/list'">
+							    <i class="fas fa-plus"></i>
+							    카테고리 관리
+							</button>
+							<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#uploadTagModal">
+							    <i class="fas fa-plus"></i>
+							    tag 일괄등록
+							</button>
+                        	<button class="btn btn-light btn-sm">
+                                <i class="fas fa-download"></i>
+                                다운로드
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="location.href='/pbm/plan/editOrg?searchUUid='">
+                                <i class="fas fa-plus"></i>
+                                신규등록
+                            </button>
+                            <div class="custom-dropdown">
+                                <button class="btn btn-primary btn-sm btnDrop" onclick="toggleDropdown()">
+                                    <i class="fas fa-calculator"></i>
+                                    요금제 코드 맵핑
+                                </button>
+                                <div id="myDropdown" class="dropdown-content">
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#downloadModal">맵핑 대상 다운로드</a>
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#uploadModal">맵핑 코드 업로드</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th>번호</th>
+                                <th>노출여부</th>
+                                <th>상태</th>
+                                <th>신규여부</th>
+                                <th>MNO</th>
+                                <th>네트워크</th>
+                                <th>사업자</th>
+                                <th>요금제</th>
+                                <th>기본료</th>
+                                <th>할인금액</th>
+                                <th>할인기간</th>
+                                <th>데이터</th>
+                                <th>QoS</th>
+                                <th>최근 수정일</th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchList">
+
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-between mt-4 align-items-start">
+                        <ul class="pagination">
+
+                        </ul>
+                        <!-- <button class="btn btn-success btn-sm"> -->
+                        <!-- <button class="btn btn-light btn-sm">
+                            <i class="fas fa-download"></i>
+                            엑셀 다운로드
+                        </button> -->
+
+                    </div>
+                </div>
+            </div>
+		</div>
+
+
+
+	  <!-- Modal 팝업 : 다운로드  -->
+            <div class="modal fade" id="downloadModal" tabindex="-1" aria-labelledby="downloadModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header border-0 pb-0 mb-4">
+                            <h5 class="modal-title fs-6 fw-bold" id="downloadModalLabel">맵핑 대상 다운로드</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body pt-2 pb-4">
+                            <div class="form-row-modal">
+                                <div class="form-label-modal">사업자</div>
+                                <div class="form-control-wrap-modal">
+                                    <select class="form-select" id="selCompMapDown">
+                                        <option value="">사업자 선택</option>
+                                        <th:block th:each="item : ${compnyList}">
+                                        	<option th:value="${item.id}" th:text="${item.name}">KG모바일</option>
+                                        </th:block>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-dark px-4 btm-sm" onclick="downloadMapFile();">다운로드</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal 팝업 : 업로드 -->
+            <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header border-0 pb-0 mb-4">
+                            <h5 class="modal-title fs-6 fw-bold" id="uploadModalLabel">맵핑 대상 업로드</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="uploadform">
+	                        <div class="modal-body pt-2 pb-4">
+	                            <div class="form-row-modal">
+	                                <div class="form-label-modal">사업자</div>
+	                                <div class="form-control-wrap-modal">
+	                                    <select class="form-select" name="hostId" id="hostId">
+	                                        <option  value="">사업자 선택</option>
+											<th:block th:each="item : ${compnyList}">
+	                                        	<option th:value="${item.id}" th:text="${item.name}">KG모바일</option>
+	                                        </th:block>
+	                                    </select>
+	                                </div>
+	                                <div class="form-row-modal" style="margin-top:10px;">
+		                                <div class="form-label-modal">파일첨부</div>
+		                                <div class="form-control-wrap-modal">
+		                                	<input type="file" class="uploader__input" id="mapFile" accept=".xls,.xlsx" name="uploadMapData" onchange="BannerUploader.getfilenameExcel(this, 'filenameDv')" />
+		                                	<div class="uploader__preview" id="filenameDv"></div>
+		                                    <button type="button" class="btn btn-primary"  onclick="BannerUploader.trigger('mapFile')">첨부하기</button>
+		                                </div>
+		                            </div>
+	                            </div>
+	                        </div>
+                        </form>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn btn-secondary px-4 btm-sm" data-bs-dismiss="modal" id="btncloseUpload" onclick="uploadCancel();">취소</button>
+                            <button type="button" class="btn btn-dark px-4 btm-sm" onclick="uploadMapExcel();">업로드</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Modal 팝업 : 업로드 결과  -->
+            <div class="modal fade" id="uploadResultModal" tabindex="-1" aria-labelledby="uploadResultModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header border-0 pb-0 mb-4">
+                            <h5 class="modal-title fs-6 fw-bold" id="uploadResultModalLabel">코드 업로드 결과</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body pt-2 pb-4">
+                            <div class="upload-result">
+                                <p class="mb-3">
+                                    업로드 결과
+                                    <span class="text-primary" id="uploadCnt">업로드 - NN건</span> /
+                                    <span class="text-success" id="sucessCnt">설패 - NN건</span> /
+                                    <span class="text-danger" id="failCnt">실패 - NN건</span>
+                                </p>
+                                <!-- <div class="uuid-list">
+                                    <p class="fw-bold mb-2">상태 UUID</p>
+                                    <ul class="list-unstyled" id="failUUidList">
+                                        <li>Amobile67085</li>
+                                        <li>Amobile67085</li>
+                                        <li>Amobile67085</li>
+                                        <li>Amobile67085</li>
+                                    </ul>
+                                </div> -->
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button"  data-bs-dismiss="modal" class="btn btn-dark px-4 btm-sm" onclick="closeUploadConfirm();">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+			<!-- Modal 팝업 : tag 업로드 -->
+			<div class="modal fade" id="uploadTagModal" tabindex="-1" aria-labelledby="uploadTagModalLabel" aria-hidden="true">
+			    <div class="modal-dialog modal-dialog-centered">
+			        <div class="modal-content">
+			            <div class="modal-header border-0 pb-0 mb-4">
+			                <h5 class="modal-title fs-6 fw-bold" id="uploadTagModalLabel">맵핑 대상 업로드</h5>
+			                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			            </div>
+			            <form id="uploadTagform">
+			                <div class="modal-body pt-2 pb-4">
+			                    <div class="form-row-modal">
+			                        <div class="form-row-modal" style="margin-top:10px;">
+			                            <div class="form-label-modal">파일첨부</div>
+			                            <div class="form-control-wrap-modal">
+			                            	<input type="file" class="uploader__input" id="tagmapFile" accept=".xls,.xlsx" name="uploadTagData" onchange="BannerUploader.getfilenameExcel(this, 'filenameDvTag')" />
+			                            	<div class="uploader__preview" id="filenameDvTag"></div>
+			                                <button type="button" class="btn btn-primary"  onclick="BannerUploader.trigger('tagmapFile')">첨부하기</button>
+			                            </div>
+			                        </div>
+			                    </div>
+			                </div>
+			            </form>
+			            <div class="modal-footer border-0 pt-0">
+			                <button type="button" class="btn btn-secondary px-4 btm-sm" data-bs-dismiss="modal" id="btncloseTagUpload" onclick="uploadTagCancel();">취소</button>
+			                <button type="button" class="btn btn-dark px-4 btm-sm" onclick="uploadTagMapExcel();">업로드</button>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+
+</html>

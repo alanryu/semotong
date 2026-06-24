@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.pmb.mapper.PlanZzimMapper">
+
+    <sql id="searchCondition">
+        <if test='userMngId != null and userMngId !=""'>
+            AND user_mng_id = #{userMngId}
+        </if>
+		<if test='planListId != null and planListId !=""'>
+            AND prod_id = #{planListId}
+        </if>
+    </sql>
+
+    <select id="getlist" parameterType="kr.co.ucomp.web.pmb.dto.searchPlanZzimDto" resultType="kr.co.ucomp.web.pmb.entity.PlanZzimEntity">
+        SELECT
+            id,
+            user_mng_id, 
+            prod_id,
+            create_date
+        FROM
+            tb_pmb_plan_zzim
+        WHERE 1=1
+        <include refid="searchCondition"/>
+        ORDER BY create_date DESC
+    </select>
+
+
+    
+
+    <insert id="create" parameterType="kr.co.ucomp.web.pmb.entity.PlanZzimEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_pmb_plan_zzim (user_mng_id, prod_id)
+        VALUES (
+            #{userMngId},
+            #{prodId}
+       );
+    </insert>
+
+
+    <delete id="delete" parameterType="Map">
+        DELETE FROM tb_pmb_plan_zzim
+        WHERE user_mng_id=#{userId}
+        AND prod_id=#{prodId}
+    </delete>
+
+
+</mapper>

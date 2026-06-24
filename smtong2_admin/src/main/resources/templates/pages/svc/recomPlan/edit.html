@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layout/default_layout}"
+  layout:fragment="Content"
+  th:with="menuIdGroup ='07',menuId ='0101'"
+>
+  <!-- index.html 고유 CSS 추가 -->
+  <th:block layout:fragment="css">
+    <script
+      th:src="|https://cdn.tiny.cloud/1/${@environment.getProperty('tinymce.apikey')}/tinymce/7/tinymce.min.js|"
+      referrerpolicy="origin"
+    ></script>
+  </th:block>
+  <!-- index.html 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+    <script th:inline="javascript">
+      var planListFromServer = /*[[${planList}]]*/ [];
+    </script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        /* 요금제 추가 레이어팝업 등록 버튼 */
+        $("#plan-add").on("click", function () {
+          var id = $("input[name=popPlanList]:checked").val();
+          var jsonStr = $("input[name=popPlanList]:checked").data("json");
+
+          // Parse the JSON string into an object
+          var jsonObj = typeof jsonStr === "string" ? JSON.parse(jsonStr) : jsonStr;
+
+          if (id != undefined) {
+            // 중복 체크 - 이미 추가된 요금제인지 확인
+            var isDuplicate = false;
+            $("#plan-add-chk")
+              .find('input[name="planList"]')
+              .each(function () {
+                if ($(this).val() === id) {
+                  isDuplicate = true;
+                  return false;
+                }
+              });
+
+            // 중복된 경우 alert 표시하고 리턴
+            if (isDuplicate) {
+              showAlert("이미 추가된 요금제 입니다.(" + jsonObj.planName + ")");
+              return;
+            }
+
+            var addidx = $("#plan-add-chk").find("tr").length;
+            alert(addidx);
+
+            var html = "";
+            html += '<tr class="bnf-select__row">';
+            html += '    <td class="bnf-select__td">';
+            html += '        <input type="hidden" name="planList" value="' + id + '">';
+            html += '        <input type="checkbox" name="planChk" class="bnf-select__radio" value="Y">';
+            html += "    </td>";
+            html += '    <td class="bnf-select__td">' + jsonObj.planMno + "</td>";
+            html += '    <td class="bnf-select__td">' + jsonObj.planType + "</td>";
+            html += '    <td class="bnf-select__td">' + jsonObj.hostNm + "</td>";
+            html += '    <td class="bnf-select__td">';
+            html +=
+              '        <a href="javascript:;" onclick="openViewPlanDetail(' + id + ')">' + jsonObj.planName + "</a>";
+            html += "    </td>";
+            html += '    <td class="bnf-select__td">' + getDataStr(jsonObj.planSupDataVal) + "</td>";
+            html += '    <td class="bnf-select__td">' + getDataStr(jsonObj.planDailyVal) + "</td>";
+            html += '    <td class="bnf-select__td">' + getQosStr(jsonObj.planSupQos) + "</td>";
+            html += '    <td class="bnf-select__td">' + getPriceStr(jsonObj.planAfterPrice) + "</td>";
+            html += '    <td class="bnf-select__td">' + getPriceStr(jsonObj.planSalePrice) + "</td>";
+            html += '    <td class="bnf-select__td">' + jsonObj.planPromotionPeriod + "</td>";
+            html += '    <td class="bnf-select__td order-item">';
+            if (addidx == 0) {
+              html += '<button class="btn btn-dark order-set" data-arrow="down">▼</button>';
+            } else {
+              html += '       <button class="btn btn-dark order-set" data-arrow="up">▲</button>';
+            }
+            html += "    </td>";
+            html += "</tr>";
+
+            $("#plan-add-chk").append(html);
+            $("#selectPlanPopupOverlay, #selectPlanPopup").hide();
+          }
+        });
+
+        initPlanTable();
+
+        function initPlanTable() {
+          if (planListFromServer && planListFromServer.length > 0) {
+            var max = planListFromServer.length;
+
+            planListFromServer.forEach(function (plan, idx) {
+              var html = "";
+              html += '<tr class="bnf-select__row">';
+              html += '    <td class="bnf-select__td">';
+              html += '        <input type="hidden" name="planList" value="' + plan.planId + '">';
+              html += '        <input type="checkbox" name="planChk" class="bnf-select__radio" value="Y">';
+              html += "    </td>";
+              html += '    <td class="bnf-select__td">' + plan.mno + "</td>";
+              html += '    <td class="bnf-select__td">' + plan.planType + "</td>";
+              html += '    <td class="bnf-select__td">' + plan.planHostNm + "</td>";
+              html += '    <td class="bnf-select__td">';
+              html +=
+                '        <a href="javascript:;" onclick="openViewPlanDetail(' +
+                plan.planId +
+                ')">' +
+                plan.planName +
+                "</a>";
+              html += "    </td>";
+              html += '    <td class="bnf-select__td">' + getDataStr(plan.supDataTotal || 0) + "</td>";
+              html += '    <td class="bnf-select__td">' + getDataStr(plan.dailyVal || 0) + "</td>";
+              html += '    <td class="bnf-select__td">' + getQosStr(plan.supQos || 0) + "</td>";
+              html += '    <td class="bnf-select__td">' + getPriceStr(plan.normalPrice || 0) + "</td>";
+              html += '    <td class="bnf-select__td">' + getPriceStr(plan.salePrice || 0) + "</td>";
+              html += '    <td class="bnf-select__td">' + plan.promotionPeriod + "</td>";
+
+              html += '    <td class="bnf-select__td order-item">';
+              if (idx == 0) {
+                html += '<button class="btn btn-dark order-set" data-arrow="down">▼</button>';
+              } else if (idx === max - 1) {
+                html += '<button class="btn btn-dark order-set" data-arrow="up">▲</button>';
+              } else {
+                html += '<button class="btn btn-dark order-set" data-arrow="up">▲</button>';
+                html += '<button class="btn btn-dark order-set" data-arrow="down" style="margin-left:5px">▼</button>';
+              }
+              html += "    </td>";
+              html += "</tr>";
+
+              $("#plan-add-chk").append(html);
+            });
+          }
+        }
+
+        /* 요금제 추가 버튼 */
+        $("#bnfAddBtn").on("click", function () {
+          $("#selectPlanPopupOverlay, #selectPlanPopup").show();
+        });
+
+        /* 요금제 닫기 버튼 */
+        $(".plan-add-cls").on("click", function () {
+          $("#selectPlanPopupOverlay, #selectPlanPopup").hide();
+        });
+
+        /* 요금제 검색 enter */
+        $("#keyword").on("keyup", function (key) {
+          if (key.keyCode == 13) {
+            schPlanList();
+          }
+        });
+
+        /* 요금제 등록 체크박스 */
+        $("#chkall").on("change", function () {
+          if ($(this).is(":checked")) {
+            $("input[name=planChk]").each(function () {
+              $(this).prop("checked", true);
+            });
+          } else {
+            $("input[name=planChk]").each(function () {
+              $(this).prop("checked", false);
+            });
+          }
+        });
+
+        /* 순서 정렬 */
+        $(document).on("click", ".order-set", function () {
+          var arrow = $(this).data("arrow");
+
+          var row = $(this).parent().parent();
+          var num = row.index();
+
+          var max = $("#plan-add-chk").find("tr").length;
+
+          if (arrow == "down") {
+            if (num >= max) {
+              return false;
+            } else {
+              row.next().after(row);
+            }
+          } else if (arrow == "up") {
+            if (num == 0) {
+              return false;
+            } else {
+              row.prev().before(row);
+            }
+          }
+
+          /* 전체 화살표 방향 다시 설정 및 정렬데이터 setting */
+          var orderIds = [];
+          $("#plan-add-chk")
+            .find("tr")
+            .each(function (idx) {
+              var html = "";
+              var data = $(this).find("td").last().data("id");
+              if (idx == 0) {
+                html += '<button class="btn btn-dark order-set" data-arrow="down">▼</button>';
+                $(this).find("td").last().html(html);
+              } else if (idx === max - 1) {
+                html += '<button class="btn btn-dark order-set" data-arrow="up">▲</button>';
+                $(this).find("td").last().html(html);
+              } else {
+                html += '<button class="btn btn-dark order-set" data-arrow="up">▲</button>';
+                html += '<button class="btn btn-dark order-set" data-arrow="down" style="margin-left:5px">▼</button>';
+                $(this).find("td").last().html(html);
+              }
+
+              orderIds.push($(this).find("td").last().data("id"));
+            });
+        });
+      });
+
+      // 화면 로드 시
+      document.addEventListener("DOMContentLoaded", function () {});
+
+      function validationCheck() {
+        const title = $("#title").val(); //타이틀
+        const subTitlePc = $("#subTitlePc").val(); //타이틀(sub pc)
+        const subTitleMo = $("#subTitleMo").val(); //타이틀(sub mo)
+
+        const descript1 = $("#descript1").val(); //소개문구 1
+        const descript2 = $("#descript2").val(); //소개문구 2
+        const descript3 = $("#descript3").val(); //소개문구 3
+        const descript4 = $("#descript4").val(); //소개문구 4
+        const descript5 = $("#descript5").val(); //소개문구 5
+
+        if (title == "") {
+          showAlert("타이틀을 입력해 주세요.");
+          return false;
+        }
+
+        if (subTitlePc == "") {
+          showAlert("pc 서브 타이틀을 입력해 주세요.");
+          return false;
+        }
+
+        if (subTitleMo == "") {
+          showAlert("Mobile 서브 타이틀을 입력해 주세요.");
+          return false;
+        }
+
+        /* 아이콘 */
+        if ($("#fileText1").val() == "") {
+          showAlert("아이콘을 선택해 주세요.");
+          return false;
+        } else {
+          $("#req-imagePc").find(".required").remove();
+        }
+
+        if (descript1 == "" && descript2 == "" && descript3 == "" && descript4 == "" && descript5 == "") {
+          showAlert("소개문구를 적어도 하나이상 입력해 주세요.");
+          return false;
+        }
+
+        return true;
+      }
+
+      function insupdProc() {
+        var isValid = validationCheck();
+
+        if (isValid) {
+          var formData = new FormData();
+          formData.append("record.id", $("#id").val());
+          formData.append("record.title", $("#title").val());
+          formData.append("record.subTitlePc", $("#subTitlePc").val());
+          formData.append("record.subTitleMo", $("#subTitleMo").val());
+
+          formData.append("record.descript1", $("#descript1").val());
+          formData.append("record.descript2", $("#descript2").val());
+          formData.append("record.descript3", $("#descript3").val());
+          formData.append("record.descript4", $("#descript4").val());
+          formData.append("record.descript5", $("#descript5").val());
+          formData.append("record.useYn", $("#useYn").val() == null ? "1" : $("#useYn").val());
+          formData.append("record.orderNo", $("#orderNo").val() == null ? "1" : $("#orderNo").val());
+
+          var fileInput = document.getElementById("fileInput1");
+          if (fileInput.files.length > 0) {
+            formData.append("fileInput1", fileInput.files[0]);
+          }
+
+          $("#plan-add-chk")
+            .find('input[name="planList"]')
+            .each(function (index, element) {
+              formData.append("planList[" + index + "].planId", $(element).val());
+              formData.append("planList[" + index + "].orderNo", index + 1);
+            });
+
+          $.ajax({
+            url: "/svc/recomPlan/insupdProc",
+            type: "post",
+            enctype: "multipart/form-data",
+            data: formData,
+            async: false,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+              if (data.code == 200) {
+                var alertTxt = "저장 되었습니다.";
+                showAlert(alertTxt, goList);
+              }
+            },
+            error: function (request, status, error) {
+              alert(error);
+            },
+            complete: function () {},
+          });
+        }
+
+        return true;
+      }
+
+      /* 요금제 검색 */
+      function schPlanList() {
+        var params = {
+          searchMno: $("#searchMno").val(),
+          searchNetrok: $("#searchPlanType").val(),
+          searchCompany: $("#searchHost").val(),
+          keyword: $("#keyword").val(),
+        };
+
+        $.ajax({
+          url: "/svc/mainbanner/planlist",
+          type: "post",
+          data: JSON.stringify(params),
+          dataType: "json",
+          contentType: "application/json",
+          async: false,
+          success: function (data) {
+            $("#plan-area").empty();
+
+            $("#plan-list").tmpl(data.data).appendTo("#plan-area");
+
+            $(document).on("click", ".bnf-select__row", function (e) {
+              $(this).find('input[type="radio"]').prop("checked", true);
+            });
+          },
+          error: function (request, status, error) {
+            alert(error);
+          },
+          complete: function () {},
+        });
+      }
+
+      /* 요금제 상품 삭제 */
+      function planDelete() {
+        const checkedItems = $("input[name=planChk]:checked");
+
+        if (checkedItems.length > 0) {
+          showConfirm(
+            "삭제하시겠습니까?",
+            () => {
+              // 체크된 행들 제거
+              checkedItems.each(function () {
+                $(this).closest("tr").remove();
+              });
+            },
+            () => {},
+            ""
+          );
+        } else {
+          showConfirm("삭제할 항목을 선택해주세요.");
+        }
+      }
+
+      function openViewPlanDetail(planId) {
+        window.open("/pbm/plan/view?searchId=" + planId);
+      }
+
+      function goList() {
+        window.location.href = "/svc/recomPlan/list";
+      }
+
+      function deleteFile1() {
+        // 파일 입력 초기화
+        document.getElementById("fileInput1").value = "";
+
+        // 파일명 텍스트 초기화
+        document.getElementById("fileText1").value = "";
+
+        // 미리보기 이미지 숨기기
+        const preview = document.getElementById("preview1");
+        preview.src = "";
+        preview.style.display = "none";
+
+        const fileInfo = document.querySelector("#req-reomplanThumbnail .file-info");
+        if (fileInfo) {
+          fileInfo.textContent = "";
+        }
+      }
+    </script>
+  </th:block>
+
+  <div class="main-content">
+    <div class="container-fluid">
+      <!-- 로케이션 & 제목 영역 추가 -->
+      <div class="page-header mb-4">
+        <div class="location mb-2">
+          <small class="text-secondary">
+            <i class="fas fa-home me-1"></i>
+            <a href="javascript:;">홈</a> > <a href="/svc/recomPlan/list">상품관리</a> >
+            <a href="/svc/recomPlan/list">맞춤요금제</a>
+          </small>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+          <h2 class="page-title fs-4 mb-0" th:text="${result.id < 1 ? '맞춤 요금제 등록' : '맞춤 요금제 수정'}"></h2>
+        </div>
+      </div>
+
+      <form method="POST" id="form" th:object="${result}">
+        <input type="hidden" name="id" id="id" th:field="*{id}" />
+        <input type="hidden" th:field="*{useYn}" />
+        <input type="hidden" th:field="*{orderNo}" />
+
+        <div class="search-section detail">
+          <div class="form-row full-width">
+            <div class="form-label">타이틀<span class="required">*</span></div>
+            <div class="form-control-wrap">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="타이틀을 입력해 주세요."
+                th:field="*{title}"
+                maxlength="500"
+                style="width: 800px"
+              />
+            </div>
+          </div>
+          <div class="form-row full-width">
+            <div class="form-label">서브타이틀(PC)<span class="required">*</span></div>
+            <div class="form-control-wrap">
+              <textarea
+                class="form-control"
+                placeholder="PC 서브 타이틀을 입력해주세요."
+                th:field="*{subTitlePc}"
+                style="min-height: 80px; width: 800px"
+              ></textarea>
+            </div>
+          </div>
+          <div class="form-row full-width">
+            <div class="form-label">서브타이틀(MO)<span class="required">*</span></div>
+            <div class="form-control-wrap">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Mobile 서브 타이틀을 입력해주세요."
+                th:field="*{subTitleMo}"
+                maxlength="500"
+                style="width: 800px"
+              />
+            </div>
+          </div>
+          <!-- 아이콘 -->
+          <div class="form-row full-width">
+            <div class="form-label">아이콘 이미지</div>
+            <div class="form-control-wrap" id="req-reomplanThumbnail">
+              <div class="file-input-wrap">
+                <input
+                  type="file"
+                  class="file-input"
+                  id="fileInput1"
+                  name="fileInput1"
+                  style="display: none"
+                  accept="image/*"
+                />
+                <input type="text" class="form-control" style="min-width: 500px" id="fileText1" readonly />
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  style="min-width: 70px"
+                  onclick="document.getElementById('fileInput1').click()"
+                >
+                  찾기
+                </button>
+                <button type="button" class="btn btn-danger" style="min-width: 70px" onclick="deleteFile1()">
+                  삭제
+                </button>
+              </div>
+              <div class="file-info c_red"></div>
+              <div class="preview-wrap">
+                <img id="preview1" class="preview-image" th:src="*{iconImage}" style="display: none" />
+              </div>
+              <p class="c_red">* 이미지 형식의 파일만 업로드 가능합니다. (jpg, png, jpeg)</p>
+            </div>
+          </div>
+
+          <div class="form-row full-width">
+            <div class="form-label">소개문구<span class="required">*</span></div>
+            <div class="form-control-wrap">
+              <textarea
+                class="form-control"
+                placeholder="첫번쨰 소개문구를 입력해 주세요."
+                th:field="*{descript1}"
+                rows="3"
+                style="min-height: 80px; width: 800px"
+              />
+              <br />
+              <textarea
+                class="form-control"
+                placeholder="두번쨰 소개문구를 입력해 주세요."
+                th:field="*{descript2}"
+                rows="3"
+                style="min-height: 80px; width: 800px"
+              />
+              <br />
+              <textarea
+                class="form-control"
+                placeholder="세번쨰 소개문구를 입력해 주세요."
+                th:field="*{descript3}"
+                rows="3"
+                style="min-height: 80px; width: 800px"
+              />
+              <br />
+              <textarea
+                class="form-control"
+                placeholder="네번쨰 소개문구를 입력해 주세요."
+                th:field="*{descript4}"
+                rows="3"
+                style="min-height: 80px; width: 800px"
+              />
+              <br />
+              <textarea
+                class="form-control"
+                placeholder="다섯번쨰 소개문구를 입력해 주세요."
+                th:field="*{descript5}"
+                rows="3"
+                style="min-height: 80px; width: 800px"
+              />
+            </div>
+          </div>
+
+          <div class="form-row full-width">
+            <div class="form-label">요금제 등록</div>
+            <div>
+              <div class="mb-2">
+                <button type="button" class="btn btn-primary" id="bnfAddBtn">요금제추가</button>
+                <button type="button" class="btn btn-primary" id="bnfDelBtn" onClick="planDelete();">상품삭제</button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table custom-table table-bordered">
+                  <colgroup>
+                    <col style="width: 40px" />
+                    <col style="width: 100px" />
+                    <col style="width: 120px" />
+                    <col style="width: 220px" />
+                    <col style="width: 120px" />
+                    <col style="width: 120px" />
+                    <col style="width: 120px" />
+                    <col style="width: 120px" />
+                    <col style="width: 120px" />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th class="bnf-select__th" style="width: 50px">
+                        <input type="checkbox" id="chkall" />
+                      </th>
+                      <th>통신사</th>
+                      <th>통신망</th>
+                      <th>사업자</th>
+                      <th>요금제명</th>
+                      <th>데이터</th>
+                      <th>데일제공데이터</th>
+                      <th>QoS</th>
+                      <th>기본료</th>
+                      <th>할인금액</th>
+                      <th>할인기간</th>
+                      <th>순서</th>
+                    </tr>
+                  </thead>
+                  <tbody id="plan-add-chk"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="d-flex justify-content-center gap-2 mt-4 w-100 mb-5">
+        <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">닫기</button>
+        <button
+          type="button"
+          class="btn btn-lg btn-dark px-4 btn-sm"
+          onclick="insupdProc();"
+          th:text="${result.id < 1 ? '등록' : '수정'}"
+        ></button>
+      </div>
+    </div>
+  </div>
+
+  <script id="plan-list" type="text/x-jquery-tmpl">
+    <tr class="bnf-select__row">
+           <td class="bnf-select__td">
+               <input type="radio" name="popPlanList" class="bnf-select__radio" value="${id}" 			data-json='
+                 {
+                  "uuid":"${uuid}"
+                 , "planMno":"${mno}"
+                 , "planName":"${planNameSmt}"
+                 , "planAfterPrice":"${afterPrice}"
+                 , "planSalePrice":"${salePrice}"
+                 , "planPromotionPeriod":"${promotionPeriod}"
+    	   , "planSupDataVal":"${supDataVal}"
+                 , "planDailyVal":"${dailyData}"
+                 , "planSupQos":"${supQos}"
+    	   , "planType":"${planType}"
+                 , "hostNm":"${hostNm}"
+                }
+       '>
+    		   <input type="hidden" id="plan-uuid" value="${uuid}"/>
+           </td>
+           <td class="bnf-select__td">${mno}</td>
+     <td class="bnf-select__td">${planType}</td>
+           <td class="bnf-select__td">${hostNm}</td>
+           <td class="bnf-select__td">
+               <a href="javascript:;" onclick="openViewPlanDetail('${planNameSmt}')">${planNameSmt}</a>
+           </td>
+     <td class="bnf-select__td">{{html getDataStr(supDataVal)}}</td>
+     <td class="bnf-select__td">{{html getDataStr(dailyData)}}</td>
+     <td class="bnf-select__td">{{html getQosStr(supQos)}}</td>
+           <td class="bnf-select__td">{{html getPriceStr(normalPrice)}}</td>
+           <td class="bnf-select__td">{{html getPriceStr(salePrice)}}</td>
+           <td class="bnf-select__td">${promotionPeriod}</td>
+           <td class="bnf-select__td">{{html getDateStr(modifiedDate)}}</td>
+       </tr>
+  </script>
+
+  <!-- 요금제 팝업 -->
+  <div class="bnf-select__overlay" id="selectPlanPopupOverlay"></div>
+  <div class="bnf-select" id="selectPlanPopup" style="width: 1000px">
+    <div class="bnf-select__header">
+      <div class="bnf-select__title">요금제 선택</div>
+      <span class="bnf-select__close plan-add-cls">&times;</span>
+    </div>
+
+    <!-- <form name="schform" id="schform"> -->
+    <div class="bnf-select__search">
+      <select class="form-select" name="searchMno" id="searchMno" style="height: 52px; width: 120px">
+        <option value="">MNO 전체</option>
+        <option value="KT">KT</option>
+        <option value="SKT">SKT</option>
+        <option value="U+">LGU</option>
+      </select>
+      <select class="form-select" name="searchPlanType" id="searchPlanType" style="height: 52px; width: 120px">
+        <option value="">네트워크 전체</option>
+        <option value="LTE">LTE</option>
+        <option value="5G">5G</option>
+      </select>
+      <select class="form-select" name="searchHost" id="searchHost" style="height: 52px; width: 120px">
+        <option value="">사업자 전체</option>
+        <option th:each="list : ${compnyList}" th:value="${list.id}" th:utext="${list.name}">통신사 선택</option>
+      </select>
+      <input type="text" class="bnf-select__input" name="keyword" id="keyword" placeholder="요금제명을 입력해주세요." />
+      <button type="button" class="bnf-select__search-btn" onClick="schPlanList()">검색</button>
+    </div>
+    <!-- </form> -->
+    <div class="bnf-select__table__outer">
+      <table class="bnf-select__table">
+        <thead>
+          <tr>
+            <th class="bnf-select__th" style="width: 50px">구분</th>
+            <th class="bnf-select__th" style="width: 100px">MNO</th>
+            <th class="bnf-select__th">네트워크</th>
+            <th class="bnf-select__th">사업자</th>
+            <th class="bnf-select__th">요금제명</th>
+            <th class="bnf-select__th">데이터</th>
+            <th class="bnf-select__th">일데이터</th>
+            <th class="bnf-select__th">QoS</th>
+            <th class="bnf-select__th">기본료</th>
+            <th class="bnf-select__th">할인금액</th>
+            <th class="bnf-select__th">할인기간</th>
+            <th class="bnf-select__th">최근 수정일</th>
+          </tr>
+        </thead>
+        <tbody id="plan-area"></tbody>
+      </table>
+    </div>
+    <div class="bnf-select__footer">
+      <button class="bnf-select__btn bnf-select__btn--apply plan-add-cls">닫기</button>
+      <button class="bnf-select__btn bnf-select__btn--confirm bg_blue" id="plan-add">등록</button>
+    </div>
+  </div>
+</html>

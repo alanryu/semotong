@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layout/default_layout}"
+  layout:fragment="Content"
+   th:with="menuIdGroup ='07',menuId = '0101'"
+>
+  <!-- index.html 고유 CSS 추가 -->
+  <th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+  </th:block>
+  <!-- index.html 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+    <!-- list 템플릿 -->
+
+    <script id="recomPlanListTmpl" type="text/x-jquery-tmpl">
+      <tr>
+		<td>${id}</td>
+		<td>
+		    <div class="d-flex gap-2">
+		        <button class="action-btn btn-sm" onclick="location.href='/svc/recomPlan/edit/${id}'">
+		            <i class="fas fa-edit me-1"></i>
+		            수정
+		        </button>
+		        <button class="action-btn btn-sm" onclick="deleteRow('${id}');">
+		            <i class="fas fa-trash me-1"></i>
+		            삭제
+		        </button>
+		    </div>
+		</td>
+        <td>${title}</td>
+        <td>${subTitlePc}</td>
+		<td><img src="${iconImage}" style="width:30px"/></td>
+		<td>${planLisCnt}</td>
+		<td>
+			<div class="form-check form-switch mb-3">
+		    	 <input class="form-check-input" type="checkbox" role="switch" {{if useYn == '1'}}checked="true"{{/if}} onclick="useYnProc('${id}', this)" style="transform: scale(1.5);">
+			</div>
+		</td>
+		<td>${createNm}</td>
+        <td>{{html getDateStr(createDate)}}</td>
+		<!-- 순서 -->
+		<td class="order-item" data-id="${id}">
+			{{if arrow == 'd'}}
+			<button class="btn btn-dark order-set" data-arrow="down">▼</button>
+			{{else arrow == 'u'}}
+			<button class="btn btn-dark order-set" data-arrow="up">▲</button>
+			{{else}}
+			<button class="btn btn-dark order-set" data-arrow="up">▲</button>
+			<button class="btn btn-dark order-set" data-arrow="down">▼</button>
+			{{/if}}
+		</td>
+
+
+      </tr>
+    </script>
+    <script type="text/javascript">
+      var authType = "";
+
+      document.addEventListener("DOMContentLoaded", function () {
+        searchListInit();
+		
+		/* 순서 정렬 */
+		$(document).on('click', '.order-set', function(){
+			
+			var arrow = $(this).data('arrow');
+			
+			var row = $(this).parent().parent();
+			var num = row.index();
+			
+			var max = $('#searchList').find('tr').length;
+			if ( arrow == 'down' ) {
+				
+				if ( num >= max ) {
+					return false;
+				} else {
+					row.next().after(row);
+				}
+			} else if ( arrow == 'up' ) {
+				
+				if(num == 0) { 
+					return false;
+				} else {
+					row.prev().before(row);
+				}
+			}
+			
+			/* 전체 화살표 방향 다시 설정 및 정렬데이터 setting */
+			var orderIds = [];
+			$('#searchList').find('tr').each(function(idx){
+				var html = '';
+				var dataId = $(this).find('td').last().data('id');
+				if ( idx == 0 ) {
+					html += '<button class="btn btn-dark order-set" data-arrow="down">▼</button>';
+					$(this).find('td').last().html(html);
+				} else if ( idx === max - 1 ) {
+					html += '<button class="btn btn-dark order-set" data-arrow="up">▲</button>';
+					$(this).find('td').last().html(html);
+				} else {
+					html += '<button class="btn btn-dark order-set" data-arrow="up">▲</button>';
+					html += '<button class="btn btn-dark order-set" data-arrow="down" style="margin-left:5px">▼</button>';
+					$(this).find('td').last().html(html);
+				}
+
+				var order = idx + 1;
+				
+				var params = {
+					  id : dataId, 
+					  orderNo : order
+					};
+											
+				$.ajax({
+					url 		: '/svc/recomPlan/updateData',
+					type 		: 'post',
+					dataType 	: 'json',
+					contentType: 'application/json',
+					data 		: JSON.stringify(params),
+					async 		: false,
+					success 	: function (data) {
+						
+					},
+					error 		: function(request, status, error){
+						alert(error);
+					},
+					complete 	: function(){
+					}
+				});
+							
+			});
+			
+			
+		});
+		
+      });
+
+
+      function goInsert() {
+        window.location.href = "/svc/recomPlan/insert";
+      }
+
+      function searchListInit() {
+        currentPage = 1;
+        searchList();
+      }
+
+	  function changeCombo(){
+	  	currentPage = 1;
+	  	searchList()
+	  }
+
+      function searchList() {
+        var page = currentPage;
+        if (page == "" || page == null) page = 1;
+
+        //페이지 사이즈
+        var _recordSize = parseInt($("#recordSize").val());
+
+        var params = {
+          keyword: $("#keyword").val(), //검색어
+		  useYn: $("input[name='searchUseYn']:checked").val(), //상태
+          page: page, //페이지 번호
+          recordSize: _recordSize, //페이지 사이즈
+        };
+
+        $.ajax({
+          url: "/svc/recomPlan/ajaxList",
+          type: "POST",
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(params),
+          success: function (data) {
+			console.log(data);
+            $("#searchList").empty();
+
+            $("#listCount").html("총 " + data.totalCnt + "건");
+			
+			
+			$.each(data.data, function(idx, obj){
+				var rIdx = data.totalCnt - ((params.page - 1) * params.recordSize + idx);
+				obj.rIdx = rIdx;
+				
+				/* 순서 방향 설정 */
+				if ( idx == 0 ) obj.arrow = 'd'
+				else if ( idx == 9 || rIdx == 1 ) obj.arrow = 'u'
+				else obj.arrow = 'b';
+			});
+			
+						
+            $("#recomPlanListTmpl").tmpl(data.data).appendTo("#searchList");
+
+            renderPagination(page, data.totalCnt, _recordSize);
+          },
+          error: function (request, status, error) {
+            alert(error);
+          },
+          complete: function () {
+            // $('#loading').addClass('display-none');
+          },
+        });
+      }
+
+	  
+	  
+	  function deleteRow(delId) {
+		 showConfirm( '삭제하시겠습니까?', () => {
+          	 deleteDb(delId);
+           },
+           () => {
+               // 취소 시 실행할 로직
+           },'계정 삭제')
+	}
+
+	  		
+	  		
+	function deleteDb(id) {
+
+		
+		$.ajax({
+			   url : '/mbm/recomPlan/delete',
+			   type : 'DELETE',
+			   data : {delId: id},
+			   success: function (data) {
+				   searchList();
+			    },
+				error : function(request, status, error){
+					showAlert(error);
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+		});
+	}
+	
+	
+	
+	
+	function toggleSearchInit(){
+		$("#keyword").val('');
+		$("#searchUseYnAll").prop('checked', true);
+		$('.period-button[value="180"]').trigger("click");
+		currentPage = 1;
+	}
+	
+	
+	/* 사용/미사용 체크 */
+		function useYnProc(id, element) {
+			
+			var useYn = $(element).is(':checked') ? 1 : 0;
+			
+			var params = {
+			  id : id, 
+			  useYn : useYn
+			};
+
+								
+			
+			$.ajax({
+			   url 		: '/svc/recomPlan/updateData',
+			   type 	: 'POST',
+			   data 	: JSON.stringify(params),
+			   contentType: 'application/json',
+			   success 	: function (data) {
+				   
+				   console.log(data);
+				   searchResult();
+			    },
+				error 	: function(request, status, error){
+		            alert(error);
+		        },
+		        complete:function(){
+		        }
+			});
+			
+			$(element).is(':checked')
+		}
+
+
+    </script>
+  </th:block>
+
+  <div class="main-content">
+    <div class="container-fluid">
+      <!-- 로케이션 & 제목 영역 추가 -->
+      <div class="page-header mb-4">
+        <div class="location mb-2">
+          <small class="text-secondary">
+            <i class="fas fa-home me-1"></i>
+            <a href="javascript:;">홈</a> > <a href="/svc/plan/list">상품관리</a> > <a href="/svc/recomPlan/list">맞춤 요금제</a>
+          </small>
+        </div>
+        <h2 class="page-title fs-4 mb-4">맞춤 요금제</h2>
+      </div>
+	  
+	  <div class="container mt-4 mb-4" id="tab-menu">
+        <ul class="tab-menu">
+            <li>
+              <a href="/svc/mainbanner/dealList">추천딜</a>
+            </li>
+            <li>
+              <a href="/svc/mainbanner/timeList">타임딜</a>
+            </li>
+            <li>
+              <a href="/svc/mainbanner/list?type=01">상단 이벤트</a>
+            </li>
+            <li>
+              <a href="/svc/mainbanner/list?type=02">요금제 소개</a>
+            </li>
+			<li class="active">
+			  <a href="/svc/recomPlan/list">맞춤 요금제</a>
+			</li>			
+            <li>
+              <a href="/svc/mainbanner/list?type=03">중단 배너</a>
+            </li>
+            <li>
+              <a href="/svc/mainbanner/list?type=04">이벤트</a>
+            </li>
+        </ul>
+    </div>
+	
+
+      <div class="search-section">
+        <div class="row g-3">
+          <div class="col-12">
+                <!-- 상태 및 제공처 -->
+            <div class="form-row full-width mb-3">
+              <div class="form-label mb-0">상태</div>
+              <div class="form-control-wrap">
+                <div class="form-check-group">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="searchUseYn" id="searchUseYnAll" checked value=""/>
+                    <label class="form-check-label" for="searchUseYnAll">전체</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="searchUseYn" id="searchUseYn01" value="1"/>
+                    <label class="form-check-label" for="searchUseYn01">사용</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="searchUseYn" id="searchUseYn02" value="0" />
+                    <label class="form-check-label" for="searchUseYn02">미사용</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 등록일 -->
+            <div class="form-row full-width">
+              <div class="form-label mb-0">등록일</div>
+              <div class="form-control-wrap d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2">
+                  <input type="date" class="form-control" id="searchStartDt" />
+                  <span class="text-secondary">-</span>
+                  <input type="date" class="form-control" id="searchEndDt" />
+                </div>
+                <div class="period-buttons">
+                  <div class="d-flex gap-2">
+                    <button class="period-button" value="0">오늘</button>
+                    <button class="period-button" value="7">1주일</button>
+                    <button class="period-button" value="30">1개월</button>
+                    <button class="period-button" value="90">3개월</button>
+                    <button class="period-button" value="180">6개월</button>
+                    <button class="period-button" value="365">1년</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+			<!-- 검색어 -->
+		     <div class="form-row full-width mb-3">
+		       <div class="form-label mb-0">검색어</div>
+		       <div class="form-control-wrap flex-grow-1">
+		         <input type="text" class="form-control" placeholder="검색어를 입력해주세요" id="keyword" />
+		       </div>
+		     </div>
+
+
+            <div class="row">
+              <div class="col-12 text-end mt-2">
+                <button class="btn btn-primary btn-sm me-2" onclick="searchListInit();">
+                  <i class="fas fa-search"></i>
+                  검색
+                </button>
+                <button class="btn btn-light btn-sm" onclick="toggleSearchInit()">
+                  <i class="fas fa-redo"></i>
+                  초기화
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 리스트 -->
+      <div class="table-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="d-flex align-items-center gap-3">
+            <div class="stats-badge">
+              <i class="fas fa-calculator me-1"></i>
+              <span id="listCount"></span>
+            </div>
+            <select class="form-select" style="width: 100px" id="recordSize" onchange="changeCombo()">
+              <option value="10">10개씩</option>
+              <option value="20">20개씩</option>
+              <option value="30">30개씩</option>
+              <option value="40">40개씩</option>
+              <option value="50">50개씩</option>
+            </select>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary btn-sm" onclick="goInsert()">
+              <i class="fas fa-plus"></i>
+              등록
+            </button>
+          </div>
+        </div>
+
+        <table class="table custom-table">
+          <thead>
+            <tr>
+              <th>번호</th>
+              <th>편집</th>
+              <th>타이틀</th>
+              <th>서브타이틀</th>
+              <th>아이콘이미지</th>
+              <th>등록요금제</th>
+              <th>사용</th>
+              <th>등록자</th>
+              <th>등록일</th>
+			  <th>순서</th>
+            </tr>
+          </thead>
+          <tbody id="searchList"></tbody>
+        </table>
+
+        <div class="d-flex justify-content-between mt-4 align-items-start">
+          <ul class="pagination"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+</html>

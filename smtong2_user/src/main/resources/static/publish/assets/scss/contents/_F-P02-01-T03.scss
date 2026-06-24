@@ -1,0 +1,61 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 통신사 리뷰
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// 요금제 상세 공통
+@import './F-P02-01';
+
+// s: 통신사 리뷰 페이지
+.F-P02-01-T03-page {
+	// s: 통신사 리뷰 섹션
+	.review-sec {
+		// 통신사 리뷰 평점
+		.review-brand-sat {
+			.ui-btn {
+				display: flex;
+				width: 100%;
+				padding: 16rem;
+				border-radius: 4rem;
+				background-color: #F4F5F8;
+				> .brand {
+					display: flex;
+					align-items: center;
+					height: 28rem;
+					gap: 6rem;
+					img {
+						height: 100%;
+					}
+					.brand-rating {
+						display: inline-flex;
+						align-items: center;
+						padding: 3rem 8rem 3rem 4rem;
+						border:1px solid #CDC2F5;
+						border-radius: 15rem;
+						color: $color-primary;
+						font-weight: 500;
+						font-size: 12rem;
+						line-height: 14rem;
+					}
+				}
+				> .ui-icn {
+					margin-left: auto;
+				}
+			}
+		}
+
+		// 이용자 리뷰 평점
+		.review-user-sat {
+			margin-top: 10rem;
+			.review-list {
+				@include review-list-02;
+			}
+
+			.review-card {
+				@include review-card-02;
+			}
+		}
+	}
+	// e: 통신사 리뷰 섹션
+}
+// e: 통신사 리뷰 페이지

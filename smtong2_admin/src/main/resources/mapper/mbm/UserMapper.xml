@@ -1,0 +1,149 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.mbm.mapper.UserMapper">
+
+	<sql id="listWhere">
+		<where>
+            <!-- 기간 조회-->
+            <if test='searchStartDt != null and searchStartDt !=""'>
+                AND create_date  <![CDATA[>=]]> #{searchStartDt}
+            </if>
+            <if test='searchEndDt != null and searchEndDt !=""'>
+                AND create_date <![CDATA[<=]]> #{searchEndDt}
+            </if>
+            
+            <if test='searchAgeGroup != null and searchAgeGroup !=""'>
+            	<choose>
+					<when test="searchAgeGroup == '60'">
+                		AND age_group_val >= #{searchAgeGroup}
+                	</when>
+                	<otherwise>
+                		AND age_group_val = #{searchAgeGroup}
+                	</otherwise>
+                </choose>
+            </if>
+            
+            <if test='searchUserState != null and searchUserState !=""'>
+                AND member_stat = #{searchUserState}
+            </if>
+			<!-- 키워드 검색 -->
+			<if test="searchType != null and searchType != ''">
+				<choose>
+					<when test="searchType == 'NAME' and keyword != null and keyword !=''">
+						<!-- 이름 -->
+						AND username LIKE CONCAT('%', #{keyword}, '%')
+					</when>
+					<!-- 카카오 id -->
+					<when test="searchType == 'KAKAO' and keyword != null and keyword !=''">
+						AND kakao_user_id LIKE CONCAT('%', #{keyword}, '%')
+					</when>
+				</choose>
+			</if>
+			<if test="searchType == null or searchType == 'ALL'">
+			 	<if test='keyword != null and keyword !=""'>
+					AND (username LIKE CONCAT('%', #{keyword}, '%') OR kakao_user_id LIKE CONCAT('%', #{keyword}, '%'))
+				</if>
+			</if>
+			<if test="searchChannelYn != null and searchChannelYn !=''">
+				<choose>
+					<when test="searchChannelYn.equalsIgnoreCase('1')">
+						AND channel_yn = #{searchChannelYn}
+					</when>
+					<otherwise>
+						AND (channel_yn = #{searchChannelYn} or channel_yn is null)
+					</otherwise>
+				</choose>
+				
+			</if>
+		</where>
+	</sql>
+	<sql id="Base_Column_list">
+		id
+		,AES_DECRYPT(FROM_BASE64(email), 'tb_mbm_user') email
+		,username
+		,AES_DECRYPT(FROM_BASE64(phone_number), 'tb_mbm_user') phoneNumber
+		,age_group
+		,age_group_val
+		,birth_day
+		,birth_year
+		,kakao_user_id
+		,join_date
+		,active_yn
+		,disable_resn
+		,pi_agree_yn
+		,pi_agree_dttm
+		,pol_agree_yn
+		,pol_agree_dttm
+		,sms_agree_yn
+		,sms_agree_dttm
+		,email_agree_yn
+		,email_agree_dttm
+		,member_stat
+		,create_date
+		,create_id
+		,modified_date
+		,modified_id
+		,disable_dttm
+		,disable_mng_id
+		,channel_yn
+		,GET_ADMIN_USER_NM(disable_mng_id) as disableMngNm
+		,GET_ADMIN_USER_NM(create_id) as createNm
+		,GET_ADMIN_USER_NM(modified_id) as modifiedNm
+		,GET_CODE_NAME('member_status',member_stat) as memberStatNm
+	</sql>
+    
+
+	<select id="getList" parameterType="kr.co.ucomp.web.mbm.dto.UserSearchDTO" resultType="kr.co.ucomp.web.mbm.entity.UserEntity">
+		  SELECT
+	            <include refid="Base_Column_list" />
+	        FROM
+	            tb_mbm_user
+	        <include refid="listWhere" />
+	        ORDER BY join_date DESC
+	        LIMIT #{offset}, #{recordSize}
+
+	</select>
+
+	<select id="getListCount" parameterType="kr.co.ucomp.web.mbm.dto.UserSearchDTO" resultType="Long">
+		  SELECT
+	            count(1)
+	        FROM
+				tb_mbm_user
+	        <include refid="listWhere" />
+	</select>
+	
+	
+	<select id="getUserUser" parameterType="int" resultType="kr.co.ucomp.web.mbm.entity.UserEntity">
+		SELECT
+            <include refid="Base_Column_list" />
+        FROM
+            tb_mbm_user
+        WHERE id=#{id}
+	</select>
+	
+	
+		<select id="getUserByKakaoId" parameterType="kr.co.ucomp.web.mbm.dto.UserSearchDTO" resultType="kr.co.ucomp.web.mbm.entity.UserEntity">
+		SELECT
+            <include refid="Base_Column_list" />
+        FROM
+            tb_mbm_user
+        WHERE kakao_user_id=#{searchKakaoId}
+	</select>
+
+    <update id="updateState" parameterType="kr.co.ucomp.web.mbm.entity.UserEntity" >
+        UPDATE tb_mbm_user
+        SET member_stat = #{memberStat},
+        disable_resn = #{disableResn},
+        active_yn = #{activeYn},
+        disable_dttm = Now(),
+        disable_mng_id = #{disableMngId}
+        WHERE id = #{id}
+    </update>
+    
+    <update id="updateChannel" parameterType="kr.co.ucomp.web.mbm.entity.UserEntity" >
+    	UPDATE tb_mbm_user
+    	SET channel_yn = #{channelYn}
+    	WHERE kakao_user_id = #{kakaoUserId}
+    </update>
+</mapper>

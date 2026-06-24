@@ -1,0 +1,136 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.point.mapper.PointNpayMapper">
+	
+	<sql id="Point_Column_list">
+			 n.id
+			,u.username ,kakao_user_id, AES_DECRYPT(FROM_BASE64(u.phone_number), 'tb_mbm_user') phoneNumber
+			,p.user_id
+			,n.point_id
+			,n.npay_api_type
+			,GET_CODE_NAME('npay_api_type', n.npay_api_type) AS npayApiTypeName
+			,n.req_amount
+			,n.user_key
+			,n.partner_tx_no
+			,n.tx_no
+			,n.memo
+			,n.daou_code
+			,n.daou_message
+			,n.create_date
+			,n.create_id
+			
+			,n.modified_date
+			,n.modified_id
+			,n.modified_date                  AS mngDate
+			,GET_ADMIN_USER_NM(n.modified_id) AS mngName
+			 
+			,CASE WHEN DATE_ADD(n.create_date, INTERVAL 3 DAY) <![CDATA[<=]]> NOW() THEN 'OUTTER' 
+			      ELSE 'INNER'
+			 END AS dayAfter
+	</sql>
+	<sql id="PointWhereInfo">
+		<where>
+			<if test='searchUserId != null and searchUserId !=""'>
+			AND u.id = #{searchUserId}
+			</if>
+			
+			<if test='npayApiType != null and npayApiType !=""'>
+			AND n.npay_api_type = #{npayApiType}
+			</if>
+			<if test='keyword != null and keyword !=""'>
+			AND (u.username LIKE CONCAT('%', #{keyword}, '%') OR u.kakao_user_id LIKE CONCAT('%', #{keyword}, '%'))
+			</if>
+			<!-- 기간 조회-->
+			<if test='searchStartDt != null and searchStartDt !=""'>
+			AND n.create_date  <![CDATA[>=]]> #{searchStartDt}
+			</if>
+			<if test='searchEndDt != null and searchEndDt !=""'>
+			AND n.create_date <![CDATA[<=]]> #{searchEndDt}
+			</if>
+		</where>
+	</sql>
+	
+	
+	<select id="getPointNpay" parameterType="kr.co.ucomp.web.point.dto.PointNpayDTO" resultType="kr.co.ucomp.web.point.entity.PointNpayEntity">
+		SELECT
+		<include refid="Point_Column_list" />
+		FROM tb_mbm_user u
+		LEFT JOIN tb_mbm_point 			p ON u.id = p.user_id
+		LEFT JOIN tb_mbm_point_npay 	n ON p.id = n.point_id
+		<include refid="PointWhereInfo" />
+		ORDER BY n.partner_tx_no DESC, n.id DESC
+		LIMIT #{offset}, #{recordSize}
+	</select>
+	<select id="getPointNpayCount" parameterType="kr.co.ucomp.web.point.dto.PointNpayDTO" resultType="integer">
+		SELECT
+			count(1)
+		FROM tb_mbm_user u
+		LEFT JOIN tb_mbm_point 			p ON u.id = p.user_id
+		LEFT JOIN tb_mbm_point_npay 	n ON p.id = n.point_id
+		<include refid="PointWhereInfo" />
+	</select>
+	
+	<select id="getPointNpayById" parameterType="kr.co.ucomp.web.point.dto.PointNpayDTO" resultType="kr.co.ucomp.web.point.entity.PointNpayEntity">
+		SELECT
+		<include refid="Point_Column_list" />
+		FROM tb_mbm_user u
+		LEFT JOIN tb_mbm_point 			p ON u.id = p.user_id
+		LEFT JOIN tb_mbm_point_npay 	n ON p.id = n.point_id
+		WHERE n.id = #{searchNpayId}
+	</select>
+	<select id="getPointNpayByPartnerTxNo" parameterType="kr.co.ucomp.web.point.dto.PointNpayDTO" resultType="integer">
+		SELECT
+			count(1)
+		FROM tb_mbm_user u
+		LEFT JOIN tb_mbm_point 			p ON u.id = p.user_id
+		LEFT JOIN tb_mbm_point_npay 	n ON p.id = n.point_id
+		WHERE n.partner_tx_no = #{searchPartnerTxNo}
+	</select>
+	
+	<insert id="insertNpay" parameterType="kr.co.ucomp.web.point.entity.PointNpayEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+	INSERT INTO tb_mbm_point_npay(
+			 point_id
+			,npay_api_type
+			,req_amount
+			
+			,user_key
+			,partner_tx_no
+			,tx_no
+			
+			,memo
+			,daou_code
+			,daou_message
+			
+			,create_date
+			,create_id
+	)VALUES (
+			 #{pointId			}
+			,#{npayApiType		}
+			,#{reqAmount		}
+			
+			,#{userKey			}
+			,#{partnerTxNo		}
+			,#{txNo				}
+			
+			,#{memo				}
+			,#{daouCode			}
+			,#{daouMessage		}
+			
+			,NOW()
+			,#{createId			}
+		)
+	</insert>
+	
+	<update id="updateNpay"  parameterType="kr.co.ucomp.web.point.entity.PointNpayEntity" >
+		UPDATE tb_mbm_point_npay
+		SET	
+ 			 npay_api_type          = #{npayApiType				}
+			,memo                   = #{memo			}
+			,modified_date          = NOW()
+			,modified_id            = #{modifiedId			}
+		WHERE id = #{id}
+	</update>
+	
+	
+</mapper>

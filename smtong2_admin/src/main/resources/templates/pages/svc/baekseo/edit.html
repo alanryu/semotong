@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='07',menuId ='06'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<script th:src="|https://cdn.tiny.cloud/1/${@environment.getProperty('tinymce.apikey')}/tinymce/7/tinymce.min.js|"  referrerpolicy="origin" ></script>
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	
+	<script type="text/javascript">
+		document.addEventListener('DOMContentLoaded', () => {
+			initTinyEditor("edt_content"); // 지원 정보 에디터 초기화
+			
+			if( $("#id").val() == 0 ){
+				console.log('0입니다');
+				var _toay = getToday();
+				var year = _toay.split("-")[0];
+				var month = parseInt(_toay.split("-")[1]);
+				var lastDay = new Date(year, month, 0).getDate();
+				var lastDayFull = year + "-" + _toay.split("-")[1] + "-" + lastDay;
+				
+				$('#displayStartDttm').val(_toay + "T00:00:00");
+				$('#displayEndDttm').val(lastDayFull + "T00:00:00");
+			}
+			
+			chkInputCount();
+			setcontentSp();
+		});
+		
+		// 에디터 초기화 완료 후 callback 함수
+		function customInitEditor(editor,targer) {
+			// 지원정보 에디터 db 값 세팅
+			if("edt_content" == targer) {
+				editor.setContent($("#content").val());
+			}
+		}
+		
+		
+		
+		function goList() {
+			showConfirm( '입력한 내용이 저장되지 않습니다. 목록으로 돌아가시겠습니까?',
+					() => { 
+						moveList();
+					},
+					() => { },
+					'공지관리'
+			 )
+		}
+		
+		
+		function moveList() {
+			window.location.href='/csm/baekseo/list';
+		}
+		
+		function saveData() {
+			$("#content").val(tinymce.get('edt_content').getContent());
+			var isValid = validationCheck();
+			
+			if ( isValid ) {
+				showConfirm( '저장 하시겠습니까?',
+						() => { 
+							insupdProc();
+						},
+						() => { },
+						'저장'
+				 )
+			}else{
+				showAlert("필수 입력값을 입력해주세요.");
+			}
+		}
+		
+		/* 등록/수정 */
+		function insupdProc() {
+			
+			$('#displayStartDttm').prop("disabled", false);
+			$('#displayEndDttm').prop("disabled", false);
+			
+			/* 모든 조건을 충족시키면 넘긴다. */
+		   const form = document.getElementById("uploadForm");
+	  	   const formData = new FormData(form);
+			
+		
+			$.ajax({
+				url 		: '/csm/baekseo/insupdProc',
+				type 		: 'post',
+				enctype 	: 'multipart/form-data',
+				data 		: formData,
+				async 		: false,
+				contentType : false,
+				processData : false,
+				success 	: function (data) {
+					
+					console.log(data.data);
+					var alertTxt = '수정되었습니다.';
+					if ( $(location).attr('href').indexOf('goUpdatePage/0') != -1 ) {
+						alertTxt = '등록되었습니다';
+					}
+					showAlert(alertTxt, moveList);
+				},
+				error 		: function(request, status, error){
+					alert(error);
+				},
+				complete 	: function(){
+				}
+			});
+				
+		}
+		/*
+		   url : '/pbm/planbenefit/info/create',
+		   type : 'POST',
+		   dataType : "json",
+		   contentType:"application/json",
+		   data : JSON.stringify(params),
+			*/
+			
+		/* validation 체크 */
+		function validationCheck() {
+			
+			if( !_isDateForm($("#displayStartDttm").val()) ){
+				alert("올바른 날짜를 넣어주세요");
+				$("#displayStartDttm").focus();
+				return;
+			}
+			if( !_isDateForm($("#displayEndDttm").val()) ){
+				alert("올바른 날짜를 넣어주세요");
+				$("#displayEndDttm").focus();
+				return;
+			}
+		
+			
+			var validIdx = 0
+			
+			if ( !$('input:radio[name=contentSp]').is(":checked") ) {
+				$('#req-contentSp').find('.required').remove();
+				$('#req-contentSp').append('<span class="required">설명서 구분을 선택해 주세요.</span>');
+				validIdx++;
+			} else {
+				$('#req-contentSp').find('.required').remove();
+			}
+			
+			if ( !$('input:radio[name=displaySp]').is(":checked") ) {
+				$('#req-displaySp').find('.required').remove();
+				$('#req-displaySp').append('<span class="required">노출여부를 선택해 주세요.</span>');
+				validIdx++;
+			} else {
+				$('#req-displaySp').find('.required').remove();
+			}
+			
+			/* 제목 */
+			if ( $.trim($('input[name=title]').val()) == '' ) {
+				$('#req-title').find('.required').remove();
+				$('#req-title').append('<span class="required">제목을 입력해주세요.</span>');
+				validIdx++;
+			} else {
+				$('#req-title').find('.required').remove();
+			}
+			
+			/* 본문 */
+			if ( $.trim($("#content").val()) == '' ) {
+				$('#req-content').find('.required').remove();
+				$('#req-content').append('<span class="required">본문을 입력해주세요.</span>');
+				validIdx++;
+			} else {
+				$('#req-content').find('.required').remove();
+			}
+			
+			var flag = true;
+			if ( validIdx > 0 ) {
+				flag = false;
+			}
+			return flag;
+		}
+		
+		
+		function setdisplaySp() {
+			var displaySp = $('input:radio[name=displaySp]:checked').val();
+			if(displaySp == "0") {
+				$('#displayStartDttm').prop("disabled", true);
+				$('#displayEndDttm').prop("disabled", true);
+			} else {
+				$('#displayStartDttm').prop("disabled", false);
+				$('#displayEndDttm').prop("disabled", false);
+			}
+			
+		}
+		
+		
+		function setcontentSp() {
+			var contentSp = $('input:radio[name=contentSp]:checked').val();
+			
+			if(contentSp == "01") {
+				$('#bannerUpliadDv').hide();
+			} else {
+				$('#bannerUpliadDv').show();
+			}
+			
+		}
+		
+		function chkInputCount(){
+			 $("#titleInputLength").html("(" + $("#title").val().length + "/" + "50)");
+		}
+		
+
+		
+	</script>
+</th:block>
+
+<div class="main-content">
+	<div class="container-fluid">
+	<div class="page-header  d-flex justify-content-between align-items-start">
+		<div>
+			<div class="location mb-2">
+			<small class="text-secondary">
+				<i class="fas fa-home me-1"></i>
+				<a href="javascript:;">홈</a>
+				>
+				<a href="javascript:;">서비스 관리</a>
+				>
+				<a href="/csm/baekseo/list">세모통설명서 관리</a>
+			</small>
+		</div>
+		<h2 class="page-title fs-4 mb-4" th:text="${result == null} ? '설명서 등록' : '설명서 수정'"></h2>
+		</div>
+	</div>
+		 
+	<!-- 등록 폼 섹션 -->
+	<form id="uploadForm">
+		
+		<input type="hidden" name="id" id="id" th:value="${result?.id}"/>
+		
+		<div class="search-section detail">
+			<!--  구분	 -->
+			<div class="form-row full-width">
+				<div class="form-label">
+						 구분<span class="required">*</span>
+				</div>
+				<div class="form-control-wrap" id="req-contentSp">
+					<div class="form-check-group">
+						
+						<th:block th:if="${result?.contentSp eq '01'}">
+						<div class="form-check">
+							<input class="form-check-input" type="radio" id="contentSp01"			name="contentSp" th:checked="${result?.contentSp eq '01'}" value="01"  >
+							<label class="form-check-label" for="contentSp01">설명서</label>
+						</div>
+						</th:block>
+						
+						<th:block th:unless="${result?.contentSp eq '01'}">
+						<div class="form-check">
+							<input class="form-check-input" type="radio" id="contentSp02" 			name="contentSp" th:checked="${result?.contentSp eq '02' or result?.contentSp eq null }" value="02" >
+							<label class="form-check-label" for="contentSp02">백서</label>
+						</div>
+						</th:block>
+						
+					</div>
+				</div>
+			</div>
+			
+			<div class="form-row full-width">
+				<div class="form-label">
+						 노출여부<span class="required">*</span>
+				</div>
+				<div class="form-control-wrap" id="req-displaySp">
+					<div class="form-check-group">
+						<div class="form-check">
+							<input class="form-check-input" type="radio" id="displaySp0"			name="displaySp" th:checked="${result?.displaySp eq '0' }" value="0" onclick="setdisplaySp()"><!-- 0:상시, 1:기간 -->
+							<label class="form-check-label" for="displaySp0">디폴트</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" id="displaySp1"			name="displaySp" th:checked="${result?.displaySp eq '1'}" value="1" onclick="setdisplaySp()">
+							<label class="form-check-label" for="displaySp1">노출기간설정</label>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			
+			<!-- 시작일시 -->
+			<div class="form-row full-width">
+				<div class="form-label">
+						 시작일시
+				</div>
+				<div class="form-control-wrap">
+					<input type="datetime-local" class="form-control" style="width: 150px" 		name="displayStartDttm" th:value="${result?.displayStartDttm}" id="displayStartDttm">
+				</div>
+			</div>
+			<div class="form-row full-width">
+				<div class="form-label">
+						 종료일시
+				</div>
+				<div class="form-control-wrap">
+					<input type="datetime-local" class="form-control" style="width: 150px" 		name="displayEndDttm" th:value="${result?.displayEndDttm}" id="displayEndDttm">
+				</div>
+			</div>
+			
+			<!-- 배너 등록 event_thumbnail -->
+			<div class="form-row full-width" id="bannerUpliadDv">
+				<div class="form-label">
+						배너 등록<span class="required">*</span>
+				</div>
+				<div class="form-control-wrap event-banner__uploader" id="req-eventThumbnail">
+					<div class="file-input-wrap">
+						<input type="hidden" 						id="bannerImage" 	name="bannerImage" 	th:value="${result?.image}">
+						<input type="file" class="uploader__input" 	id="file1" 			name="file1" 		onchange="BannerUploader.preview(this, 'preview2')" accept="image/*">
+						<input type="text" class="form-control" 	id="fileText1" 		name="fileText1"	th:value="${result?.image}" readonly>
+						<button type="button" class="btn btn-secondary" onclick="BannerUploader.trigger('file1')" style="min-width:70px">찾기</button>
+					</div>
+					<div class="file-info c_red"></div>
+					<div class="uploader__preview" id="preview2">
+						<img th:src="@{${result?.image}}"  class="uploader__preview-image">
+					</div>
+				</div>
+			</div>
+			<!-- 제목 -->
+			<div class="form-row full-width">
+				<div class="form-label" >
+						 제목<span class="required">*</span>
+				</div>
+				<div class="form-control-wrap-flex w80" id="req-title">
+					<input type="text"  class="form-control" placeholder="제목을 등록해 주세요"	id="title" name="title" th:value="${result?.title}" maxlength="50" oninput="chkInputCount();">
+					<span id="titleInputLength"></span>
+				</div>
+			</div>
+			
+			<div class="form-row full-width">
+				<div class="form-label">
+					본문<span class="required">*</span>
+				</div>
+				<div class="form-control-wrap" id="req-content">
+					<div class="form-check-group">
+						
+						<textarea placeholder="내용을 입력하세요." 	id="edt_content" th:value="${result?.content}"></textarea>
+						<textarea style="display:none" 	id="content" name="content" th:value="${result?.content}" th:text="${result?.content}"></textarea>
+						<!-- display:none -->
+					</div>
+				</div>
+			</div>
+		
+			
+		
+		</div><!-- End Detail -->
+			
+		
+		
+	</form>
+	<!-- 버튼 영역 -->
+	<div class="d-flex justify-content-center gap-2 mt-4">
+		<button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" 	onclick="goList();">취소</button>
+		<button type="button" class="btn btn-lg btn-dark px-4 btn-sm" 		onclick="saveData()">저장</button>
+	</div>
+		 
+		 
+		
+
+	</div>
+</div>

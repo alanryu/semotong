@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/today_layout}"
+	  layout:fragment="Content"
+	  th:with="layoutSubTitleYN ='N', subPageTitle = '', goBackYN ='N', noneFunctionnaly = 'noFooterTop', menuId='03' ">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+
+	<!-- 페이지 스크립트 영역 -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.0.0/swiper-bundle.min.css" />
+	<script src="https://cdn.jsdelivr.net/npm/swiper@7.0.0/swiper-bundle.min.js"></script>
+	
+<script id="internetMnoListmpl" type="text/x-jquery-tmpl">
+	<li class="telecom-item">  
+		<label class="telecom-rdo is-selected"> 
+	{{if id == 1 }}
+				<input type="radio" name="frmTelecom" value="${id}" onchange="setRadioSelected('frmTelecom', '.telecom-rdo'); planViewHendler('${tmpViewStr}', '${name}');" id="firstMno"> 
+	{{else}}
+				<input type="radio" name="frmTelecom" value="${id}" onchange="setRadioSelected('frmTelecom', '.telecom-rdo'); planViewHendler('${tmpViewStr}', '${name}');"> 
+	{{/if}}
+			<span class="telecom-con"> 
+				<i class="ui-icn ${classNm}" aria-label="${name}"></i>
+			</span>
+		</label>
+	</li>
+</script>
+
+<script id="internetPlanListmpl" type="text/x-jquery-tmpl">
+	<li class="choice-item swiper-slide">
+		<label class="choice-rdo">
+	{{if idx == 0 }}
+				<input type="radio" value="${id}" name="frmInternet" onchange="setRadioSelected('frmInternet', '.choice-rdo'); goChannelSearch('${prodName}', '${channelCount }')" id="firstPlan">
+	{{else}}
+				<input type="radio" value="${id}" name="frmInternet" onchange="setRadioSelected('frmInternet', '.choice-rdo'); goChannelSearch('${prodName}', '${channelCount}')">
+	{{/if}}
+			<span class="choice-con">
+				<strong class="tit">${prodName}</strong>
+	{{if channelCount != 0}}
+					<span class="txt">${channelCount}채널</span>
+	{{else}}
+					<span class="txt">  &nbsp;</span>
+	{{/if}}
+			</span>
+		</label>
+	</li>
+</script>
+	
+<script id="internetSpeedListmpl" type="text/x-jquery-tmpl">
+		<li class="choice-item swiper-slide">
+			<label class="choice-rdo">
+	{{if idx == 0 }}
+					<input type="radio" name="frmChanel" onchange="setRadioSelected('frmChanel', '.choice-rdo'); choicePlanLast('${normalPrice}', '${normalFreeblePrice}', '${id}', '${stressTxt}')" id="firstSpeed">
+	{{else}}
+					<input type="radio" name="frmChanel" onchange="setRadioSelected('frmChanel', '.choice-rdo'); choicePlanLast('${normalPrice}', '${normalFreeblePrice}', '${id}', '${stressTxt}')">
+	{{/if}}
+				<span class="choice-con">
+					<strong class="tit">${internetSpeedName}bps</strong>
+	{{if internetSpeedName == '500M' || internetSpeedName == '1G' }}
+						<span class="txt">빠른 속도</span>
+						<span class="txt">4인 가구</span>
+						<i class="ui-icn icn-h20-speed-high" aria-hidden="true"></i>
+	{{else}}
+						<span class="txt">보통 속도</span>
+						<span class="txt">1~2인 가구</span>
+		{{if internetSpeedName == '200M' }}
+							<i class="ui-icn icn-h20-speed-nor" aria-hidden="true"></i>
+		{{else}}
+							<i class="ui-icn icn-h20-speed-low" aria-hidden="true"></i>
+		{{/if}}
+	{{/if}}
+				</span>
+			</label>
+		</li>
+</script>
+	<script>
+		var searchSiteSp = "[[${siteSp}]]";
+	
+		// DOMContentLoaded
+		$( document ).ready(function() {
+			if( '[[${session.isLoginYn}]]' == 'Y' ){
+				$('#hSessionId').val(	'[[${userInfoMap.id				}]]');
+				$('#frmName').val(		'[[${userInfoMap.username		}]]');
+				$('#frmPhoneNum').val(		'[[${userInfoMap.phoneNumber	}]]'.replace('+82 ', '0'));
+			}
+			getInternetMnoList();
+		})
+	
+	
+		function planViewHendler(id, name){
+			
+			//조건표 컨트롤
+			const planViewSec = document.querySelectorAll('.plan-view-sec'); 
+			planViewSec.forEach((element) => {
+				if (element.id === id) {
+					// 주어진 id와 일치하는 요소는 is-hide 클래스 제거
+					element.classList.remove('is-hide');
+				} else {
+					// 나머지 요소는 is-hide 클래스 추가
+					element.classList.add('is-hide');
+				}
+			});
+			
+			//MNO id 저장
+			let mnos = $('input:radio[name=frmTelecom]');
+			for(let i = 0 ; i < mnos.length ; i++){
+				if(mnos[i].checked){
+					$('input:hidden[name=hMnoId]').val(mnos[i].value);
+					$("#choiceMNOtext1").text(name);
+					$("#choiceMNOtext2").text(name);
+				}
+			}
+			
+			
+			getInternetPlanList();
+		}
+		
+		
+		function getInternetMnoList() {
+			var params = {}
+					  
+				$.ajax({
+				   url : '/internetMno/getMnoList',
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+				   beforeSend: function(xhr){
+				       xhr.setRequestHeader(header,token);
+				   },
+					success: function (data) {
+						$('#internetMnoList').empty();
+						
+						var html = '';
+						
+						const filteredData = data.data.filter(item => [1, 2, 3].includes(item.id));
+						
+						console.log(filteredData);
+						$.each(filteredData, function( idx, obj ){
+							
+							obj.tmpViewStr = 'planViewKT';
+							obj.classNm = 'icn-104-choice-kt-nor';
+							if(obj.id == 1){
+								obj.tmpViewStr = 'planViewKT';
+								obj.classNm = 'icn-104-choice-kt-nor';
+							}else if(obj.id == 2){
+								obj.tmpViewStr = 'planViewLGUplus';
+								obj.classNm = 'icn-104-choice-lg-nor';
+							}else if(obj.id == 3){
+								obj.tmpViewStr = 'planViewSK';
+								obj.classNm = 'icn-104-choice-sk-nor';
+							}else if(obj.id == 4){
+								obj.tmpViewStr = 'planViewSkylife';
+								obj.classNm = 'icn-104-choice-skylife-nor';
+							}else if(obj.id == 5){
+								obj.tmpViewStr = 'planViewLGHV';
+								obj.classNm = 'icn-104-choice-lghv-nor';
+							}else if(obj.id == 6){
+								obj.tmpViewStr = 'planViewSKB';
+								obj.classNm = 'icn-104-choice-skb-nor';
+							}
+							
+						});
+						
+						$('#internetMnoListmpl').tmpl(filteredData).appendTo('#internetMnoList');
+						
+					},
+					error : function(request, status, error){
+						alertModalShow(error,"");
+					},
+					complete:function(){
+						//통신 후 > 화면 다시 수정 후 > 이거 하면 먹는다.
+						$("#firstMno").trigger('click');
+						//hidden 에 MNO id 저장
+						let mnos = $('input:radio[name=frmTelecom]');
+						let checkedid = '';
+						for(let i = 0 ; i < mnos.length ; i++){
+							if(mnos[i].checked){
+								$('input:hidden[name=hMnoId]').val(mnos[i].value);		//hidden 에 id 저장
+							}
+						}
+						
+					}
+				});
+		}
+		
+		
+		function getInternetPlanList() {
+			
+			var paramid = $('input:hidden[name=hMnoId]').val();
+			
+			var params = {
+							searchInternetMno : paramid,
+							searchSiteSp:searchSiteSp
+						}
+			$.ajax({
+					url : '/internet/getInternetPlanList'
+					,type : 'POST'
+					,dataType : "json"
+					,contentType:"application/json"
+					,data : JSON.stringify(params)
+					,beforeSend: function(xhr){
+						xhr.setRequestHeader(header,token);
+					}
+					,success: function (data) {
+						$('#internetPlanList').empty();
+						
+						var html = '';
+						$.each(data.data, function( idx, obj ){
+							obj.idx = idx;
+						});
+						$('#internetPlanListmpl').tmpl(data.data).appendTo('#internetPlanList');
+						
+						// 상품선택 스와이프
+						var productChoiceSwiper = new Swiper("#productSwiper", {
+							threshold: 3,
+							slidesPerView: 'auto',
+							spaceBetween: 12,
+							navigation: {
+								nextEl: ".product-choice-sec .choice-button-next",
+								prevEl: ".product-choice-sec .choice-button-prev",
+							}
+						});		
+						
+						productChoiceSwiper.update(); // DOM 변경 감지
+						productChoiceSwiper.slideTo(0, 0); // 첫 번째 슬라이드로 이동
+						
+					}
+					,error : function(request, status, error){
+						alertModalShow(error,"");
+					}
+					,complete:function(){
+						$("#firstPlan").trigger('click');
+					}
+			});
+		}
+		
+		function goChannelSearch(prd, chn){
+			
+			var paramid = $('input:hidden[name=hMnoId]').val();
+			
+			var params = {
+							searchInternetMno : paramid
+							,searchProdName : prd
+							,searchChannelCount : chn
+							,searchSiteSp : searchSiteSp
+						}
+			$.ajax({
+					url : '/internet/getInternetSpeedList'
+					,type : 'POST'
+					,dataType : "json"
+					,contentType:"application/json"
+					,data : JSON.stringify(params)
+					,beforeSend: function(xhr){
+						xhr.setRequestHeader(header,token);
+					}
+					,success: function (data) {
+						$('#internetSpeedList').empty();
+						
+						var html = '';
+						$.each(data.data, function( idx, obj ){
+							obj.idx = idx;
+																			
+						});
+						$('#internetSpeedListmpl').tmpl(data.data).appendTo('#internetSpeedList');
+						
+						//인터넷 속도 선택 스와이프
+						var internetChoiceSwiper = new Swiper("#internetSwiper", {
+							threshold: 3,
+							slidesPerView: 'auto',
+							spaceBetween: 12,
+							navigation: {
+								nextEl: ".internet-choice-sec .choice-button-next",
+								prevEl: ".internet-choice-sec .choice-button-prev",
+							}
+						});
+						
+					}
+					,error : function(request, status, error){
+						alertModalShow(error,"");
+					}
+					,complete:function(){
+						$("#firstSpeed").trigger('click');
+					}
+			});
+		}
+		
+		function choicePlanLast(nPrice, nFPrice, planId, stressTxt){
+			
+			//신청 상품 ID 임시저장.
+			$('input:hidden[name=hPlanId]').val(planId);
+			
+			const np = nPrice.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+			const nfp = nFPrice.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+			
+			
+			$("#choicePriceText").text('월 ' + np + '원');
+			$("#choiceFPriceText").text('최대 ' + nfp + '원');
+			
+			if ( stressTxt != 'null' && stressTxt != '' ) {
+				$('.stress-txt').show();
+				$('#stress-txt').html(stressTxt);
+			} else {
+				$('.stress-txt').hide();
+			}
+		}
+		
+		document.addEventListener("DOMContentLoaded", () => {
+			
+			// GNB Trigger
+			const nav = document.querySelector('.header-desktop .header-nav');
+			const navItems = document.querySelectorAll('.header-desktop .header-nav .nav-item');
+
+			let currentItem = null;
+
+			navItems.forEach(function (item) {
+				item.addEventListener('mouseenter', function () {
+					// 이전에 켜진 메뉴 끄기
+					if (currentItem && currentItem !== item) {
+						currentItem.classList.remove('is-on');
+					}
+					item.classList.add('is-on');
+					currentItem = item;
+				});
+			});
+
+			// nav 전체를 벗어나면 모든 메뉴 닫기
+			nav.addEventListener('mouseleave', function () {
+				navItems.forEach(function (item) {
+					item.classList.remove('is-on');
+				});
+				currentItem = null;
+			});
+			
+			// 상품 스와이프
+		    var productChoiceSwiper = new Swiper("#productSwiper", {
+				threshold: 3,
+				slidesPerView: 'auto',
+				spaceBetween: 12,
+				// 4차 수정 : 상풍 스와이프 버튼 옵션 추가
+				navigation: {
+					nextEl: ".product-choice-sec .choice-button-next",
+					prevEl: ".product-choice-sec .choice-button-prev",
+				}
+			});
+
+			// 인터넷 선택 스와이프
+		    var internetChoiceSwiper = new Swiper("#internetSwiper", {
+				threshold: 3,
+				slidesPerView: 'auto',
+				spaceBetween: 12,
+				// 4차 수정 : 인터넷 스와이프 버튼 옵션 추가
+				navigation: {
+					nextEl: ".internet-choice-sec .choice-button-next",
+					prevEl: ".internet-choice-sec .choice-button-prev",
+				}
+			});
+		})
+		
+		
+		
+		//상담 신청 modal, login 확인
+		function goApply(){
+			
+			$("#goApplyModalOpen").trigger('click');
+		}
+		
+		
+		const pattern = /^(01[016789]{1}|02|0[3-9]{1}[0-9]{1})-?[0-9]{3,4}-?[0-9]{4}$/;
+
+		function telValidChk(tel) {
+			if(pattern.test(tel) === false) { return false; }
+		    else { return true; }
+		}
+		
+		//상담 신청 modal, commit
+		function goApplyCommit(){
+			
+			var inputPlanId 			= $('#hPlanId').val();
+			var inputUserId 			= $('#hSessionId').val();
+			var inputUserName 			= $('#frmName').val();
+			var inputUserPhoneNumber 	= $('#frmPhoneNum').val();
+			var inputUserMno =  $('input:radio[name=frmTelecom]:checked').val();
+			
+			if(!telValidChk(inputUserPhoneNumber)){
+				alertModalShow('', '정확한 번호를 입력해주세요.');
+				$('#frmPhoneNum').focus();
+				return;
+			}
+			if($.trim(inputUserName) == '' ) {
+				alertModalShow('', '이름을 입력해주세요.');
+				$('#frmName').focus();
+				return;
+			}
+			
+			if(inputUserId=="") inputUserId = "-1";
+
+			var params = {
+							reqUser 		: inputUserId
+							,inputPlanId 	: inputPlanId
+							,inputName 		: inputUserName
+							,inputNumber 	: inputUserPhoneNumber
+							,siteSp 		: searchSiteSp
+							,inputMno : inputUserMno
+							,incomSp : "01"
+							,incomUrl : ""
+							,rdpMngId : 0
+						}
+			
+			$.ajax({
+				url : '/pmb/internetreq/create'
+				,type : 'POST'
+				,dataType : "json"
+				,contentType:"application/json"
+				,data : JSON.stringify(params)
+				,beforeSend: function(xhr){
+					xhr.setRequestHeader(header,token);
+				}
+				,success: function (data) {
+					
+				}
+				,error : function(request, status, error){
+					alertModalShow(error,"");
+				}
+				,complete:function(){
+					
+					$("#ToAlertModal").trigger('click');
+				}
+			});
+			
+		}
+		
+
+		function goPersnalAgreement(){
+			var url = window.location.protocol + '//' + window.location.host + '/inc/internetPonitto/ponitto_internet_terms.html';
+			window.open(url, '_blank');
+		}
+		
+		
+		
+		function stayThis() {
+			$('#frmPhoneNum').focus();
+		}
+		
+	</script>
+	
+</th:block>
+		
+		<!-- Container -->
+		<main role="main" class="container">
+		
+			<!-- sancho -->
+			<input type="hidden" name="hMnoId"	id="hMnoId" 	value="">
+			<input type="hidden" name="hPlanId"	id="hPlanId" 	value="">
+			
+			<!-- value="${session.userInfo.id}"  이렇게 쓰면 이게 string 으로 들어간다. 죈장 -->
+			<input type="hidden" 	name="hSessionId"			id="hSessionId" 			value="">
+			
+			<!-- sancho -->
+			
+			<!-- content -->
+			<!-- 2024-11-28 조찬기 : 주요내용 전체변경 -->
+
+			<div class="content internet-tv-page">
+
+								<!-- 이벤트 섹션 -->
+				<section class="event-sec">
+					<div class="sec-inner">
+						<div class="event-bnr">
+							<img src="/images/common/bnr_01_mo.png" alt="이벤트 내용" class="only-mo" />
+							<img src="/images/common/bnr_01_pc.png" alt="이벤트 내용" class="only-pc" />
+						</div>
+					</div>
+				</section>
+				<!-- // 이벤트 섹션 -->
+				
+				<!-- 통신사 선택 섹션 -->
+				<section class="telecom-choice-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">통신사를 선택해주세요</h2>
+						</div>
+						<div class="sec-body">
+							<ul class="telecom-list" id="internetMnoList">
+							</ul>
+							<!-- <ul class="choice-list" id="internetMnoList">
+							</ul> -->
+						</div>
+					</div>
+				</section>
+				<!-- // 통신사 선택 섹션 -->
+
+				<!-- 상품 선택 섹션 -->
+				<section class="product-choice-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">상품을 선택해주세요.</h2>
+						</div>
+						<div class="sec-body">
+							<div class="swiper choice-swiper" id="productSwiper">
+								<ul class="choice-list swiper-wrapper" id="internetPlanList">
+								</ul>
+							</div>
+							<!-- 4차 수정 : 상품 스와이프 버튼 추가 -->
+							<button type="button" class="ui-btn choice-button-prev">
+								<i class="ui-icn icn-28-arw" aria-label="Prev"></i>
+							</button>
+							<button type="button" class="ui-btn choice-button-next">
+								<i class="ui-icn icn-28-arw" aria-label="Next"></i>
+							</button>
+						</div>
+					</div>
+				</section>
+				<!-- // 상품 선택 섹션 -->
+
+				<!-- 인터넷 선택 섹션 -->
+				<section class="internet-choice-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">사용하실 인터넷을 선택해주세요.</h2>
+						</div>
+						<div class="sec-body">
+							<!-- 2024-12-23 조찬기 : 인터넷 Swiper 적용
+								[SCSS] 2024-12-23 조찬기 인터넷 Swiper 적용 및 list 수정
+							-->
+							<div class="swiper choice-swiper" id="internetSwiper">
+								<ul class="choice-list swiper-wrapper" id="internetSpeedList">
+								</ul>
+							</div>
+							<!-- 4차 수정 : 인터넷 스와이프 버튼 추가 -->
+							<button type="button" class="ui-btn choice-button-prev">
+								<i class="ui-icn icn-28-arw" aria-label="Prev"></i>
+							</button>
+							<button type="button" class="ui-btn choice-button-next">
+								<i class="ui-icn icn-28-arw" aria-label="Next"></i>
+							</button>
+						</div>
+					</div>
+				</section>
+				<!-- // 인터넷 선택 섹션 -->
+
+				<!-- 요금제 누눈에 보기 섹션 - 숨김처리: is-hide -->
+				<!-- Case KT -->
+				<section class="plan-view-sec" id="planViewKT">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">KT 요금제 한눈에 보기</h2>
+						</div>
+						<div class="sec-body">
+							<div class="plan-table">
+								<!-- 2차 수정 : 사은품 만원단위로 변경 -->
+								<script>$('#planViewKT .plan-table').load('/inc/internetPonitto/include-table-kt.html')</script>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- //Case KT -->
+
+				<!-- Case LGU+ -->
+				<section class="plan-view-sec is-hide" id="planViewLGUplus">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">LGU+ 요금제 한눈에 보기</h2>
+						</div>
+						<div class="sec-body">
+							<div class="plan-table">
+								<!-- 2차 수정 : 사은품 만원단위로 변경 -->
+								<script>$('#planViewLGUplus .plan-table').load('/inc/internetPonitto/include-table-lg.html')</script>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- //Case LGU+ -->
+
+				<!-- Case SK -->
+				<section class="plan-view-sec is-hide" id="planViewSK">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">SK 요금제 한눈에 보기</h2>
+						</div>
+						<div class="sec-body">
+							<div class="plan-table">
+								<!-- 2차 수정 : 사은품 만원단위로 변경 -->
+								<script>$('#planViewSK .plan-table').load('/inc/internetPonitto/include-table-sk.html')</script>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- //Case SK -->
+
+				<!-- Case skylife -->
+				<section class="plan-view-sec is-hide" id="planViewSkylife">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">skyLife 요금제 한눈에 보기</h2>
+						</div>
+						<div class="sec-body">
+							<div class="plan-table">
+								<!-- 2차 수정 : 요금표 업데이트 -->
+								<script>$('#planViewSkylife .plan-table').load('/inc/internetPonitto/include-table-skylife.html')</script>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- //Case skylife -->
+
+				<!-- Case 헬로비전 -->
+				<section class="plan-view-sec is-hide" id="planViewLGHV">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">LG HelloVision 요금제 한눈에 보기</h2>
+						</div>
+						<div class="sec-body">
+							<div class="plan-table">
+								<!-- 2차 수정 : 요금표 업데이트 -->
+								<script>$('#planViewLGHV .plan-table').load('/inc/internetPonitto/include-table-lghv.html')</script>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- //Case 헬로비전 -->
+
+				<!-- Case SKB -->
+				<section class="plan-view-sec is-hide" id="planViewSKB">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">SKB 요금제 한눈에 보기</h2>
+						</div>
+						<div class="sec-body">
+							<div class="plan-table">
+								<!-- 2차 수정 : 요금표 업데이트 -->
+								<script>$('#planViewSKB .plan-table').load('/inc/internetPonitto/include-table-skb.html')</script>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- //Case SKB -->
+				<!-- // 요금제 누눈에 보기 섹션 -->
+
+				<!-- 인터넷 가입절차 섹션 -->
+				<section class="join-steps-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">인터넷 가입 절차 알려드려요</h2>
+						</div>
+						<div class="sec-body">
+							<ol class="join-steps">
+								<li>
+									<em class="num">1</em>
+									<dl class="con">
+										<dt>친절 상담</dt>
+										<dd>최적요금제 추천, 업셀링 NO!</dd>
+									</dl>
+								</li>
+								<li>
+									<em class="num">2</em>
+									<dl class="con">
+										<dt>신청서 작성</dt>
+										<dd>3분이면 작성완료!</dd>
+									</dl>
+								</li>
+								<li>
+									<em class="num">3</em>
+									<dl class="con">
+										<dt>본사 접수</dt>
+										<dd>상담 후 3시간 이내</dd>
+									</dl>
+								</li>
+								<li>
+									<em class="num">4</em>
+									<dl class="con">
+										<dt>설치 완료</dt>
+										<dd>원하는 날짜에 설치 가능! (신청 후 1~2일)</dd>
+									</dl>
+								</li>
+								<li>
+									<em class="num">5</em>
+									<dl class="con">
+										<dt>사은품 입금</dt>
+										<dd>설치 당일 혹은 익일 입금!</dd>
+									</dl>
+								</li>
+							</ol>
+						</div>
+					</div>
+				</section>
+				<!-- // 인터넷 가입절차 섹션 -->
+
+				<!-- 납부금액 알림 섹션 -->
+				<section class="payment-noti-sec is-hide">
+					<div class="sec-inner">
+						<div class="payment-noti">
+							<div class="payment-tit">
+								<h2 class="blind">월 납부금액 알려드릴게요.</h2>
+								<p class="charge"><strong>월 납부금액</strong> <strong id="choicePriceText">월 25,500원</strong></p>
+								<p class="merge stress-txt"><strong class="stress-txt" id="stress-txt">알뜰폰 결합시 월 25,500원</strong></p>
+								<p class="freeGift"><span>현급 지급 사은품</span> <strong id="choiceFPriceText">최대 480,000원</strong></p>
+								<p class="explan"><i class="ui-icn icn-14-info-gr"></i>자세한 요금은 상담 시 안내드릴게요</p>
+							</div>
+							<div class="payment-btn">
+							
+								<!-- 눈에 보이는 신청하기  -->
+								<button type="button" class="ui-btn btn-action primary" onclick="javascript:goApply();">
+									<span>상담 신청하기</span>
+								</button>
+								
+								<button type="button" class="ui-btn btn-action primary" data-bs-toggle="modal" data-bs-target="#FI0101P01Modal" style="display:none;" id="goApplyModalOpen">
+									<span>상담 신청하기</span>
+								</button>
+								
+								
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- // 납부금액 알림 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+
+	<!--
+		[모달 가이드]
+		모달 효과 : fade (공통)
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+		// 1차 수정 : fade-pc 사용안함, fade 공통으로 사용
+	-->
+	<!-- 인터넷 상품 상담 신청하기 modal basic -->
+	<div class="modal modal-basic fade" id="FI0101P01Modal" tabindex="-1" role="dialog" aria-labelledby="FI0101P01ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content consult-app-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FI0101P01ModalLabel"><p id="choiceMNOtext1"></p></h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+
+				</div>
+				<div class="modal-body">
+					<!-- 상담신청 섹션 -->
+					<section class="consult-frm-sec">
+						<div class="sec-inner">
+							<div class="sec-header">
+								<h4 class="sec-tit">빠르게 연락드릴게요.</h4>
+							</div>
+							<div class="sec-body">
+								<div class="consult-msg">
+									<i class="ui-icn icn-14-noti-gr" aria-hidden="true"></i>
+									<p>이미 <span id="choiceMNOtext2"></span> 인터넷을 쓰고 계시다면 사은품은 지급되지 않아요. 사은품은 신규가입자 대상이에요.</p>
+								</div>
+
+								<!-- 등록폼 -->
+								<div class="consult-frm">
+									<!-- 이름 선택 -->
+									<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+									<div class="frm-field">
+										<div class="frm-title">
+											<label class="tit" for="frmName">이름</label>
+										</div>
+										<div class="frm-content">
+											<div class="ui-inp">
+												<input type="text" name="" id="frmName" value="" placeholder="이름을 입력해 주세요." title="" class="inp" />
+											</div>
+										</div>
+									</div>
+									<!-- // 이름 선택 -->
+
+									<!-- 전화번호 입력 -->
+									<div class="frm-field">
+										<div class="frm-title">
+											<label for="frmPhoneNum" class="tit">전화번호</label>
+										</div>
+										<div class="frm-content">
+											<div class="ui-inp">
+												<input type="tel" name="" id="frmPhoneNum" value="" placeholder="전화번호를 입력해 주세요." title="" class="inp" oninput="setRegularNumber(this);inputTelNo(this);"/>
+											</div>
+										</div>
+									</div>
+									<!-- // 전화번호 입력 -->
+								</div>
+								<!-- // 등록폼 -->
+
+								<div class="consult-links">
+									<button type="button" class="ui-btn btn-texted" onclick="goPersnalAgreement()"><span>개인정보 수집 이용</span></button>
+								</div>
+							</div>
+						</div>
+					</section>
+					<!-- // 상담신청 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary" onclick="javascript:goApplyCommit();" id="modalBlurA">
+						<span>상담 신청하기</span>
+					</button>
+					<!-- modal 띄우기용 script 에서 .trigger click사용 -->
+					<button type="button" class="ui-btn btn-action primary" data-bs-toggle="modal" data-bs-target="#FI0101P02Modal" style="display:none;" id="ToAlertModal">
+						<span>상담 신청하기</span>
+					</button>
+					
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 인터넷 상품 상담 신청하기 modal basic -->
+	
+		<!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+	-->
+	<!-- Modal Alert -->
+	<div class="modal modal-alert fade" id="FI0101P02Modal" tabindex="-1" role="alertdialog" data-bs-backdrop="static" aria-labelledby="FI0101P02ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title blind" id="FI0101P02ModalLabel">Alert Message</h3>
+				</div>
+				<div class="modal-body">
+					<section class="msg-sec">
+						<h4 class="sec-tit">상담을 신청했어요.</h4>
+						<p class="sec-txt">감사합니다. 고객님. <br>입력하신 번호로 상담 전화를 드릴게요.</p>
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal primary" data-bs-dismiss="modal">
+						<span>확인</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // Modal Alert -->
+	
+	
+	
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='세모통 백서', layoutSubTitleYN='N', layoutFooterYn='Y', menuId='01' ">
+	  
+  <!-- index.html 고유 CSS 추가 -->
+  <th:block layout:fragment="css">
+	  <!--	<link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+  </th:block>
+  <!-- index.html 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+   <!--	<script th:src="@{/js/page/home.js}"></script>-->
+   
+ <script id="bakseoListTmpl" type="text/x-jquery-tmpl">
+	<li class="howto-item" onclick="goDetailPage('${id}');">
+		<div role="link" class="howto-card" tabindex="0">
+			<div class="card-thumb">
+				<img src="${image}" alt="" />
+			</div>
+			<div class="card-cont">
+				<p>${title}</p>
+			</div>
+		</div>
+	</li>
+ </script>
+
+ <script>
+	
+	function goDetailPage(id) {
+		//window.location="/csm/baekseo/baekseoDetail?id="+id;
+		window.location="/csm/baekseo/detail/"+id;
+	}
+	
+	//엔터 검색 
+	function OnKeyEnter() {
+		if (window.event.keyCode == 13) {
+			$("#nowpage").val(1);			//엔터 검색은 무조건 처음으로 본다.
+			getBakseoList();
+		}
+	}
+	
+	function clickSearchList() {
+		$("#nowpage").val(1);			//엔터 검색은 무조건 처음으로 본다.
+		getBakseoList();
+	}
+	
+	function readMore(){
+		var nowpage = $('#nowpage').val();
+		var newpage = Number(nowpage) +1;
+		$('#nowpage').val(newpage);
+		
+		getBakseoList();
+	}	
+	
+	function getBakseoList() {
+		var nowpage 		= $('#nowpage').val();
+		var pageSize 	= 10;
+		
+		var params = {
+			 title : $("#searchTitle").val()
+			 ,contentSp : "02" // 구분(01:설명서, 02: 백서)
+			 ,page : nowpage
+			 ,recordSize : pageSize
+			}
+			
+		$.ajax({
+			url : '/csm/baekseo/list',
+			type : 'POST',
+			dataType : "json",
+			contentType:"application/json",
+			data : JSON.stringify(params),
+			beforeSend: function(xhr){
+				xhr.setRequestHeader(header,token);
+			},
+			success: function (data) {
+				if(nowpage == 1){
+					$('#bakseoList').empty();
+				}
+				
+				var cnt = data.totalCnt;
+				const np = cnt.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+				$("#totCntText").text('총 ' + np + '개');
+				$('#bakseoListTmpl').tmpl(data.data).appendTo('#bakseoList');
+				
+				if(nowpage*pageSize >= cnt){
+					$('#readMoreBtn').hide();
+				}else{
+					$('#readMoreBtn').show();
+					
+				}
+									
+									
+			},
+			error : function(request, status, error){
+				alertModalShow(error);
+			},
+			complete:function(){
+			   // $('#loading').addClass('display-none');
+			}
+		});
+	}
+  	
+  	
+  	$( document ).ready(function() {
+  		getBakseoList("");
+  	});
+   </script>
+  </th:block>
+  
+  <!-- Container -->
+  <main role="main" class="container">
+	
+	<input type="hidden" name="nowpage"			id="nowpage" 			value="1">
+	
+  	<!-- content -->
+  	<div class="content">
+  		<div class="ui-tab tab-style1">
+  			<ul class="tab-list" role="tablist">
+<!--   				<li class="tab-item" role="presentation">
+  					<button class="tab-link" id="tab-11" data-bs-toggle="tab" data-bs-target="#tab-11-pane" type="button" role="tab" aria-controls="tab-11-pane" aria-selected="false" onclick="navigateTo('/csm/baekseo/mvnoInfo');">세모통이란?</button>
+  				</li> -->
+  				<li class="tab-item" role="presentation">
+  					<button class="tab-link active" id="tab-12" data-bs-toggle="tab" data-bs-target="#tab-12-pane" type="button" role="tab" aria-controls="tab-12-pane" aria-selected="true">세모통 백서</button>
+  				</li>
+  				<li class="tab-item" role="presentation">
+  					<button class="tab-link" id="tab-13" data-bs-toggle="tab" data-bs-target="#tab-13-pane" type="button" role="tab" aria-controls="tab-13-pane" aria-selected="false" onclick="navigateTo('/cms/faq/faqlist');">자주묻는 질문</button>
+  				</li>
+  			</ul>
+  		</div>
+  		<div class="tab-content">
+  			<!-- 세모통 백서 탭 -->
+  			<div class="F-G02-01-page tab-pane fade show active" id="tab-12-pane" role="tabpanel" aria-labelledby="tab-12" tabindex="0">
+  				<!-- 세모통 백서 섹션 -->
+  				<section class="howto-sec">
+  					<div class="sec-inner">
+  						<!-- 검색 -->
+  						<div class="howto-srch">
+  							<div class="ui-inp">
+  								<input type="text" name="" value="" placeholder="검색어를 입력해 주세요." class="inp" id="searchTitle" onkeyup="OnKeyEnter()"/>
+  								<div class="on-right">
+  									<button type="button" class="ui-btn btn-srch" onclick="clickSearchList()" />
+  										<i class="ui-icn icn-20-srch-bk" aria-label="검색"></i>
+  									</button>
+  								</div>
+  							</div>
+  						</div>
+  						<!-- // 검색 -->
+
+  						<div class="howto-list-wrap">
+  							<div class="howto-toolbar">
+								<p class="count" id="totCntText">20,000</p>
+  							</div>
+
+  							<ul class="howto-list" id="bakseoList">
+  							</ul>
+
+  							<!-- Case 목록이 많은 경우 더보기 -->
+  							<button type="button" class="ui-btn btn-more-list" onclick="javascript:readMore();" id="readMoreBtn">
+  								<i class="ui-icn icn-16-more-list-gr" aria-hidden="true"></i>
+  								<span>더보기</span>
+  							</button>
+  						</div>
+  					</div>
+  				</section>
+  				<!-- // 세모통 백서 섹션 -->
+  			</div>
+  			<!-- // 세모통 백서 탭 -->
+  		</div>
+  	</div>
+  	<!-- // content -->
+  </main>
+  <!-- // Container -->
+  
+  
+</html>

@@ -1,0 +1,89 @@
+# Spring: DB Connection Setting
+spring:
+  datasource:
+    url: ENC(bsQMi+yDb5wbsXoKnAqtMVmC0sVMvzSXinoCObqjaSX/9zDhVgyJvmyZOvJrUws2huMczNPMolVXrgU8RMcZ82jQf7EOHKHRFclynx9Qk6nF6B8oday5eFqrwJiK0xiD)
+    username: ENC(N166+NtYWKpAYp7nJyVwu416S+j32HmknVrD+yYTiYg=)
+    password: ENC(olbTgkyv2rrDIazKjzyGrcWBV0HDieh2fH5QE+dcA3s=)
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+  data:
+    redis:
+      host: ENC(Yn3WecrcpOc9GGzzZJMEalYM9xUY3PObgLRZxE60gdg=)
+      port: 6380
+      password: ENC(ovlknXi1mGvsRkohs7d/dS6mpqRf3Ot428FpGqGfamA=)
+  devtools:
+    restart:
+      enabled: false
+  freemarker:
+    cache: false
+file:
+  upload-dir: C:\\uploadfile
+
+# JWT
+jwt:
+  header: Authorization
+  secret: XJqvMst1Ejg9Wgsj2qxSQixSvVf/QP3/vUEwwvLAkh0=
+  token-validity-in-seconds: 3600000
+
+jasypt:
+  encryptor:
+    algorithm: PBEWithHMACSHA512AndAES
+    bean: jasyptStringEncryptor
+    password: ${ENCRYPTION_KEY}
+
+kakao:
+  token:
+    uri: https://kauth.kakao.com
+  user-info:
+    uri: https://kapi.kakao.com/v2/user/me
+  terms-info:
+    uri: https://kapi.kakao.com/v2/user/service_terms?result=app_service_terms
+  client:
+    id: ENC(P73y2VT13lK7uUkgrUaiU24UmgLWvJAILpOsPgEItlOGhtF+YBlantl3voDN1iYpbvDBuAHyM8s=)
+    redirect-uri: http://127.0.0.1:8080/auth/kakao/callback
+    scope:
+      - account_email
+      - name
+      - phone_number
+# Scraping
+scraping:
+  server: http://logs.smtong.co.kr:5001
+
+#host company api
+gogo:
+  api:
+    base-url: https://api.gogofactory.co.kr
+    auth-key: 057485accc44c076e27b7fa2328232e4
+    order-req-url: /info/semo/online_order.php
+    order-state-query-url: /info/semo/online_memo.php
+minigate:
+  api:
+    base-url: https://dev.shakemobile.co.kr
+    auth-key: 570b7be77c423c81cd05dc67babe4fa0d0fd0dca46c9f952bf990758cac89c741a525be560bd82cfe533ed254accd38119c6540370185501fc27a66849c5dfd4
+    order-req-url: /M2Mobile/v1/api/partner/member/recv
+    enc-key: mMvno0105Mgm@!gm
+    vector: (byte)0x26, (byte)0x8D, (byte)0x66, (byte)0xA7, (byte)0x35, (byte)0xA8, (byte)0x1A, (byte)0x81, (byte)0x6F, (byte)0xBA, (byte)0xD9, (byte)0xFA, (byte)0x36, (byte)0x16, (byte)0x25, (byte)0x01
+    client-id: VMG0016
+#DAOU
+daou:
+  url: https://test-box-api.addcon.co.kr
+  partner-code: PAKED7
+  key:
+    api-key: SuTPg735wUypp1WttPMdpdl9t9jWdT1g
+    enc-key: wj7Z5ylj2iD7iST5tKO1JIF1Yj8eEfsz
+    iv-key: wj7Z5ylj2iD7iST5
+
+#BIZPPURIO
+bizppurio:
+  kakao:
+    url: https://api.bizppurio.com
+    id: semotong
+    password: smtongdaebak1^^
+    fromNum: 070-5038-5883
+    senderkey: 7012483899c61b22b0832cca13a2311be0526b76
+    apikey: mxzVXEeTmbWW
+#tinymce:
+#  apikey: msoz9q348s6y1ti7az3ytf0x2ka1hhdkai8zsr8osnz6506n

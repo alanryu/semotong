@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.csm.mapper.OnetooneMapper">
+    
+   	<sql id="listWhere">
+		<if test='searchCategory != null and searchCategory !=""'>
+			AND a.category_id = #{searchCategory}
+		</if>
+		<if test='searhDisplayYn != null and searhDisplayYn !=""'>
+			AND a.display_yn = #{searhDisplayYn}
+		</if>
+		
+		<if test='searhState != null and searhState !=""'>
+			AND a.status = #{searhState}
+		</if>
+
+		<if test='keyword != null and keyword !=""'>
+    		AND (b.username LIKE CONCAT('%', #{keyword}, '%') OR a.inquery_title LIKE CONCAT('%', #{keyword}, '%'))
+    	</if> 
+	    	 <!-- 기간 조회-->
+          <if test='searchStartDt != null and searchStartDt !=""'>
+              AND a.create_date  <![CDATA[>=]]> #{searchStartDt}
+          </if>
+          <if test='searchEndDt != null and searchEndDt !=""'>
+              AND a.create_date <![CDATA[<=]]> #{searchEndDt}
+          </if>
+          
+ 		 <!-- MNO-->
+    	 <if test='searchScore != null and searchScore !=""'>
+    	 	AND a.score IN
+	         <foreach item="score" index="index" collection="_parameter.searchScore.split(',')" open="(" separator="," close=")">
+	             #{score}
+	         </foreach>
+    	 </if>
+	</sql>
+	
+	<sql id="Base_Column_list">
+		a.id
+        ,a.request_user
+        ,a.status
+        ,a.category_id
+        ,a.inquery_title
+        ,a.inquery_content
+        ,a.response_user
+        ,a.response_content
+        ,a.response_date
+        ,a.response_inquery
+        ,a.score
+        ,a.create_date
+        ,a.create_id
+        ,a.modified_date
+        ,a.modified_id
+        ,a.display_yn
+		,b.username AS createUserName
+        ,c.user_name AS responseNm		
+        ,d.code_name AS categoryNm
+	</sql>    
+	
+    <select id="getList" parameterType="kr.co.ucomp.web.csm.dto.OnetooneDto" resultType="kr.co.ucomp.web.csm.entity.OnetooneEntity">
+        SELECT
+            <include refid="Base_Column_list" />
+		FROM tb_csm_one_to_one_inquiry a
+		LEFT JOIN tb_mbm_user b ON a.create_id = b.id
+		LEFT JOIN tb_mbm_admin_user c ON a.modified_id = c.id
+		LEFT JOIN tb_cmm_code d ON a.category_id = d.code
+		AND d.code_group='onetoone_cate'
+		WHERE 1=1
+        <include refid="listWhere" />
+    	ORDER BY a.id DESC
+    	LIMIT #{offset}, #{recordSize}
+    </select>
+    
+    <select id="getListCount" parameterType="kr.co.ucomp.web.csm.dto.OnetooneDto" resultType="long">
+        SELECT
+            count(1)
+		FROM tb_csm_one_to_one_inquiry a
+		LEFT JOIN tb_mbm_user b ON a.create_id = b.id
+		LEFT JOIN tb_mbm_admin_user c ON a.modified_id = c.id
+		LEFT JOIN tb_cmm_code d ON a.category_id = d.code
+		AND d.code_group='onetoone_cate'
+		WHERE 1=1
+        <include refid="listWhere" />
+    </select>    
+    
+
+
+    <select id="getDetail" parameterType="int" resultType="kr.co.ucomp.web.csm.entity.OnetooneEntity">
+        SELECT
+            <include refid="Base_Column_list" />
+		FROM tb_csm_one_to_one_inquiry a
+		LEFT JOIN tb_mbm_user b ON a.create_id = b.id
+		LEFT JOIN tb_mbm_admin_user c ON a.modified_id = c.id
+		LEFT JOIN tb_cmm_code d ON a.category_id = d.code
+		AND d.code_group='onetoone_cate'
+        WHERE a.id = #{id}
+    </select>
+
+
+    <update id="update" parameterType="kr.co.ucomp.web.csm.entity.OnetooneEntity">
+        UPDATE tb_csm_one_to_one_inquiry
+        SET
+            modified_id = #{modifiedId},
+            <if test='requestUser != null and requestUser !=""'>
+            	request_user = #{requestUser},
+            </if>
+            <if test='status != null and status !=""'>
+            	status = #{status},
+            </if>
+            <if test='categoryId != null and categoryId !=""'>
+            	category_id = #{categoryId},
+            </if>
+            <if test='responseUser != null and responseUser !=""'>
+            	response_user = #{responseUser},
+            	response_date = Now(),
+            </if>
+            <if test='responseContent != null and responseContent !=""'>
+            	response_content = COALESCE(#{responseContent}, response_content),
+            </if>
+            <if test='score != null and score !=""'>            
+            	score = #{score},
+            </if>
+            <if test='displayYn != null and displayYn !=""'>
+            	display_yn = #{displayYn},
+            </if>
+            modified_date = Now()
+        WHERE id = #{id}
+    </update>
+    
+    
+
+    <delete id="delete" parameterType="Int">
+        DELETE FROM tb_csm_one_to_one_inquiry
+       WHERE id = #{id}
+    </delete>
+
+</mapper>

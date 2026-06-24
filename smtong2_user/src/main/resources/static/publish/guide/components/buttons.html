@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Buttons | 세모통 스타일가이드</title>
+	<meta http-equiv="X-UA-Compatible" content="ie=edge chrome=1" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="프로젝트가이드, 세모통 스타일가이드" />
+	<meta name="description" content="프로젝트가이드, 세모통 스타일가이드" />
+	<link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 인크루드 설정용도(개발적용안함) -->
+	<link rel="stylesheet" type="text/css" href="css/guide.css" /><!-- 가이드전용 -->
+</head>
+
+<body>
+	<div class="wrapper sub_page">
+		<!-- Header -->
+		<div data-include="include_header.html"></div>
+		<!-- // Header -->
+
+		<!-- Container -->
+		<div class="container">
+			<main id="content" class="content" role="main">
+				<div class="content-body">
+					<div class="out-sec in-sec">
+						<h1 class="g-h1">Buttons</h1>
+					</div>
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">기본 구조</h2>
+						</div>
+						<div class="g-section-body">
+							<xmp>
+<!-- 텍스트 버튼 -->
+<button type="button" class="ui-btn btn-[유형]">
+	<span></span>
+</button>
+
+<!-- 아이콘 버튼 -->
+<button type="button" class="ui-btn btn-[유형]">
+	<i class="ui-icn icn-[아이콘]" aria-label=""></i>
+</button>
+							</xmp>
+						</div>
+					</section>
+					<!-- // Section -->
+
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">모달 버튼 (alert, confirm)</h2>
+						</div>
+						<div class="g-section-body">
+							<div style="display: flex;">
+								<button type="button" class="ui-btn btn-modal normal">
+									<span>아니오</span>
+								</button>
+								<button type="button" class="ui-btn btn-modal primary">
+									<span>예</span>
+								</button>
+							</div>
+						</div>
+					</section>
+					<!-- // Section -->
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">페이지 버튼</h2>
+						</div>
+						<div class="g-section-body">
+							<button type="button" class="ui-btn btn-action primary">
+								<span>버튼</span>
+							</button>
+							<button type="button" class="ui-btn btn-sub xl">
+								<span>버튼</span>
+							</button>
+							<br>
+							<br>
+							<button type="button" class="ui-btn btn-sub xs">
+								<span>버튼</span>
+							</button>
+						</div>
+					</section>
+					<!-- // Section -->
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">더보기 버튼</h2>
+						</div>
+						<div class="g-section-body">
+							<button type="button" class="ui-btn btn-more">
+								<span>더보기</span>
+								<i class="ui-icn icn-14-more-gr" aria-hidden="true"></i>
+							</button>
+							<button type="button" class="ui-btn btn-more-list">
+								<i class="ui-icn icn-16-more-list-gr" aria-hidden="true"></i>
+								<span>더보기</span>
+							</button>
+							<button type="button" class="ui-btn btn-more-list">
+								<span>다른 요금제를 안내해 드릴까요?</span>
+								<i class="ui-icn icn-16-more-02-gr" aria-hidden="true"></i>
+							</button>
+						</div>
+					</section>
+					<!-- // Section -->
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">텍스트 버튼</h2>
+						</div>
+						<div class="g-section-body">
+							<button type="button" class="ui-btn btn-texted">
+								<span>개인정보 수집 이용</span>
+							</button>
+						</div>
+					</section>
+					<!-- // Section -->
+				</div>
+			</main>
+		</div>
+		<!-- // Container -->
+
+		<!-- Footer (include_footer.html) -->
+		<div data-include="include_footer.html"></div>
+		<!-- // Footer -->
+	</div>
+</body>
+
+</html>

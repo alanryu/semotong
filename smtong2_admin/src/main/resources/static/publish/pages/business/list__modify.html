@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>세모통</title>
+        <link
+            href="../../css/bootstrap.min.css"
+            rel="stylesheet">
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            rel="stylesheet">
+          <link
+            href="../../css/design.css"
+            rel="stylesheet">
+    </head>
+    <body>
+        <div class="sidebarWrapper">
+            <div class="left-sidebar">
+                <div class="admin-profile">
+                    <div class="profile-letter">A</div>
+                    <div>
+                        <div class="fw-semibold text-dark">관리자 - 아무개님</div>
+                        <small class="text-muted">UPDATE -<br> 2024-12-12 18:02</small>
+                    </div>
+                </div>
+                <ul class="menu-list">
+                    <!-- 계정권한관리 -->
+                    <li class="menu-item">
+                        <a href="javascript:;" class="menu-link">
+                            <i class="fas fa-user-cog"></i>
+                            <span>계정권한관리</span>
+                        </a>
+                    </li>
+                    <!-- 회원관리 -->
+                    <li class="menu-item">
+                        <a href="javascript:;" class="menu-link">
+                            <i class="fas fa-users"></i>
+                            <span>회원관리</span>
+                        </a>
+                    </li>
+                    <!-- 입점사관리 -->
+                    <li class="menu-item has-submenu open">
+                        <a href="javascript:;" class="menu-link">
+                            <i class="fas fa-building"></i>
+                            <span>입점사관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item active">
+                                <a href="../business/list.html" class="submenu-link">사업자 목록</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../business/manage.html" class="submenu-link">입점사 관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 상품관리 -->
+                    <li class="menu-item has-submenu ">
+                        <a href="javascript:;" class="menu-link">
+                            <i class="fas fa-box"></i>
+                            <span>상품관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item ">
+                                <a href="../product/rateplan.html" class="submenu-link">요금제</a>
+                            </li>
+                            <li class="submenu-item ">
+                                <a href="../product/scraping.html" class="submenu-link">스크래핑 관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="javascript:;" class="submenu-link">인터넷</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 신청관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="../applications/applications.html" class="menu-link">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>신청관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                                <a href="javascript:;" class="submenu-link">요금제 신청</a>
+                            </li>
+                            <li class="submenu-item ">
+                                <a href="javascript:;" class="submenu-link">인터넷 신청</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 정산관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="../settlements/settlements.html" class="menu-link">
+                            <i class="fas fa-calculator"></i>
+                            <span>정산관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                                <a href="javascript:;" class="submenu-link">요금제 정산</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="javascript:;" class="submenu-link">인터넷 정산</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 서비스관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="../services/services.html" class="menu-link">
+                            <i class="fas fa-cog"></i>
+                            <span>서비스관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                            <a href="javascript:;" class="submenu-link">메인화면관리</a>
+                            </li>
+                            <li class="submenu-item">
+                            <a href="javascript:;" class="submenu-link">배너관리</a>
+                            </li>
+                            <li class="submenu-item">
+                            <a href="javascript:;" class="submenu-link">게시판관리</a>
+                            </li>
+                            <li class="submenu-item">
+                            <a href="javascript:;" class="submenu-link">이벤트관리</a>
+                            </li>
+                            <li class="submenu-item">
+                            <a href="javascript:;" class="submenu-link">세모통 설명서</a>
+                            </li>
+                            <li class="submenu-item">
+                            <a href="javascript:;" class="submenu-link">후기관리</a>
+                            </li>
+                            <li class="submenu-item">
+                            <a href="javascript:;" class="submenu-link">잘못된 정보 관리</a>
+                            </li>
+                            <li class="submenu-item">
+                            <a href="javascript:;" class="submenu-link">챗봇요금제관리</a>
+                            </li>
+                            <li class="submenu-item">
+                            <a href="javascript:;" class="submenu-link">푸터관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <button class="toggle-sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="main-content">
+            <div class="container-fluid">
+                 <!-- 로케이션 & 제목 영역 추가 -->
+                <div class="page-header mb-4">
+                    <div class="location mb-2">
+                        <small class="text-secondary">
+                            <i class="fas fa-home me-1"></i>
+                            <a href="javascript:;">홈</a>
+                            >
+                            <a href="javascript:;">입점사관리</a>
+                            >
+                            <a href="../business/list.html">사업자 목록</a>
+                        </small>
+                    </div>
+                    <h2 class="page-title fs-4 mb-4">
+                        사업자 목록
+                    </h2>
+                </div>
+                
+                <div class="search-section">
+                    <!-- 검색어 -->
+                    <div class="col-12 mb-2">
+                        <div class="form-row full-width">
+                            <div class="form-label mb-0">검색조건</div>
+                            <div class="form-control-wrap flex-grow-1">
+                                <select class="form-select">
+                                    <option>전체</option>
+                                </select>
+                            </div>
+                            <div class="position-relative col-9">
+                                <i
+                                    class="fas fa-search position-absolute"
+                                    style="left: 16px; top: 15.5px; color: #94a3b8;"></i>
+                                <input type="text" class="form-control ps-5" placeholder="검색어를 입력하세요">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-2">
+                        <div class="form-row full-width">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="form-label mb-0">검색기간</div>
+                                <select class="form-select" style="width: 120px">
+                                    <option>등록일자</option>
+                                </select>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="date" class="form-control" style="width: 150px">
+                                    <span class="text-secondary">-</span>
+                                    <input type="date" class="form-control" style="width: 150px">
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="period-button">오늘</button>
+                                    <button class="period-button">1주일</button>
+                                    <button class="period-button">1개월</button>
+                                    <button class="period-button">3개월</button>
+                                    <button class="period-button">6개월</button>
+                                    <button class="period-button">1년</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 text-end mt-2">
+                            <button class="btn btn-light me-2 btn-sm">
+                                <i class="fas fa-redo"></i>
+                                초기화
+                            </button>
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-search"></i>
+                                검색
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="stats-badge">
+                                <i class="fas fa-calculator me-1"></i>
+                                총 450건
+                            </div>
+                            <select class="form-select" style="width: 100px">
+                                <option>50개씩</option>
+                            </select>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-light btn-sm">
+                                <i class="fas fa-download"></i>
+                                다운로드
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="location.href='../business/list_add.html'">
+                                <i class="fas fa-plus"></i>
+                                신규등록
+                            </button>
+                        </div>
+                    </div>
+
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" class="form-check-input">
+                                </th>
+                                <th>번호</th>
+                                <th>편집</th>
+                                <th>사업자명</th>
+                                <th>회사</th>
+                                <th>사업자코드</th>
+                                <th>통신사구분</th>
+                                <th>등록일</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input">
+                                </td>
+                                <td>450</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <div class="custom-dropdown">
+                                            <button class="action-btn btn-sm btnDrop" onclick="toggleDropdown()">
+                                                <i class="fas fa-edit me-1"></i>
+                                                수정
+                                            </button>
+                                            <div id="myDropdown" class="dropdown-content">
+                                                <a href="#">요금제 그룹 변경</a>
+                                                <a href="#">메모 변경</a>
+                                            </div>
+                                        </div>
+                                        <button class="action-btn btn-sm">
+                                            <i class="fas fa-trash me-1"></i>
+                                            삭제
+                                        </button>
+                                    </div>
+                                </td>
+                                <td>에이모바일</td>
+                                <td>(주)에이스멤버쉽</td>
+                                <td>Amobile</td>
+                                <td>SKT</td>
+                                <td>2024-12-12</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-left mt-4">
+                        <ul class="pagination">
+                            <li class="page-item">
+                                <a class="page-link" href="#">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item active">
+                                <a class="page-link" href="#">1</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">2</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">3</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">4</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">5</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">6</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">7</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">8</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">9</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">10</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <script src="../../js/bootstrap.bundle.min.js"></script>
+            <script src="../../js/script.js"></script>
+        </body>
+    </html>

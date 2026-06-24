@@ -1,0 +1,82 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 신청한 요금제
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 신청한 요금제 페이지
+.F-MY01-05-page {
+
+	// 페이시 여백
+	padding-top: 20rem; /* 1차 수정 : 제목 추가로 여백 적용 */
+	@include bottom-spacer;
+
+	// s: 상품리스트 섹션
+	.ratePlanD-sec {
+		@include sec-basic;
+		.sec-header {
+			margin-bottom: 0;
+		}
+		// 요금제 상품 툴바
+		.ratePlanC-toolbar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			.count {
+				font-weight: 500;
+				font-size: 12rem;
+				line-height: 16rem;
+				color: #63666A;
+			}
+			.sort {
+				display: flex;
+				margin-left: auto;
+				.ui-btn {
+					font-weight: 600;
+					font-size: 12rem;
+					line-height: 16rem;
+					color: #36383A;
+					gap: 4rem;
+				}
+			}
+		}
+
+		// 요금제 상품 리스트 공통
+		.ratePlanD-list { /* 1차 수정 : ratePlanD-list 추가 */
+			@include ratePlanD-list;
+
+			// 요금제 상품 리스트 카드 공통
+			.ratePlanD-card { /* 1차 수정 : ratePlanD-card로 변경 */
+				@include ratePlanD-card;
+			}
+		}
+
+		// nodata 공통
+		.nodata {
+			@include nodata;
+
+			// 페이지별 대응
+			margin: 20vh 0;
+			@include media-tablet-xs {
+				margin: 120px 0;
+			}
+		}
+	}
+	// e: 상품리스트 섹션
+
+	// s: 노데이터 섹션
+	.nodata-sec {
+		@include nodata-sec;
+
+		.nodata {
+			@include nodata;
+		}
+	}
+	// e: 노데이터 섹션
+
+	// s: 플로팅 섹션
+	.floating-sec {
+		@include floating-sec;
+	}
+	// e: 플로팅 섹션
+}
+// e: 신청한 요금제 페이지

@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>세모통</title>
+        <link
+            href="../../css/bootstrap.min.css"
+            rel="stylesheet">
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            rel="stylesheet">
+          <link
+            href="../../css/design.css"
+            rel="stylesheet">
+    </head>
+    <body>
+        <div class="sidebarWrapper">
+            <div class="left-sidebar">
+                <div class="admin-profile">
+                    <div class="profile-letter">A</div>
+                    <div>
+                        <div class="fw-semibold text-dark">관리자 - 아무개님</div>
+                        <small class="text-muted">UPDATE -<br> 2024-12-12 18:02</small>
+                    </div>
+                </div>
+                <ul class="menu-list">
+                    <!-- 계정권한관리 -->
+                    <li class="menu-item">
+                        <a href="../account/account.html" class="menu-link">
+                            <i class="fas fa-user-cog"></i>
+                            <span>계정권한관리</span>
+                        </a>
+                    </li>
+                    <!-- 회원관리 -->
+                    <li class="menu-item">
+                        <a href="../members/members.html" class="menu-link">
+                            <i class="fas fa-users"></i>
+                            <span>회원관리</span>
+                        </a>
+                    </li>
+                    <!-- 입점사관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="#" class="menu-link">
+                            <i class="fas fa-building"></i>
+                            <span>입점사관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                                <a href="../business/list.html" class="submenu-link">사업자 목록</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../business/manage.html" class="submenu-link">입점사 관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 상품관리 -->
+                    <li class="menu-item has-submenu active open">
+                        <a href="#" class="menu-link">
+                            <i class="fas fa-box"></i>
+                            <span>상품관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item active">
+                                <a href="../product/rateplan.html" class="submenu-link">요금제</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../product/scraping.html" class="submenu-link">스크래핑 관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="javascript:;" class="submenu-link">인터넷</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 신청관리 -->
+                    <li class="menu-item">
+                        <a href="../applications/applications.html" class="menu-link">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>신청관리</span>
+                        </a>
+                    </li>
+                    <!-- 정산관리 -->
+                    <li class="menu-item">
+                        <a href="../settlements/settlements.html" class="menu-link">
+                            <i class="fas fa-calculator"></i>
+                            <span>정산관리</span>
+                        </a>
+                    </li>
+                    <!-- 서비스관리 -->
+                    <li class="menu-item">
+                        <a href="../services/services.html" class="menu-link">
+                            <i class="fas fa-cog"></i>
+                            <span>서비스관리</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <button class="toggle-sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="main-content">
+            <div class="container-fluid">
+                <!-- 로케이션 & 제목 영역 추가 -->
+                <div class="page-header mb-4">
+                    <div class="location mb-2">
+                        <small class="text-secondary">
+                            <i class="fas fa-home me-1"></i>
+                            <a href="javascript:;">홈</a>
+                            >
+                            <a href="javascript:;">상품관리</a>
+                            >
+                            <a href="../product/rateplan.html">요금제</a>
+                        </small>
+                    </div>
+                    <h2 class="page-title fs-4 mb-4">
+                        요금제 상세
+                    </h2>
+                </div>
+                
+                <div class="search-section detail">
+                    <div class="form-row">
+                        <div class="form-label">최초 생성일</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="2023-12-17-08:21:55" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">최근 수정일</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="2024-12-07-08:55:44" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row full-width">
+                        <div class="form-label">노출 여부</div>
+                        <div class="form-check-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="visible" name="visibility" checked>
+                                <label class="form-check-label" for="visible">노출</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="invisible" name="visibility">
+                                <label class="form-check-label" for="invisible">미노출</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">판매상태</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="판매중" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">신규여부</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="Y" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">수집 UUID</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="Amobile67085" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">요금제 코드</div>
+                        <div class="form-control-wrap">
+                            <div style="display: flex; gap: 5px;">
+                                <input type="text" class="form-control" placeholder="텍스트 입력란">
+                                <button class="btn btn-primary btn-sm"><span>등록</span></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">MNO</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="LGU" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">사업자</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="에이모바일" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-label">네트워크</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="5G" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-label">요금제명</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="A 5G 갓성비 5GB/100분 (평생)" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">대체 요금제명</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">기본료</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="13,200원" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">할인금액</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="7,700원" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">최종금액</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="7,700원" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">할인기간</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="7개월" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">데이터</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="5GB" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">Qos</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="1Mbps" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">전화</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="무제한" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">메시지</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="텍스트 입력란" >
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">URL(단순랜딩)</div>
+                        <div class="form-control-wrap">
+                            <a href="https://www.amobile.co.kr/plan/67085" target="_blank">https://www.amobile.co.kr/plan/67085</a>
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">URL(아웃링크)</div>
+                        <div class="form-control-wrap">
+                        </div>
+                    </div>
+                    <div class="form-row full-width">
+                        <div class="form-label">혜택</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="메가박스 2D 일반관람권을 매월 1매, 24개월간 제공" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row full-width">
+                        <div class="form-label">사은품</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="-" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-label">이미지 뱃지</div>
+                        <div class="form-check-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="gift1" checked>
+                                <label class="form-check-label" for="gift1">단독특가</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="gift2">
+                                <label class="form-check-label" for="gift2">인터넷 결합</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="gift3">
+                                <label class="form-check-label" for="gift3">추가데이터제공</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="gift4">
+                                <label class="form-check-label" for="gift4">간편개통</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-label">혜택</div>
+                        <div class="bnf-manager">
+                            <div class="bnf-manager__container">
+                                <div id="bnfInputs" class="bnf-manager__inputs">
+                                    
+                                </div>
+                                <div class="bnf-manager__btn-container">
+                                    <button class="bnf-manager__btn bg_green" id="bnfManageBtn">혜택관리</button>
+                                    <button class="bnf-manager__btn" id="bnfAddBtn">추가</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 혜택 팝업 -->
+                        <div class="bnf-select__overlay"></div>
+                        <div class="bnf-select">
+                            <div class="bnf-select__header">
+                                <div class="bnf-select__title">혜택 선택</div>
+                                <span class="bnf-select__close">&times;</span>
+                            </div>
+                            
+                            <div class="bnf-select__search">
+                                <input type="text" class="bnf-select__input" placeholder="제목을 검색하세요.">
+                                <button class="bnf-select__search-btn">검색</button>
+                            </div>
+                            
+                            <div class="bnf-select__table__outer">
+                                <table class="bnf-select__table">
+                                    <thead>
+                                        <tr>
+                                            <th class="bnf-select__th" style="width: 50px">구분</th>
+                                            <th class="bnf-select__th" style="width: 100px">제목</th>
+                                            <th class="bnf-select__th">툴팁 내용</th>
+                                            <th class="bnf-select__th" style="width:150px">등록일</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="bnf-select__row">
+                                            <td class="bnf-select__td">
+                                                <input type="radio" name="benefit" class="bnf-select__radio">
+                                            </td>
+                                            <td class="bnf-select__td">밀리의서재1</td>
+                                            <td class="bnf-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                            <td class="bnf-select__td">2022.04.21- 15:21:15</td>
+                                        </tr>
+                                        <tr class="bnf-select__row">
+                                            <td class="bnf-select__td">
+                                                <input type="radio" name="benefit" class="bnf-select__radio">
+                                            </td>
+                                            <td class="bnf-select__td">밀리의서재2</td>
+                                            <td class="bnf-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                            <td class="bnf-select__td">2022.04.21- 14:21:15</td>
+                                        </tr>
+                                        <tr class="bnf-select__row bnf-select__row--selected">
+                                            <td class="bnf-select__td">
+                                                <input type="radio" name="benefit" class="bnf-select__radio" checked>
+                                            </td>
+                                            <td class="bnf-select__td">밀리의서재3</td>
+                                            <td class="bnf-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                            <td class="bnf-select__td">2022.04.21- 13:21:15</td>
+                                        </tr>
+                                        <tr class="bnf-select__row">
+                                            <td class="bnf-select__td">
+                                                <input type="radio" name="benefit" class="bnf-select__radio">
+                                            </td>
+                                            <td class="bnf-select__td">밀리의서재4</td>
+                                            <td class="bnf-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                            <td class="bnf-select__td">2022.04.21- 14:21:15</td>
+                                        </tr>
+                                        <tr class="bnf-select__row">
+                                            <td class="bnf-select__td">
+                                                <input type="radio" name="benefit" class="bnf-select__radio">
+                                            </td>
+                                            <td class="bnf-select__td">밀리의서재2</td>
+                                            <td class="bnf-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                            <td class="bnf-select__td">2022.04.21- 14:21:15</td>
+                                        </tr>
+                                        <tr class="bnf-select__row bnf-select__row--selected">
+                                            <td class="bnf-select__td">
+                                                <input type="radio" name="benefit" class="bnf-select__radio" checked>
+                                            </td>
+                                            <td class="bnf-select__td">밀리의서재3</td>
+                                            <td class="bnf-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                            <td class="bnf-select__td">2022.04.21- 13:21:15</td>
+                                        </tr>
+                                        <tr class="bnf-select__row">
+                                            <td class="bnf-select__td">
+                                                <input type="radio" name="benefit" class="bnf-select__radio">
+                                            </td>
+                                            <td class="bnf-select__td">밀리의서재4</td>
+                                            <td class="bnf-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                            <td class="bnf-select__td">2022.04.21- 14:21:15</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="bnf-select__footer">
+                                <button class="bnf-select__btn bnf-select__btn--apply">닫기</button>
+                                <button class="bnf-select__btn bnf-select__btn--confirm bg_blue">등록</button>
+                            </div>
+                        </div>
+
+                        <!-- Benefit Management Modal -->
+                        <div class="bnf-manager__modal" id="bnfManageModal">
+                            <div class="bnf-manager__modal-content">
+                                <div class="bnf-manager__modal-header">
+                                    <div class="bnf-manager__modal-title">혜택 관리</div>
+                                    <span class="bnf-select__close">&times;</span>
+                                </div>
+                                <div class="bnf-select__search">
+                                    <input type="text" class="bnf-select__input" placeholder="제목을 검색하세요.">
+                                    <button class="bnf-select__search-btn">검색</button>
+                                </div>
+                                <div class="bnf-select__table__outer">
+                                    <table class="bnf-select__table">
+                                        <thead>
+                                            <tr>
+                                                <th class="bnf-select__th" style="width: 50px">No</th>
+                                                <th class="bnf-select__th" style="width: 100px">제목</th>
+                                                <th class="bnf-select__th">툴팁 내용</th>
+                                                <th class="bnf-select__th" style="width:150px">등록일</th>
+                                                <th class="bnf-select__th" style="width:100px">수정</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="bnf-select__row">
+                                                <td class="bnf-select__td">
+                                                    35
+                                                </td>
+                                                <td class="bnf-select__td">밀리의서재1</td>
+                                                <td class="bnf-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                                <td class="bnf-select__td">2022.04.21- 15:21:15</td>
+                                                <td class="bnf-select__td"><button class="bnf-btn-modify">수정</button></td>
+                                            </tr>
+                                            <tr class="bnf-select__row">
+                                                <td class="bnf-select__td">
+                                                    34
+                                                </td>
+                                                <td class="bnf-select__td">밀리의서재2</td>
+                                                <td class="bnf-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                                <td class="bnf-select__td">2022.04.21- 14:21:15</td>
+                                                <td class="bnf-select__td"><button class="bnf-btn-modify">수정</button></td>
+                                            </tr>
+                                            <tr class="bnf-select__row bnf-select__row--selected">
+                                                <td class="bnf-select__td">
+                                                    33
+                                                </td>
+                                                <td class="bnf-select__td">밀리의서재3</td>
+                                                <td class="bnf-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                                <td class="bnf-select__td">2022.04.21- 13:21:15</td>
+                                                <td class="bnf-select__td"><button class="bnf-btn-modify">수정</button></td>
+                                            </tr>
+                                            <tr class="bnf-select__row">
+                                                <td class="bnf-select__td">
+                                                    32
+                                                </td>
+                                                <td class="bnf-select__td">밀리의서재4</td>
+                                                <td class="bnf-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                                <td class="bnf-select__td">2022.04.21- 14:21:15</td>
+                                                <td class="bnf-select__td"><button class="bnf-btn-modify">수정</button></td>
+                                            </tr>
+                                            <tr class="bnf-select__row">
+                                                <td class="bnf-select__td">
+                                                    34
+                                                </td>
+                                                <td class="bnf-select__td">밀리의서재2</td>
+                                                <td class="bnf-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                                <td class="bnf-select__td">2022.04.21- 14:21:15</td>
+                                                <td class="bnf-select__td"><button class="bnf-btn-modify">수정</button></td>
+                                            </tr>
+                                            <tr class="bnf-select__row bnf-select__row--selected">
+                                                <td class="bnf-select__td">
+                                                    33
+                                                </td>
+                                                <td class="bnf-select__td">밀리의서재3</td>
+                                                <td class="bnf-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                                <td class="bnf-select__td">2022.04.21- 13:21:15</td>
+                                                <td class="bnf-select__td"><button class="bnf-btn-modify">수정</button></td>
+                                            </tr>
+                                            <tr class="bnf-select__row">
+                                                <td class="bnf-select__td">
+                                                    32
+                                                </td>
+                                                <td class="bnf-select__td">밀리의서재4</td>
+                                                <td class="bnf-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                                <td class="bnf-select__td">2022.04.21- 14:21:15</td>
+                                                <td class="bnf-select__td"><button class="bnf-btn-modify">수정</button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="bnf-select__footer">
+                                    <button class="bnf-select__btn bnf-select__btn--apply bnf-select-close2">닫기</button>
+                                    <button class="bnf-select__btn bnf-select__btn--confirm" id="btnBenefitAdd">등록</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Benefit add Modal -->
+                        <div class="bnf-manager__modal" id="bnfAddModal">
+                            <div class="bnf-manager__modal-content">
+                                <div class="bnf-manager__modal-header">
+                                    <div class="bnf-manager__modal-title">혜택 등록</div>
+                                    <span class="bnf-select__close">&times;</span>
+                                </div>
+                                <div class="custom-table-outer">
+                                    <table class="table custom-table">
+                                        <tr>
+                                            <th>상태</th>
+                                            <td>
+                                                <div class="form-control-wrap">
+                                                    <div class="form-check-group">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="exposure" id="expShow1" checked>
+                                                            <label class="form-check-label" for="expShow">노출</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="exposure" id="expHide1">
+                                                            <label class="form-check-label" for="expHide">비노출</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>제목</th>
+                                            <td>
+                                                <input type="text" placeholder="제목을 입력하세요." class="form-control">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>툴팁 내용</th>
+                                            <td>
+                                                <textarea name="" id="" class="form-control" placeholder="내용을 입력하세요."></textarea>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="bnf-select__footer">
+                                    <button class="bnf-select__btn bnf-select__btn--apply bnf-select-close3">취소</button>
+                                    <button class="bnf-select__btn bnf-select__btn--confirm bg_blue">등록</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Benefit modify Modal -->
+                        <div class="bnf-manager__modal" id="bnfModifyModal">
+                            <div class="bnf-manager__modal-content">
+                                <div class="bnf-manager__modal-header">
+                                    <div class="bnf-manager__modal-title">혜택 수정</div>
+                                    <span class="bnf-select__close">&times;</span>
+                                </div>
+                                <div class="custom-table-outer">
+                                    <table class="table custom-table">
+                                        <tr>
+                                            <th>상태</th>
+                                            <td>
+                                                <div class="form-control-wrap">
+                                                    <div class="form-check-group">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="exposure" id="expShow2" checked>
+                                                            <label class="form-check-label" for="expShow">노출</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="exposure" id="expHide2">
+                                                            <label class="form-check-label" for="expHide">비노출</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>제목</th>
+                                            <td>
+                                                <input type="text" placeholder="제목을 입력하세요." class="form-control">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>툴팁 내용</th>
+                                            <td>
+                                                <textarea name="" id="" class="form-control" placeholder="내용을 입력하세요."></textarea>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>등록일</th>
+                                            <td>
+                                                2023.12.17-08:21
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="bnf-select__footer">
+                                    <button class="bnf-select__btn bnf-select__btn--apply bnf-select-close4">취소</button>
+                                    <button class="bnf-select__btn bnf-select__btn--confirm bg_green">수정</button>
+                                </div>
+                            </div>
+                        </div> 
+                        <!-- // 혜택 팝업 -->
+                    </div>
+
+
+                    <!-- 사은품  -->
+                    <div class="form-row full-width">
+                        <div class="form-label">사은품</div>
+                        <div class="gift-manager">
+                            <div class="gift-manager__container">
+                                <div id="giftInputs" class="gift-manager__inputs">
+                                    
+                                </div>
+                                <div class="gift-manager__btn-container">
+                                    <button class="gift-manager__btn bg_green" id="giftManageBtn">사은품관리</button>
+                                    <button class="gift-manager__btn" id="giftAddBtn">추가</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 사은품 팝업 -->
+                        <div class="gift-select__overlay"></div>
+                        <div class="gift-select">
+                            <div class="gift-select__header">
+                                <div class="gift-select__title">사은품 선택</div>
+                                <span class="gift-select__close">&times;</span>
+                            </div>
+                            <div class="gift-select__search">
+                                <input type="text" class="gift-select__input" placeholder="제목을 검색하세요.">
+                                <button class="gift-select__search-btn">검색</button>
+                            </div>
+                            <div class="gift-select__table__outer">
+                                <table class="gift-select__table">
+                                    <thead>
+                                        <tr>
+                                            <th class="gift-select__th" style="width: 50px">구분</th>
+                                            <th class="gift-select__th" style="width: 100px">제목</th>
+                                            <th class="gift-select__th">툴팁 내용</th>
+                                            <th class="gift-select__th" style="width:150px">등록일</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="gift-select__row">
+                                            <td class="gift-select__td">
+                                                <input type="radio" name="gift" class="gift-select__radio">
+                                            </td>
+                                            <td class="gift-select__td">밀리의서재1</td>
+                                            <td class="gift-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                            <td class="gift-select__td">2022.04.21- 15:21:15</td>
+                                        </tr>
+                                        <tr class="gift-select__row">
+                                            <td class="gift-select__td">
+                                                <input type="radio" name="gift" class="gift-select__radio">
+                                            </td>
+                                            <td class="gift-select__td">밀리의서재2</td>
+                                            <td class="gift-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                            <td class="gift-select__td">2022.04.21- 15:21:15</td>
+                                        </tr>
+                                        <tr class="gift-select__row">
+                                            <td class="gift-select__td">
+                                                <input type="radio" name="gift" class="gift-select__radio">
+                                            </td>
+                                            <td class="gift-select__td">밀리의서재3</td>
+                                            <td class="gift-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                            <td class="gift-select__td">2022.04.21- 15:21:15</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="gift-select__footer">
+                                <button class="gift-select__btn gift-select__btn--apply">닫기</button>
+                                <button class="gift-select__btn gift-select__btn--confirm bg_blue">등록</button>
+                            </div>
+                        </div>
+                    <div class="gift-manager__modal" id="giftManageModal">
+                        <div class="gift-manager__modal-content">
+                            <div class="gift-manager__modal-header">
+                                <div class="gift-manager__modal-title">사은품 관리</div>
+                                <span class="gift-select__close">&times;</span>
+                            </div>
+                            <div class="gift-select__search">
+                                <input type="text" class="gift-select__input" placeholder="제목을 검색하세요.">
+                                <button class="gift-select__search-btn">검색</button>
+                            </div>
+                            
+                            <div class="gift-select__table__outer">
+                                <table class="gift-select__table">
+                                    <thead>
+                                        <tr>
+                                            <th class="gift-select__th" style="width: 50px">No</th>
+                                            <th class="gift-select__th" style="width: 100px">제목</th>
+                                            <th class="gift-select__th">툴팁 내용</th>
+                                            <th class="gift-select__th" style="width:150px">등록일</th>
+                                            <th class="gift-select__th" style="width:100px">수정</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="gift-select__row">
+                                            <td class="gift-select__td">35</td>
+                                            <td class="gift-select__td">밀리의서재1</td>
+                                            <td class="gift-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                            <td class="gift-select__td">2022.04.21- 15:21:15</td>
+                                            <td class="gift-select__td"><button class="gift-btn-modify">수정</button></td>
+                                        </tr>
+                                        <tr class="gift-select__row">
+                                            <td class="gift-select__td">35</td>
+                                            <td class="gift-select__td">밀리의서재2</td>
+                                            <td class="gift-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                            <td class="gift-select__td">2022.04.21- 15:21:15</td>
+                                            <td class="gift-select__td"><button class="gift-btn-modify">수정</button></td>
+                                        </tr>
+                                        <tr class="gift-select__row">
+                                            <td class="gift-select__td">35</td>
+                                            <td class="gift-select__td">밀리의서재3</td>
+                                            <td class="gift-select__td">한달 12,900원으로 전자책을 구독할 수 있는 밀리의 서재를 이용하실 수 있어요! </td>
+                                            <td class="gift-select__td">2022.04.21- 15:21:15</td>
+                                            <td class="gift-select__td"><button class="gift-btn-modify">수정</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="gift-select__footer">
+                                <button class="gift-select__btn gift-select__btn--apply gift-select-close2">닫기</button>
+                                <button class="gift-select__btn gift-select__btn--confirm" id="btnGiftAdd">등록</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gift add Modal -->
+                    <div class="gift-manager__modal" id="giftAddModal">
+                        <div class="gift-manager__modal-content">
+                            <div class="gift-manager__modal-header">
+                                <div class="gift-manager__modal-title">사은품 등록</div>
+                                <span class="gift-select__close">&times;</span>
+                            </div>
+                            <div class="custom-table-outer">
+                                <table class="table custom-table">
+                                    <tr>
+                                        <th>상태</th>
+                                        <td>
+                                            <div class="form-control-wrap">
+                                                <div class="form-check-group">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="giftexposure" id="giftexpShow1" checked>
+                                                        <label class="form-check-label" for="expShow">노출</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="giftexposure" id="giftexpHide1">
+                                                        <label class="form-check-label" for="expHide">비노출</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>내용</th>
+                                        <td>
+                                            <textarea name="" id="" class="form-control" placeholder="내용을 입력하세요."></textarea>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="gift-select__footer">
+                                <button class="gift-select__btn gift-select__btn--apply gift-select-close3">취소</button>
+                                <button class="gift-select__btn gift-select__btn--confirm bg_blue">등록</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gift modify Modal -->
+                    <div class="gift-manager__modal" id="giftModifyModal">
+                        <div class="gift-manager__modal-content">
+                            <div class="gift-manager__modal-header">
+                                <div class="gift-manager__modal-title">사은품 수정</div>
+                                <span class="gift-select__close">&times;</span>
+                            </div>
+                            <div class="custom-table-outer">
+                                <table class="table custom-table">
+                                    <tr>
+                                        <th>상태</th>
+                                        <td>
+                                            <div class="form-control-wrap">
+                                                <div class="form-check-group">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="giftexposure" id="giftexpShow2" checked>
+                                                        <label class="form-check-label" for="expShow">노출</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="giftexposure" id="giftexpHide2">
+                                                        <label class="form-check-label" for="expHide">비노출</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>내용</th>
+                                        <td>
+                                            <textarea name="" id="" class="form-control" placeholder="내용을 입력하세요."></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>등록일</th>
+                                        <td>
+                                            2023.12.17-08:21
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="gift-select__footer">
+                                <button class="gift-select__btn gift-select__btn--apply gift-select-close4">취소</button>
+                                <button class="gift-select__btn gift-select__btn--confirm bg_green">수정</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- //사은품 팝업 -->
+                </div>
+
+                <!-- 인터넷 결합 여부 -->
+                <div class="form-row full-width">
+                    <div class="form-label">인터넷 결합 여부</div>
+                    <div class="form-control-wrap">
+                        <div class="form-check-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="combination" name="combination" checked>
+                                <label class="form-check-label" for="combination">결합 있음</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="notCombination" name="combination">
+                                <label class="form-check-label" for="notCombination">결합 없음</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row full-width">
+                    <div class="form-label">지원 <p class="c_red">※ 미입력시 미노출</p></div>
+                    <div class="form-control-wrap">
+                        <div class="form-check-group">
+                            <textarea name="" id="" class="form-control" placeholder="내용을 입력하세요."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row full-width">
+                    <div class="form-label">미지원 <p class="c_red">※ 미입력시 미노출</p></div>
+                    <div class="form-control-wrap">
+                        <div class="form-check-group">
+                            <textarea name="" id="" class="form-control" placeholder="내용을 입력하세요."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row full-width">
+                    <div class="form-label">이벤트 배너 설정 <p class="c_red">※ 미입력시 미노출</p></div>
+                    <div class="form-control-wrap">
+                        <div class="form-check-group">
+                            <!-- Image Upload Section -->
+                            <div class="event-banner">
+                                <!-- PC Banner -->
+                                <div class="event-banner__section">
+                                    <div class="event-banner__uploader uploader">
+                                        <div class="uploader__header">
+                                            <span class="uploader__title">PC 배너*</span>
+                                        </div>
+                                        <div class="uploader__content">
+                                            <div class="uploader__input-group">
+                                                <input type="file" 
+                                                    class="uploader__input" 
+                                                    id="pcBanner" 
+                                                    accept=".jpg,.png,.jpeg" 
+                                                    onchange="BannerUploader.preview(this, 'pcPreview')" />
+                                                <button type="button" 
+                                                        class="uploader__button" 
+                                                        onclick="BannerUploader.trigger('pcBanner')">찾기</button>
+                                            </div>
+                                            <p class="uploader__guide">
+                                                이미지 형식의 파일만 업로드 가능합니다. (jpg, png, jpeg) / 권장 사이즈 : 720x160
+                                            </p>
+                                        </div>
+                                        <div class="uploader__preview" id="pcPreview"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Mobile Banner -->
+                                <div class="event-banner__section">
+                                    <div class="event-banner__uploader uploader">
+                                        <div class="uploader__header">
+                                            <span class="uploader__title">모바일 배너*</span>
+                                        </div>
+                                        <div class="uploader__content">
+                                            <div class="uploader__input-group">
+                                                <input type="file" 
+                                                    class="uploader__input" 
+                                                    id="mobileBanner" 
+                                                    accept=".jpg,.png,.jpeg" 
+                                                    onchange="BannerUploader.preview(this, 'mobilePreview')" />
+                                                <button type="button" 
+                                                        class="uploader__button" 
+                                                        onclick="BannerUploader.trigger('mobileBanner')">찾기</button>
+                                            </div>
+                                            <p class="uploader__guide">
+                                                이미지 형식의 파일만 업로드 가능합니다. (jpg, png, jpeg) / 권장 사이즈 : 328x140
+                                            </p>
+                                        </div>
+                                        <div class="uploader__preview" id="mobilePreview"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="form-row full-width">
+                    <div class="form-label"></div>
+                    <div class="form-control-wrap">
+                        <div class="form-check-group">
+                            <div class="link-form">
+                                <div class="link-form__input-wrap">
+                                    <input type="text" 
+                                           class="link-form__input" 
+                                           placeholder="https://www.naver.com/" 
+                                           value="https://www.naver.com/">
+                                </div>
+                                <div class="link-form__options">
+                                    <div class="link-form__radio-item">
+                                        <input type="radio" 
+                                               id="selfLink" 
+                                               name="linkTarget" 
+                                               value="_self" 
+                                               class="link-form__radio" 
+                                               checked>
+                                        <label for="selfLink" class="link-form__label">
+                                            현재 이동 (_self)
+                                        </label>
+                                    </div>
+                                    <div class="link-form__radio-item">
+                                        <input type="radio" 
+                                               id="blankLink" 
+                                               name="linkTarget" 
+                                               value="_blank" 
+                                               class="link-form__radio">
+                                        <label for="blankLink" class="link-form__label">
+                                            새창 이동 (_blank)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center gap-2 mt-4 w-100 mb-5">
+                <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="history.back()">
+                    닫기
+                </button>
+                <button type="button" class="btn btn-lg btn-dark px-4 btn-sm">
+                    등록
+                </button>
+            </div>
+
+            <script src="../../js/bootstrap.bundle.min.js"></script>
+            <script src="../../js/script.js"></script>
+        </body>
+    </html>

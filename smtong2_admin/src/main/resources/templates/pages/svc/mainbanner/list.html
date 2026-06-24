@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='07',menuId = ${ #strings.equals(param.type, '05') ? '0102' : ( #strings.equals(param.type, '06') ? '0103' : '0101') }">
+	  
+<th:block layout:fragment="css">
+</th:block>
+
+<th:block layout:fragment="script">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script> 
+<script type="text/javascript">
+	$(document).ready(function(){
+		
+		currentPage = 1;
+		
+		var searchParams = new URL($(location).attr('href')).searchParams;
+		var type = searchParams.get('type');
+		$('#banner-type').val(type);
+		searchResult();
+		
+		/* 대표문구 설정 버튼(상단 이벤트일 경우만 보여줌) */
+		type != '01' ? $('#left-btn').hide() : $('#left-btn').show();
+		/* 배너종류에 따른 화면 설정 */
+		displaySetting(type);
+		
+		/* 순서 정렬 */
+		$(document).on('click', '.order-set', function(){
+			
+			var arrow = $(this).data('arrow');
+			
+			var row = $(this).parent().parent();
+			var num = row.index();
+			
+			var max = $('#list-area').find('tr').length;
+			
+			if ( arrow == 'down' ) {
+				
+				if ( num >= max ) {
+					return false;
+				} else {
+					row.next().after(row);
+				}
+			} else if ( arrow == 'up' ) {
+				
+				if(num == 0) { 
+					return false;
+				} else {
+					row.prev().before(row);
+				}
+			}
+			
+			/* 전체 화살표 방향 다시 설정 및 정렬데이터 setting */
+			var orderIds = [];
+			$('#list-area').find('tr').each(function(idx){
+				var html = '';
+				var data = $(this).find('td').last().data('id');
+				if ( idx == 0 ) {
+					html += '<button class="btn btn-dark order-set" data-arrow="down">▼</button>';
+					$(this).find('td').last().html(html);
+				} else if ( idx === max - 1 ) {
+					html += '<button class="btn btn-dark order-set" data-arrow="up">▲</button>';
+					$(this).find('td').last().html(html);
+				} else {
+					html += '<button class="btn btn-dark order-set" data-arrow="up">▲</button>';
+					html += '<button class="btn btn-dark order-set" data-arrow="down" style="margin-left:5px">▼</button>';
+					$(this).find('td').last().html(html);
+				}
+				
+				orderIds.push($(this).find('td').last().data('id'));
+			});
+			
+			$.ajax({
+				url 		: '/svc/mainbanner/listorder',
+				type 		: 'post',
+				dataType 	: 'json',
+				data 		: {orderIds : orderIds.join(',')},
+				async 		: false,
+				success 	: function (data) {
+					
+				},
+				error 		: function(request, status, error){
+					alert(error);
+				},
+				complete 	: function(){
+				}
+			});
+		});
+		
+		/* 체크박스 전체 */
+		$('#expAll').on('change', function(){
+			if ( $(this).is(':checked') ) {
+				$('input[type=checkbox]').each(function(){
+					$(this).prop('checked', true);
+				});
+			} else {
+				$('input[type=checkbox]').each(function(){
+					$(this).prop('checked', false);
+				});
+			}
+		});
+		
+		/* 대기/노출/종료 전부 체크시 전체 체크박스 체크, 아닐시 전체 체크박스 해제 */
+		$('#expShow, #expCancel, #expEnd').on('change', function(){
+			
+			var total = $('input[name=status]').length;
+			var checked = $('input[name=status]:checked').length; 
+			
+			if(!$(this).is(':checked')) {
+				$('#expAll').prop('checked', false);
+			} else {
+				if ( total != checked ) $('#expAll').prop('checked', false);
+				else $('#expAll').prop('checked', true);
+			}
+		});
+	})
+	
+	/* 배너종류에 따른 화면 설정 (결합, 챗봇배너는 탭 숨김 처리) */
+	function displaySetting(type) {
+		
+		switch(type) {
+			case "01" :
+				// 상단배너
+				$('.tab-menu li').eq(3).addClass('active');
+				$('.landing-url').hide(); // 랜딩url 숨김
+				break;
+			case "02" :
+				// 요금제 소개
+				$('.tab-menu li').eq(4).addClass('active');
+				$('.order-item').show(); 	//순서 표시
+				break;
+			case "03" :
+				// 중단 배너
+				$('.tab-menu li').eq(6).addClass('active');
+				break;
+			case "04" :
+				// 이벤트 배너
+				$('.tab-menu li').eq(7).addClass('active');
+				$('.order-item').show(); 	//순서 표시
+				break;
+			case "05" :
+				// 결합배녀
+				$('#tab-menu').hide();
+				$('.title-txt').html('결합'); $('.combination').hide();
+				$('.order-item').show(); 	//순서 표시
+				break;
+			case "06" :
+				// 챗봇배너
+				$('#tab-menu').hide();
+				$('.title-txt').html('챗봇'); $('.combination').hide();
+				$('.order-item').show(); 	//순서 표시
+				break;
+			case "07" :
+				// 빅배너
+				$('.tab-menu li').eq(0).addClass('active');
+				$('.landing-url').hide(); // 랜딩url 숨김
+				$('.order-item').show(); 	//순서 표시
+				break;				
+		}
+	}
+	
+	/* 검색 결과 */
+	function searchResult() {
+		
+		var type = $('#banner-type').val();
+		
+		var page = currentPage;
+		if(page =="" || page == null) page =1;
+				
+				
+		
+		/* 배너타입 01:상단이벤트 02:요금제소개 03:중단배너 04:이벤트 05:결합 06:챗봇 */
+		var params = {
+			  searchBannerType : type
+			, page : currentPage
+			, recordSize : 10
+		}
+		
+		/* 등록일 */
+		if ( $('#searchStartDt').val() != null && $('#searchStartDt').val() != '' ) {
+			params.searchStartDt = $('#searchStartDt').val();
+		}
+		if ( $('#searchEndDt').val() != null && $('#searchEndDt').val() != '' ) {
+			params.searchEndDt = $('#searchEndDt').val();
+		}
+		
+		/* 상태 */
+		if ( type == '05' || type == '06' ) {	/* 결합 / 챗봇 배너 (사용/미사용) */
+			
+			if ( $('input[name=searchUseYn]:checked').val() != 'A' ) {
+				params.searchUseYn = $('input[name=searchUseYn]:checked').val();
+			}
+		} else {	/* 그 외(대기/노출/종료) */
+			if ( !$('#expAll').is(':checked') ) {
+				if ( $('#expShow').is(':checked') ) {
+					params.isDispStatusBef = '1';	//대기
+				}
+				
+				if ( $('#expCancel').is(':checked') ) {
+					params.isDispStatusDsp = '1';	//노출
+				}
+				
+				if ( $('#expEnd').is(':checked') ) {
+					params.isDispStatusEnd = '1';	//종료
+				}
+			}
+		}
+		
+		
+		if ( type == '02' || type == '04' || type == '05' || type == '06') {
+			params.searchOrderSp = "01"
+		} else {
+			params.searchOrderSp = "00"
+		}
+		
+		params.keyword = $('#keyword').val();
+		
+		$.ajax({
+			url 		: '/svc/mainbanner/listProc',
+			type 		: 'post',
+			dataType 	: 'json',
+			contentType : 'application/json',
+			data 		: JSON.stringify(params),
+			async 		: false,
+			success 	: function (data) {
+				
+				var items = data.data
+				$('#list-area').empty();	
+				
+				if(data.totalCnt == 0) {
+					//
+				} else {
+					
+					var totalCnt = data.totalCnt;
+					$.each(data.data, function(idx, obj){
+						var rIdx = totalCnt - ((params.page - 1) * params.recordSize + idx);
+						obj.rIdx = rIdx;
+						
+						/* 순서 방향 설정 */
+						if ( idx == 0 ) obj.arrow = 'd'
+						else if ( idx == 9 || rIdx == 1 ) obj.arrow = 'u'
+						else obj.arrow = 'b';
+					});
+					$('#bannerlist').tmpl(data.data).appendTo('#list-area');	
+				}
+				
+				displaySetting(type);
+				
+				renderPagination(params.page, data.totalCnt, params.recordSize)
+			},
+			error 		: function(request, status, error){
+				alert(error);
+			},
+			complete 	: function(){
+			}
+		});
+	}
+	
+	/* 등록 화면 진입 */
+	function goInsert() {
+		var url = $(location).attr('href');
+		var searchParams = new URL(url).searchParams;
+		var type = searchParams.get('type');
+		
+		/* 결합 /챗봇 등록 버튼 */
+		if ( type == '05' || type == '06' ) {
+			$(location).attr('href', '/svc/mainbanner/cbInsert?type=' + type);
+			
+		} else if ( type == '07' ) {
+			$(location).attr('href', '/svc/mainbanner/insert2');
+		} else {
+			$(location).attr('href', '/svc/mainbanner/insert?type=' + type);
+		}
+	}
+	
+	/* 현재 시간 기준으로 대기/노출/종료 표시 */
+	function divisionStr(startDate, endDate, status) {
+		var str = '';
+		var now = moment();
+		var std = moment(startDate);
+		var etd = moment(endDate);
+		
+		if ( status == 'ALWAYS' ) {
+			str = '노출';
+		} else {
+			if ( etd < now ) {
+				str = '종료';
+			} else if ( std > now ) {
+				str = '대기'
+			} else if ( std < now && etd > now ) {
+				str = '노출'
+			}
+		}
+		
+		return str;
+	}
+	
+	/* date => string */
+	function dateToString(date) {
+		var str = '';
+		if ( date != null ) {
+			var temp = moment(date);
+			str = temp.format('YYYY.MM.DD HH:mm');
+		}
+		return str;
+	}
+	
+	/* 삭제 프로세스 */
+	function deleteRow(id) {
+		
+		var delFlag = true;
+		
+		showConfirm('삭제하시겠습니까?',
+			() => { 
+				$.ajax({
+				   url 		: '/svc/mainbanner/delete',
+				   type 	: 'DELETE',
+				   data 	: {delId: id},
+				   async 	: false,
+				   success 	: function (data) {
+					   
+					   if ( data.data == 'del fail' ) {
+						   showAlert('배너는 최소 1개 이상 노출되어야 합니다.');
+					   } else {
+						   searchResult();
+					   }
+				    },
+					error 	: function(request, status, error){
+			            alert(error);
+			        },
+			        complete:function(){
+			        }
+				});
+			},
+			() => {},
+			''
+		)
+	}
+	
+	/* 사용/미사용 체크 */
+	function useYnProc(id, element) {
+		
+		var useYn = $(element).is(':checked') ? 'Y' : 'N';
+		
+		$.ajax({
+		   url 		: '/svc/mainbanner/useYn',
+		   type 	: 'POST',
+		   data 	: {id : id, useYn : useYn},
+		   success 	: function (data) {
+			   
+			   console.log(data);
+			   
+			   /*
+			   	* return 메시지로 update유무 판단
+			    * 01 : 노출상태이고 사용으로 체크된 배너가 없어 미사용 업데이트 불가
+			    * 02 : 기준갯수의 배너가 노출상태
+			    */
+			    
+			   if ( data.data == '01' ) {
+				   showAlert('배너는 최소 1개 이상 노출되어야합니다.');
+				   $(element).prop('checked', true);
+			   } else if ( data.data == '02' ) {
+				   //사용 가능 개수 제한 99 로 하여 제한을 없앰 20260605 (기존 2,3)
+				   // 요금제(02), 이벤트 배너(04), 결합배너(05), 챗봇배너(06)
+				   var stndCnt = '99';
+				  
+				   if ( $('#banner-type').val() == '02' || $('#banner-type').val() == '04' || $('#banner-type').val() == '05' || $('#banner-type').val() == '06' ) {
+					   stndCnt = '99';
+				   }
+				   showAlert('최대 ' + stndCnt + '개의 배너가 노출되어야합니다.');
+				   $(element).prop('checked', false);
+			   } else if ( data.data == '03' ) {
+				   searchResult();
+			   }
+		    },
+			error 	: function(request, status, error){
+	            alert(error);
+	        },
+	        complete:function(){
+	        }
+		});
+		
+		$(element).is(':checked')
+	}
+	
+	/* 초기화 */
+	function resetSearch() {
+		//$('.period-button').eq(1).trigger('click');
+		periodButtonInit();
+		
+		$('#expAll').prop('checked', true);
+		$('input[name=status]').each(function(){
+			$(this).prop('checked', true);
+		});
+		
+		$('#keyword').val('');
+	}
+	
+	
+	function renderPage(page) {
+		currentPage = page;
+		searchResult();
+	}
+	
+</script>
+
+<script id="bannerlist" type="text/x-jquery-tmpl">
+	<tr>
+		<!-- 번호 -->
+		<td>${rIdx}</td>
+		<!-- 편집 -->
+		<td>
+			<div class="d-flex gap-2">
+				{{if  type == '07' }}
+					<button class="action-btn btn-sm" onclick="location.href='/svc/mainbanner/update2/${id}?type=${type}'"> 
+				{{else}}
+					<button class="action-btn btn-sm" onclick="location.href='/svc/mainbanner/update/${id}?type=${type}'">
+				{{/if}}
+                	<i class="fas fa-edit me-1"></i>
+                    수정
+                </button>
+                <button class="action-btn btn-sm" onclick="deleteRow('${id}');">
+                	<i class="fas fa-trash me-1"></i>
+                    삭제
+                </button>
+            </div>
+		</td>
+		<!-- 구분 -->
+		<td class="combination">{{html divisionStr(startDate, endDate, status)}}</td>
+		<!-- 게시기간 -->
+		<td class="combination">
+			{{if status == 'ALWAYS'}} 상시 {{/if}}
+			{{if status != 'ALWAYS'}}
+				{{html dateToString(startDate)}} ~ {{html dateToString(endDate)}}
+			{{/if}}
+		</td>
+		<!-- 항목명 -->
+		<td>${bannerName}</td>
+		<!-- 랜딩 URL -->
+		<td class="landing-url"><a href="${url}" target="_blank">${url}</a></td>
+		<!-- 이미지 -->
+		<td><img src="${imagePc}" alt="${bannerAlt}" style="height: 30px;"/></td>
+		<!-- 사용 -->
+		<td>
+			<div class="form-check form-switch mb-3">
+            	<input class="form-check-input" type="checkbox" role="switch" {{if useYn == 'Y'}}checked="true"{{/if}} onclick="useYnProc('${id}', this)" style="transform: scale(1.5);">
+            </div>
+		</td>
+		<!-- 등록자 -->
+		<td>${createNm}</td>
+		<!-- 등록일 -->
+		<td>{{html getDateStr(createDate)}}</td>
+		<!-- 순서 -->
+		<td class="order-item" style="display:none;" data-id="${id}">
+			{{if arrow == 'd'}}
+			<button class="btn btn-dark order-set" data-arrow="down">▼</button>
+			{{else arrow == 'u'}}
+			<button class="btn btn-dark order-set" data-arrow="up">▲</button>
+			{{else}}
+			<button class="btn btn-dark order-set" data-arrow="up">▲</button>
+			<button class="btn btn-dark order-set" data-arrow="down">▼</button>
+			{{/if}}
+		</td>
+	</tr>
+</script>
+</th:block>
+
+<div class="main-content">
+	
+	<div class="container-fluid">
+		<!-- 로케이션 & 제목 영역 추가 -->
+	    <div class="page-header mb-4">
+	        <div class="location mb-2">
+	            <small class="text-secondary">
+	                <i class="fas fa-home me-1"></i>
+	                <a href="javascript:;">홈</a>
+	                >
+	                <a href="javascript:;">서비스 관리</a>
+	                >
+	                <a href="javascript:;">배너 관리</a>
+	                >
+	                <a href="javascript:;" class="title-txt">메인</a>
+	            </small>
+	        </div>
+	        <h2 class="page-title fs-4 mb-4"><span class="title-txt">메인</span> 배너</h2>
+	    </div>
+	    
+	    <div class="container mt-4 mb-4" id="tab-menu">
+	        <ul class="tab-menu">
+				<li>
+	              <a href="/svc/mainbanner/list?type=07">빅배너</a>
+	            </li>				
+	            <li>
+	              <a href="/svc/mainbanner/dealList">추천딜</a>
+	            </li>
+	            <li>
+	              <a href="/svc/mainbanner/timeList">타임딜</a>
+	            </li>
+	            <li>
+	              <a href="/svc/mainbanner/list?type=01">상단 이벤트</a>
+	            </li>
+	            <li>
+	              <a href="/svc/mainbanner/list?type=02">요금제 소개</a>
+	            </li>
+				<li>
+				  <a href="/svc/recomPlan/list">맞춤 요금제</a>
+				</li>
+	            <li>
+	              <a href="/svc/mainbanner/list?type=03">중단 배너</a>
+	            </li>
+	            <li>
+	              <a href="/svc/mainbanner/list?type=04">이벤트</a>
+	            </li>
+	        </ul>
+	    </div>
+	    <!-- 검색 영역 -->
+	    <div class="search-section">
+	    	<input type="hidden" id="banner-type" value=""/>
+	    	<div class="row g-3">
+	            <div class="col-12">
+	                <div class="col-12">
+	                    <div class="form-row full-width">
+	                      <div class="form-label mb-0">등록일</div>
+	                      <div class="form-control-wrap d-flex align-items-center gap-2">
+	                          <div class="d-flex align-items-center gap-2">
+	                              <input type="date" id="searchStartDt" name="searchStartDt" class="form-control" value="">
+	                              <span class="text-secondary">-</span>
+	                              <input type="date" id="searchEndDt" name="searchEndDt" class="form-control" value="">
+	                          </div>
+	                          <div class="period-buttons">
+	                                <div class="d-flex gap-2">
+	                                 	<button class="period-button" value="0">오늘</button>
+	                                    <button class="period-button" value="7">1주일</button>
+	                                    <button class="period-button" value="30">1개월</button>
+	                                    <button class="period-button" value="90">3개월</button>
+	                                    <button class="period-button" value="180">6개월</button>
+	                                    <button class="period-button" value="365">1년</button>
+	                                </div>
+	                          </div>
+	                      </div>
+	                  </div>
+	                </div>
+	
+	                <!-- 노출여부 -->
+	                <div class="form-row full-width mb-4 mt-4">
+	                  <div class="form-label mb-0">상태</div>
+	                  <div class="form-control-wrap">
+	                  	<th:block th:if="${#strings.equals(param.type, '05') || #strings.equals(param.type, '06')}">
+	                  		<div class="form-check-group">
+		                  		<div class="form-check">
+		                            <input class="form-check-input" type="radio" name="searchUseYn" value="A" checked>
+		                            <label class="form-check-label" for="expAll">전체</label>
+		                        </div>
+		                        <div class="form-check">
+		                            <input class="form-check-input" type="radio" name="searchUseYn" value="Y">
+		                            <label class="form-check-label" for="expShow">사용</label>
+		                        </div>
+		                        <div class="form-check">
+		                            <input class="form-check-input" type="radio" name="searchUseYn" value="N">
+		                            <label class="form-check-label" for="expHide">미사용</label>
+		                        </div>
+							</div>
+	                  	</th:block>
+	                  	<th:block th:unless="${#strings.equals(param.type, '05') || #strings.equals(param.type, '06')}">
+							<div class="form-check-group">
+							    <div class="form-check">
+		                              <input class="form-check-input" type="checkbox" id="expAll" checked>
+		                              <label class="form-check-label" for="expShow">전체</label>
+		                        </div>
+		                        <div class="form-check">
+		                              <input class="form-check-input" type="checkbox" name="status" id="expShow" checked>
+		                              <label class="form-check-label" for="expShow">대기</label>
+		                        </div>
+		                        <div class="form-check">
+		                              <input class="form-check-input" type="checkbox" name="status" id="expCancel" checked>
+		                              <label class="form-check-label" for="expHide">노출</label>
+		                        </div>
+		                        <div class="form-check">
+		                            <input class="form-check-input" type="checkbox" name="status" id="expEnd" checked>
+		                            <label class="form-check-label" for="expHide">종료</label>
+		                        </div>
+							</div>
+	                    </th:block>
+	                  </div>
+	                </div>
+	
+	                <!-- 검색어 -->
+	                <div class="form-row full-width mb-3">
+	                  <div class="form-label mb-0">검색어</div>
+	                  <div class="form-control-wrap flex-grow-1">
+	                      <input type="text" id="keyword" class="form-control" placeholder="검색어를 입력해주세요">
+	                  </div>
+	                </div>
+	
+	                <div class="row">
+	                  <div class="col-12 text-end mt-2">
+	                      <button class="btn btn-primary btn-sm me-2" onclick="searchResult()">
+	                          <i class="fas fa-search"></i>
+	                          검색
+	                      </button>
+	                      <button class="btn btn-light btn-sm" onclick="resetSearch()">
+	                          <i class="fas fa-redo"></i>
+	                          초기화
+	                      </button>
+	                  </div>
+	              </div>
+	            </div>
+	        </div>
+	    </div>
+	    
+	    <!-- contents 영역 -->
+	    <div class="table-section">
+		    <div class="d-flex justify-content-between align-items-center mb-4">
+		        <div class="d-flex align-items-center gap-3">
+		        </div>
+		        <div class="header-actions">
+		        	<button id="left-btn" class="btn btn-dark btn-sm btnDrop" data-bs-toggle="modal" data-bs-target="#commentModal">
+	                    대표문구 설정
+	                </button>
+	                <div class="custom-dropdown">
+	                    <button class="btn btn-primary btn-sm btnDrop" onclick="goInsert()">
+	                        <i class="fas fa-calculator"></i>
+	                        등록
+	                    </button>
+	                    <!-- <div id="myDropdown" class="dropdown-content">
+	                        <a href="#" data-bs-toggle="modal" data-bs-target="#downloadModal">맵핑 대상 다운로드</a>
+	                        <a href="#" data-bs-toggle="modal" data-bs-target="#uploadModal">맵핑 코드 업로드</a>
+	                    </div> -->
+	                </div>
+		        </div>
+		    </div>
+		    
+		    <table class="table custom-table">
+	            <thead>
+	                <tr>
+	                    <th>번호</th>
+	                    <th>편집</th>
+	                    <th class="combination">구분</th>
+	                    <th class="combination">게시 기간</th>
+	                    <th>항목명</th>
+	                    <th class="landing-url">랜딩 URL</th>
+	                    <th>이미지</th>
+	                    <th>사용</th>
+	                    <th>등록자</th>
+	                    <th>등록일</th>
+	                    <th style="display:none;width:120px" class="order-item">순서</th>
+	                </tr>
+	            </thead>
+	            <tbody id="list-area">
+	            </tbody>
+	        </table>
+	        
+	        <div class="d-flex justify-content-left mt-4">
+                <ul class="pagination">
+                    
+                </ul>
+            </div>
+	    </div>
+	</div>
+</div>

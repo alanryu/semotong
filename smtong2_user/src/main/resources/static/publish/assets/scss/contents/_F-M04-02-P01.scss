@@ -1,0 +1,52 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 후기
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 후기 페이지
+.F-M04-02-P01-page {
+
+	// s: 소개 섹션
+	.review-intro-sec {
+		.sec-inner {
+			display: flex;
+			align-items: center;
+			gap: 12rem;
+		}
+		.intro-img {
+			width: 62rem;
+			img {
+				width: 100%;
+			}
+		}
+		.intro-con {
+			p {
+				font-weight: 600;
+				font-size: 20rem;
+				line-height: 28rem;
+				color: #000;
+				em {
+					color: $color-primary;
+				}
+			}
+		}
+
+	}
+	// e: 소개 섹션
+
+	// s: 리뷰 섹션
+	.review-sec {
+		margin-top: 16rem;
+
+		.review-list {
+			@include review-list-02;
+		}
+
+		.review-card {
+			@include review-card-02;
+		}
+
+	}
+	// e: 리뷰 섹션
+}
+// e: 후기 페이지

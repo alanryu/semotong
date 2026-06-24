@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.csm.review.mapper.SemotongReviewMapper">
+
+    <sql id="searchCondition">
+
+        <if test='displayYn != null and displayYn !=""'>
+            AND r.display_yn = #{displayYn}
+        </if>
+
+        <if test='reviewType != null and reviewType !=""'>
+            AND review_type = #{reviewType}
+        </if>
+        
+        <if test='createId != null and createId !=""'>
+            AND r.create_id = #{createId}
+        </if>
+        
+        <if test='planId != null and planId !=""'>
+            AND r.plan_id = #{planId}
+        </if>
+        
+        <if test='companyId != null and companyId !=""'>
+            AND r.company_id = #{companyId}
+        </if>
+        
+    </sql>
+
+    <select id="reviewList" parameterType="kr.co.ucomp.web.csm.review.dto.SemotongReviewDto" resultType="kr.co.ucomp.web.csm.review.entity.SemotongReviewEntity">
+		SELECT
+            r.id,
+            r.review_type as reviewType,
+            r.content as content,
+            r.company_id as companyId,
+            r.plan_id as planId,
+            r.score as score,
+            r.display_yn as displayYn,
+            r.plan_id as planId,
+            r.create_date as createDate,
+            r.create_id as createId,
+            u.username,
+            u.kakao_user_id,
+            r.company_id,
+            c.name AS companyNm,
+            c.logo_img as planLogoImg
+        FROM
+            tb_csm_semotong_review r
+        LEFT JOIN tb_mbm_user u ON r.create_id = u.id
+        LEFT OUTER JOIN tb_mbm_company_list c ON r.company_id = c.id            
+        WHERE 1=1 
+        <include refid="searchCondition"/>
+        ORDER BY r.create_date DESC
+        LIMIT #{offset}, #{recordSize}
+
+    </select>
+    
+    
+    <select id="reviewListCount" parameterType="kr.co.ucomp.web.csm.review.dto.SemotongReviewDto" resultType="int">
+        SELECT count(1)
+        FROM
+            tb_csm_semotong_review r
+        LEFT JOIN tb_mbm_user u ON r.create_id = u.id
+        LEFT OUTER JOIN tb_mbm_company_list c ON r.company_id = c.id            
+        WHERE 1=1
+        <include refid="searchCondition"/>
+
+    </select>
+
+    <select id="review" parameterType="kr.co.ucomp.web.csm.review.dto.SemotongReviewDto" resultType="kr.co.ucomp.web.csm.review.entity.SemotongReviewEntity">
+        SELECT
+            id,
+            review_type,
+            content,
+            score,
+            display_yn,
+            manage_id,
+            manage_memo,
+            create_date,
+            create_id,
+            modified_date,
+            modified_id
+        FROM
+            tb_csm_semotong_review
+        WHERE id=#{id}
+    </select>
+
+    <insert id="insertReview" parameterType="kr.co.ucomp.web.csm.review.entity.SemotongReviewEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+        INSERT INTO tb_csm_semotong_review (review_type, company_id, order_id,plan_id, content, score, display_yn, manage_id, manage_memo, create_id)
+        VALUES(
+            #{reviewType},        
+        	#{companyId},
+        	#{orderId},
+        	#{planId},
+            #{content},
+            #{score},
+            #{displayYn},
+            #{manageId},
+            #{manageMemo},
+            #{createId}            
+        );
+    </insert>
+
+    <update id="updateReview" parameterType="kr.co.ucomp.web.csm.review.entity.SemotongReviewEntity">
+        UPDATE tb_csm_semotong_review 
+        SET
+           content			= #{content}
+           ,score			= #{score}
+           ,modified_id		= #{modifiedId}
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteReview" parameterType="Long">
+        DELETE FROM tb_csm_semotong_review
+        WHERE id=#{id}
+    </delete>
+
+
+
+    <select id="userOrderReviewList" parameterType="map" resultType="kr.co.ucomp.web.csm.review.entity.SemotongReviewEntity">
+		
+		/* userOrderReviewList */
+		SELECT a.id
+				,a.order_seq
+				,a.telecom_cd
+				,a.open_comp_dttm
+				,a.company_id
+				,a.plan_id
+				,c.plan_name
+				,c.plan_name_smt
+				,c.plan_type
+				,c.sup_data_val
+				,c.sup_qos
+				,c.sup_call_val
+				,c.sup_sms_val
+				,c.daily_data
+				,c.normal_price
+				,c.sale_price
+				,c.after_price
+				,c.promotion_period
+				,c.promotion_period_val
+				,c.image_badge_special
+				,c.image_badge_it_comb
+				,c.image_badge_add_data
+				,c.image_badge_add_data_nm
+				,c.image_badge_simple_open		
+				,IFNULL(b.id,-1) AS reviewId
+				,b.review_type	
+				,b.content
+				,b.score
+				,d.logo_img as planLogoImg
+				,d.name AS companyNm
+				,(SELECT CASE WHEN h.amount = h.avail_amount then 'YET' ELSE 'EXX' END 
+					FROM tb_mbm_point_history h 
+					WHERE h.order_id = a.id 
+					AND h.cr_point_type = 'REV'
+					LIMIT 1
+				  ) AS pointHistoryAvailAmount
+		FROM tb_pmb_plan_online_open a
+		LEFT OUTER JOIN tb_csm_semotong_review b 
+		ON a.id = b.order_id
+		LEFT OUTER JOIN tb_pmb_plan_list c
+		ON a.plan_id = c.id
+		LEFT OUTER JOIN tb_mbm_company_list d
+		ON a.company_id = d.id
+		WHERE entr_user_id = #{userId}
+		AND a.order_state = '06'
+
+    </select>
+    
+    <select id="reviewAggregate" parameterType="kr.co.ucomp.web.csm.review.dto.SemotongReviewDto" resultType="kr.co.ucomp.web.csm.review.entity.SemotongReviewEntity">
+    	SELECT 
+    		IFNULL(MIN(score), 0) AS min_score,
+		 	IFNULL(MAX(score), 0) AS max_score,
+		 	IFNULL(AVG(score), 0) AS avg_score,
+		 	COUNT(1) AS cnt
+ 		FROM tb_csm_semotong_review
+ 		WHERE 1=1
+ 		 <if test='planId != null and planId !=""'>
+            AND plan_id = #{planId}
+        </if>
+        
+        <if test='companyId != null and companyId !=""'>
+            AND company_id = #{companyId}
+        </if>
+        
+        <if test="reviewType != null and reviewType !=''">
+        	AND review_type = #{reviewType}
+        </if>
+    </select>    
+
+</mapper>

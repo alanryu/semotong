@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.event.mapper.EvtMapper">
+	
+	<sql id="Base_Column_list">
+		 id				
+		,event_category	
+		,event_mng_sp	
+		,title			
+		,event_thumbnail
+		,event_image	
+		,content		
+		,manager
+		,start_date		
+		,end_date		
+		,DATE_FORMAT(start_date	,'%Y-%m-%d') strStart
+		,DATE_FORMAT(end_date	,'%Y-%m-%d') strEnd
+		,IFNULL(event_notice_sp,'C') event_notice_sp
+		,event_notice_image
+		,event_notice_content
+		,use_yn
+		,create_date	
+		,create_id		
+		,modified_date	
+		,modified_id	
+
+	</sql>
+	
+	<sql id="listWhereInfo">
+		<where>
+			AND use_yn = 'Y'
+			<choose>
+				<when test="searchRunYn.equals('ING') ">  
+					AND start_date <![CDATA[ < ]]> NOW()
+					AND NOW()      <![CDATA[ < ]]> end_date
+					
+				</when>
+				<otherwise> 
+					AND end_date <![CDATA[ < ]]> NOW()
+				</otherwise>
+			</choose>
+			
+			<if test=" searchCategory != null and searchCategory != '' and searchCategory !='ALL' ">
+				AND event_category = #{searchCategory}
+			</if>
+			<if test=" useYn != null and useYn != '' and useYn =='Y' ">
+				AND use_yn = #{useYn}
+			</if>
+			AND event_category != 'TIMEDEAL'
+		</where>
+	</sql>
+	
+	<select id="evtList" parameterType="kr.co.ucomp.web.event.dto.EvtSearchDTO" resultType="kr.co.ucomp.web.event.entity.EvtEntity">
+		SELECT
+		<include refid="Base_Column_list" />
+		FROM tb_evt_event
+		<include refid="listWhereInfo" />
+		<choose>
+			<when test="searchOrderType == 'NEW'">  
+				ORDER BY start_date ASC
+			</when>
+			<when test="searchOrderType == 'END'">  
+				ORDER BY end_date ASC
+			</when>
+			<otherwise> 
+				ORDER BY id DESC 
+			</otherwise>
+		</choose>
+		LIMIT #{offset}, #{recordSize}
+	</select>
+	
+	<select id="evtCount" parameterType="kr.co.ucomp.web.event.dto.EvtSearchDTO" resultType="java.lang.Long">
+		SELECT COUNT(1)
+		FROM tb_evt_event
+		<include refid="listWhereInfo" />
+	</select>
+	
+	
+	<select id="evtById" parameterType="kr.co.ucomp.web.event.dto.EvtSearchDTO" resultType="kr.co.ucomp.web.event.entity.EvtEntity">
+		SELECT
+		<include refid="Base_Column_list" />
+		FROM tb_evt_event
+		WHERE id = #{searchId}
+	</select>
+	
+	<select id="getTimeDealEventId" resultType="java.lang.Long">
+		SELECT id
+		FROM tb_evt_event
+		WHERE event_category = 'TIMEDEAL'
+		ORDER BY id DESC
+		LIMIT 1
+	</select>
+	
+	<insert id="create"  parameterType="kr.co.ucomp.web.event.entity.EvtEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+		INSERT INTO tb_evt_event (event_category, event_mng_sp, title, content, event_thumbnail, manager, start_date, end_date,  create_id, modified_date) 
+		VALUES(	
+				 #{eventCategory}
+				,#{eventMngSp}
+				,#{title}
+				,#{content}
+				
+				,#{eventThumbnail}
+				,#{manager}
+				,#{startDate}
+				,#{endDate}
+				,#{createId}
+				,NULL
+		);
+	</insert>
+	
+	<update id="update"  parameterType="kr.co.ucomp.web.event.entity.EvtEntity" >
+		UPDATE tb_evt_event 
+		SET		 title			=#{title}
+				,content		=#{content}
+				,event_category	=#{eventCategory}
+				,event_thumbnail=#{eventThumbnail}
+				,manager		=#{manager}
+				,start_date		=#{startDate}
+				,end_date		=#{endDate}
+				,modified_date	=now()
+				,modified_id	=#{modifiedId}
+		WHERE id = #{id}
+	
+	</update>
+	
+	<delete id="delete" parameterType="kr.co.ucomp.web.event.entity.EvtEntity">
+		DELETE FROM tb_evt_event
+		WHERE id = #{id}
+	</delete>
+	
+</mapper>

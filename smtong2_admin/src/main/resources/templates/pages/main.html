@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+    <!--    <script th:src="@{/js/page/home.js}"></script>-->
+</th:block>
+	<!-- Container -->
+	<main role="main" class="container">
+		<!-- content -->
+		<div class="content F-M01-page">
+			<!-- 메인 비주얼 섹션 -->
+			<section class="visual-sec">
+				<div class="sec-inner">
+					<div class="sec-body">
+						<h2 class="sec-tit"><em>나에게 딱 맞는</em> <br>요금제를 추천 받아 보세요.</h2>
+						<div class="sec-img"><img src="/images/contents/main-visual-bot.svg" alt="챗봇 캐릭터" /></div>
+						<div class="sec-btn">
+							<button type="button" class="ui-btn">
+								<span>지금 바로 요금제 추천받기!</span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- // 비주얼 섹션 -->
+
+			<!-- 메인 추천딜 섹션 -->
+			<section class="deal-sec">
+				<div class="sec-inner">
+					<div class="sec-header">
+						<h2 class="sec-tit">세모통 얼리버드 추천딜<i class="ui-icn icn-24-clock"></i></h2>
+					</div>
+					<div class="sec-body">
+						<div class="deal-timer">
+							<p class="timer-txt">이벤트 종료까지 남은 시간</p>
+							<div class="timer-labels">
+								<span class="label-num"><span>1</span></span>
+								<span class="label-num"><span>0</span></span>
+								<span class="label-num"><span>0</span></span>
+								<span class="label-split" aria-label=":"></span>
+								<span class="label-num"><span>3</span></span>
+								<span class="label-num"><span>0</span></span>
+								<span class="label-split" aria-label=":"></span>
+								<span class="label-num"><span>4</span></span>
+								<span class="label-num"><span>7</span></span>
+							</div>
+						</div>
+
+						<!-- 추천딜 목록 -->
+						<div class="swiper deal-swiper">
+							<div class="swiper-wrapper">
+								<div class="swiper-slide">
+									<!-- 추천딜 상품 -->
+									<div class="deal-card" role="button" tabindex="0">
+										<div class="card-body">
+											<div class="card-label">
+												<em class="label-best">BEST</em>
+											</div>
+											<h3 class="card-info">셀프로 더 할인된 요금제</h3>
+											<p class="card-tit">셀프 LTE유심 7GB+</p>
+										</div>
+										<div class="card-footer">
+											<p class="card-partner"><img src="/images/partner/logo-snowman.svg" alt="안녕 알뜰폰 snowman" /></p>
+											<p class="card-charge">월 18,700원</p>
+										</div>
+									</div>
+									<!-- 추천딜 상품 -->
+								</div>
+								<div class="swiper-slide">
+									<!-- 추천딜 상품 -->
+									<div class="deal-card" role="button" tabindex="0">
+										<div class="card-body">
+											<div class="card-label">
+												<em class="label-recom">추천</em>
+											</div>
+											<h3 class="card-info">셀프로 더 할인된 요금제</h3>
+											<p class="card-tit">셀프 LTE유심 7GB+</p>
+										</div>
+										<div class="card-footer">
+											<p class="card-partner"><img src="/images/partner/logo-snowman.svg" alt="안녕 알뜰폰 snowman" /></p>
+											<p class="card-charge"><em>월 18,700원</em></p>
+										</div>
+									</div>
+									<!-- 추천딜 상품 -->
+								</div>
+								<div class="swiper-slide">
+									<!-- 추천딜 상품 -->
+									<div class="deal-card" role="button" tabindex="0">
+										<div class="card-body">
+											<div class="card-label">
+												<em class="ui-label style-1 item-recom">추천</em>
+											</div>
+											<h3 class="card-info">셀프로 더 할인된 요금제</h3>
+											<p class="card-tit">셀프 LTE유심 7GB+</p>
+										</div>
+										<div class="card-footer">
+											<p class="card-partner"><img src="/images/partner/logo-snowman.svg" alt="안녕 알뜰폰 snowman" /></p>
+											<p class="card-charge"><em>월 18,700원</em></p>
+										</div>
+									</div>
+									<!-- 추천딜 상품 -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- // 추천딜 섹션 -->
+
+			<!-- 내게 맞는 요금제 섹션 -->
+			<section class="ratePlanA-sec">
+				<div class="sec-inner">
+					<div class="sec-header">
+						<h2 class="sec-tit">내게 맞는 요금제는?</h2>
+						<p class="sec-explain">데이터 사용 패턴에 맞는 카드를 눌러보세요!</p>
+					</div>
+					<div class="sec-body">
+						<!-- 요금제 공통 타입 A : 요금제 리스트 타입 -->
+						<ul class="ratePlanA-list">
+							<li class="ratePlanA-item">
+								<div class="ratePlanA-card" role="button" tabindex="0">
+									<div class="card-thumb">
+										<img src="/images/common/img-plan-price-kakao.png" alt="" />
+									</div>
+									<div class="card-body">
+										<p class="card-tit"><strong>웹서핑, 카톡을<br>주로 사용해요.</strong></p>
+										<p class="card-tag">#추천 #합리파</p>
+										<p class="card-charge">월 0원 부터</p>
+										<p class="card-data"><strong>7GB+</strong></p>
+									</div>
+								</div>
+							</li>
+							<li class="ratePlanA-item">
+								<div class="ratePlanA-card" role="button" tabindex="0">
+									<div class="card-thumb">
+										<img src="/images/common/img-plan-price-melon.png" alt="" />
+									</div>
+									<div class="card-body">
+										<p class="card-tit"><strong>웹툰이나<br>음악을 들어요.</strong></p>
+										<p class="card-tag">#음악 #동영상</p>
+										<p class="card-charge">월 15,900원 부터</p>
+										<p class="card-data"><strong>15GB+</strong></p>
+									</div>
+								</div>
+							</li>
+							<li class="ratePlanA-item">
+								<div class="ratePlanA-card" role="button" tabindex="0">
+									<div class="card-thumb">
+										<img src="/images/common/img-plan-price-youtube.png" alt="" />
+									</div>
+									<div class="card-body">
+										<p class="card-tit"><strong>동영상을 시청하거나<br>게임을 자주해요.</strong></p>
+										<p class="card-tag">#게임 #무제한</p>
+										<p class="card-charge">월 21,900원 부터</p>
+										<p class="card-data"><strong>71GB+</strong></p>
+									</div>
+								</div>
+							</li>
+							<li class="ratePlanA-item">
+								<div class="ratePlanA-card" role="button" tabindex="0">
+									<div class="card-thumb">
+										<img src="/images/common/img-plan-price-low.png" alt="" />
+									</div>
+									<div class="card-body">
+										<p class="card-tit"><strong>저렴한 요금을<br>찾고 있어요.</strong></p>
+										<p class="card-tag">#저렴 #세컨폰</p>
+										<p class="card-charge">월 110원 부터</p>
+										<p class="card-data"><strong>갓성비</strong></p>
+									</div>
+								</div>
+							</li>
+						</ul>
+						<!-- // 요금제 공통 타입 A : 요금제 리스트 타입 -->
+					</div>
+				</div>
+			</section>
+			<!-- // 내게 맞는 요금제 섹션 -->
+
+			<!-- 요금제 추천 섹션 -->
+			<section class="recom-sec">
+				<div class="sec-inner">
+					<div class="sec-header">
+						<h2 class="sec-tit">이런 요금제는 어떠세요?</h2>
+					</div>
+					<div class="sec-body">
+						<ul class="recom-list">
+							<li class="recom-item">
+								<button class="recom-bnr">
+									<i class="ui-icn icn-48-recom-best" aria-hidden="true"></i>
+									<span class="recom-con">
+										<strong class="tit">주간 베스트 10 요금제</strong>
+										<span class="txt">10월 주간 요금제 랭킹</span>
+									</span>
+									<i class="ui-icn icn-24-more-gr" aria-hidden="true"></i>
+								</button>
+							</li>
+							<li class="recom-item">
+								<button class="recom-bnr">
+									<i class="ui-icn icn-48-recom-parent" aria-hidden="true"></i>
+									<span class="recom-con">
+										<strong class="tit">0원 요금제</strong>
+										<span class="txt">세모통에만 있는 0원 요금제</span>
+									</span>
+									<i class="ui-icn icn-24-more-gr" aria-hidden="true"></i>
+								</button>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</section>
+			<!-- // 요금제 추천 섹션 -->
+
+			<!-- 이벤트 섹션 -->
+			<!-- 2차 수정 : 이벤트 배너 위치 변경 -->
+			<section class="event-sec">
+				<div class="sec-inner">
+					<button type="button" class="event-bnr">
+						<img src="/images/upload/@bnr-event-03-mo.png" alt="이벤트 내용" class="only-mo" />
+						<img src="/images/upload/@bnr-event-01-pc.png" alt="이벤트 내용" class="only-pc" />
+					</button>
+				</div>
+			</section>
+			<!-- // 이벤트 섹션 -->
+
+			<!-- 특별한 이벤트 섹션 -->
+			<section class="special-event-sec">
+				<div class="sec-inner">
+					<div class="sec-header">
+						<h2 class="sec-tit">세모통 이벤트</h2>
+						<button type="button" class="ui-btn btn-more">
+							<span>더보기</span>
+							<i class="ui-icn icn-14-more-gr" aria-label="더보기"></i>
+						</button>
+					</div>
+					<div class="sec-body">
+						<ul class="special-event-list">
+							<li class="special-event-item">
+								<button type="button" class="special-event-bnr">
+									<img src="/images/upload/@bnr-special-01-mo.png" alt="이벤트 내용" class="only-mo" />
+									<img src="/images/upload/@bnr-event-01-pc.png" alt="이벤트 내용" class="only-pc" />
+								</button>
+							</li>
+							<li class="special-event-item">
+								<button type="button" class="special-event-bnr">
+									<img src="/images/upload/@bnr-special-01-mo.png" alt="이벤트 내용" class="only-mo" />
+									<img src="/images/upload/@bnr-event-01-pc.png" alt="이벤트 내용" class="only-pc" />
+								</button>
+							</li>
+							<li class="special-event-item">
+								<button type="button" class="special-event-bnr">
+									<img src="/images/upload/@bnr-special-01-mo.png" alt="이벤트 내용" class="only-mo" />
+									<img src="/images/upload/@bnr-event-01-pc.png" alt="이벤트 내용" class="only-pc" />
+								</button>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</section>
+			<!-- // 특별한 이벤트 섹션 -->
+
+			<!-- 리뷰 섹션 -->
+			<section class="review-sec">
+				<div class="sec-inner">
+					<div class="sec-header">
+						<h2 class="sec-tit">세모통 고객님들의 리뷰에요</h2>
+						<button type="button" class="ui-btn btn-more">
+							<span>더보기</span>
+							<i class="ui-icn icn-14-more-gr" aria-label="더보기"></i>
+						</button>
+					</div>
+					<div class="sec-body">
+						<!-- 리뷰 스와이프 -->
+						<div class="swiper review-swiper">
+							<div class="swiper-wrapper">
+								<div class="swiper-slide">
+									<div class="review-card">
+										<div class="card-rating" aria-label="평점 5점">
+											<i class="ui-icn icn-16-star-bl" aria-hidden="true"></i>
+											<strong class="val">5.0</strong>
+										</div>
+										<p class="card-name">홍길동</p>
+										<p class="card-cont">
+											리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다
+											리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다
+										</p>
+									</div>
+								</div>
+								<div class="swiper-slide">
+									<div class="review-card">
+										<div class="card-rating" aria-label="평점 5점">
+											<i class="ui-icn icn-16-star-bl" aria-hidden="true"></i>
+											<strong class="val">5.0</strong>
+										</div>
+										<p class="card-name">홍길동</p>
+										<p class="card-cont">
+											리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다
+											리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- // 리뷰 리스트 -->
+					</div>
+				</div>
+			</section>
+			<!-- // 리뷰 섹션 -->
+
+			<!-- 파트너사 섹션 -->
+			<section class="partner-sec">
+				<div class="sec-inner">
+					<div class="sec-header">
+						<h2 class="sec-tit">세모통의 파트너사를 소개합니다.</h2>
+						<button type="button" class="ui-btn btn-more">
+							<span>더보기</span>
+							<i class="ui-icn icn-14-more-gr" aria-label="더보기"></i>
+						</button>
+					</div>
+					<div class="sec-body">
+						<!-- 파트너사 -->
+						<div class="swiper partner-swiper">
+							<div class="swiper-wrapper">
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-gogofactory.svg" alt="고고모바일" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-liivm.svg" alt="KB Liiv m" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-mobilemona.svg" alt="MO-NA" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-s1mobile.svg" alt="에스원 안심모바일" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-well.svg" alt="위너스텔" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-eyagi.svg" alt="이야기 모바일" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-pindirect.svg" alt="pindirect" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-lghellovision.svg" alt="Hello Mobile" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-amobile.svg" alt="A mobile" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-kt.svg" alt="KT" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-ktmmobile.svg" alt="KT M mobile" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-ktskylife.svg" alt="KT skyLife" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-sk7mobile.svg" alt="SK 7 mobile" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-sktelecom.svg" alt="SK telecom" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-smartel.svg" alt="SMT" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-uplusumobile.svg" alt="U+ U mobile" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-yytelecom.svg" alt="여유알뜰모바일" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-snowman.svg" alt="안녕 알뜰폰 snowman" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-shakemobile.svg" alt="Shake mobile" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-eyes.svg" alt="아이즈 모바일" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-erel.svg" alt="EREL Mobile" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-egmobile.svg" alt="EG Mobile" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-chance.svg" alt="chance Mobile" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-freet.svg" alt="프리티" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-ins.svg" alt="INS MOBILE" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-kctvjeju.svg" alt="KCTV" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-kgmobile.svg" alt="KG 모바일+" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-lguplus.svg" alt="LG U+" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-marvelring.svg" alt="marvelring" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-mobing.svg" alt="Mobing" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-sugar.svg" alt="sugar Mobile" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="partner-link">
+										<img src="/images/partner/logo-tplus.svg" alt="tplus" />
+									</button>
+								</li>
+							</div>
+						</div>
+						<!-- // 파트너사 공통 -->
+					</div>
+				</div>
+			</section>
+			<!-- // 파트너사 섹션 -->
+		</div>
+		<!-- // content -->
+	</main>
+	<!-- // Container -->
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/order_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='약관동의'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ 
+<script id="modelListTmpl" type="text/x-jquery-tmpl">
+	<li role="option" tabindex="0" data-bs-dismiss="modal" data-memorylist="${etc1}" onclick="setSelectValuedMD('${code}', this)">${codeName}</li>
+</script>
+
+
+<script id="memoryListTmpl" type="text/x-jquery-tmpl">
+	<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValuedMM('${value}', this)">${value}GB</li>
+</script>
+
+
+ <script>
+	
+	
+	$( document ).ready(function() {
+		
+		getCodeList('esim_model');
+	   
+	});
+	
+	function setSelectValuedMD(code,element) {
+		
+		$("#esimModel").val(code);
+		
+		$('#esimModelList li').removeClass('is-selected');
+	    $(element).addClass('is-selected');
+	    var codeNm = $(element).html();
+	    
+		$('#spEsimModel').html(codeNm);
+		
+		var memoryLst = $(element).attr("data-memorylist");
+		setSelectMemory(memoryLst);
+		
+	}
+	
+	//  메모리
+	function setSelectMemory(val) {
+		
+		const dataList = val.split("/").map(value => ({ value }));
+		$('#memoryListTmpl').tmpl(dataList).appendTo('#esimMemoryList');
+	}
+	
+	function setSelectValuedMM(code,element) {
+		
+		$("#esimMemory").val(code);
+		
+		$('#esimMemoryList li').removeClass('is-selected');
+	    $(element).addClass('is-selected');
+	    var codeNm = $(element).html();
+	    
+		$('#spEsimMemory').html(codeNm);
+		
+		
+	}
+	
+	
+	function getCodeList(scode_group) {
+		
+		var params = {
+				codeGroup : scode_group,
+				userYn : "Y",
+				page : 1,
+				recordSize : 99
+		}
+		
+		$.ajax({
+			   url : '/cmm/cmmcode/code/list',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+			   beforeSend: function(xhr){
+			       xhr.setRequestHeader(header,token);
+			    },
+				success: function (data) {
+					var resData = data.data;
+					$('#esimModelList').empty();
+					$('#modelListTmpl').tmpl(data.data).appendTo('#esimModelList');
+			    },
+				error : function(request, status, error){
+					
+		        },
+		        complete:function(){
+		           
+		        }
+			});
+		
+	}
+	
+	
+	
+	
+	function chkInputValid() {		
+		
+		$('#btnNext').attr('disabled', 'disabled');
+		
+		var esimModelLength = $("#esimModel").val();
+		var esimMemoryLength = $("#esimMemory").val();
+		
+		var frmNoLength = $('#frmNo').val().length;		
+		var frmEIDLength = $('#frmEID').val().length;		
+		var frmIMEILength = $('#frmIMEI').val().length;
+		var frmIMEI2Length = $('#frmIMEI2').val().length;
+		
+		if(esimModelLength==0) {
+			return;
+		}
+		
+		if(esimMemoryLength==0) {
+			return;
+		}
+		
+		if(frmNoLength < 3) {
+			return;
+		}
+		
+		
+		if(frmEIDLength != 32) {
+			return;
+		}
+		
+		if(frmIMEILength != 15) {
+			return;
+		}
+		
+		if(frmIMEI2Length != 15) {
+			return;
+		}
+
+		$('#btnNext').removeAttr("disabled");		
+		
+		
+		
+	}
+	
+	
+	function goNext() {
+		
+		
+		$("#esimNumber").val($('#frmNo').val());
+		$("#esimEid").val($('#frmEID').val());
+		$("#esimImei1").val($('#frmIMEI').val());
+		$("#esimImei2").val($('#frmIMEI2').val());
+		moveNextOrder('/order/indentifyCert');
+	}
+	
+ </script>
+</th:block>
+
+<!-- Container -->
+<main role="main" class="container">
+<th:block th:include="pages/order/incOrderForm :: orderFormFragment"></th:block>
+<!-- content -->
+			<div class="content F-QU-page F-QU01-08-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">요금제를 사용할 <br>휴대폰 정보를 입력해 주세요.</h2>
+						</div>
+						<div class="sec-body">
+							<!-- 등록폼 -->
+							<div class="basic-frm">
+								<!-- 모델명 선택 -->
+								<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label class="tit" for="frmName">모델명</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-sel">
+											<!-- 선택전 is-placeholder, (선택후 삭제) -->
+											<button type="button" id="frmType" class="sel is-placeholder" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#selectEsimModal">
+												<span id="spEsimModel">휴대폰 기종 선택</span>
+												<i class="ui-icn icn-20-select-arw" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+								<!-- // 모델명 선택 -->
+
+								<!-- 용량 선택 -->
+								<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label class="tit" for="frmName">용량</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-sel">
+											<!-- 선택전 is-placeholder, (선택후 삭제) -->
+											<button type="button" id="frmType" class="sel is-placeholder" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#selectEsimMemory">
+												<span id="spEsimMemory">선택</span>
+												<i class="ui-icn icn-20-select-arw" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+								<!-- // 용량 선택 -->
+
+								<!-- 일련번호 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmNo" class="tit">일련번호</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="text" name="" id="frmNo" value="" placeholder="예) F1W7LQ9A2V" title="" class="inp" oninput="chkInputMax(this,'frmEID');chkInputValid();"/>
+										</div>
+									</div>
+								</div>
+								<!-- // 일련번호 입력 -->
+
+								<!-- EID 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmEID" class="tit">EID</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="tel" name="" id="frmEID" value="" placeholder="EID" title="" class="inp" oninput="setRegularNumber(this);chkInputMax(this,'frmIMEI');chkInputValid();" maxlength="32"/>
+										</div>
+									</div>
+								</div>
+								<!-- // EID 입력 -->
+
+								<!-- IMEI 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmIMEI" class="tit">IMEI</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="tel" name="" id="frmIMEI" value="" placeholder="IMEI" title="" class="inp" oninput="setRegularNumber(this);chkInputMax(this,'frmIMEI2');chkInputValid();" maxlength="15"/>
+										</div>
+									</div>
+								</div>
+								<!-- // IMEI 입력 -->
+
+								<!-- IMEI2 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmIMEI2" class="tit">IMEI2</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="tel" name="" id="frmIMEI2" value="" placeholder="IMEI2" title="" class="inp" oninput="setRegularNumber(this);chkInputValid();" maxlength="15"/>
+										</div>
+									</div>
+								</div>
+								<!-- // IMEI2 입력 -->
+							</div>
+							<!-- // 등록폼 -->
+
+							<!-- 휴대폰정보 안내 -->
+							<div class="ui-accordion accordion-help" id="accordionFQU0108">
+								<div class="accordion-item">
+									<h3 class="accordion-header">
+										<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#FQU0108-01-acco"
+											aria-expanded="false" aria-controls="FQU0108-01-acco">
+											<i class="ui-icn icn-16-info-gr" aria-hidden="true"></i>
+											<span>휴대폰 정보를 어디서 확인하나요?</span>
+											<i class="ui-icn icn-16-acco-gr" aria-hidden="true"></i>
+										</button>
+									</h3>
+									<div id="FQU0108-01-acco" class="accordion-collapse collapse" data-bs-parent="#accordionFQU0108">
+										<div class="accordion-body">
+											<!-- 탭 영역 -->
+											<div class="ui-tab tab-style3">
+												<ul class="tab-list" id="FQU0108Tab" role="tablist">
+													<li class="tab-item" role="presentation">
+														<button class="tab-link active" id="FQU0108-01-tab" data-bs-toggle="tab" data-bs-target="#FQU0108-01-pane" type="button" role="tab" aria-controls="FQU0108-01-pane" aria-selected="true">아이폰</button>
+													</li>
+													<li class="tab-item" role="presentation">
+														<button class="tab-link" id="FQU0108-02-tab" data-bs-toggle="tab" data-bs-target="#FQU0108-02-pane" type="button" role="tab" aria-controls="FQU0108-02-pane" aria-selected="false">삼성</button>
+													</li>
+												</ul>
+											</div>
+											<div class="tab-content" id="FQU0108TabContent">
+												<!-- 아이폰 패널 -->
+												<div class="tab-pane fade show active" id="FQU0108-01-pane" role="tabpanel" aria-labelledby="FQU0108-01-tab" tabindex="0">
+													<div class="set-device">
+														<p class="set-device-desc">
+															<i class="ui-icn icn-20-set-ios" aria-hidden="true"></i><em>설정</em>&nbsp;&gt;&nbsp;<em>일반</em>&nbsp;&gt;&nbsp;<em>정보</em>에서&nbsp;<em>3가지 정보 모두 확인할 수 있어요.</em>
+														</p>
+														<figure class="set-device-img">
+															<img src="/images/common/img-set-ios.png" alt="IOS 설정화면" />
+														</figure>
+													</div>
+												</div>
+												<!-- //아이폰 패널 -->
+												 <!-- 삼성 패널 -->
+												<div class="tab-pane fade" id="FQU0108-02-pane" role="tabpanel" aria-labelledby="FQU0108-02-tab" tabindex="0">
+													<div class="set-device">
+														<p class="set-device-desc">
+															<i class="ui-icn icn-20-set-aos" aria-hidden="true"></i>
+															<em>설정</em>&nbsp;&gt;&nbsp;<em>휴대전화 정보</em>&nbsp;&gt;&nbsp;<em>규제 정보</em>에서 확인할 수 있어요.</em>
+														</p>
+														<figure class="set-device-img">
+															<img src="/images/common/img-set-aos.png" alt="AOS 설정화면" />
+														</figure>
+													</div>
+												</div>
+												<!-- //삼성 패널 -->
+											</div>
+											<!-- //탭 영역 -->
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- //휴대폰정보 안내 -->
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" disabled id="btnNext" onclick="goNext();">
+							<span>다음</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 플로팅 섹션 -->
+			</div>
+			<!-- // content -->
+</main>
+
+
+
+<!-- 휴대폰 기종 modal select -->
+<div class="modal modal-select fade" id="selectEsimModal" tabindex="-1" role="dialog" aria-labelledby="selectEsimModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 class="modal-title" id="selectEsimModalLabel">휴대폰 기종 선택</h3>
+				<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+				<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+					<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+				</button>
+			</div>
+			<div class="modal-body">
+				<!-- 콤보박스 섹션 -->
+				<section class="select-sec">
+					<div class="sec-inner">
+						<!-- modal-select 공통 -->
+						<ul class="select-listbox" role="listbox" id="esimModelList">
+							
+						</ul>
+					</div>
+				</section>
+				<!-- // 콤보박스 섹션 -->
+			</div>
+		</div>
+	</div>
+</div>
+<!-- // 정렬 modal select -->
+
+
+<!-- 휴대폰 기종별  메모리 select -->
+<div class="modal modal-select fade" id="selectEsimMemory" tabindex="-1" role="dialog" aria-labelledby="selectEsimMemoryLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 class="modal-title" id="selectEsimMemoryLabel">메모리 선택</h3>
+				<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+				<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+					<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+				</button>
+			</div>
+			<div class="modal-body">
+				<!-- 콤보박스 섹션 -->
+				<section class="select-sec">
+					<div class="sec-inner">
+						<!-- modal-select 공통 -->
+						<ul class="select-listbox" role="listbox" id="esimMemoryList">
+							 
+						</ul>
+					</div>
+				</section>
+				<!-- // 콤보박스 섹션 -->
+			</div>
+		</div>
+	</div>
+</div>
+<!-- // 정렬 modal select -->
+
+	
+</html>

@@ -1,0 +1,98 @@
+
+
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>세모통</title>
+        <link
+            href="../../css/bootstrap.min.css"
+            rel="stylesheet">
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            rel="stylesheet">
+          <link
+            href="../../css/design.css"
+            rel="stylesheet">
+    </head>
+  <body>
+
+      <a href="javascript:;" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#applyDetailModal">
+        <span class="log-status__text">신청내역 상세보기</span>
+      </a>
+
+
+      <!-- 신청내역 상세보기 -->
+        <div class="modal fade" id="applyDetailModal" tabindex="-1" aria-labelledby="applyDetailModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                  <div class="modal-header border-0 pb-0 mb-4">
+                      <h5 class="modal-title fs-6 fw-bold" id="scrapingModalLabel">신청내역 상세보기</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="bnf-select__table__outer otherH mb-3">
+                    <table class="bnf-select__table">
+                      <colgroup>
+                        <col style="width: 20%">
+                        <col style="width: 80%">
+                      </colgroup>
+                      <tr>
+                          <td class="bnf-select__th">유입구분</td>
+                          <td class="bnf-select__td">단순랜딩</td>
+                      </tr>
+                      <tr>
+                          <td class="bnf-select__th">랜딩URL</td>
+                          <td class="bnf-select__td">
+                            <a href="https://www.amobile.co.kr/plan/67085">https://www.amobile.co.kr/plan/67085</a>
+                          </td>
+                      </tr>
+                      <tr>
+                        <td class="bnf-select__th">신청자</td>
+                        <td class="bnf-select__td">홍길동</td>
+                      </tr>
+                      <tr>
+                        <td class="bnf-select__th">연락처</td>
+                        <td class="bnf-select__td">010-1234-5678</td>
+                      </tr>
+                      <tr>
+                        <td class="bnf-select__th">MNO</td>
+                        <td class="bnf-select__td">SKT</td>
+                      </tr>
+                      <tr>
+                        <td class="bnf-select__th">사업자</td>
+                        <td class="bnf-select__td">이야기모바일</td>
+                      </tr>
+                      <tr>
+                        <td class="bnf-select__th">요금제명</td>
+                        <td class="bnf-select__td">
+                          <a href="">이야기 스탠다드S 11휴GB+</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="bnf-select__th">기본요금</td>
+                        <td class="bnf-select__td">39,600원</td>
+                      </tr>
+                      <tr>
+                        <td class="bnf-select__th">할인요금</td>
+                        <td class="bnf-select__td">19,800원</td>
+                      </tr>
+                      <tr>
+                        <td class="bnf-select__th">할인기간</td>
+                        <td class="bnf-select__td">7개월</td>
+                      </tr>
+                    </table>
+                  </div>
+                  <div class="modal-footer border-0 pt-0">
+                      <button type="button" class="btn btn-secondary px-4 btn-sm" data-bs-dismiss="modal" aria-label="Close">닫기</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+
+
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script src="../../js/script.js"></script>
+    </body>
+</html>

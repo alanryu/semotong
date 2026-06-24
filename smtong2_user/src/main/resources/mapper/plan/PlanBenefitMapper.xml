@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.plan.mapper.PlanBenefitMapper">
+
+	<sql id="listWhereInfo">
+		<where>
+
+			<if test='keyword != null and keyword !=""'>
+				AND title LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test='displayYn != null and displayYn !=""'>
+				AND display_yn = #{displayYn}
+			</if>
+
+		</where>
+	</sql>
+
+
+	<!--  ========================================= benefit manage ============================================================ -->
+	<sql id="Base_Column_list_Info">
+		id
+		,title
+		,content
+		,display_yn
+		,create_date
+		,create_id
+		,GET_ADMIN_USER_NM(create_id) as createNm
+		,modified_date
+		,modified_id
+		,GET_ADMIN_USER_NM(modified_id) as modifiedNm
+
+	</sql>
+
+   	<select id="infolist" parameterType="kr.co.ucomp.web.plan.dto.PlanBenefitSearchDto" resultType="kr.co.ucomp.web.plan.entity.PlanBenefitEntity">
+		  SELECT
+	            <include refid="Base_Column_list_Info" />
+	        FROM
+	            tb_pmb_plan_benefits
+	        <include refid="listWhereInfo" />
+	        ORDER BY id
+	        LIMIT #{offset}, #{recordSize}
+
+	</select>
+
+	<select id="infolistCount" parameterType="kr.co.ucomp.web.plan.dto.PlanBenefitSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+	        FROM
+	            tb_pmb_plan_benefits
+	        <include refid="listWhereInfo" />
+	</select>
+
+	<select id="infoDetail" parameterType="int" resultType="kr.co.ucomp.web.plan.entity.PlanBenefitEntity">
+		SELECT
+	            <include refid="Base_Column_list_Info" />
+	        FROM
+	            tb_pmb_plan_benefits
+	        WHERE id=#{id}
+	</select>
+
+    <insert id="createInfo" parameterType="kr.co.ucomp.web.plan.entity.PlanBenefitEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_pmb_plan_benefits (title, content, display_yn, create_id, modified_id)
+        VALUES (
+	        #{title},
+	        #{content},
+	        #{displayYn},
+	        #{createId},
+	        #{modifiedId}
+        )
+    </insert>
+
+    <update id="updateInfo" parameterType="kr.co.ucomp.web.plan.entity.PlanBenefitEntity">
+        UPDATE tb_pmb_plan_benefits SET
+            title = #{title},
+            content = #{content},
+            display_yn = #{displayYn},
+            modified_date = NOW(),
+            modified_id = #{modifiedId}
+        WHERE id=#{id}
+    </update>
+
+    <delete id="deleteInfo" parameterType="int">
+        DELETE FROM tb_pmb_plan_benefits
+        WHERE id=#{id}
+    </delete>
+
+
+	<!--  ========================================= benefit mapping manage ============================================================ -->
+
+
+
+
+	<!--  ========================================= benefit manage ============================================================ -->
+
+	<sql id="listWhereMap">
+		<if test='keyword != null and keyword !=""'>
+			AND c.title LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+
+		<if test='displayYn != null and displayYn !=""'>
+			AND c.display_yn = #{displayYn}
+		</if>
+
+		<if test='planId != null and planId !=""'>
+			AND a.plan_list_id = #{planId}
+		</if>
+
+	</sql>
+
+	<sql id="Base_Column_list_map">
+		a.id
+		,a.plan_list_id
+		,a.order_no
+		,b.plan_name as planName
+		,a.plan_benefits_id
+		,c.title as benefitTitle
+		,c.content as benefitContent
+		,c.major_category_id
+		,c.minor_category_id
+		,c.icon
+		,(select name from tb_pmb_benefits_category where id = c.major_category_id LIMIT 1) majorCategoryName
+		,(select name from tb_pmb_benefits_category where id = c.minor_category_id AND parent_id = c.major_category_id  LIMIT 1) minorCategoryName
+		,a.create_date
+		,a.create_id
+		,GET_ADMIN_USER_NM(a.create_id) as createNm
+		,a.modified_date
+		,a.modified_id
+		,GET_ADMIN_USER_NM(a.modified_id) as modifiedNm
+		,c.provider
+		,c.icon benefitIcon
+		,c.benefit_url
+    ,c.benefit_image
+		,c.benefit_content as benefitContent2
+
+
+	</sql>
+
+   	<select id="maplist" parameterType="kr.co.ucomp.web.plan.dto.PlanBenefitSearchDto" resultType="kr.co.ucomp.web.plan.entity.PlanBenefitMappingEntity">
+		  SELECT
+	            <include refid="Base_Column_list_map" />
+			FROM tb_pmb_plan_benefits_list a,  tb_pmb_plan_list b, tb_pmb_plan_benefits c
+			WHERE a.plan_list_id = b.id
+			AND a.plan_benefits_id = c.id
+	        <include refid="listWhereMap" />
+	        ORDER BY a.plan_list_id, a.order_no
+	        LIMIT #{offset}, #{recordSize}
+
+	</select>
+
+   	<select id="maplistAll" parameterType="kr.co.ucomp.web.plan.dto.PlanBenefitSearchDto" resultType="kr.co.ucomp.web.plan.entity.PlanBenefitMappingEntity">
+		  SELECT
+	            <include refid="Base_Column_list_map" />
+			FROM tb_pmb_plan_benefits_list a,  tb_pmb_plan_list b, tb_pmb_plan_benefits c
+			WHERE a.plan_list_id = b.id
+			AND a.plan_benefits_id = c.id
+			AND c.display_yn = 'Y'
+			AND NOW() <![CDATA[>=]]> c.display_period_start
+    	AND NOW() <![CDATA[<=]]> c.display_period_end
+	        <include refid="listWhereMap" />
+	        ORDER BY a.plan_list_id, a.order_no, a.id desc
+
+	</select>
+
+	<select id="maplistCount" parameterType="kr.co.ucomp.web.plan.dto.PlanBenefitSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+			FROM tb_pmb_plan_benefits_list a,  tb_pmb_plan_list b, tb_pmb_plan_benefits c
+			WHERE a.plan_list_id = b.id
+			AND a.plan_benefits_id = c.id
+	        <include refid="listWhereMap" />
+	</select>
+
+	<select id="mapDetail" parameterType="int" resultType="kr.co.ucomp.web.plan.entity.PlanBenefitMappingEntity">
+		SELECT
+	            <include refid="Base_Column_list_map" />
+			FROM tb_pmb_plan_benefits_list a,  tb_pmb_plan_list b, tb_pmb_plan_benefits c
+			WHERE a.plan_list_id = b.id
+			AND a.plan_benefits_id = c.id
+	        AND a.id=#{id}
+	</select>
+
+    <insert id="createmap" parameterType="kr.co.ucomp.web.plan.entity.PlanBenefitMappingEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_pmb_plan_benefits_list (plan_list_id, plan_benefits_id,order_no,create_id, modified_id)
+        VALUES (
+	        #{planListId},
+	        #{planBenefitsId},
+	        #{orderNo},
+	        #{createId},
+	        #{modifiedId}
+        )
+    </insert>
+
+    <update id="updatemap" parameterType="kr.co.ucomp.web.plan.entity.PlanBenefitMappingEntity">
+        UPDATE tb_pmb_plan_benefits_list SET
+            plan_list_id = #{planListId},
+            plan_benefits_id = #{planBenefitsId},
+            order_no = #{orderNo},
+            modified_date = NOW(),
+            modified_id = #{modifiedId}
+        WHERE id=#{id}
+    </update>
+
+    <delete id="deletemap" parameterType="int">
+        DELETE FROM tb_pmb_plan_benefits_list
+        WHERE id=#{id}
+    </delete>
+
+
+	<!--  ========================================= benefit mapping manage ============================================================ -->
+
+
+</mapper>

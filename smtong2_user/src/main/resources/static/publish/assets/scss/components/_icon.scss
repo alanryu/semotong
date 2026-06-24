@@ -1,0 +1,1253 @@
+/*-------------------------------------------------------------------
+	분류그룹 : 아이콘
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------
+	@@ 공통
+-------------------------------------------------------------------*/
+.ui-icn {
+	flex: none;
+	position: relative;
+	overflow: hidden;
+	display: inline-block;
+	vertical-align: middle;
+	background: no-repeat center 1000rem/contain;
+}
+
+.ui-icn::before {
+	content: "";
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background: no-repeat center center/contain;
+	transform: translateY(0%);
+}
+
+.ui-icn::after {
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background: no-repeat center center/contain;
+	transform: translateY(110%);
+}
+
+[class*=icn-12] {
+	width: 12rem;
+	height: 12rem;
+}
+
+[class*=icn-14] {
+	width: 14rem;
+	height: 14rem;
+}
+
+[class*=icn-16] {
+	width: 16rem;
+	height: 16rem;
+}
+
+[class*=icn-18] {
+	width: 18rem;
+	height: 18rem;
+}
+
+[class*=icn-20] {
+	width: 20rem;
+	height: 20rem;
+}
+
+[class*=icn-24] {
+	width: 24rem;
+	height: 24rem;
+}
+
+[class*=icn-26] {
+	width: 26rem;
+	height: 26rem;
+}
+
+[class*=icn-28] {
+	width: 28rem;
+	height: 28rem;
+}
+
+[class*=icn-30] {
+	width: 30rem;
+	height: 30rem;
+}
+
+[class*=icn-32] {
+	width: 32rem;
+	height: 32rem;
+}
+
+[class*=icn-34] {
+	width: 34rem;
+	height: 34rem;
+}
+
+[class*=icn-40] {
+	width: 40rem;
+	height: 40rem;
+}
+
+[class*=icn-44] {
+	width: 44rem;
+	height: 44rem;
+}
+
+[class*=icn-48] {
+	width: 48rem;
+	height: 48rem;
+}
+
+[class*=icn-50] {
+	width: 50rem;
+	height: 50rem;
+}
+
+[class*=icn-54] {
+	width: 54rem;
+	height: 54rem;
+}
+
+[class*=icn-62] {
+	width: 62rem;
+	height: 62rem;
+}
+
+[class*=icn-64] {
+	width: 64rem;
+	height: 64rem;
+}
+
+[class*=icn-80] {
+	width: 80rem;
+	height: 80rem;
+}
+
+[class*=icn-100] {
+	width: 100rem;
+	height: 100rem;
+}
+
+[class*=icn-104] {
+	width: 104rem;
+	height: 104rem;
+}
+
+[class*=icn-110] {
+	width: 110rem;
+	height: 110rem;
+}
+
+[class*=icn-140] {
+	width: 140rem;
+	height: 140rem;
+}
+
+/*-------------------------------------------------------------------
+	@@ 아이콘
+	- 클래스명과 파일명을 매칭 (폴더와 확장자를 분리)
+	- 컬러 호버와, 파일 호버의 대응 추가
+-------------------------------------------------------------------*/
+.icn-24-demo-edit-bk::before {
+	background-image: url("../images/common/icn-24-demo-edit-bk.svg");
+}
+
+.icn-24-demo-medal-none::before {
+	background-image: url("../images/common/icn-24-demo-medal-none.png");
+}
+
+.icn-24-demo-medal-none::after {
+	content: "";
+	background-image: url("../images/common/icn-24-demo-medal-hover.png");
+}
+
+.is-selected .icn-24-demo-medal-none::before {
+	transform: translateY(110%);
+}
+
+.is-selected .icn-24-demo-medal-none::after {
+	transform: translateY(0%);
+}
+
+.icn-12-tel-gr::before {
+	background-image: url("../images/common/icn-12-tel-gr.svg");
+}
+
+.icn-12-mail-gr::before {
+	background-image: url("../images/common/icn-12-mail-gr.svg");
+}
+
+.icn-12-antena-gr::before {
+	background-image: url("../images/common/icn-12-antena-gr.svg");
+}
+
+.icn-12-wifi-gr::before {
+	background-image: url("../images/common/icn-12-wifi-gr.svg");
+}
+
+.icn-12-plan-check-pr::before {
+	background-image: url("../images/common/icn-12-plan-check-pr.svg");
+}
+
+.icn-12-compare-sel::before {
+	background-image: url("../images/common/icn-12-plus-dr.svg");
+}
+
+.icn-12-compare-sel {
+	background-image: url("../images/common/icn-12-check-pr.svg");
+}
+
+.is-selected .icn-12-compare-sel {
+	background-position: center center;
+}
+
+.is-selected .icn-12-compare-sel::before {
+	transform: translateY(-110%);
+}
+
+.icn-14-more-gr::before {
+	background-image: url("../images/common/icn-14-more-gr.svg");
+}
+
+.icn-14-more-pr::before {
+	background-image: url("../images/common/icn-14-more-pr.svg");
+}
+
+.icn-14-noti-gr::before {
+	background-image: url("../images/common/icn-14-noti-gr.svg");
+}
+
+.icn-14-info-gr::before {
+	background-image: url("../images/common/icn-14-info-gr.svg");
+}
+
+.icn-14-plan-link-pr::before {
+	background-image: url("../images/common/icn-14-plan-link-pr.svg");
+}
+
+.icn-14-plan-self-pr::before {
+	background-image: url("../images/common/icn-14-plan-self-pr.svg");
+}
+
+.icn-14-plan-star-pr::before {
+	background-image: url("../images/common/icn-14-plan-star-pr.svg");
+}
+
+.icn-14-plan-expand-bk::before {
+	background-image: url("../images/common/icn-14-plan-expand-bk.svg");
+}
+
+.icn-14-plan-more-gr::before {
+	background-image: url("../images/common/icn-14-plan-more-gr.svg");
+}
+
+.icn-14-plan-data-pr::before {
+	background-image: url("../images/common/icn-14-plan-data-pr.svg");
+}
+
+.icn-14-plan-sale-pr::before {
+	background-image: url("../images/common/icn-14-plan-sale-pr.svg");
+}
+
+.icn-16-more-gr::before {
+	background-image: url("../images/common/icn-16-more-gr.svg");
+}
+
+.icn-16-more-02-gr::before {
+	background-image: url("../images/common/icn-16-more-02-gr.svg");
+}
+
+.icn-16-more-wh::before {
+	background-image: url("../images/common/icn-16-more-wh.svg");
+}
+
+.icn-16-more-pr::before {
+	background-image: url("../images/common/icn-16-more-pr.svg");
+}
+
+.icn-16-star-bk::before {
+	background-image: url("../images/common/icn-16-star-bk.svg");
+}
+
+.icn-16-star-pr::before {
+	background-image: url("../images/common/icn-16-star-pr.svg");
+}
+
+.icn-16-star-bl::before {
+	background-image: url("../images/common/icn-16-star-bl.svg");
+}
+
+.icn-16-emo-hand::before {
+	background-image: url("../images/common/icn-16-emo-hand.png");
+}
+
+.icn-16-plan-quse-gr::before {
+	background-image: url("../images/common/icn-16-plan-quse-gr.svg");
+}
+
+.icn-16-plan-gift-gr::before {
+	background-image: url("../images/common/icn-16-plan-gift-gr.svg");
+}
+
+.icn-16-more-list-gr::before {
+	background-image: url("../images/common/icn-16-more-list-gr.svg");
+}
+
+.icn-16-select-arw::before {
+	background-image: url("../images/common/icn-16-select-arw.svg");
+}
+
+.icn-16-select-arw::after {
+	content: "";
+	background-image: url("../images/common/icn-16-select-arw-sel.svg");
+}
+
+.is-selected .icn-16-select-arw::before {
+	transform: translateY(110%);
+}
+
+.is-selected .icn-16-select-arw::after {
+	transform: translateY(0%);
+}
+
+.icn-16-sort-gr::before {
+	background-image: url("../images/common/icn-16-sort-gr.svg");
+}
+
+.icn-16-acco-arw::before {
+	background-image: url("../images/common/icn-16-acco-arw.svg");
+}
+
+.icn-16-usim-quse-gr::before {
+	background-image: url("../images/common/icn-16-usim-quse-gr.svg");
+}
+
+.icn-16-remove-bk::before {
+	background-image: url("../images/common/icn-16-remove-bk.svg");
+}
+
+.icn-16-star::before {
+	background-image: url("../images/common/icn-16-star.svg");
+}
+
+.icn-16-plus-gr::before {
+	background-image: url("../images/common/icn-16-plus-gr.svg");
+}
+
+.icn-16-compare-sel::before {
+	background-image: url("../images/common/icn-16-plus-dr.svg");
+}
+
+.icn-16-compare-sel {
+	background-image: url("../images/common/icn-16-check-pr.svg");
+}
+
+.is-selected .icn-16-compare-sel {
+	background-position: center center;
+}
+
+.is-selected .icn-16-compare-sel::before {
+	transform: translateY(-110%);
+}
+
+.icn-16-info-gr::before {
+	background-image: url("../images/common/icn-16-info-gr.svg");
+}
+
+.icn-16-acco-gr::before {
+	background-image: url("../images/common/icn-16-acco-gr.svg");
+}
+
+.icn-16-plan-expand-gr::before {
+	background-image: url("../images/common/icn-16-plan-expand-gr.svg");
+}
+
+.icn-16-more-bk::before {
+	background-image: url("../images/common/icn-16-more-bk.svg");
+}
+
+.icn-18-kakao-bk::before {
+	background-image: url("../images/common/icn-18-kakao-bk.png");
+}
+
+.icn-18-plan-best-wh::before {
+	background-image: url("../images/common/icn-18-plan-best-wh.svg");
+}
+
+.icn-20-headset-bk::before {
+	background-image: url("../images/common/icn-20-headset-bk.svg");
+}
+
+.icn-20-plan-like-gr::before {
+	background-image: url("../images/common/icn-20-plan-like-gr.svg");
+}
+
+.icn-20-plan-like-gr::after {
+	content: "";
+	background-image: url("../images/common/icn-20-plan-like-sel.svg");
+}
+
+.is-selected .icn-20-plan-like-gr::before {
+	transform: translateY(110%);
+}
+
+.is-selected .icn-20-plan-like-gr::after {
+	transform: translateY(0%);
+}
+
+.icn-20-plan-share-gr::before {
+	background-image: url("../images/common/icn-20-plan-share-gr.svg");
+}
+
+.icn-20-select-arw::before {
+	background-image: url("../images/common/icn-20-select-arw.svg");
+}
+
+.icn-20-acco-arw::before {
+	background-image: url("../images/common/icn-20-acco-arw.svg");
+}
+
+.icn-20-select-chk-sel::before {
+	background-image: url("../images/common/icn-20-select-chk-sel.svg");
+}
+
+.icn-20-remove-gr::before {
+	background-image: url("../images/common/icn-20-remove-gr.svg");
+}
+
+.icn-20-rdo-sel::before {
+	background-image: url("../images/common/icn-20-rdo-sel.svg");
+}
+
+.icn-20-user-gr::before {
+	background-image: url("../images/common/icn-20-user-gr.svg");
+}
+
+.icn-20-srch-bk::before {
+	background-image: url("../images/common/icn-20-srch-bk.svg");
+}
+
+.icn-20-pin-gr::before {
+	/* 2차 수정 : 고정게시글 아이콘 추가 */
+	background-image: url("../images/common/icn-20-pin-gr.svg");
+}
+
+.icn-20-set-aos::before {
+	background-image: url("../images/common/icn-20-set-aos.png");
+}
+
+.icn-20-set-ios::before {
+	background-image: url("../images/common/icn-20-set-ios.png");
+}
+
+.icn-20-link-wh::before {
+	background-image: url("../images/common/icn-20-link-wh.svg");
+}
+
+.icn-20-expand-arw-gr::before {
+	background-image: url("../images/common/icn-20-expand-arw-gr.svg");
+}
+
+.icn-24-plus-bk::before {
+	background-image: url("../images/common/icn-24-plus-bk.svg");
+}
+
+.icn-24-dropdown-arw-gr::before {
+	background-image: url("../images/common/icn-24-dropdown-arw-gr.svg");
+}
+
+.icn-24-nav-01-gr::before {
+	background-image: url("../images/common/icn-24-nav-01-gr.svg");
+}
+
+.icn-24-nav-01-gr::after {
+	content: "";
+	background-image: url("../images/common/icn-24-nav-01-pre.svg");
+}
+
+.icn-24-nav-01-gr {
+	background-image: url("../images/common/icn-24-nav-01-sel.svg");
+}
+
+.ui-btn:hover .icn-24-nav-01-gr::before,
+.ui-btn:active .icn-24-nav-01-gr::before,
+.ui-btn:focus-visible .icn-24-nav-01-gr::before {
+	transform: translateY(110%);
+}
+
+.ui-btn:hover .icn-24-nav-01-gr::after,
+.ui-btn:active .icn-24-nav-01-gr::after,
+.ui-btn:focus-visible .icn-24-nav-01-gr::after {
+	transform: translateY(0%);
+}
+
+.is-selected .icn-24-nav-01-gr {
+	background-position: center center;
+}
+
+.is-selected .icn-24-nav-01-gr::before,
+.is-selected .icn-24-nav-01-gr::after {
+	transform: translateY(-110%);
+	transform: translateY(-110%);
+}
+
+.icn-24-nav-02-gr::before {
+	background-image: url("../images/common/icn-24-nav-02-gr.svg");
+}
+
+.icn-24-nav-02-gr::after {
+	content: "";
+	background-image: url("../images/common/icn-24-nav-02-pre.svg");
+}
+
+.icn-24-nav-02-gr {
+	background-image: url("../images/common/icn-24-nav-02-sel.svg");
+}
+
+.ui-btn:hover .icn-24-nav-02-gr::before,
+.ui-btn:active .icn-24-nav-02-gr::before,
+.ui-btn:focus-visible .icn-24-nav-02-gr::before {
+	transform: translateY(110%);
+}
+
+.ui-btn:hover .icn-24-nav-02-gr::after,
+.ui-btn:active .icn-24-nav-02-gr::after,
+.ui-btn:focus-visible .icn-24-nav-02-gr::after {
+	transform: translateY(0%);
+}
+
+.is-selected .icn-24-nav-02-gr {
+	background-position: center center;
+}
+
+.is-selected .icn-24-nav-02-gr::before,
+.is-selected .icn-24-nav-02-gr::after {
+	transform: translateY(-110%);
+	transform: translateY(-110%);
+}
+
+.icn-24-nav-03-gr::before {
+	background-image: url("../images/common/icn-24-nav-03-gr.svg");
+}
+
+.icn-24-nav-03-gr::after {
+	content: "";
+	background-image: url("../images/common/icn-24-nav-03-pre.svg");
+}
+
+.icn-24-nav-03-gr {
+	background-image: url("../images/common/icn-24-nav-03-sel.svg");
+}
+
+.ui-btn:hover .icn-24-nav-03-gr::before,
+.ui-btn:active .icn-24-nav-03-gr::before,
+.ui-btn:focus-visible .icn-24-nav-03-gr::before {
+	transform: translateY(110%);
+}
+
+.ui-btn:hover .icn-24-nav-03-gr::after,
+.ui-btn:active .icn-24-nav-03-gr::after,
+.ui-btn:focus-visible .icn-24-nav-03-gr::after {
+	transform: translateY(0%);
+}
+
+.is-selected .icn-24-nav-03-gr {
+	background-position: center center;
+}
+
+.is-selected .icn-24-nav-03-gr::before,
+.is-selected .icn-24-nav-03-gr::after {
+	transform: translateY(-110%);
+	transform: translateY(-110%);
+}
+
+.icn-24-nav-04-gr {
+	width: 52rem;
+}
+.icn-24-nav-04-gr::before {
+	background-image: url("../images/common/icn-24-nav-04-gr.svg");
+}
+
+.icn-24-nav-04-gr::after {
+	content: "";
+	background-image: url("../images/common/icn-24-nav-04-pre.svg");
+}
+
+.ui-btn:hover .icn-24-nav-04-gr::before,
+.ui-btn:active .icn-24-nav-04-gr::before,
+.ui-btn:focus-visible .icn-24-nav-04-gr::before {
+	transform: translateY(110%);
+}
+
+.ui-btn:hover .icn-24-nav-04-gr::after,
+.ui-btn:active .icn-24-nav-04-gr::after,
+.ui-btn:focus-visible .icn-24-nav-04-gr::after {
+	transform: translateY(0%);
+}
+
+.is-selected .icn-24-nav-04-gr {
+	background-position: center center;
+}
+
+.is-selected .icn-24-nav-04-gr::before,
+.is-selected .icn-24-nav-04-gr::after {
+	transform: translateY(-110%);
+	transform: translateY(-110%);
+}
+
+.icn-24-nav-05-gr::before {
+	background-image: url("../images/common/icn-24-nav-05-gr.svg");
+}
+
+.icn-24-nav-05-gr::after {
+	content: "";
+	background-image: url("../images/common/icn-24-nav-05-pre.svg");
+}
+
+.icn-24-nav-05-gr {
+	background-image: url("../images/common/icn-24-nav-05-sel.svg");
+}
+
+.ui-btn:hover .icn-24-nav-05-gr::before,
+.ui-btn:active .icn-24-nav-05-gr::before,
+.ui-btn:focus-visible .icn-24-nav-05-gr::before {
+	transform: translateY(110%);
+}
+
+.ui-btn:hover .icn-24-nav-05-gr::after,
+.ui-btn:active .icn-24-nav-05-gr::after,
+.ui-btn:focus-visible .icn-24-nav-05-gr::after {
+	transform: translateY(0%);
+}
+
+.is-selected .icn-24-nav-05-gr {
+	background-position: center center;
+}
+
+.is-selected .icn-24-nav-05-gr::before,
+.is-selected .icn-24-nav-05-gr::after {
+	transform: translateY(-110%);
+	transform: translateY(-110%);
+}
+
+.icn-24-clock::before {
+	background-image: url("../images/common/icn-24-clock.png");
+}
+
+.icn-24-clock-wh::before {
+	background-image: url("../images/common/icn-24-clock-wh.png");
+}
+
+.icn-24-more-gr::before {
+	background-image: url("../images/common/icn-24-more-gr.svg");
+}
+
+.icn-24-star-gr::before {
+	background-image: url("../images/common/icn-24-star-gr.svg");
+}
+
+.icn-24-star-gr::after {
+	content: "";
+	background-image: url("../images/common/icn-24-star-sel.svg");
+}
+
+.is-selected .icn-24-star-gr::before {
+	transform: translateY(110%);
+}
+
+.is-selected .icn-24-star-gr::after {
+	transform: translateY(0%);
+}
+
+.icn-24-filter-gr::before {
+	background-image: url("../images/common/icn-24-filter-gr.svg");
+}
+.icn-24-filter-bk::before {
+	background-image: url("../images/common/icn-24-filter-bk.svg");
+}
+
+.icn-24-refresh-gr::before {
+	background-image: url("../images/common/icn-24-refresh-gr.svg");
+}
+
+.icn-24-floating-review::before {
+	background-image: url("../images/common/icn-24-floating-review.svg");
+}
+
+.icn-24-floating-recom::before {
+	background-image: url("../images/common/icn-24-floating-recom.svg");
+}
+
+.icn-24-floating-kakao::before {
+	background-image: url("../images/common/icn-24-floating-kakao.svg");
+}
+
+.icn-24-aside-01::before {
+	background-image: url("../images/common/icn-24-aside-01.svg");
+}
+
+.icn-24-aside-02::before {
+	background-image: url("../images/common/icn-24-aside-02.svg");
+}
+
+.icn-24-aside-03::before {
+	background-image: url("../images/common/icn-24-aside-03.svg");
+}
+
+.icn-24-aside-04::before {
+	background-image: url("../images/common/icn-24-aside-04.svg");
+}
+
+.icn-24-aside-05::before {
+	background-image: url("../images/common/icn-24-aside-05.svg");
+}
+
+.icn-24-aside-06::before {
+	background-image: url("../images/common/icn-24-aside-06.svg");
+}
+
+.icn-24-close-bk::before {
+	background-image: url("../images/common/icn-24-close-bk.svg");
+}
+
+.icn-26-npay::before {
+	background-image: url("../images/common/icn-26-npay.png");
+}
+
+.icn-26-cash::before {
+	background-image: url("../images/common/icn-26-cash.png");
+}
+
+.icn-28-moving::before {
+	background-image: url("../images/common/icn-28-moving.png");
+}
+
+.icn-28-antena-gr::before {
+	background-image: url("../images/common/icn-28-antena-gr.svg");
+}
+
+.icn-28-tv-gr::before {
+	background-image: url("../images/common/icn-28-tv-gr.svg");
+}
+
+.icn-28-tel-gr::before {
+	background-image: url("../images/common/icn-28-tel-gr.svg");
+}
+
+.icn-28-bps-100m::before {
+	background-image: url("../images/common/icn-28-bps-100m.svg");
+}
+
+.icn-28-bps-500m::before {
+	background-image: url("../images/common/icn-28-bps-500m.svg");
+}
+
+.icn-28-bps-1g::before {
+	background-image: url("../images/common/icn-28-bps-1g.svg");
+}
+
+.icn-28-arw::before {
+	/* 4차 수정 : 스와이프 아이콘 추가(여기부터) */
+	background-image: url("../images/common/icn-28-arw.svg");
+}
+
+.icn-28-arw::after {
+	content: "";
+	background-image: url("../images/common/icn-28-arw-hover.svg");
+}
+
+.ui-btn:hover .icn-28-arw::before,
+.ui-btn:active .icn-28-arw::before,
+.ui-btn:focus-visible .icn-28-arw::before {
+	transform: translateY(110%);
+}
+
+.ui-btn:hover .icn-28-arw::after,
+.ui-btn:active .icn-28-arw::after,
+.ui-btn:focus-visible .icn-28-arw::after {
+	/* 4차 수정 : 스와이프 아이콘 추가(여기까지) */
+	transform: translateY(0%);
+}
+
+.icn-30-floating-logo::before {
+	background-image: url("../images/common/icn-30-floating-logo.svg");
+}
+
+.icn-30-floating-close::before {
+	background-image: url("../images/common/icn-30-floating-close.svg");
+}
+
+.icn-30-floating-top::before {
+	/* 3차 수정 : 푸터 Top버튼 이미지 교체 */
+	background-image: url("../images/common/icn-30-floating-top.svg");
+}
+
+.icn-32-back-bk::before {
+	background-image: url("../images/common/icn-32-back-bk.svg");
+}
+
+.icn-32-headset-bk::before {
+	background-image: url("../images/common/icn-32-headset-bk.svg");
+}
+
+.icn-32-anb-bk::before {
+	background-image: url("../images/common/icn-32-anb-bk.svg");
+}
+
+.icn-32-close-bk::before {
+	background-image: url("../images/common/icn-32-close-bk.svg");
+}
+
+.icn-32-close-wh::before {
+	background-image: url("../images/common/icn-32-close-wh.svg");
+}
+
+.icn-32-remove-bk::before {
+	background-image: url("../images/common/icn-32-remove-bk.svg");
+}
+
+.icn-32-acco-arw::before {
+	background-image: url("../images/common/icn-32-acco-arw.svg");
+}
+
+.icn-34-bank-hb::before {
+	background-image: url("../images/bank/icn-34-bank-hb.png");
+}
+
+.icn-34-bank-ibk::before {
+	background-image: url("../images/bank/icn-34-bank-ibk.png");
+}
+
+.icn-34-bank-kakao::before {
+	background-image: url("../images/bank/icn-34-bank-kakao.png");
+}
+
+.icn-34-bank-kb::before {
+	background-image: url("../images/bank/icn-34-bank-kb.png");
+}
+
+.icn-34-bank-kbank::before {
+	background-image: url("../images/bank/icn-34-bank-kbank.png");
+}
+
+.icn-34-bank-nh::before {
+	background-image: url("../images/bank/icn-34-bank-nh.png");
+}
+
+.icn-34-bank-sb::before {
+	background-image: url("../images/bank/icn-34-bank-sb.png");
+}
+
+.icn-34-bank-sc::before {
+	background-image: url("../images/bank/icn-34-bank-sc.png");
+}
+
+.icn-34-bank-toss::before {
+	background-image: url("../images/bank/icn-34-bank-toss.png");
+}
+
+.icn-34-bank-wb::before {
+	background-image: url("../images/bank/icn-34-bank-wb.png");
+}
+
+.icn-34-bank-wo::before {
+	background-image: url("../images/bank/icn-34-bank-wo.png");
+}
+
+.icn-34-bank-bnk::before {
+	background-image: url("../images/bank/icn-34-bank-bnk.png");
+}
+
+.icn-34-bank-kjb::before {
+	background-image: url("../images/bank/icn-34-bank-kjb.png");
+}
+
+.icn-34-bank-dgb::before {
+	background-image: url("../images/bank/icn-34-bank-dgb.png");
+}
+
+.icn-34-bank-kdb::before {
+	background-image: url("../images/bank/icn-34-bank-kdb.png");
+}
+
+.icn-34-bank-kfcc::before {
+	background-image: url("../images/bank/icn-34-bank-kfcc.png");
+}
+
+.icn-34-bank-suhyup::before {
+	background-image: url("../images/bank/icn-34-bank-suhyup.png");
+}
+
+.icn-34-bank-shinhyup::before {
+	background-image: url("../images/bank/icn-34-bank-shinhyup.png");
+}
+
+.icn-34-bank-citi::before {
+	background-image: url("../images/bank/icn-34-bank-citi.png");
+}
+
+.icn-40-plan-cate-01::before {
+	background-image: url("../images/common/icn-44-plan-cate-01.png");
+}
+
+.icn-40-plan-cate-02::before {
+	background-image: url("../images/common/icn-44-plan-cate-02.png");
+}
+
+.icn-40-plan-cate-03::before {
+	background-image: url("../images/common/icn-44-plan-cate-03.png");
+}
+
+.icn-40-plan-cate-04::before {
+	background-image: url("../images/common/icn-44-plan-cate-04.png");
+}
+
+.icn-40-plan-cate-05::before {
+	background-image: url("../images/common/icn-44-plan-cate-05.png");
+}
+
+.icn-40-plan-cate-06::before {
+	background-image: url("../images/common/icn-44-plan-cate-06.png");
+}
+
+.icn-44-plan-cate-01::before {
+	background-image: url("../images/common/icn-44-plan-cate-01.png");
+}
+
+.icn-44-plan-cate-02::before {
+	background-image: url("../images/common/icn-44-plan-cate-02.png");
+}
+
+.icn-44-plan-cate-03::before {
+	background-image: url("../images/common/icn-44-plan-cate-03.png");
+}
+
+.icn-48-recom-best::before {
+	background-image: url("../images/common/icn-48-recom-best.png");
+}
+
+.icn-48-recom-parent::before {
+	background-image: url("../images/common/icn-48-recom-parent.png");
+}
+
+.icn-50-sat-good::before {
+	background-image: url("../images/common/icn-50-sat-good.svg");
+}
+
+.icn-50-sat-good::after {
+	content: "";
+	background-image: url("../images/common/icn-50-sat-good-sel.svg");
+}
+
+.is-selected .icn-50-sat-good::before {
+	transform: translateY(110%);
+}
+
+.is-selected .icn-50-sat-good::after {
+	transform: translateY(0%);
+}
+
+.icn-50-sat-soso::before {
+	background-image: url("../images/common/icn-50-sat-soso.svg");
+}
+
+.icn-50-sat-soso::after {
+	content: "";
+	background-image: url("../images/common/icn-50-sat-soso-sel.svg");
+}
+
+.is-selected .icn-50-sat-soso::before {
+	transform: translateY(110%);
+}
+
+.is-selected .icn-50-sat-soso::after {
+	transform: translateY(0%);
+}
+
+.icn-50-sat-bad::before {
+	background-image: url("../images/common/icn-50-sat-bad.svg");
+}
+
+.icn-50-sat-bad::after {
+	content: "";
+	background-image: url("../images/common/icn-50-sat-bad-sel.svg");
+}
+
+.is-selected .icn-50-sat-bad::before {
+	transform: translateY(110%);
+}
+
+.is-selected .icn-50-sat-bad::after {
+	transform: translateY(0%);
+}
+
+.icn-50-cert-kakao::before {
+	background-image: url("../images/common/icn-50-cert-kakao.png");
+}
+
+.icn-50-cert-card::before {
+	background-image: url("../images/common/icn-50-cert-card.png");
+}
+
+.icn-54-floating-kakao::before {
+	background-image: url("../images/common/icn-54-floating-kakao.png");
+}
+
+.icn-54-floating-bot::before {
+	background-image: url("../images/common/icn-54-floating-bot.png");
+}
+
+.icn-62-motong::before {
+	/* 2차 수정 : 캐릭터 이미지 파일 교체 */
+	background-image: url("../images/common/icn-62-motong.png");
+}
+
+.icn-64-internet-bk::before {
+	background-image: url("../images/common/icn-64-internet-bk.svg");
+}
+
+.icn-64-tv-bk::before {
+	background-image: url("../images/common/icn-64-tv-bk.svg");
+}
+
+.icn-80-kakao::before {
+	background-image: url("../images/common/icn-80-kakao.svg");
+}
+
+.icn-80-copy::before {
+	background-image: url("../images/common/icn-80-copy.svg");
+}
+
+.icn-100-nodata-recom::before {
+	background-image: url("../images/common/icn-100-nodata-recom.svg");
+}
+
+.icn-100-nodata-bookmark::before {
+	background-image: url("../images/common/icn-100-nodata-bookmark.svg");
+}
+
+.icn-100-nodata-recent::before {
+	background-image: url("../images/common/icn-100-nodata-recent.svg");
+}
+
+.icn-100-nodata-reg::before {
+	background-image: url("../images/common/icn-100-nodata-reg.svg");
+}
+
+.icn-100-nodata-srch::before {
+	background-image: url("../images/common/icn-100-nodata-srch.svg");
+}
+
+.icn-104-choice-kt-nor::before {
+	background-image: url("../images/common/icn-104-choice-kt-nor.png");
+}
+
+.icn-104-choice-kt-nor::after {
+	content: "";
+	background-image: url("../images/common/icn-104-choice-kt-sel.png");
+}
+
+.icn-104-choice-lg-nor::before {
+	background-image: url("../images/common/icn-104-choice-lg-nor.png");
+}
+
+.icn-104-choice-lg-nor::after {
+	content: "";
+	background-image: url("../images/common/icn-104-choice-lg-sel.png");
+}
+
+.icn-104-choice-lghv-nor::before {
+	background-image: url("../images/common/icn-104-choice-lghv-nor.png");
+}
+
+.icn-104-choice-lghv-nor::after {
+	content: "";
+	background-image: url("../images/common/icn-104-choice-lghv-sel.png");
+}
+
+.icn-104-choice-sk-nor::before {
+	background-image: url("../images/common/icn-104-choice-sk-nor.png");
+}
+
+.icn-104-choice-sk-nor::after {
+	content: "";
+	background-image: url("../images/common/icn-104-choice-sk-sel.png");
+}
+
+.icn-104-choice-skb-nor::before {
+	background-image: url("../images/common/icn-104-choice-skb-nor.png");
+}
+
+.icn-104-choice-skb-nor::after {
+	content: "";
+	background-image: url("../images/common/icn-104-choice-skb-sel.png");
+}
+
+.icn-104-choice-skylife-nor::before {
+	background-image: url("../images/common/icn-104-choice-skylife-nor.png");
+}
+
+.icn-104-choice-skylife-nor::after {
+	content: "";
+	background-image: url("../images/common/icn-104-choice-skylife-sel.png");
+}
+
+.icn-110-nodata-cry::before {
+	background-image: url("../images/common/icn-110-nodata-cry.svg");
+}
+
+.icn-140-complete::before {
+	background-image: url("../images/common/icn-140-complete.svg");
+}
+
+.icn-140-change::before {
+	background-image: url("../images/common/icn-140-change.svg");
+}
+
+.icn-140-fail::before {
+	background-image: url("../images/common/icn-140-fail.svg");
+}
+
+.icn-h20-speed-low::before {
+	background-image: url("../images/common/icn-h20-speed-low.svg");
+}
+
+.icn-h20-speed-low::after {
+	content: "";
+	background-image: url("../images/common/icn-h20-speed-low-sel.svg");
+}
+
+.icn-h20-speed-nor::before {
+	background-image: url("../images/common/icn-h20-speed-nor.svg");
+}
+
+.icn-h20-speed-nor::after {
+	content: "";
+	background-image: url("../images/common/icn-h20-speed-nor-sel.svg");
+}
+
+.icn-h20-speed-high::before {
+	background-image: url("../images/common/icn-h20-speed-high.svg");
+}
+
+.icn-h20-speed-high::after {
+	content: "";
+	background-image: url("../images/common/icn-h20-speed-high-sel.svg");
+}
+
+.icn-h20-sk {
+	width: 12rem;
+	height: 20rem;
+
+	&::before {
+		background-image: url("../images/common/icn-h20-sk.png");
+	}
+}
+
+.icn-h20-kt {
+	width: 15rem;
+	height: 20rem;
+
+	&::before {
+		background-image: url("../images/common/icn-h20-kt.png");
+	}
+}
+
+.icn-h20-lgu {
+	width: 62rem;
+	height: 20rem;
+
+	&::before {
+		background-image: url("../images/common/icn-h20-lgu.png");
+	}
+}
+
+.icn-h20-lgu-02 {
+	width: 20rem;
+	height: 20rem;
+
+	&::before {
+		background-image: url("../images/common/icn-h20-lgu-02.png");
+	}
+}
+
+// 삭제예정 2025-07-09
+.icn-h16-kt {
+	width: 20rem;
+	height: 16rem;
+
+	&::before {
+		mask: url("../images/common/icn-h16-kt-wh.svg") no-repeat 0 0 / 100% auto;
+		background: #B7B9BA;
+	}
+}
+
+.icn-h16-lgu {
+	width: 46rem;
+	height: 16rem;
+
+	&::before {
+		mask: url("../images/common/icn-h16-lgu-wh.svg") no-repeat 0 0 / 100% auto;
+		background: #B7B9BA;
+	}
+}
+
+.icn-h16-b {
+	width: 15rem;
+	height: 16rem;
+
+	&::before {
+		mask: url("../images/common/icn-h16-b-wh.svg") no-repeat 0 0 / 100% auto;
+		background: #B7B9BA;
+	}
+}
+
+.icn-h16-skylife {
+	width: 51rem;
+	height: 16rem;
+
+	&::before {
+		mask: url("../images/common/icn-h16-skylife-wh.svg") no-repeat 0 0 / 100% auto;
+		background: #B7B9BA;
+	}
+}
+
+// 교체소스 2025-07-09
+.icn-40-kt-wh::before {
+  -webkit-mask: url("../images/common/icn-40-kt-wh.svg") no-repeat 0 0/100% auto;
+  mask: url("../images/common/icn-40-kt-wh.svg") no-repeat 0 0/100% auto;
+  background: #b7b9ba;
+}
+
+.icn-40-lgu-wh::before {
+  -webkit-mask: url("../images/common/icn-40-lgu-wh.svg") no-repeat 0 0/100% auto;
+  mask: url("../images/common/icn-40-lgu-wh.svg") no-repeat 0 0/100% auto;
+  background: #b7b9ba;
+}
+
+.icn-40-sk-wh::before {
+  -webkit-mask: url("../images/common/icn-40-sk-wh.svg") no-repeat 0 0/100% auto;
+  mask: url("../images/common/icn-40-sk-wh.svg") no-repeat 0 0/100% auto;
+  background: #b7b9ba;
+}
+
+.icn-40-b-wh::before {
+  -webkit-mask: url("../images/common/icn-40-b-wh.svg") no-repeat 0 0/100% auto;
+  mask: url("../images/common/icn-40-b-wh.svg") no-repeat 0 0/100% auto;
+  background: #b7b9ba;
+}
+
+.icn-40-skylife-wh::before {
+  -webkit-mask: url("../images/common/icn-40-skylife-wh.svg") no-repeat 0 0/100% auto;
+  mask: url("../images/common/icn-h16-skylife-wh.svg") no-repeat 0 0/100% auto;
+  background: #b7b9ba;
+}

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/order_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='약관동의'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ 
+ <script>
+	
+	
+	$( document ).ready(function() {
+		selIdenfySp("01");
+		var custBirth = getBirthDateFromRRN($("#userSsn").val());
+		$("#custBd").val(custBirth)
+		
+		$("#issuDt01").focus();
+	});
+	
+	
+	
+	function chkInputValid() {		
+		$('#btnNext').attr('disabled', 'disabled');
+		
+		var IdenfySp = $("#disAuthJoinDiv").val();
+		
+		if(IdenfySp =="01") {
+			var custIssuDtId = $('#issuDt01').val().length;
+			
+			if(custIssuDtId != 8) {
+				return;
+			}
+		} else {
+			var licenseNum01Length = $('#licenseNum01').val().length;
+			var licenseNum02Length = $('#licenseNum02').val().length;
+			var licenseNum03Length = $('#licenseNum03').val().length;
+			var licenseNum04Length = $('#licenseNum04').val().length;
+			var custIssuDtIdLength = $('#issuDt02').val().length;
+			//var custsecureNumLength = $('#secureNum').val().length;
+			var custBdLength = $('#custBd').val().length;
+			
+			
+			
+			if(licenseNum01Length != 2) {
+				return;
+			}
+			if(licenseNum02Length != 2) {
+				return;
+			}
+			if(licenseNum03Length != 6) {
+				return;
+			}
+			if(licenseNum04Length != 2) {
+				return;
+			}
+			
+			if(custIssuDtIdLength != 8) {
+				return;
+			}
+			
+			/* if(custsecureNumLength != 6) {
+				return;
+			}
+			 */
+			if(custBdLength != 8) {
+				return;
+			}
+			
+			
+		}
+		
+		$('#btnNext').removeAttr("disabled");		
+		
+	}
+	
+	
+	function selIdenfySp(sp) {
+		$('#btnNext').attr('disabled', 'disabled');
+		$('#issuDt01').val("");
+		
+		$('#licenseNum01').val("");
+		$('#licenseNum02').val("");
+		$('#licenseNum03').val("");
+		$('#licenseNum04').val("");
+		$('#issuDt02').val("");
+		//$('#secureNum').val("");
+		
+		
+		$("#disAuthJoinDiv").val(sp);
+	}
+	
+	
+	
+	function callIdentifyCert() {
+		var certSp = "";
+		var issuDt = "";
+		var custhid = "";
+		var custnm = "";
+		
+		if($("#disAuthJoinDiv").val() =="01") {
+			certSp = "104";
+			issuDt = $("#issuDt01").val();
+			custhid = $('#userSsn').val();
+			custnm =  $('#orderNm').val();
+		} else {
+			certSp = "111";
+			issuDt = $("#issuDt02").val();
+			custhid = $('#custBd').val();
+			custnm =  $('#orderNm').val();
+		}
+		
+		$("#cmmLoadingBar").show();
+		
+		var params = {
+				custnm : custnm,
+				custhid : custhid,
+				issudt : issuDt,
+				licenseNum : $('#licenseNum01').val() + "" +  $('#licenseNum02').val() + "" +  $('#licenseNum03').val() + "" +  $('#licenseNum04').val(),
+				secureNum : "000000",//$('#secureNum').val() ,
+				identifySp : certSp 
+		}
+		
+		$.ajax({
+			   url : '/order/identifyCert',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+			   beforeSend: function(xhr){
+			       xhr.setRequestHeader(header,token);
+			    },
+				success: function (data) {
+					$("#cmmLoadingBar").hide();
+					var resCode = data.data.resultStatus;
+					if(resCode == "200") {
+						var AGREEMENT = data.data.AGREEMENT;
+						var DISAGREEMENT_REASON = data.data.DISAGREEMENT_REASON;
+						if(AGREEMENT =="Y") {
+							alertModalShow("신분증 인증이 완료되었습니다.","",goNext);
+						} else {
+							alertModalShow(DISAGREEMENT_REASON)
+						}
+					} else {
+						alertModalShow("인증 요청이 실패 하였습니다. 다시 시도 바랍니다.");
+					}
+			    },
+				error : function(request, status, error){
+					alertModalShow("인증 요청이 실패 하였습니다. 다시 시도 바랍니다.");
+					$("#cmmLoadingBar").hide();
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        	$("#cmmLoadingBar").hide();
+		        }
+			});
+		
+	}
+	
+	
+	function goNext() {
+		
+		if($("#disAuthJoinDiv").val() =="01") {
+			$("#authOrgDt").val($("#issuDt01").val())
+			
+		} else {
+			$("#authOrgDt").val($("#issuDt02").val())
+			$("#driverNumber").val($('#licenseNum01').val() + "" +  $('#licenseNum02').val() + "" +  $('#licenseNum03').val() + "" +  $('#licenseNum04').val());
+			$("#driverSecureNum").val($("#secureNum").val())
+		}
+		
+		moveNextOrder('/order/paymentInfo');
+	}
+	
+	
+ </script>
+</th:block>
+
+<!-- Container -->
+<main role="main" class="container">
+<th:block th:include="pages/order/incOrderForm :: orderFormFragment"></th:block>
+<!-- content -->
+			<div class="content F-QU-page F-QU01-10-01-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">신분증 정보를 입력해주세요.</h2>
+							<p class="sec-explain">신분증에 표시된 부분을 확인해주세요.</p>
+						</div>
+						<div class="sec-body">
+							<!-- 탭 영역 -->
+							<div class="ui-tab tab-style1">
+								<ul class="tab-list" role="tablist">
+									<li class="tab-item" role="presentation">
+										<button class="tab-link active" id="FQU0110-01" data-bs-toggle="tab" data-bs-target="#FQU0110-01-pane" type="button" role="tab" aria-controls="FQU0110-01-pane" aria-selected="true" onclick="selIdenfySp('01');">주민등록증</button>
+									</li>
+									<li class="tab-item" role="presentation">
+										<button class="tab-link" id="FQU0110-02" data-bs-toggle="tab" data-bs-target="#FQU0110-02-pane" type="button" role="tab" aria-controls="FQU0110-02-pane" aria-selected="false" onclick="selIdenfySp('02');">운전면허증</button>
+									</li>
+								</ul>
+							</div>
+							<div class="tab-content">
+								<!-- 주민등록증 패널 -->
+								<div class="tab-pane fade show active" id="FQU0110-01-pane" role="tabpanel" aria-labelledby="FQU0110-01" tabindex="0">
+									<figure class="persnal-card">
+										<img src="/images/common/img-social-card.png" alt="주민등록증 예시" />
+									</figure>
+
+									<!-- 등록폼 -->
+									<div class="basic-frm">
+										<!-- 이름 입력 -->
+										<div class="frm-field">
+											<div class="frm-title">
+											</div>
+											<div class="frm-content">
+												<div class="ui-inp">
+													 <p class="inp-txt" th:text="${orderReq.orderNm}">세모통</p>
+												</div>
+											</div>
+										</div>
+										<!-- // 이름 입력 -->
+
+										<!-- 주민등록번호 입력 -->
+										<div class="frm-field">
+											<div class="frm-title">
+												<label for="custId01" class="tit">주민등록번호</label>
+											</div>
+											<div class="frm-content">
+												<div class="frm-group">
+													<div class="ui-inp">
+														<p class="inp-txt" th:text="${#strings.substring(orderReq.userSsn, 0, 6)}">800101</p>
+													</div>
+													<span class="frm-split">-</span>
+													<div class="ui-inp">
+														<p class="inp-txt" th:text="${#strings.substring(orderReq.userSsn, 6)}">800101</p>
+													</div>
+												</div>
+											</div>
+										</div>
+										<!-- // 주민등록번호 입력 -->
+
+										<!-- 발급일자 입력 -->
+										<div class="frm-field">
+											<div class="frm-title">
+												<label for="issuDt01" class="tit">발급일자</label>
+											</div>
+											<div class="frm-content">
+												<div class="ui-inp">
+													<input type="tel" id="issuDt01" value="" placeholder="예) 20211012" title="" class="inp" oninput="chkInputValid();" maxlength="8"/>
+												</div>
+											</div>
+										</div>
+										<!-- // 발급일자 입력 -->
+									</div>
+									<!-- // 등록폼 -->
+								</div>
+								<!-- //주민등록증 패널 -->
+
+								 <!-- 운전면허증 패널 -->
+								<div class="tab-pane fade" id="FQU0110-02-pane" role="tabpanel" aria-labelledby="FQU0110-02" tabindex="0">
+									<figure class="persnal-card">
+										<img src="/images/common/img-car-card.png" alt="운전면허증 예시" />
+									</figure>
+
+									<!-- 등록폼 -->
+									<div class="basic-frm">
+										<!-- 이름 입력 -->
+										<div class="frm-field">
+											<div class="frm-title">
+												<label for="custname02" class="tit">이름</label>
+											</div>
+											<div class="frm-content">
+												<div class="ui-inp">
+													 <p class="inp-txt" th:text="${orderReq.orderNm}">세모통</p>
+												</div>
+											</div>
+										</div>
+										<!-- // 이름 입력 -->									
+										<!-- 운전면허번호 선택 -->
+										<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+										<div class="frm-field">
+											<div class="frm-title">
+												<label class="tit" for="licenseNum01">운전면허번호</label>
+											</div>
+											<div class="frm-content">
+												<div class="frm-group type-car">
+													<div class="ui-inp ">
+														<input type="tel" id="licenseNum01" value="" placeholder="2자리" title="" class="inp" oninput="chkInputMax(this,'licenseNum02');chkInputValid();" maxlength="2"/>
+													</div>
+													<div class="ui-inp">
+														<input type="tel" id="licenseNum02" value="" placeholder="2자리" title="" class="inp" oninput="chkInputMax(this,'licenseNum03');chkInputValid();" maxlength="2"/>
+													</div>
+													<div class="ui-inp">
+														<input type="tel" id="licenseNum03" value="" placeholder="6자리" title="" class="inp" oninput="chkInputMax(this,'licenseNum04');chkInputValid();" maxlength="6"/>
+													</div>
+													<div class="ui-inp">
+														<input type="tel" id="licenseNum04" value="" placeholder="2자리" title="" class="inp" oninput="chkInputMax(this,'issuDt02');chkInputValid();" maxlength="2"/>
+													</div>
+												</div>
+											</div>
+										</div>
+										<!-- // 운전면허번호 선택 -->
+
+										<!-- 생년월일 입력 -->
+										<div class="frm-field" style="display:none">
+											<div class="frm-title">
+												<label for="custBd" class="tit">생년월일</label>
+											</div>
+											<div class="frm-content">
+												<div class="frm-group">
+													<div class="ui-inp">
+														<input type="tel" id="custBd" value="" placeholder="YYYYMMDD" title="" class="inp" oninput="chkInputMax(this,'issuDt02');chkInputValid();" maxlength="8"/>
+													</div>
+												</div>
+											</div>
+										</div>
+										<!-- // 주민등록번호 입력 -->
+										
+										<!-- 발급일자 입력 -->
+										<div class="frm-field">
+											<div class="frm-title">
+												<label for="issuDt02" class="tit">발급일자</label>
+											</div>
+											<div class="frm-content">
+												<div class="ui-inp">
+													<input type="tel" id="issuDt02" value="" placeholder="예) 20211012" title="" class="inp" oninput="chkInputMax(this,'secureNum');chkInputValid();" maxlength="8"/>
+												</div>
+											</div>
+										</div>
+										<!-- // 발급일자 입력 -->
+
+										<!-- 전화번호 입력 -->
+										<!-- <div class="frm-field">
+											<div class="frm-title">
+												<label for="secureNum" class="tit">일련번호</label>
+											</div>
+											<div class="frm-content">
+												<div class="ui-inp">
+													<input type="text" id="secureNum" value="" placeholder="예) A1B2CD (앞면 하단을 확인하세요)" title="" class="inp" oninput="chkInputMax(this,'secureNum');chkInputValid();" maxlength="6"/>
+												</div>
+											</div>
+										</div> -->
+										<!-- // 전화번호 입력 -->
+									</div>
+									<!-- // 등록폼 -->
+								</div>
+								<!-- //운전면허증 -->
+							</div>
+							<!-- //탭 영역 -->
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" disabled id="btnNext" onclick="callIdentifyCert()">
+							<span>확인</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 페이지 섹션 -->
+			</div>
+			<!-- // content -->
+</main>
+
+	
+</html>

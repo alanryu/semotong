@@ -1,0 +1,116 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 주간 베스트
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 주간 베스트 페이지
+.F-M03-page {
+
+	// 페이지별 섹션 여백 설정
+	--sec-outer-margin: 50rem;
+	@include bottom-spacer;
+
+	// s: 주간베스트 요금제 섹션
+	.week-best-sec {
+		padding-left: 0;
+		padding-right: 0;
+
+		// 주간베스트 요금제 배너
+		.week-best-bnr {
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			padding: 24rem;
+			padding-right: 160rem;
+			background-color: #F2F5FB;
+			border-radius: 0;
+			height: 120rem;
+			.bnr-tit {
+				font-weight: 700;
+				font-size: 16rem;
+				line-height: 24rem;
+				color: #000;
+			}
+			.bnr-explain {
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #484848;
+			}
+			.bnr-img {
+				position: absolute;
+				top: 0;
+				right: 0;
+				width: 140rem;
+				height: 120rem;
+				img {
+					width: 100%;
+					height: 100%;
+				}
+			}
+		}
+	}
+	// e: 주간베스트 요금제 섹션
+
+	// s: 상품리스트 섹션
+	.ratePlanC-sec {
+		margin-top: 30rem;
+		@include sec-basic;
+
+		// 요금제 상품 툴바
+		.ratePlanC-toolbar {
+			display: flex;
+			align-items: center;
+			gap: 12rem;
+			.opt {
+				display: flex;
+				align-items: center;
+				gap: 4rem;
+				flex:none; /* 3차 수정 : 툴바 옵션 가변방지 추가 */
+				p {
+					font-weight: 500;
+					font-size: 12rem;
+					line-height: 16rem;
+					color: #63666A;
+				}
+			}
+			.sort {
+				display: flex;
+				margin-left: auto;
+				.ui-btn {
+					font-weight: 600;
+					font-size: 12rem;
+					line-height: 16rem;
+					color: #36383A;
+					gap: 4rem;
+				}
+			}
+		}
+
+		// 요금제 상품 리스트 공통
+		.ratePlanC-list {
+			@include ratePlanC-list;
+
+			// 요금제 상품 리스트 카드 공통
+			.ratePlanC-card {
+				@include ratePlanC-card;
+			}
+		}
+
+		// nodata 공통
+		.nodata {
+			@include nodata;
+		}
+
+	}
+	// e: 상품리스트 섹션
+
+	// s: 상품추천 섹션
+	.recom-bnr-sec {
+		margin-top: var(--sec-outer-margin);
+		@include sec-basic;
+	}
+	// e: 상품추천 섹션
+}
+// e: 추천 요금제 페이지

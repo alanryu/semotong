@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/order_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='약관동의'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ 
+ <script>
+	
+	
+	$( document ).ready(function() {
+		
+	   
+	});
+	
+	
+function kakaoCertStatus() {
+		
+		var params = {
+				txId : $("#custCertTxid").val()
+		}
+		
+		$.ajax({
+			   url : '/order/kakaoCertStatus',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+			   beforeSend: function(xhr){
+			       xhr.setRequestHeader(header,token);
+			    },
+				success: function (data) {
+
+					if(data.data.resultBody !=null) {
+ 						var resultStatus = data.data.resultStatus;
+ 						var txId = data.data.resultBody.txId;
+ 						var status = data.data.resultBody.status;
+ 						if(resultStatus == "200") {
+ 							if(status =="COMPLETED") {
+ 								
+ 								kakaoCertVerify();	
+ 							} else {
+ 								alertModalShow("인증을 완료 해 주세요.");
+ 								$("#custCertTxid").val(txId);	
+ 							}
+ 							
+ 							 
+ 						}
+ 					} else {
+ 						alertModalShow("인증 요청이 실패 하였습니다. 다시 시도 바랍니다.");
+ 					}
+					
+					
+					
+			    },
+				error : function(request, status, error){
+					alertModalShow("인증 요청이 실패 하였습니다. 다시 시도 바랍니다.");
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+			});
+		
+	}
+	
+	
+function kakaoCertVerify() {
+	
+	var params = {
+			txId : $("#custCertTxid").val()
+	}
+	
+	$.ajax({
+		   url : '/order/kakaoCertVerify',
+	       type : 'POST',
+	       dataType : "json",
+	       contentType:"application/json",
+		   data : JSON.stringify(params),
+		   beforeSend: function(xhr){
+		       xhr.setRequestHeader(header,token);
+		    },
+			success: function (data) {
+
+				if(data.data !=null) {
+					var resultStatus = data.data.resultStatus;
+					if(resultStatus == "200") {
+						$("#custCertTxid").val("");
+						alertModalShow("인증이 완료되었습니다.","",goNext);
+					}
+				} else {
+					alertModalShow("인증 요청이 실패 하였습니다. 다시 시도 바랍니다.");
+				}
+				
+				
+				
+		    },
+			error : function(request, status, error){
+				alertModalShow("인증 요청이 실패 하였습니다. 다시 시도 바랍니다.");
+	        },
+	        complete:function(){
+	           // $('#loading').addClass('display-none');
+	        }
+		});
+	
+}
+	
+	
+	function goNext() {
+		moveNextOrder('/order/selUsimEntr');
+	}
+	
+	
+	
+ </script>
+</th:block>
+
+<!-- Container -->
+<main role="main" class="container">
+<th:block th:include="pages/order/incOrderForm :: orderFormFragment"></th:block>
+<!-- content -->
+			<div class="content F-QU-page F-QU01-05-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">카카오톡으로 <br>인증 요청을 보냈어요.</h2>
+						</div>
+						<div class="sec-body">
+							<ol class="certi-steps">
+								<li>
+									<em class="num">1</em>
+									<div class="con">
+										<p class="txt">카카오톡 앱에서 본인 인증을 진행해주세요.</p>
+									</div>
+								</li>
+								<li>
+									<em class="num">2</em>
+									<div class="con">
+										<p class="txt">인증 후 아래 인증 완료 버튼을 눌러주세요.</p>
+									</div>
+								</li>
+							</ol>
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" onclick="kakaoCertStatus()">
+							<span>인증을 완료했어요</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 페이지 섹션 -->
+			</div>
+			<!-- // content -->
+			
+</main>
+
+	
+</html>

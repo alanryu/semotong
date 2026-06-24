@@ -1,0 +1,64 @@
+# Spring: Default Setting, DB Connection Setting
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local} # 환경 변수가 없으면 기본값(local) 사용
+  application:
+    name: semotong
+  web:
+    resources:
+      add-mappings: false
+  datasource:
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    hikari:
+      maximum-pool-size: "4"
+  thymeleaf:
+    cache: false
+    check-template-location: true
+    prefix: classpath:/templates/
+    suffix: .html
+    enabled: true
+    enable-spring-el-compiler: true
+  mvc:
+    static-path-pattern: "/static/**"
+  session:
+    store-type: redis
+    redis:
+      flush-mode: ON_SAVE
+      repository-type: default
+      namespace: semotong:session
+  devtools:
+    livereload:
+      enabled: true
+# Server: Default Setting
+server:
+  port: 8081
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+    session:
+      cookie:
+        name: JSESSIONID
+      timeout: 18000
+# Mybatis
+mybatis:
+  type-aliases-package: kr.co.ucomp.domain
+  mapper-locations: classpath*:mapper/**/*.xml
+  configuration:
+    cache-enabled: false
+    map-underscore-to-camel-case: true
+    use-generated-keys: true
+    default-executor-type: reuse
+    jdbc-type-for-null: null
+# Logging
+logging:
+  level:
+    jdbc:
+      audit: "off"
+      connection: "off"
+      sqlonly: "off"
+      sqltiming: "info"
+      resultset: "off"
+      resultsettable: "info"

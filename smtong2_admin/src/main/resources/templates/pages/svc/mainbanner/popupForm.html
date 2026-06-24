@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layout/default_layout}"
+  layout:fragment="Content"
+  th:with="menuIdGroup = '07', menuId = '0104'"
+>
+  <!-- 고유 CSS 추가 -->
+  <th:block layout:fragment="css">
+    <style>
+      .file-input-wrap {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .file-info {
+        font-size: 12px;
+        margin-top: 5px;
+      }
+      .preview-wrap {
+        margin-top: 10px;
+      }
+      .preview-image {
+        max-width: 200px;
+        max-height: 100px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .required {
+        color: #dc3545;
+      }
+      .c_red {
+        color: #dc3545;
+      }
+    </style>
+  </th:block>
+
+  <!-- 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+    <script type="text/javascript">
+      document.addEventListener("DOMContentLoaded", function () {
+        // 파일 입력 이벤트 설정
+        setupFileInputs();
+
+        // 기존 이미지가 있는 경우 미리보기 표시
+        if (document.getElementById("orgImagePc").value) {
+          document.getElementById("preview1").style.display = "block";
+          document.getElementById("fileText1").value = document.getElementById("orgImagePc").value;
+        }
+
+        if (document.getElementById("orgImageMo").value) {
+          document.getElementById("preview2").style.display = "block";
+          document.getElementById("fileText2").value = document.getElementById("orgImageMo").value;
+        }
+      });
+
+      function setupFileInputs() {
+        // PC 이미지 파일 선택
+        document.getElementById("fileInput1").addEventListener("change", function (e) {
+          handleFileSelect(e, "fileText1", "preview1");
+        });
+
+        // 모바일 이미지 파일 선택
+        document.getElementById("fileInput2").addEventListener("change", function (e) {
+          handleFileSelect(e, "fileText2", "preview2");
+        });
+      }
+
+      function handleFileSelect(event, textInputId, previewId) {
+        const file = event.target.files[0];
+        const textInput = document.getElementById(textInputId);
+        const preview = document.getElementById(previewId);
+
+        if (file) {
+          // 파일 타입 체크
+          const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+          if (!allowedTypes.includes(file.type)) {
+            showAlert("이미지 형식의 파일만 업로드 가능합니다. (jpg, png, jpeg)");
+            event.target.value = "";
+            return;
+          }
+
+          textInput.value = file.name;
+
+          // 미리보기 표시
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.style.display = "block";
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      function formClose() {
+        if (confirm("작성중인 내용이 있습니다. 정말 취소하시겠습니까?")) {
+          location.href = "/svc/mainbanner/popupList";
+        }
+      }
+
+      function insupdProc() {
+        if (!validateForm()) {
+          return;
+        }
+
+        const form = document.getElementById("form");
+        const formData = new FormData(form);
+        const id = document.getElementById("id").value;
+
+        // 등록/수정 구분
+        const isUpdate = id && id.trim() !== "";
+        const url = isUpdate ? "/svc/mainbanner/popupUpdate" : "/svc/mainbanner/popupInsert";
+        const successMessage = isUpdate ? "수정되었습니다." : "등록되었습니다.";
+
+        console.log(formData);
+
+        $.ajax({
+          url: url,
+          type: "POST",
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (response) {
+            console.log(response);
+            if (response.code === 200) {
+              showAlert(successMessage, function () {
+                location.href = "/svc/mainbanner/popupList";
+              });
+            } else {
+              showAlert(response.message || "처리 중 오류가 발생했습니다.");
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error("Ajax 오류:", error);
+            showAlert("처리 중 오류가 발생했습니다.");
+          },
+        });
+      }
+
+      function validateForm() {
+        // 필수 입력 체크
+        const requiredFields = [
+          { id: "bannerName", name: "항목명", wrapper: "req-bannerName" },
+          { id: "fileInput1", name: "PC 배너", wrapper: "req-imagePc" },
+          { id: "fileInput2", name: "모바일 배너", wrapper: "req-imageMo" },
+          { id: "startDate", name: "게시 시작일", wrapper: "req-startDate" },
+          { id: "endDate", name: "게시 종료일", wrapper: "req-endDate" },
+        ];
+
+        // 기존 오류 스타일 제거
+        document.querySelectorAll(".form-control-wrap").forEach((wrap) => {
+          wrap.classList.remove("error");
+        });
+
+        for (let field of requiredFields) {
+          const element = document.getElementById(field.id);
+          const wrapper = document.getElementById(field.wrapper);
+
+          if (!element.value || element.value.trim() === "") {
+            // 수정 시 기존 이미지가 있는 경우 파일 선택 안해도 됨
+            if (
+              (field.id === "fileInput1" && document.getElementById("orgImagePc").value) ||
+              (field.id === "fileInput2" && document.getElementById("orgImageMo").value)
+            ) {
+              continue;
+            }
+
+            showAlert(field.name + "을(를) 입력해주세요.");
+            wrapper.classList.add("error");
+            element.focus();
+            return false;
+          }
+        }
+
+        // 게시기간 유효성 체크
+        const startDate = new Date(document.getElementById("startDate").value);
+        const endDate = new Date(document.getElementById("endDate").value);
+
+        if (startDate >= endDate) {
+          showAlert("게시 종료일은 시작일보다 늦어야 합니다.");
+          document.getElementById("endDate").focus();
+          return false;
+        }
+
+        return true;
+      }
+    </script>
+  </th:block>
+
+  <div class="main-content">
+    <div class="container-fluid">
+      <!-- 로케이션 & 제목 영역 -->
+      <div class="page-header mb-4">
+        <div class="location mb-2">
+          <small class="text-secondary">
+            <i class="fas fa-home me-1"></i>
+            <a th:href="@{/}">홈</a> > <a href="#none;">서비스관리</a> >
+            <a th:href="@{/svc/mainbanner/popupList}">레이어팝업</a> >
+            <span th:text="${entity?.id != null ? '수정' : '등록'}">등록</span>
+          </small>
+        </div>
+        <h2 class="page-title fs-4 mb-4">
+          레이어팝업 <span th:text="${entity?.id != null ? '수정' : '등록'}">등록</span>
+        </h2>
+      </div>
+    </div>
+
+    <form name="form" id="form">
+      <input type="hidden" name="id" id="id" th:value="${entity?.id}" />
+      <input type="hidden" name="useYn" value="Y" />
+
+      <div class="search-section detail">
+        <!-- 항목명 -->
+        <div class="form-row full-width">
+          <div class="form-label mb-0">항목명<span class="required">*</span></div>
+          <div class="form-control-wrap" id="req-bannerName">
+            <input
+              type="text"
+              class="form-control"
+              name="name"
+              id="bannerName"
+              placeholder="항목명을 입력해주세요."
+              th:value="${entity?.name}"
+            />
+          </div>
+        </div>
+
+        <!-- 랜딩URL -->
+        <div class="form-row full-width">
+          <div class="form-label mb-0">랜딩URL</div>
+          <div class="form-control-wrap">
+            <input
+              type="text"
+              class="form-control"
+              name="linkUrl"
+              placeholder="URL을 입력해주세요."
+              th:value="${entity?.linkUrl}"
+            />
+          </div>
+        </div>
+
+        <!-- 게시기간 -->
+        <div class="form-row full-width">
+          <div class="form-label mb-0">게시기간<span class="required">*</span></div>
+          <div class="form-control-wrap">
+            <div class="d-flex align-items-center gap-2">
+              <div class="form-control-wrap" id="req-startDate">
+                <input
+                  type="date"
+                  class="form-control"
+                  name="startDateStr"
+                  id="startDate"
+                  th:value="${entity?.startDate != null ? #temporals.format(entity.startDate, 'yyyy-MM-dd') : #temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+                />
+              </div>
+              <span class="text-secondary">-</span>
+              <div class="form-control-wrap" id="req-endDate">
+                <input
+                  type="date"
+                  class="form-control"
+                  name="endDateStr"
+                  id="endDate"
+                  th:value="${entity?.endDate != null ? #temporals.format(entity.endDate, 'yyyy-MM-dd') : #temporals.format(#temporals.createNow().plusDays(30), 'yyyy-MM-dd')}"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PC 이미지 -->
+        <div class="form-row full-width">
+          <div class="form-label mb-0">PC 이미지<span class="required">*</span></div>
+          <div class="form-control-wrap" id="req-imagePc">
+            <div class="file-input-wrap">
+              <input type="hidden" id="orgImagePc" th:value="${entity?.imagePcUrl}" />
+              <input type="text" class="form-control" readonly id="fileText1" />
+              <input
+                type="file"
+                name="imagePc"
+                id="fileInput1"
+                class="file-input"
+                style="display: none"
+                accept="image/*"
+              />
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="document.getElementById('fileInput1').click()"
+                style="min-width: 70px"
+              >
+                찾기
+              </button>
+            </div>
+            <div class="file-info c_red">*이미지 형식의 파일만 업로드 가능합니다. (jpg, png, jpeg)</div>
+            <div class="preview-wrap">
+              <img id="preview1" class="preview-image" th:src="@{${entity?.imagePcUrl}}" style="display: none" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 모바일 이미지 -->
+        <div class="form-row full-width">
+          <div class="form-label mb-0">모바일 이미지<span class="required">*</span></div>
+          <div class="form-control-wrap" id="req-imageMo">
+            <div class="file-input-wrap">
+              <input type="hidden" id="orgImageMo" th:value="${entity?.imageMobileUrl}" />
+              <input type="text" class="form-control" readonly id="fileText2" />
+              <input
+                type="file"
+                name="imageMo"
+                id="fileInput2"
+                class="file-input"
+                style="display: none"
+                accept="image/*"
+              />
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="document.getElementById('fileInput2').click()"
+                style="min-width: 70px"
+              >
+                찾기
+              </button>
+            </div>
+            <div class="file-info c_red">*이미지 형식의 파일만 업로드 가능합니다. (jpg, png, jpeg)</div>
+            <div class="preview-wrap">
+              <img id="preview2" class="preview-image" th:src="@{${entity?.imageMobileUrl}}" style="display: none" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- 버튼 영역 -->
+    <div class="d-flex justify-content-center gap-2 mt-4">
+      <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="formClose()">취소</button>
+      <button
+        type="button"
+        class="btn btn-lg btn-dark px-4 btn-sm"
+        onclick="insupdProc()"
+        th:text="${entity?.id != null ? '수정' : '등록'}"
+      >
+        등록
+      </button>
+    </div>
+  </div>
+</html>

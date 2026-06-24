@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='07',menuId = '0101'">
+	  
+<th:block layout:fragment="css">
+</th:block>
+
+<th:block layout:fragment="script">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		
+		searchResult();
+		
+		/* 체크박스 전체 */
+		$('#expAll').on('change', function(){
+			if ( $(this).is(':checked') ) {
+				$('input[type=checkbox]').each(function(){
+					$(this).prop('checked', true);
+				});
+			} else {
+				$('input[type=checkbox]').each(function(){
+					$(this).prop('checked', false);
+				});
+			}
+		});
+		
+		/* 대기/노출/종료 전부 체크시 전체 체크박스 체크, 아닐시 전체 체크박스 해제 */
+		$('#expShow, #expCancel, #expEnd').on('change', function(){
+			
+			var total = $('input[name=status]').length;
+			var checked = $('input[name=status]:checked').length; 
+			
+			if(!$(this).is(':checked')) {
+				$('#expAll').prop('checked', false);
+			} else {
+				if ( total != checked ) $('#expAll').prop('checked', false);
+				else $('#expAll').prop('checked', true);
+			}
+		});
+	})
+	
+	function searchResult() {
+		var params = {
+				  page : 1
+				, recordSize : 10
+			}
+		
+			/* 배너 타입 */
+			params.type = '07';
+		
+			/* 등록일 */
+			if ( $('#searchStartDt').val() != null && $('#searchStartDt').val() != '' ) {
+				params.searchStartDt = $('#searchStartDt').val();
+			}
+			if ( $('#searchEndDt').val() != null && $('#searchEndDt').val() != '' ) {
+				params.searchEndDt = $('#searchEndDt').val();
+			}
+			
+			/* 상태 */
+			if ( !$('#expAll').is(':checked') ) {
+				if ( $('#expShow').is(':checked') ) {
+					params.isDispStatusBef = '1';	//대기
+				}
+				
+				if ( $('#expCancel').is(':checked') ) {
+					params.isDispStatusDsp = '1';	//노출
+				}
+				
+				if ( $('#expEnd').is(':checked') ) {
+					params.isDispStatusEnd = '1';	//종료
+				}
+			}
+			
+			if ( $.trim($('#keyword').val()) != null && $.trim($('#keyword').val()) != '' ) {
+				params.keyword = $('#keyword').val();
+			}
+			
+			$.ajax({
+				url 		: '/svc/mainbanner/dealListProc',
+				type 		: 'post',
+				dataType 	: 'json',
+				contentType : 'application/json',
+				data 		: JSON.stringify(params),
+				async 		: false,
+				success 	: function (data) {
+					
+					if(params.page == 1) {
+						$('#list-area').empty();	
+					}
+					
+					if(data.totalCnt == 0) {
+						
+					} else {
+						
+						var totalCnt = data.totalCnt;
+						$.each(data.data, function(idx, obj){
+							obj.rIdx = totalCnt - ((params.page - 1) * params.recordSize + idx);
+						});
+						$('#dealbannerlist').tmpl(data.data).appendTo('#list-area');	
+					}
+					
+					renderPagination(params.page, data.totalCnt, params.recordSize);
+				},
+				error 		: function(request, status, error){
+					alert(error);
+				},
+				complete 	: function(){
+				}
+			});
+	}
+	
+	/* 등록 화면 진입 */
+	function goInsert() {
+		$(location).attr('href', '/svc/mainbanner/dealInsert');
+	}
+	
+	/* 현재 시간 기준으로 대기/노출/종료 표시 */
+	function divisionStr(startDate, endDate, status) {
+		var str = '';
+		var now = moment();
+		var std = moment(startDate);
+		var etd = moment(endDate);
+		
+		if ( etd < now ) {
+			str = '종료';
+		} else if ( std > now ) {
+			str = '대기'
+		} else if ( std < now && etd > now ) {
+			str = '노출'
+		}
+		
+		return str;
+	}
+	
+	/* date => string */
+	function dateToString(date) {
+		var str = '';
+		if ( date != null ) {
+			var temp = moment(date);
+			str = temp.format('YYYY.MM.DD HH:mm');
+		}
+		return str;
+	}
+	
+	/* 삭제 프로세스 */
+	function deleteRow(id) {
+		
+		showConfirm('삭제하시겠습니까?',
+				() => { 
+					$.ajax({
+					   url 		: '/svc/mainbanner/dealDelete',
+				       type 	: 'DELETE',
+				       async 	: false,
+					   data 	: {delId : id},
+						success: function (data) {
+							searchResult();
+					    },
+						error : function(request, status, error){
+				            alert(error);
+				        },
+				        complete:function(){
+				           // $('#loading').addClass('display-none');
+				        }
+					});
+				},
+				() => {},
+				''
+		)
+	}
+	
+	/* 초기화 */
+	function resetSearch() {
+		
+		//$('.period-button').eq(1).trigger('click');
+		periodButtonInit();
+		
+		$('input[type=checkbox]').each(function(){
+			$(this).prop('checked', true);
+		});
+		
+		$('#keyword').val('');
+	}
+	
+</script>
+
+<script id="dealbannerlist" type="text/x-jquery-tmpl">
+	<tr>
+		<!-- 번호 -->
+		<td>${rIdx}</td>
+		<!-- 편집 -->
+		<td>
+			<div class="d-flex gap-2">
+            	<button class="action-btn btn-sm" onclick="location.href='/svc/mainbanner/dealUpdate/${id}'">
+                	<i class="fas fa-edit me-1"></i>
+                    수정
+                </button>
+                <button class="action-btn btn-sm" onclick="deleteRow('${id}');">
+                	<i class="fas fa-trash me-1"></i>
+                    삭제
+                </button>
+            </div>
+		</td>
+		<!-- 구분 -->
+		<td>{{html divisionStr(start_date, end_date)}}</td>
+		<!-- 게시기간 -->
+		<td>
+			{{html dateToString(start_date)}} ~ {{html dateToString(end_date)}}
+		</td>
+		<!-- 요금제 -->
+		<td>
+			{{each(idx, obj) list}}
+			${obj.plan_name}<br/>
+			{{/each}}
+		</td>
+		<!-- 등록자 -->
+		<td>${createNm}</td>
+		<!-- 등록일 -->
+		<td>{{html getDateStr(create_date)}}</td>
+	</tr>
+</script>
+</th:block>
+
+<div class="main-content">
+	<div class="container-fluid">
+		<!-- 로케이션 & 제목 영역 추가 -->
+	    <div class="page-header mb-4">
+	        <div class="location mb-2">
+	            <small class="text-secondary">
+	                <i class="fas fa-home me-1"></i>
+	                <a href="javascript:;">홈</a>
+	                >
+	                <a href="javascript:;">서비스 관리</a>
+	                >
+	                <a href="javascript:;">배너 관리</a>
+	                >
+	                <a href="javascript:;">메인</a>
+	            </small>
+	        </div>
+	        <h2 class="page-title fs-4 mb-4">메인 배너</h2>
+	    </div>
+	    
+	    <div class="container mt-4 mb-4">
+	        <ul class="tab-menu">
+				<li>
+	              <a href="/svc/mainbanner/list?type=07">빅배너</a>
+	            </li>
+	            <li class="active">
+	              <a href="#none;">추천딜</a>
+	            </li>
+	            <li>
+	              <a href="/svc/mainbanner/timeList">타임딜</a>
+	            </li>
+	            <li>
+	              <a href="/svc/mainbanner/list?type=01">상단 이벤트</a>
+	            </li>
+	            <li>
+	              <a href="/svc/mainbanner/list?type=02">요금제 소개</a>
+	            </li>
+				<li>
+				  <a href="/svc/recomPlan/list">맞춤 요금제</a>
+				</li>
+	            <li>
+	              <a href="/svc/mainbanner/list?type=03">중단 배너</a>
+	            </li>
+	            <li>
+	              <a href="/svc/mainbanner/list?type=04">이벤트</a>
+	            </li>
+	        </ul>
+	    </div>
+	    
+	    <!-- 검색 영역 -->
+	    <div class="search-section">
+	    	<div class="row g-3">
+	            <div class="col-12">
+	                <div class="col-12">
+	                    <div class="form-row full-width">
+	                        <div class="form-label mb-0">등록일</div>
+	                        <div class="form-control-wrap d-flex align-items-center gap-2">
+	                            <div class="d-flex align-items-center gap-2">
+	                                <input type="date" name="searchStartDt" id="searchStartDt" class="form-control" value="">
+	                                <span class="text-secondary">-</span>
+	                                <input type="date" name="searchEndDt" id="searchEndDt" class="form-control" value="">
+	                            </div>
+	                            <div class="period-buttons">
+	                                <div class="d-flex gap-2">
+	                                  	<button class="period-button" value="0">오늘</button>
+	                                    <button class="period-button" value="7">1주일</button>
+	                                    <button class="period-button" value="30">1개월</button>
+	                                    <button class="period-button" value="90">3개월</button>
+	                                    <button class="period-button" value="180">6개월</button>
+	                                    <button class="period-button" value="365">1년</button>
+	                                </div>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+	
+	                <!-- 노출여부 -->
+	                <div class="form-row full-width mb-4 mt-4">
+	                  <div class="form-label mb-0">상태</div>
+	                  <div class="form-control-wrap">
+	                      <div class="form-check-group">
+	                      	  <div class="form-check">
+	                              <input class="form-check-input" type="checkbox" id="expAll" checked>
+	                              <label class="form-check-label" for="expShow">전체</label>
+	                          </div>
+	                          <div class="form-check">
+	                              <input class="form-check-input" type="checkbox" name="status" id="expShow" checked>
+	                              <label class="form-check-label" for="expShow">대기</label>
+	                          </div>
+	                          <div class="form-check">
+	                              <input class="form-check-input" type="checkbox" name="status" id="expCancel" checked>
+	                              <label class="form-check-label" for="expHide">노출</label>
+	                          </div>
+	                          <div class="form-check">
+	                            <input class="form-check-input" type="checkbox" name="status" id="expEnd" checked>
+	                            <label class="form-check-label" for="expHide">종료</label>
+	                        </div>
+	                      </div>
+	                  </div>
+	                </div>
+	                
+	                <!-- 검색어 -->
+	                <div class="form-row full-width mb-3">
+	                  <div class="form-label mb-0">검색어</div>
+	                  <div class="form-control-wrap flex-grow-1">
+	                      <input type="text" id="keyword" class="form-control" placeholder="검색어를 입력해주세요">
+	                  </div>
+	                </div>
+	                
+	                <div class="row">
+	                  <div class="col-12 text-end mt-2">
+	                      <button class="btn btn-primary btn-sm me-2" onclick="searchResult()">
+	                          <i class="fas fa-search"></i>
+	                          검색
+	                      </button>
+	                      <button class="btn btn-light btn-sm" onclick="resetSearch()">
+	                          <i class="fas fa-redo"></i>
+	                          초기화
+	                      </button>
+	                  </div>
+	              </div>
+	            </div>
+	        </div>
+	    </div>
+	    
+	    <!-- contents 영역 -->
+	    <div class="table-section">
+		    <div class="d-flex justify-content-between align-items-center mb-4">
+		        <div class="d-flex align-items-center gap-3">
+		        </div>
+		        <div class="header-actions">
+		            <button class="btn btn-primary btn-sm" onclick="goInsert()">
+		                <i class="fas fa-plus"></i>
+		                등록
+		            </button>
+		        </div>
+		    </div>
+		    
+		    <table class="table custom-table">
+	            <thead>
+	                <tr>
+	                    <th>번호</th>
+	                    <th>편집</th>
+	                    <th>구분</th>
+	                    <th>게시 기간</th>
+	                    <th>요금제</th>
+	                    <th>등록자</th>
+	                    <th>등록일</th>
+	                </tr>
+	            </thead>
+	            <tbody id="list-area">
+	            </tbody>
+	        </table>
+	        
+	        <div class="d-flex justify-content-left mt-4">
+                <ul class="pagination">
+                    
+                </ul>
+            </div>
+	    </div>
+	</div>
+</div>

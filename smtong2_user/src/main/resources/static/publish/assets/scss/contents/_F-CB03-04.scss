@@ -1,0 +1,29 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 요금제 선택
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 요금제 선택 페이지
+.F-CB03-04-page {
+	// s: 모통봇 소개 섹션
+	.cb-intro-sec {
+		@include cb-intro-sec;
+		margin-bottom: 40rem;
+	}
+	// e: 모통봇 소개 섹션
+
+	// s: 요금제 카테고리 섹션
+	.cb-ratePlanA-sec {
+		padding-bottom: 10rem; /* 5차 수정 : 요금제목록 그림자 가려짐 대응 */
+		.ratePlanA-list {
+			@include ratePlanA-list;
+		}
+
+		.ratePlanA-card {
+			@include ratePlanA-card;
+		}
+	}
+	// e: 요금제 카테고리 섹션
+
+}
+// e: 요금제 선택 페이지

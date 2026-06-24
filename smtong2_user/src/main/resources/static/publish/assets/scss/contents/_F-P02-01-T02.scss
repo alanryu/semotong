@@ -1,0 +1,33 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 사은품
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// 요금제 상세 공통
+@import './F-P02-01';
+
+// s: 사은품 페이지
+.F-P02-01-T02-page {
+	// s: 사은품 섹션
+	.noti-box {
+		@include noti-box;
+	}
+
+	// s: 사은품 리스트
+	.free-gift-list { /* 2025-01-10 조찬기 : 사은품 UI 변경 건 */
+		display: flex;
+		flex-direction: column;
+		gap: 6rem;
+		li { /* 2025-01-10 조찬기 : 사은품 UI 변경 건 */
+			padding: 20rem 16rem;
+			border-radius: 2rem;
+			background-color: #f4f4f4;
+			font-weight: 700;
+			font-size: 16rem;
+			line-height: 22rem;
+			color: #000;
+		}
+	}
+	// s: 사은품 리스트
+}
+// e: 사은품 페이지

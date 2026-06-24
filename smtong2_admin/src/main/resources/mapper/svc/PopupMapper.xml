@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.svc.banner.mapper.PopupMapper">
+
+    <sql id="listWhere">
+
+        <!-- 등록일 조회-->
+        <if test='searchStartDt != null and searchStartDt !=""'>
+            AND a.create_date  <![CDATA[>=]]> #{searchStartDt}
+        </if>
+        <if test='searchEndDt != null and searchEndDt !=""'>
+            AND a.create_date <![CDATA[<=]]> #{searchEndDt}
+        </if>
+
+        <!-- 게시상태 조회-->
+        <if test="status != null and status != ''">
+            <choose>
+                <when test="status == 'wait'">
+                    AND NOW() <![CDATA[<]]> a.start_date
+                </when>
+                <when test="status == 'active'">
+                    AND NOW() <![CDATA[>=]]> a.start_date
+                    AND NOW() <![CDATA[<=]]> a.end_date
+                </when>
+                <when test="status == 'close'">
+                    AND NOW() <![CDATA[>]]> a.end_date
+                </when>
+            </choose>
+        </if>
+
+        <!-- 팝업명 조회 -->
+        <if test='keyword != null and keyword !=""'>
+            AND a.name LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+
+        <!-- 사용여부 조회 -->
+        <if test='useYn != null and useYn !=""'>
+            AND a.use_yn = #{useYn}
+        </if>
+
+        <!-- 게시기간 조회 -->
+        <if test='publishStartDt != null'>
+            AND a.start_date <![CDATA[>=]]> #{publishStartDt}
+        </if>
+        <if test='publishEndDt != null'>
+            AND a.end_date <![CDATA[<=]]> #{publishEndDt}
+        </if>
+
+    </sql>
+
+    <sql id="Base_Column_list">
+        a.id
+        , CASE
+            WHEN NOW() <![CDATA[<]]> a.start_date THEN 'wait'
+            WHEN NOW() <![CDATA[>]]> a.end_date THEN 'close'
+            ELSE 'active' END as status
+        , a.name
+        , a.content
+        , a.image_pc_url
+        , a.image_mobile_url
+        , a.start_date
+        , a.end_date
+        , a.link_url
+        , a.display_url
+        , a.use_yn
+        , a.target
+        , a.sort
+        , a.memo
+        , a.create_date
+        , a.create_id
+        , a.modified_date
+        , a.modified_id
+        , GET_ADMIN_USER_NM(a.create_id) as createNm
+        , GET_ADMIN_USER_NM(a.modified_id) as modifiedNm
+        , b.user_name
+        , b.com_group
+    </sql>
+
+
+    <select id="list" parameterType="kr.co.ucomp.web.svc.banner.dto.PopupSearchDto" resultType="kr.co.ucomp.web.svc.banner.entity.PopupEntity">
+        SELECT
+            <include refid="Base_Column_list" />
+        FROM
+            tb_svc_popup a left outer join tb_mbm_admin_user as b
+            on a.create_id = b.id
+        WHERE 1=1
+        <include refid="listWhere"/>
+        ORDER BY sort asc
+        LIMIT #{offset}, #{recordSize}
+    </select>
+
+
+    <select id="listCount" parameterType="kr.co.ucomp.web.svc.banner.dto.PopupSearchDto" resultType="Long">
+        SELECT count(1)
+        FROM
+            tb_svc_popup a
+        WHERE 1=1
+        <include refid="listWhere"/>
+    </select>
+
+    <select id="listWithoutLimit" parameterType="kr.co.ucomp.web.svc.banner.dto.PopupSearchDto" resultType="kr.co.ucomp.web.svc.banner.entity.PopupEntity">
+        SELECT
+            <include refid="Base_Column_list" />
+        FROM
+            tb_svc_popup a left outer join tb_mbm_admin_user as b
+            on a.create_id = b.id
+        WHERE 1=1
+        <include refid="listWhere"/>
+        ORDER BY a.sort ASC, a.id DESC, a.order_no ASC
+    </select>
+
+    <select id="getDetail" parameterType="Long" resultType="kr.co.ucomp.web.svc.banner.entity.PopupEntity">
+        SELECT
+             <include refid="Base_Column_list" />
+        FROM
+            tb_svc_popup a left outer join tb_mbm_admin_user as b
+            on a.create_id = b.id
+        WHERE a.id = #{id}
+    </select>
+
+    <insert id="create" parameterType="kr.co.ucomp.web.svc.banner.entity.PopupEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_svc_popup (
+            name,
+            content,
+            image_pc_url,
+            image_mobile_url,
+            start_date,
+            end_date,
+            link_url,
+            display_url,
+            use_yn,
+            target,
+            sort,
+            memo,
+            create_id,
+            modified_id
+        ) VALUES (
+            #{name},
+            #{content},
+            #{imagePcUrl},
+            #{imageMobileUrl},
+            #{startDate},
+            #{endDate},
+            #{linkUrl},
+            #{displayUrl},
+            #{useYn},
+            #{target},
+            #{sort},
+            #{memo},
+            #{createId},
+            #{modifiedId}
+        )
+    </insert>
+
+    <update id="update" parameterType="kr.co.ucomp.web.svc.banner.entity.PopupEntity">
+        UPDATE tb_svc_popup
+        SET
+            name = #{name},
+            content = #{content},
+            image_pc_url = #{imagePcUrl},
+            image_mobile_url = #{imageMobileUrl},
+            start_date = #{startDate},
+            end_date = #{endDate},
+            link_url = #{linkUrl},
+            display_url = #{displayUrl},
+            use_yn = #{useYn},
+            target = #{target},
+            sort = #{sort},
+            memo = #{memo},
+            modified_id = #{modifiedId}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="Long">
+        UPDATE tb_svc_popup
+        SET use_yn = 'N'
+        WHERE id = #{id}
+    </delete>
+
+    <select id="getActivePopopList" resultType="kr.co.ucomp.web.svc.banner.entity.PopupEntity">
+        SELECT
+            <include refid="Base_Column_list" />
+        FROM
+            tb_svc_popup a left outer join tb_mbm_admin_user as b
+            on a.create_id = b.id
+        WHERE 1=1
+        AND a.use_yn = 'Y'
+        AND NOW() <![CDATA[>=]]> a.start_date
+        AND NOW() <![CDATA[<=]]> a.end_date
+        ORDER BY a.sort ASC, a.id DESC
+    </select>
+
+
+    <!-- 바로 위 항목 찾기 (현재 순서보다 작은 값 중 가장 큰 값) -->
+    <select id="findPreviousPopup" parameterType="Integer" resultType="kr.co.ucomp.web.svc.banner.entity.PopupEntity">
+        SELECT
+            <include refid="Base_Column_list" />
+        FROM
+            tb_svc_popup a left outer join tb_mbm_admin_user as b
+            on a.create_id = b.id
+        WHERE use_yn = 'Y' AND a.sort <![CDATA[<]]> #{currentSort}
+        ORDER BY a.sort DESC
+        LIMIT 1
+    </select>
+
+    <!-- 바로 아래 항목 찾기 (현재 순서보다 큰 값 중 가장 작은 값) -->
+    <select id="findNextPopup" parameterType="Integer" resultType="kr.co.ucomp.web.svc.banner.entity.PopupEntity">
+        SELECT
+            <include refid="Base_Column_list" />
+        FROM
+            tb_svc_popup a left outer join tb_mbm_admin_user as b
+            on a.create_id = b.id
+        WHERE use_yn = 'Y' AND a.sort <![CDATA[>]]> #{currentSort}
+        ORDER BY a.sort ASC
+        LIMIT 1
+    </select>
+
+    <!-- 특정 팝업의 순서만 업데이트 -->
+    <update id="updateSort">
+        UPDATE tb_svc_popup
+        SET
+            sort = #{sort},
+            modified_date = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- sort 값을 순차적으로 재정렬 (1,2,3,4,5,6...) -->
+    <update id="reorderSort">
+        UPDATE tb_svc_popup a
+        INNER JOIN (
+            SELECT
+                id,
+                ROW_NUMBER() OVER (ORDER BY sort ASC, id ASC) as new_sort
+            FROM tb_svc_popup
+            WHERE use_yn = 'Y'
+        ) b ON a.id = b.id
+        SET
+            a.sort = b.new_sort,
+            a.modified_date = NOW()
+        WHERE a.use_yn = 'Y'
+    </update>
+
+</mapper>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='KG 모바일', layoutSubTitleYN='Y', layoutFooterYn='Y'">
+	  
+  <!-- index.html 고유 CSS 추가 -->
+  <th:block layout:fragment="css">
+      <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+  </th:block>
+  <!-- index.html 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+   <!--    <script th:src="@{/js/page/home.js}"></script>-->
+   <script>
+  	
+	document.addEventListener("DOMContentLoaded", () => {
+		// Spyscroll body 스크롤인 경우: 속성처리
+		const bodyElement = document.body;
+		bodyElement.setAttribute("data-bs-spy", "scroll");
+		bodyElement.setAttribute("data-bs-target", "#navbarSpyscroll");
+		bodyElement.setAttribute("data-bs-root-margin", `0px 0px -50%`); // 탭티 스티기 되기 전과 후를 고려한 값
+		bodyElement.setAttribute("data-bs-smooth-scroll", "true");
+
+		// Spyscroll body 스크롤인 경우: 스크롤링 scrollTo 행들러
+		document.querySelectorAll('#navbarSpyscroll .tab-link').forEach(anchor => {
+			anchor.addEventListener('click', function (e) {
+				e.preventDefault(); // 기본 링크 동작을 방지
+				const targetId = this.getAttribute('href').substring(1); // 클릭한 링크의 href 속성에서 섹션 id 추출
+				const targetElement = document.getElementById(targetId);
+				const headerHeight = window.innerWidth < 768 ? 60 : 80; // 모바일 60px, PC 80px
+				const navbarHeight = document.querySelector('#navbarSpyscroll').offsetHeight;
+				const scrollToPosition = targetElement.offsetTop - headerHeight - navbarHeight;
+				
+				window.scrollTo({
+					top: scrollToPosition, // 계산된 스크롤 위치
+					behavior: 'smooth' // 부드러운 스크롤 애니메이션
+				});
+			});
+		});
+		
+		
+		let _subPageTitle ="[[${companyInfo.name}]]";
+		$("#subPageTitleNm").html(_subPageTitle);
+		getPlanList(5);		
+		
+		
+		setPopover('ui-popover popover-style1'); // 공통 컴포넌트 규칙 ui- 반영
+
+		getReviewListComp();
+		
+	});
+  	
+  	var currpage = 1;
+	//요금제 더보기
+	function getPlanListMore() {
+		currpage = currpage +1;
+		getPlanList(10);
+	}
+	
+  	function getPlanList(pageSize) {
+  		var page = currpage;
+
+
+  		var searchId = "[[${searchId}]]";
+  		
+		var params = {
+		     keyword : "",
+			 searchSaleSp : "SALE",
+			 searchCompany  : searchId,
+			 searchOrderType : "SP",
+			 page : page,
+			 recordSize : pageSize
+		    }
+				  
+			$.ajax({
+			   url : '/pbm/plan/getPlanlist',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+			   beforeSend: function(xhr){
+			       xhr.setRequestHeader(header,token);
+			    },
+				success: function (data) {
+					if(page == 1) {
+						$('#companyplanList').empty();	
+					}
+					$.each(data.data, function(idx, obj){
+						obj.displayPrice = 0;
+					});
+
+					$('#planListTmpl').tmpl(data.data).appendTo('#companyplanList');
+					if(pageSize>data.data.length) {
+						$("#compListMoreBtn").hide();
+					} else {
+						$("#compListMoreBtn").show();
+					}
+				    
+			    },
+				error : function(request, status, error){
+					alertModalShow(error,"");
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+			});
+	}
+  	
+  	var reviewCurrpage = 1;
+ // 리뷰리스트 팝업
+	function getReviewListComp() {
+  		var page 		= reviewCurrpage;
+  		var pageSize 	= 10;
+
+  		var searchId = "[[${searchId}]]";
+  		
+		var params = {
+		     displayYn 	: "Y"		,
+		     reviewType : "SEMOTONG",
+		     companyId : searchId,
+			 page 		: page		,
+			 recordSize : pageSize
+		    }
+				  
+			$.ajax({
+			   url : '/csm/review/list',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+			   beforeSend: function(xhr){
+			       xhr.setRequestHeader(header,token);
+			    },
+				success: function (data) {
+					var selectDataSize = page * pageSize;
+					var totCnt = data.totalCnt;
+					
+					
+					if(page == 1) {
+						$('#reviewList').empty();	
+					}
+					
+					if(totCnt > 0){
+						$('#reviewListTmpl').tmpl(data.data).appendTo('#reviewList');	
+						
+						if(pageSize>data.data.length) {
+							$("#reviewListMoreBtn").hide();
+						} else {
+							$("#reviewListMoreBtn").show();
+						}
+						
+						$("#partner-review-li").show();
+						$("#partner-02-pane").show();
+						$("#companyReviewAvg").show();
+						
+						
+					} else {
+						$("#partner-review-li").hide();
+						$("#partner-02-pane").hide();
+						$("#companyReviewAvg").hide();
+					}
+					
+			    },
+				error : function(request, status, error){
+					alertModalShow(error);
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+			});
+	}
+  	
+   </script>
+  </th:block>
+  
+  <!-- Container -->
+  <main role="main" class="container">
+  	<!-- content -->
+  	<div class="content F-O01-page">
+  		<!-- 파트너사 섹션 -->
+  		<section class="partner-detail-sec">
+  			<div class="sec-inner">
+  				<!-- 파트너사 주요정보 -->
+  				<div class="partner-detail-card">
+  					<div class="card-label">
+	 					<th:bolck th:each="itm : ${#strings.setSplit(companyInfo.companyMno, ',')}">
+						    <span class="label type-sk" th:if="${itm == 'SKT'}" th:text="'SKT'">SKT</span>
+						    <span class="label type-kt" th:if="${itm == 'KT'}" th:text="'KT'">KT</span>
+						    <span class="label type-lg" th:if="${itm == 'LGU'}" th:text="'U+'">U+</span>
+						</th:bolck>
+  					</div>
+  					<div class="card-partner">
+  						<div class="partner-logo">
+  							<img th:src="@{${companyInfo.logoImg}}" alt="KG모바일" />
+  						</div>
+ 						<div class="partner-sat" id="companyReviewAvg" style="display:none">
+  							<i class="ui-icn icn-16-star" aria-label="평점"></i>[[${reviewAg.avgScore}]]
+  						</div>  
+  					</div>
+  				</div>
+  				<!-- //파트너사 주요정보 -->
+  			</div>
+  		</section>
+  		<!-- // 파트너사 섹션 -->
+
+  		<!-- Spyscroll 탭 목록 -->
+  		<div class="ui-tab tab-style2" id="navbarSpyscroll">
+  			<ul class="tab-list">
+  				<li class="tab-item" role="presentation">
+  					<a href="#partner-01-pane" class="tab-link active">기본정보</a>
+  				</li>
+  				<li class="tab-item" role="presentation" id="partner-review-li">
+  					<a href="#partner-02-pane" class="tab-link">리뷰</a>
+  				</li>
+  				<li class="tab-item" role="presentation">
+  					<a href="#partner-03-pane" class="tab-link">요금제</a>
+  				</li>
+  				<!-- <li class="tab-item" role="presentation">
+  					<a href="#partner-04-pane" class="tab-link">이벤트</a>
+  				</li> -->
+  			</ul>
+  		</div>
+  		<!-- // Spyscroll 탭 목록 -->
+
+  		<!-- Spyscroll 탭 내용 -->
+  		<div class="tab-content">
+  			<!-- 기본정보 탭 패널 -->
+  			<div class="tab-pane fade show active" id="partner-01-pane">
+  				<section class="partner-info-sec">
+  					<div class="sec-inner">
+  						<div class="sec-header">
+  							<h2 class="sec-tit">기본정보</h2>
+  						</div>
+  						<div class="sec-body">
+  							<dl class="partner-info">
+  								<dt>업무시간</dt>
+  								<dd>[[${companyInfo.workTime}]]</dd>
+
+  								<dt>고객센터</dt>
+  								<dd>[[${companyInfo.customerCenetr}]]</dd>
+
+  								<dt>주소</dt>
+  								<dd>[[${companyInfo.companyAdress}]]</dd>
+
+  								<dt>홈페이지</dt>
+  								<dd><a th:href="@{${companyInfo.homepageUrl}}" target="_blank" th:text="${companyInfo.homepageUrl}">http://www.kgmobile.co.kr/main</a></dd>
+  							</dl>
+  						</div>
+  					</div>
+  				</section>
+  			</div>
+  			<!-- // 기본정보 탭 패널 -->
+  			<!-- 리뷰 탭 패널 -->
+  			<div class="tab-pane fade show active" id="partner-02-pane">
+  				<!-- 리뷰 섹션 -->
+  				<section class="review-sec">
+  					<div class="sec-inner">
+  						<div class="sec-header">
+  							<h2 class="sec-tit">리뷰</h2>
+  						</div>
+  						<div class="sec-body">
+  							<!-- 이용자 리뷰 평점 -->
+  							<div class="review-user-sat">
+  								<ul class="review-list" id="reviewList">
+  									<li class="review-item">
+  										<div class="review-card">
+  											<p class="review-name">홍길동</p>
+  											<p class="review-sat">
+  												<i class="ui-icn icn-16-star-pr" aria-hidden="true"></i>
+  												<strong class="val">5.0</strong>
+  											</p>
+  											<p class="review-con">
+  												리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용
+  											</p>
+  										</div>
+  									</li>
+  									
+  								</ul>
+  								<button type="button" class="ui-btn btn-more-list" id="reviewListMoreBtn">
+  									<i class="ui-icn icn-16-more-list-gr"></i>
+  									<span>더보기</span>
+  								</button>
+  							</div>
+  							<!-- // 이용자 리뷰 평점 -->
+  						</div>
+  					</div>
+  				</section>
+  				<!-- // 리뷰 섹션 -->
+  			</div>
+  			<!-- // 리뷰 탭 패널 -->
+  			<!-- 요금제 탭 패널 -->
+  			<div class="tab-pane fade show active" id="partner-03-pane">
+  				<!-- 요금제 상품 섹션 -->
+  				<section class="ratePlanC-sec">
+  					<div class="sec-inner">
+  						<div class="sec-header">
+  							<h2 class="sec-tit">요금제</h2>
+  						</div>
+  						<div class="sec-body">
+  							<!-- 요금제 공통 타입 C : 요금제 상품 리스트 -->
+  							<div class="ratePlanC-list-wrap">
+  								<ul class="ratePlanC-list" id="companyplanList">
+  									
+  								</ul>
+
+  								<!-- Case 목록이 많은 경우 더보기 -->
+  								<button type="button" class="ui-btn btn-more-list" onclick="getPlanListMore()" id="compListMoreBtn">
+  									<i class="ui-icn icn-16-more-list-gr" aria-hidden="true"></i>
+  									<span>더보기</span>
+  								</button>
+  							</div>
+  							<!-- // 요금제 공통 타입 C : 요금제 상품 리스트 -->
+  						</div>
+  					</div>
+  				</section>
+  				<!-- // 요금제 상품 섹션 -->
+  			</div>
+  			<!-- // 요금제 탭 패널 -->
+  			<!-- 이벤트 탭 패널 -->
+  			<!-- <div class="tab-pane fade show active" id="partner-04-pane">
+  				이벤트 섹션
+  				<section class="event-sec">
+  					<div class="sec-inner">
+  						<div class="sec-header">
+  							<h2 class="sec-tit">이벤트</h2>
+  						</div>
+  						<div class="sec-body">
+  							<div class="swiper event-swiper">
+  								<div class="swiper-wrapper">
+  									<div class="swiper-slide">
+  										<button type="button" class="event-bnr">
+  											<img src="../../assets/images/upload/@bnr-event-01-mo.png" alt="이벤트 내용" class="only-mo" />
+  											<img src="../../assets/images/upload/@bnr-event-01-pc.png" alt="이벤트 내용" class="only-pc" />
+  										</button>
+  									</div>
+  									<div class="swiper-slide">
+  										<button type="button" class="event-bnr">
+  											<img src="../../assets/images/upload/@bnr-event-02-mo.png" alt="이벤트 내용" class="only-mo" />
+  											<img src="../../assets/images/upload/@bnr-event-02-pc.png" alt="이벤트 내용" class="only-pc" />
+  										</button>
+  									</div>
+  								</div>
+  								<div class="swiper-pagination"></div>
+  							</div>
+  						</div>
+  					</div>
+  				</section>
+  				// 이벤트 섹션
+  			</div> -->
+  			<!-- // 이벤트 탭 패널 -->
+  		</div>
+  		<!-- Spyscroll 탭 내용 -->
+  	</div>
+  	<!-- // content -->
+  </main>
+  <!-- // Container -->
+ 

@@ -1,0 +1,927 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.pmb.mapper.PlanMapper">
+
+	<sql id="listWhere">
+			<!-- 노출여부 -->
+			<if test='searchDispYn != null and searchDispYn !=""'>
+				AND a.disp_yn = #{searchDispYn}
+			</if>
+
+			<if test='searchNewSp != null and searchNewSp !=""'>
+				AND a.new_yn = #{searchNewSp}
+			</if>
+
+			<if test='keyword != null and keyword !=""'>
+				AND (
+					a.plan_name LIKE CONCAT('%', #{keyword}, '%') OR
+					b.name LIKE CONCAT('%', #{keyword}, '%')  OR
+					a.plan_code LIKE CONCAT('%', #{keyword}, '%')  OR
+					a.uuid LIKE CONCAT('%', #{keyword}, '%')  OR
+					a.id IN (
+							SELECT distinct a.plan_list_id 
+							FROM tb_pmb_plan_benefits_list a,  tb_pmb_plan_list b, tb_pmb_plan_benefits c
+							WHERE a.plan_list_id = b.id
+							AND a.plan_benefits_id = c.id
+							AND c.display_yn = 'Y'
+							AND NOW()  <![CDATA[>=]]>  c.display_period_start
+				    		AND NOW()  <![CDATA[<=]]>  c.display_period_end
+							AND (
+							   c.title LIKE CONCAT('%', #{keyword}, '%') OR 
+							   c.content LIKE CONCAT('%', #{keyword}, '%') OR
+							   c.name LIKE CONCAT('%', #{keyword}, '%')
+							 )
+						)
+					)
+			</if>
+
+			<!-- 상태 -->
+			<if test='searchSaleSp != null and searchSaleSp !=""'>
+				<choose>
+					<when test="searchSaleSp == 'SALE'">
+						AND a.sale_status = 1
+						AND a.disp_yn = 1
+					</when>
+					<when test="searchSaleSp == 'DROP'">
+						AND (a.sale_status = 0 OR a.disp_yn = 0)
+					</when>
+				</choose>
+			</if>
+
+	    	<!-- 최종 수정일 조회-->
+	    	<if test='searchStartDt != null and searchStartDt !=""'>
+				AND a.modified_date  <![CDATA[>=]]> #{searchStartDt}
+			</if>
+			<if test='searchEndDt != null and searchEndDt !=""'>
+				AND a.modified_date <![CDATA[<=]]> #{searchEndDt}
+			</if>
+
+
+			<!-- MNO-->
+	    	<if test='searchMno != null and searchMno !=""'>
+	    		AND a.mno IN
+		        <foreach item="mno" index="index" collection="_parameter.searchMno.split(',')" open="(" separator="," close=")">
+		            #{mno}
+		        </foreach>
+	    	</if>
+
+			<!-- NETWORK-->
+	    	<if test='searchNetrok != null and searchNetrok !=""'>
+	    		AND a.plan_type IN
+		        <foreach item="network" index="index" collection="_parameter.searchNetrok.split(',')" open="(" separator="," close=")">
+		            #{network}
+		        </foreach>
+	    	</if>
+
+	    	<!-- 사업자-->
+	    	<if test='searchCompanyList != null and searchCompanyList !=""'>
+	    		AND a.host IN
+		        <foreach item="company" index="index" collection="_parameter.searchCompanyList.split(',')" open="(" separator="," close=")">
+		            #{company}
+		        </foreach>
+	    	</if>
+
+	    	<if test='searchCompany != null and searchCompany !=""'>
+	    		AND a.host = #{searchCompany}
+	    	</if>
+
+	    	<!-- 기본료 조회 -->
+	    	<if test='searchBasicPrice != null and searchBasicPrice !=""'>
+	    		AND a.normal_price = #{searchBasicPrice}
+	    	</if>
+	    	<if test='searchBasicPriceTermFrom != null and searchBasicPriceTermFrom !=""'>
+	    		AND a.normal_price <![CDATA[>=]]> #{searchBasicPriceTermFrom}
+	    	</if>
+	    	<if test='searchBasicPriceTermTo != null and searchBasicPriceTermTo !=""'>
+	    		AND a.normal_price <![CDATA[<=]]> #{searchBasicPriceTermTo}
+	    	</if>
+
+			<!-- 데이터 조회 -->
+	    	<if test='searchData != null and searchData !=""'>
+	    		AND a.sup_data_total = #{searchData}
+	    	</if>
+	    	<if test='searchDataTermFrom != null and searchDataTermFrom !=""'>
+	    		AND a.sup_data_total <![CDATA[>=]]> #{searchDataTermFrom}
+	    	</if>
+	    	<if test='searchDataTermTo != null and searchDataTermTo !=""'>
+	    		AND a.sup_data_total <![CDATA[<=]]> #{searchDataTermTo}
+	    	</if>
+
+	    	<!-- 제공통화 조회 -->
+	    	<if test='searchCall != null and searchCall !=""'>
+	    		AND a.sup_call_val = #{searchCall}
+	    	</if>
+	    	<if test='searchCallTermFrom != null and searchCallTermFrom !=""'>
+	    		AND a.sup_call_val <![CDATA[>=]]> #{searchCallTermFrom}
+	    	</if>
+	    	<if test='searchCallTermTo != null and searchCallTermTo !=""'>
+	    		AND a.sup_call_val <![CDATA[<=]]> #{searchCallTermTo}
+	    	</if>
+
+	    	<!-- 제공SMS 조회 -->
+	    	<if test='searchSms != null and searchSms !=""'>
+	    		AND a.sup_sms_val = #{searchSms}
+	    	</if>
+	    	<if test='searchSmsTermFrom != null and searchSmsTermFrom !=""'>
+	    		AND a.sup_sms_val <![CDATA[>=]]> #{searchSmsTermFrom}
+	    	</if>
+	    	<if test='searchSmsTermTo != null and searchSmsTermTo !=""'>
+	    		AND a.sup_sms_val <![CDATA[<=]]> #{searchSmsTermTo}
+	    	</if>
+
+			<!-- Qos 조회 -->
+	    	<if test='searchQos != null and searchQos !=""'>
+	    		AND a.sup_qos = #{searchQos}
+	    	</if>
+	    	<if test='searchQosTermFrom != null and searchQosTermFrom !=""'>
+	    		AND a.sup_qos <![CDATA[>=]]> #{searchQosTermFrom}
+	    	</if>
+	    	<if test='searchQosTermTo != null and searchQosTermTo !=""'>
+	    		AND a.sup_qos <![CDATA[<=]]> #{searchQosTermTo}
+	    	</if>
+
+	    	<!-- 할인기간 이후 요금 조회 -->
+	    	<if test='searchAfterPrice != null and searchAfterPrice !=""'>
+	    		AND a.after_price = #{searchAfterPrice}
+	    	</if>
+	    	<if test='searchAfterPriceTermFrom != null and searchAfterPriceTermFrom !=""'>
+	    		AND a.after_price <![CDATA[>=]]> #{searchAfterPriceTermFrom}
+	    	</if>
+	    	<if test='searchAfterPriceTermTo != null and searchAfterPriceTermTo !=""'>
+	    		AND a.after_price <![CDATA[<=]]> #{searchAfterPriceTermTo}
+	    	</if>
+
+			<!-- 할인기간 조회 -->
+	    	<if test='searchPromoPeriod != null and searchPromoPeriod !=""'>
+	    		AND a.promotion_period_val = #{searchPromoPeriod}
+	    	</if>
+	    	<if test='searchPromoPeriodTermFrom != null and searchPromoPeriodTermFrom !=""'>
+	    		AND a.promotion_period_val <![CDATA[>=]]> #{searchPromoPeriodTermFrom}
+	    	</if>
+	    	<if test='searchPromoPeriodTermTo != null and searchPromoPeriodTermTo !=""'>
+	    		AND a.promotion_period_val <![CDATA[<=]]> #{searchPromoPeriodTermTo}
+	    	</if>
+
+	    	<!-- 간편개통 구분 -->
+	    	<if test="searchImageBadgeSimpleOpen != null and searchImageBadgeSimpleOpen != ''">
+	    		AND IFNULL(a.image_badge_simple_open, 0) = #{searchImageBadgeSimpleOpen}
+	    	</if>
+
+	    	<!-- 포인트 요금제 구분 -->
+	    	<if test="searchPointPlanYn != null and searchPointPlanYn != ''">
+	    		AND IFNULL(a.point_plan_yn, 0) = #{searchPointPlanYn}
+	    	</if>
+
+	    	<!-- 영업요 요금제 -->
+	    	<if test="searchHiddenYn != null and searchHiddenYn != ''">
+	    		AND a.hidden_yn = #{searchHiddenYn}
+	    	</if>
+
+
+
+			<!--정렬 순서 리스트 구분 -->
+			<if test='searchOrderListSp != null and searchOrderListSp !=""'>
+				<choose>
+					<when test="searchOrderListSp == '02'"> <!-- 내게맞는 요금제 가성비 요금제 리스트 -->
+						AND a.sale_price <![CDATA[<=]]> 9900
+					</when>
+					<when test="searchOrderListSp == '03'"> <!-- 내게맞는 요금제 7G -->
+						AND a.sup_data_total = '7168'
+						AND a.sup_qos <![CDATA[>]]> 0
+					</when>
+					<when test="searchOrderListSp == '04'"> <!-- 내게맞는 요금제 10G -->
+						AND a.sup_data_total = '10240'
+						AND a.sup_qos <![CDATA[>]]> 0
+					</when>
+					<when test="searchOrderListSp == '05'"> <!-- 내게맞는 요금제 15G -->
+						AND a.sup_data_total = '15360'
+						AND a.sup_qos <![CDATA[>]]> 0
+					</when>
+					<when test="searchOrderListSp == '06'"> <!-- 내게맞는 요금제 71	G -->
+						AND a.sup_data_total = 72704
+						AND a.sup_qos <![CDATA[>]]> 0
+					</when>
+					<when test="searchOrderListSp == '07'"> <!-- 내게맞는 요금제 100 G-> 100G 100기가 이상 전체 qos 조회조건에서 제외 -->
+						AND a.sup_data_total <![CDATA[>=]]> '102400'
+					</when>
+					<when test="searchOrderListSp == '01'"> <!-- 알뜰폰 -->
+						AND a.host NOT IN ('5', '8', '12')
+					</when>
+					<when test="searchOrderListSp == '08'"> <!-- 통신3사 -->
+						AND a.host IN ('5', '8', '12')
+					</when>
+				</choose>
+			</if>
+
+			<!-- 실제 체감가 값 존재 여부 -->
+			<if test='searchSecondPrice != null and searchSecondPrice != ""'>
+				<choose>
+					<when test="searchSecondPrice == 1">  <!-- 실제 체감가에 값이 존재 -->
+						AND a.second_price IS NOT NULL
+            AND a.second_price != ''
+					</when>
+					<when test="searchSecondPrice == 0">   <!-- 미입력된 경우: 값이 없는 데이터 -->
+            AND (a.second_price IS NULL OR a.second_price = '')
+        	</when>
+				</choose>
+			</if>
+
+
+	    	<if test='searchPlanTag != null and searchPlanTag != ""'>
+	    		AND (
+	    		
+	    				
+						a.plan_tag1 IN (SELECT b.code FROM tb_pmb_plan_tag_category a, tb_cmm_code b WHERE cate_id =#{searchPlanTag} AND a.tag_id = b.code AND b.code_group = 'plan_tag_code' and b.use_yn = 'Y') OR 
+						a.plan_tag2 IN (SELECT b.code FROM tb_pmb_plan_tag_category a, tb_cmm_code b WHERE cate_id =#{searchPlanTag} AND a.tag_id = b.code AND b.code_group = 'plan_tag_code' and b.use_yn = 'Y') OR 
+						a.plan_tag3 IN (SELECT b.code FROM tb_pmb_plan_tag_category a, tb_cmm_code b WHERE cate_id =#{searchPlanTag} AND a.tag_id = b.code AND b.code_group = 'plan_tag_code' and b.use_yn = 'Y') OR
+						a.plan_tag4 IN (SELECT b.code FROM tb_pmb_plan_tag_category a, tb_cmm_code b WHERE cate_id =#{searchPlanTag} AND a.tag_id = b.code AND b.code_group = 'plan_tag_code' and b.use_yn = 'Y') OR
+						a.plan_tag5 IN (SELECT b.code FROM tb_pmb_plan_tag_category a, tb_cmm_code b WHERE cate_id =#{searchPlanTag} AND a.tag_id = b.code AND b.code_group = 'plan_tag_code' and b.use_yn = 'Y')
+					)
+	    	</if>			
+	    	
+
+			<!-- 추천요금제 정렬 순서 업데이트 구분 -->
+			<choose>
+				<when test="searchOrderType == 'RECOM01'">
+					ORDER BY a.recom_order1
+				</when>
+				<when test="searchOrderType == 'RECOM02'">
+					ORDER BY a.recom_order2
+				</when>
+				<when test="searchOrderType == 'RECOM03'">
+					ORDER BY a.recom_order3
+				</when>
+				<when test="searchOrderType == 'SPC'">
+					ORDER BY b.allyPartnetYn desc, a.sale_price
+				</when>
+				<otherwise>
+					ORDER BY a.id DESC
+				</otherwise>
+			</choose>
+			
+			
+	</sql>
+
+	<sql id="Base_Column_list">
+		a.id
+		,a.uuid
+		,a.plan_code
+		,a.plan_name
+		,a.plan_name_smt
+		,a.plan_name_smt_sub
+		,a.mno
+		,a.host
+		,b.name hostNm
+		,b.company_mng_code as companyMngCode
+		,a.plan_type
+		,a.sup_data_val
+		,a.sup_qos
+		,a.sup_call_val
+		,a.sup_sms_val
+		,a.normal_price
+		,a.sale_price
+		,a.after_price
+		,a.promotion_period
+		,a.combination_enable
+		,a.benefit
+		,a.freebies
+		,a.link_url
+		,a.url_smt
+		,a.business_name
+		,a.etc
+		,IFNull(a.sale_status,0) saleStatus
+		,IFNull(a.disp_yn,0) dispYn
+		,IFNull(a.new_yn,0) newYn
+		,a.image_badge_special
+		,a.image_badge_it_comb
+		,a.image_badge_add_data
+		,a.image_badge_add_data_nm
+		,a.image_badge_simple_open
+		,a.image_badge_lowest
+		,a.supp_content
+		,a.no_supp_content
+		,a.notice_content
+		,a.event_banner_image_pc
+		,a.event_banner_image_mo
+		,a.event_banner_image_url
+		,a.event_banner_image_target
+		,a.create_date
+		,a.create_id
+		,a.modified_date
+		,a.modified_id
+		,b.logo_img  planLogoImg
+		,a.point_plan_yn
+		,IF(CAST(sup_qos AS UNSIGNED) >= 1024,   CAST(sup_qos AS UNSIGNED) / 1024,  0) AS int_qos
+		,a.daily_data
+		,a.second_price
+		,a.new_num_req_url
+		,a.num_move_req_url
+		,a.recom_order1
+		,a.recom_order2
+		,a.recom_order3
+		,a.is_protected
+		,a.data_create_sp
+		,b.allyPartnetYn
+		,a.sup_data_total
+		,a.marketing_type
+		,a.pc_url
+		,a.mo_url
+		,a.sup_call_buga_val
+		,a.join_count
+		,a.recom_order4
+		,a.plan_tag1
+		,a.plan_tag2
+		,a.plan_tag3
+		,a.plan_tag4
+		,a.plan_tag5
+		,GET_CODE_NAME('plan_tag_code',a.plan_tag1) plan_tag1_name
+		,GET_CODE_NAME('plan_tag_code',a.plan_tag2) plan_tag2_name
+		,GET_CODE_NAME('plan_tag_code',a.plan_tag3) plan_tag3_name
+		,GET_CODE_NAME('plan_tag_code',a.plan_tag4) plan_tag4_name
+		,GET_CODE_NAME('plan_tag_code',a.plan_tag5) plan_tag5_name
+	</sql>
+
+	<select id="getList" parameterType="kr.co.ucomp.web.pmb.dto.SearchPlanDto" resultType="kr.co.ucomp.web.pmb.entity.PlanEntity">
+		  SELECT *  FROM (
+			  SELECT
+		            <include refid="Base_Column_list" />
+		        FROM
+		            tb_pmb_plan_list a left outer join  tb_mbm_company_list b
+ 					ON a.host = b.id
+ 				WHERE 1=1
+		        <include refid="listWhere" />
+	      ) tb
+			<choose>
+				<when test="searchOrderType == 'BP'">
+					ORDER BY normal_price
+				</when>
+				<when test="searchOrderType == 'SEL'">
+					ORDER BY planZzimCnt DESC
+				</when>
+				<when test="searchOrderType == 'AP'">
+					ORDER BY after_price DESC
+				</when>
+				<when test="searchOrderType == 'DATA'">
+					ORDER BY sup_data_total DESC
+				</when>
+				<when test="searchOrderType == 'RECOM01'">
+					ORDER BY recom_order1 DESC
+				</when>
+				<when test="searchOrderType == 'RECOM02'">
+					ORDER BY recom_order2 DESC
+				</when>
+				<when test="searchOrderType == 'RECOM03'">
+					ORDER BY recom_order3 DESC
+				</when>
+				<when test="searchOrderType == 'SPC'">
+					ORDER BY allyPartnetYn desc, sale_price
+				</when>
+				<when test="searchOrderType == 'POP'">
+					ORDER BY ifNull(recom_order4,999) asc, join_count desc
+				</when>
+				<otherwise>
+					ORDER BY newYn DESC, saleStatus DESC, id DESC
+				</otherwise>
+			</choose>
+	         <if test="recordSize != null and recordSize &lt; 999">
+	        LIMIT #{offset}, #{recordSize}
+	        </if>
+
+	</select>
+
+	<select id="getListWithoutLimit" parameterType="kr.co.ucomp.web.pmb.dto.SearchPlanDto" resultType="kr.co.ucomp.web.pmb.entity.PlanEntity">
+		  SELECT *  FROM (
+			  SELECT
+		            <include refid="Base_Column_list" />
+		        FROM
+		            tb_pmb_plan_list a left outer join  tb_mbm_company_list b
+ 					ON a.host = b.id
+ 				WHERE 1=1
+		        <include refid="listWhere" />
+	      ) tb
+			<choose>
+				<when test="searchOrderType == 'BP'">
+					ORDER BY normal_price
+				</when>
+				<when test="searchOrderType == 'SEL'">
+					ORDER BY planZzimCnt DESC
+				</when>
+				<when test="searchOrderType == 'AP'">
+					ORDER BY after_price DESC
+				</when>
+				<when test="searchOrderType == 'DATA'">
+					ORDER BY sup_data_total DESC
+				</when>
+				<otherwise>
+					ORDER BY id DESC
+				</otherwise>
+			</choose>
+	</select>
+
+	<select id="getListCount" parameterType="kr.co.ucomp.web.pmb.dto.SearchPlanDto" resultType="Long">
+		  SELECT
+	            count(1)
+            FROM tb_pmb_plan_list a
+            left outer join  tb_mbm_company_list b
+			ON a.host = b.id
+			WHERE 1=1
+	        <include refid="listWhere" />
+	</select>
+
+
+	<select id="getDetail" parameterType="int" resultType="kr.co.ucomp.web.pmb.entity.PlanEntity">
+		SELECT
+	            <include refid="Base_Column_list" />
+	        FROM tb_pmb_plan_list a
+            left outer join  tb_mbm_company_list b
+			ON a.host = b.id
+	        WHERE a.id=#{id}
+	</select>
+
+
+	<select id="getDetailByUUid" parameterType="map" resultType="kr.co.ucomp.web.pmb.entity.PlanEntity">
+		SELECT
+	            <include refid="Base_Column_list" />
+	        FROM tb_pmb_plan_list a
+            left outer join  tb_mbm_company_list b
+			ON a.host = b.id
+	        WHERE a.uuid=#{uuid}
+	</select>
+
+	<update id="update"  parameterType="kr.co.ucomp.web.pmb.dto.PlanUpdateDto" >
+		UPDATE tb_pmb_plan_list SET
+					plan_code=#{planCode},
+					disp_yn=#{dispYn},
+					url_smt=#{urlSmt},
+					plan_name_smt = #{planNameSmt},
+					image_badge_special=#{imageBadgeSpecial},
+					image_badge_it_comb=#{imageBadgeItComb},
+					image_badge_add_data=#{imageBadgeAddData},
+					image_badge_simple_open=#{imageBadgeSimpleOpen},
+					image_badge_lowest=#{imageBadgeLowest},
+					image_badge_add_data_nm=#{imageBadgeAddDataNm},
+					supp_content=#{suppContent},
+					no_supp_content=#{noSuppContent},
+					notice_content=#{noticeContent},
+					<if test='eventBannerImagePc != null and eventBannerImagePc !=""'>
+						event_banner_image_pc=#{eventBannerImagePc},
+					</if>
+					<if test='eventBannerImageMo != null and eventBannerImageMo !=""'>
+						event_banner_image_mo=#{eventBannerImageMo},
+					</if>
+					event_banner_image_url=#{eventBannerImageUrl},
+					event_banner_image_target=#{eventBannerImageTarget},
+					point_plan_yn=#{pointPlanYn},
+					plan_name_smt_sub=#{planNameSmtSub},
+					second_price=#{secondPrice},
+					new_num_req_url=#{newNumReqUrl},
+					num_move_req_url=#{numMoveReqUrl},
+					pc_url=#{pcUrl},
+					mo_url=#{moUrl},
+					sup_call_buga_val=#{supCallBugaVal},
+					plan_tag1=#{planTag1},
+					plan_tag2=#{planTag2},
+					plan_tag3=#{planTag3},
+					plan_tag4=#{planTag4},
+					plan_tag5=#{planTag5},
+					modified_id=#{modifiedId},
+					modified_date=NOW()
+		WHERE id=#{id};
+	</update>
+
+	<delete id="delPlanReqMng" parameterType="int">
+		UPDATE tb_pmb_plan_list SET sale_status = 0
+	    WHERE id=#{id}
+	</delete>
+
+
+
+	<select id="getMapListExcel" parameterType="kr.co.ucomp.web.pmb.dto.SearchPlanDto" resultType="kr.co.ucomp.web.pmb.entity.PlanEntity">
+		  SELECT
+	            <include refid="Base_Column_list" />
+	        FROM tb_pmb_plan_list a
+            left outer join  tb_mbm_company_list b
+			ON a.host = b.id
+			WHERE a.host = #{searchCompany}
+	        ORDER BY uuid
+	</select>
+
+
+	<select id="getListCountByPlanCode" parameterType="kr.co.ucomp.web.pmb.dto.PlanUpdateDto" resultType="Long">
+		  SELECT
+	            count(1)
+          FROM tb_pmb_plan_list
+          WHERE plan_code=#{planCode}
+	</select>
+
+
+
+	<update id="updataByUuid"  parameterType="kr.co.ucomp.web.pmb.dto.PlanUpdateDto" >
+		UPDATE tb_pmb_plan_list SET
+					<if test="planCode != null and planCode != ''">
+						plan_code=#{planCode},
+					</if>
+					<if test="recomOrder1 != null and recomOrder1 != ''">
+						recom_order1=#{recomOrder1},
+					</if>
+					<if test="recomOrder2 != null and recomOrder2 != ''">
+						recom_order2=#{recomOrder2},
+					</if>
+					<if test="recomOrder3 != null and recomOrder3 != ''">
+						recom_order3=#{recomOrder3},
+					</if>
+					modified_date=NOW()
+		WHERE uuid=#{uuid}
+	</update>
+
+
+
+	<select id="getAllListByPlanIds" parameterType="kr.co.ucomp.web.pmb.dto.SearchPlanDto" resultType="kr.co.ucomp.web.pmb.entity.PlanEntity">
+		  SELECT
+	            <include refid="Base_Column_list" />
+	        FROM tb_pmb_plan_list a
+            left outer join  tb_mbm_company_list b
+			ON a.host = b.id
+			WHERE a.id IN
+			<if test='searchplanIds != null and searchplanIds !=""'>
+			    <foreach item="planid" index="index" collection="_parameter.searchplanIds.split(',')" open="(" separator="," close=")">
+		            #{planid}
+		        </foreach>
+	        </if>
+	        <if test='searchplanIdList != null'>
+	        	 <foreach item="planid" index="index" collection="_parameter.searchplanIdList" open="(" separator="," close=")">
+			        #{planid}
+			  </foreach>
+	        </if>
+
+
+	        ORDER BY uuid
+	</select>
+
+
+	<select id="getDataQosGroupBy" parameterType="kr.co.ucomp.web.pmb.dto.SearchPlanDto" resultType="kr.co.ucomp.web.pmb.entity.PlanEntity">
+
+		<if test="searchType.equalsIgnoreCase('data')">
+			SELECT sup_data_val FROM tb_pmb_plan_list
+			WHERE 1 = 1
+			<if test="searchMno != null and searchMno != ''">
+				AND mno = #{searchMno}
+			</if>
+			GROUP BY sup_data_val ORDER BY sup_data_val
+		</if>
+		<if test="searchType.equalsIgnoreCase('qos')">
+			SELECT sup_qos FROM tb_pmb_plan_list
+			WHERE 1 = 1
+			<if test="searchMno != null and searchMno != ''">
+				AND mno = #{searchMno}
+			</if>
+			GROUP BY sup_qos ORDER BY sup_qos
+		</if>
+	</select>
+
+
+
+
+	<update id="planMapUploadOrderInit"  parameterType="kr.co.ucomp.web.pmb.dto.PlanUpdateDto" >
+		UPDATE tb_pmb_plan_list SET
+					<choose>
+						<when test="planOrderSp == 'RECOM01'">
+							recom_order1=0,
+						</when>
+						<when test="planOrderSp == 'RECOM02'">
+							recom_order2=0,
+						</when>
+						<when test="planOrderSp == 'RECOM03'">
+							recom_order3=0,
+						</when>
+					</choose>
+					modified_date=NOW()
+				WHERE hidden_yn = 1
+			<choose>
+				<when test="searchOrderListSp == '02'"> <!-- 내게맞는 요금제 가성비 요금제 리스트 -->
+					AND sale_price <![CDATA[<=]]> 9900
+				</when>
+				<when test="searchOrderListSp == '03'"> <!-- 내게맞는 요금제 7G -->
+					AND sup_data_total = '7168'
+					AND sup_qos <![CDATA[>]]> 1
+				</when>
+				<when test="searchOrderListSp == '04'"> <!-- 내게맞는 요금제 10G -->
+					AND sup_data_total = '10240'
+					AND sup_qos <![CDATA[>]]> 1
+				</when>
+				<when test="searchOrderListSp == '05'"> <!-- 내게맞는 요금제 15G -->
+					AND sup_data_total = '15360'
+					AND sup_qos <![CDATA[>]]> 1
+				</when>
+				<when test="searchOrderListSp == '06'"> <!-- 내게맞는 요금제 71	G -->
+					AND sup_data_total = 72704
+					AND sup_qos <![CDATA[>]]> 1
+				</when>
+				<when test="searchOrderListSp == '07'"> <!-- 내게맞는 요금제 100	G -->
+					AND sup_data_total <![CDATA[>=]]> '102400'
+				</when>
+
+				<when test="searchOrderListSp == '01'"> <!-- 알뜰폰 -->
+					AND host NOT IN ('5', '8', '12')
+				</when>
+
+				<when test="searchOrderListSp == '08'"> <!-- 통신3사 -->
+					AND host IN ('5', '8', '12')
+				</when>
+
+			</choose>
+	</update>
+
+
+
+
+	<select id="getDetailOrg" parameterType="map" resultType="kr.co.ucomp.web.pmb.entity.PlanDataEntity">
+		SELECT
+			a.id
+			,a.uuid
+			,a.telecom
+			,a.mno
+			,a.plan_type
+			,a.plan_name
+			,a.normal_price
+			,a.sale_price
+			,a.after_price
+			,a.promotion_period
+			,a.data
+			,a.qos
+			,a.voice_call
+			,a.buga_call
+			,a.message
+			,a.combination
+			,a.benefit
+			,a.freebies
+			,a.url
+			,a.business_name
+			,a.etc
+			,a.sale_status
+			,a.create_date
+			,a.modified_date
+			,a.company_id
+			,a.plan_code
+			,a.daily_data
+			,a.m12_price
+			,a.m24_price
+			,a.contract_option
+			,a.hidden_yn
+			,a.special_category
+			,a.datasharing_yn
+			,a.micropayment_yn
+			,a.data_tethering
+			,a.agreement_period
+			,a.qos_blocked
+			,a.data_daily_tethering
+			,a.is_protected
+			,a.pc_url
+			,a.mo_url
+			,b.name companyNm
+			,c.id AS planId
+			,c.marketing_type
+	        FROM tb_pmb_plan_data a
+            left outer join  tb_mbm_company_list b
+			ON a.company_id = b.id
+			 left outer join  tb_pmb_plan_list c
+			ON a.uuid = c.uuid
+	        WHERE a.uuid=#{uuid}
+	</select>
+
+
+
+	<insert id="createOrg"  parameterType="kr.co.ucomp.web.pmb.entity.PlanDataEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+		INSERT INTO tb_pmb_plan_data (
+			uuid
+			,telecom
+			,mno
+			,plan_type
+			,plan_name
+			,normal_price
+			,sale_price
+			,after_price
+			,promotion_period
+			,data
+			,qos
+			,voice_call
+			,buga_call
+			,message
+			,combination
+			,benefit
+			,freebies
+			,url
+			,business_name
+			,etc
+			,sale_status
+			,modified_date
+			,company_id
+			,plan_code
+			,daily_data
+			,m12_price
+			,m24_price
+			,contract_option
+			,hidden_yn
+			,special_category
+			,datasharing_yn
+			,micropayment_yn
+			,data_tethering
+			,agreement_period
+			,qos_blocked
+			,data_daily_tethering
+			,is_protected
+			,data_create_sp
+			,pc_url
+			,mo_url
+			,create_date
+		)VALUES(
+			#{uuid}
+			,#{telecom}
+			,#{mno}
+			,#{planType}
+			,#{planName}
+			,#{normalPrice}
+			,#{salePrice}
+			,#{afterPrice}
+			,#{promotionPeriod}
+			,#{data}
+			,#{qos}
+			,#{voiceCall}
+			,#{bugaCall}
+			,#{message}
+			,#{combination}
+			,#{benefit}
+			,#{freebies}
+			,#{url}
+			,#{businessName}
+			,#{etc}
+			,#{saleStatus}
+			,#{modifiedDate}
+			,#{companyId}
+			,#{planCode}
+			,#{dailyData}
+			,#{m12Price}
+			,#{m24Price}
+			,#{contractOption}
+			,#{hiddenYn}
+			,#{specialCategory}
+			,#{dataSharingYn}
+			,#{microPaymentYn}
+			,#{dataTethering}
+			,#{agreementPeriod}
+			,#{qosBlocked}
+			,#{dataDailyTethering}
+			,#{isProtected}
+			,#{dataCreateSp}
+			,#{pcUrl}
+			,#{moUrl}
+			,Now()
+		);
+	</insert>
+
+
+
+	<update id="updateOrg"  parameterType="kr.co.ucomp.web.pmb.entity.PlanDataEntity">
+		UPDATE tb_pmb_plan_data
+			SET
+			    telecom = #{telecom},
+			    mno = #{mno},
+			    plan_type = #{planType},
+			    plan_name = #{planName},
+			    normal_price = #{normalPrice},
+			    sale_price = #{salePrice},
+			    after_price = #{afterPrice},
+			    promotion_period = #{promotionPeriod},
+			    data = #{data},
+			    qos = #{qos},
+			    voice_call = #{voiceCall},
+			    buga_call = #{bugaCall},
+			    message = #{message},
+			    combination = #{combination},
+			    benefit = #{benefit},
+			    freebies = #{freebies},
+			    url = #{url},
+			    business_name = #{businessName},
+			    sale_status = #{saleStatus},
+			    modified_date = Now(),
+			    company_id = #{companyId},
+			    plan_code = #{planCode},
+			    daily_data = #{dailyData},
+			    m12_price = #{m12Price},
+			    m24_price = #{m24Price},
+			    hidden_yn = #{hiddenYn},
+			    pc_url = #{pcUrl},
+			    mo_url = #{moUrl}
+			WHERE
+			    uuid = #{uuid};
+	</update>
+
+
+
+
+
+
+
+	<select id="getChatbotPlanList" parameterType="kr.co.ucomp.web.pmb.dto.SearchPlanDto" resultType="kr.co.ucomp.web.pmb.entity.PlanEntity">
+	  SELECT
+           <include refid="Base_Column_list" />
+           ,c.plan_memo as chatbotPlanMeno
+			,c.recom_yn as chatbotPlanRecomYn
+			,c.low_price_yn as chatbotPlanLowPriceYn
+			,c.max_benefit_yn as chatbotPlanMaxBenefitYn
+			,c.order_seq AS chatbotPlanOrderNo
+       FROM
+     	tb_pmb_plan_list a left outer join  tb_mbm_company_list b
+		ON a.host = b.id
+		left outer join  tb_svc_chatbot_group_plan c
+		ON a.id = c.plan
+		WHERE c.chatbot_group_id = #{searchChatbotGroupId}
+        ORDER BY c.order_seq
+	</select>
+
+
+
+    <select id="selectPlanSearchCond" parameterType="kr.co.ucomp.web.pmb.dto.SearchPlanDto" resultType="String">
+        SELECT DISTINCT
+        <choose>
+            <when test="searchCondCol != null and searchCondCol != ''">
+                  ${searchCondCol}
+            </when>
+            <otherwise>
+                mno
+            </otherwise>
+        </choose>
+        FROM tb_pmb_plan_list
+        WHERE 1=1
+        <!-- MNO-->
+	    	<if test='searchMno != null and searchMno !=""'>
+	    		AND mno IN
+		        <foreach item="mno" index="index" collection="_parameter.searchMno.split(',')" open="(" separator="," close=")">
+		            #{mno}
+		        </foreach>
+	    	</if>
+		<!-- 데이터 조회 -->
+    	<if test='searchData != null and searchData !=""'>
+    		AND sup_data_total = #{searchData}
+    	</if>
+    	<!-- Qos 조회 -->
+    	<if test='searchQos != null and searchQos !=""'>
+    		AND sup_qos = #{searchQos}
+    	</if>
+    	<!-- 제공통화 조회 -->
+    	<if test='searchCall != null and searchCall !=""'>
+    		AND sup_call_val = #{searchCall}
+    	</if>
+    	<!-- 제공SMS 조회 -->
+    	<if test='searchSms != null and searchSms !=""'>
+    		AND sup_sms_val = #{searchSms}
+    	</if>
+    	<!-- 상태 -->
+		<if test='searchSaleSp != null and searchSaleSp !=""'>
+			<choose>
+				<when test="searchSaleSp == 'SALE'">
+					AND sale_status = 1
+					AND disp_yn = 1
+				</when>
+				<when test="searchSaleSp == 'DROP'">
+					AND (sale_status = 0 OR disp_yn = 0)
+				</when>
+			</choose>
+		</if>
+        ORDER BY
+        <choose>
+            <when test="searchCondCol != null and searchCondCol != ''">
+               ${searchCondCol}
+            </when>
+            <otherwise>
+                mno
+            </otherwise>
+        </choose>
+    </select>
+
+    <update id="updataPopulerOrderInit" >
+    	UPDATE tb_pmb_plan_list SET recom_order4 = NULL;
+    </update>
+
+	<update id="updataPopulerOrder"  parameterType="kr.co.ucomp.web.pmb.dto.PlanUpdateDto" >
+		UPDATE tb_pmb_plan_list SET recom_order4 = ${recomOrder4}
+	    WHERE id=#{id}
+	</update>
+	
+	
+	<update id="updataPlanTag"  parameterType="kr.co.ucomp.web.pmb.dto.PlanUpdateDto" >
+		UPDATE tb_pmb_plan_list 
+			SET 
+			modified_id=#{modifiedId},
+			plan_tag1=#{planTag1},
+			plan_tag2=#{planTag2},
+			plan_tag3=#{planTag3},
+			plan_tag4=#{planTag4},
+			plan_tag5=#{planTag5},
+			modified_date=NOW()
+	    WHERE id=#{id}
+	</update>	
+</mapper>

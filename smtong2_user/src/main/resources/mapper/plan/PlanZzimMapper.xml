@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.plan.mapper.PlanZzimMapper">
+	
+	
+	<sql id="Base_Column_list">
+		 a.id
+		,uuid
+		,plan_code
+		,plan_name
+		,plan_name_smt
+		,mno
+		,host
+		,GET_COMPANY_NM(host) hostNm
+		,plan_type
+		,sup_data_val
+		,sup_qos
+		,sup_call_val
+		,sup_sms_val
+		,normal_price
+		,sale_price
+		,after_price
+		,promotion_period
+		,promotion_period_val
+		,combination_enable
+		,benefit
+		,freebies
+		,link_url
+		,url_smt
+		,business_name
+		,etc
+		,sale_status
+		,disp_yn
+		,new_yn
+		,image_badge_special
+		,image_badge_it_comb
+		,image_badge_add_data
+		,image_badge_add_data_nm
+		,image_badge_simple_open
+		,supp_content
+		,no_supp_content
+		,event_banner_image_pc
+		,event_banner_image_mo
+		,event_banner_image_url
+		,event_banner_image_target
+		,a.create_date
+		,a.create_id
+		,a.modified_date
+		,a.modified_id
+		,a.point_plan_yn
+		,a.m12_price
+		,a.m24_price
+		,IFNULL(a.sup_call_buga_val, '') as sup_call_buga_val
+		,(a.sup_qos / 1024) AS int_qos
+		,a.daily_data
+		,(select max(logo_img) from tb_mbm_company_list where id = a.host)  planLogoImg
+		,(select count(1) from tb_pmb_plan_zzim where prod_id = a.id)  planZzimCnt
+		,(select count(1) from tb_pmb_plan_req_mng where req_prod = a.id)  planReqCnt
+		,(select count(1) from tb_pmb_plan_zzim where prod_id = a.id and user_mng_id =#{userMngId} )  planLoginUserZzimCnt
+	</sql>
+	
+	
+	
+	<sql id="listWhere">
+		<where>
+			<if test='userMngId != null and userMngId !=""'>
+			AND user_mng_id = #{userMngId}
+			</if>
+			<if test='planListId != null and planListId !=""'>
+			AND prod_id = #{planListId}
+			</if>
+		</where>
+	</sql>
+	
+	
+	
+	<select id="getZzimListPlan" parameterType="kr.co.ucomp.web.plan.dto.searchPlanZzimDto" resultType="kr.co.ucomp.web.plan.entity.PlanEntity">
+		SELECT
+		<include refid="Base_Column_list" />
+		FROM tb_pmb_plan_list a
+		LEFT JOIN tb_pmb_plan_zzim b ON b.prod_id = a.id
+		WHERE sale_status = 1
+		AND disp_yn = 1
+		AND user_mng_id = #{userMngId}
+		LIMIT #{offset}, #{recordSize}
+	</select>
+	
+	<select id="getZzimNoDataListPlan" parameterType="kr.co.ucomp.web.plan.dto.searchPlanZzimDto" resultType="kr.co.ucomp.web.plan.entity.PlanEntity">
+		SELECT
+		<include refid="Base_Column_list" />
+		FROM tb_pmb_plan_list a
+		LEFT JOIN tb_pmb_plan_zzim b ON b.prod_id = a.id
+		WHERE sale_status = 1
+		AND disp_yn = 1
+		AND a.id IN
+		<if test='searchplanIdList != null'>
+			<foreach item="planid" index="index" collection="_parameter.searchplanIdList" open="(" separator="," close=")">
+				#{planid}
+			</foreach>
+		</if>
+		ORDER BY sale_price
+		LIMIT #{offset}, #{recordSize}
+	</select>
+	
+	<select id="getZzimNoDataListPlanCount" parameterType="kr.co.ucomp.web.plan.dto.searchPlanZzimDto" resultType="Long">
+		SELECT
+			count(1)
+		FROM tb_pmb_plan_list a
+		LEFT JOIN tb_pmb_plan_zzim b ON b.prod_id = a.id
+		WHERE sale_status = 1
+		AND disp_yn = 1
+		AND a.id IN
+		<if test='searchplanIdList != null'>
+			<foreach item="planid" index="index" collection="_parameter.searchplanIdList" open="(" separator="," close=")">
+				#{planid}
+			</foreach>
+		</if>
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+    <select id="getlist" parameterType="kr.co.ucomp.web.plan.dto.searchPlanZzimDto" resultType="kr.co.ucomp.web.plan.entity.PlanZzimEntity">
+        SELECT
+            a.id,
+            a.user_mng_id, 
+            a.prod_id,
+            a.create_date
+        FROM
+            tb_pmb_plan_zzim a LEFT JOIN tb_pmb_plan_list b
+            ON a.prod_id = b.id
+        WHERE b.disp_yn = 1
+        AND b.sale_status = 1
+        <if test='userMngId != null and userMngId !=""'>
+			AND user_mng_id = #{userMngId}
+			</if>
+			<if test='planListId != null and planListId !=""'>
+			AND prod_id = #{planListId}
+		</if>
+        ORDER BY create_date DESC
+    </select>
+    
+    <select id="getCount" parameterType="kr.co.ucomp.web.plan.dto.searchPlanZzimDto" resultType="Long">
+		  SELECT
+	            count(1)
+	      FROM
+            tb_pmb_plan_zzim a LEFT JOIN tb_pmb_plan_list b
+            ON a.prod_id = b.id
+	       WHERE b.disp_yn = 1
+        AND b.sale_status = 1
+        <if test='userMngId != null and userMngId !=""'>
+			AND user_mng_id = #{userMngId}
+			</if>
+			<if test='planListId != null and planListId !=""'>
+			AND prod_id = #{planListId}
+		</if>
+	</select>
+
+
+    
+
+    <insert id="create" parameterType="kr.co.ucomp.web.plan.entity.PlanZzimEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_pmb_plan_zzim (user_mng_id, prod_id)
+        VALUES (
+            #{userMngId},
+            #{prodId}
+       );
+    </insert>
+
+
+    <delete id="delete" parameterType="kr.co.ucomp.web.plan.entity.PlanZzimEntity">
+        DELETE FROM tb_pmb_plan_zzim
+        WHERE user_mng_id = #{userMngId}
+        AND prod_id = #{prodId}
+    </delete>
+    
+    <delete id="deleteAll" parameterType="kr.co.ucomp.web.plan.entity.PlanZzimEntity">
+        DELETE FROM tb_pmb_plan_zzim
+        WHERE user_mng_id = #{userMngId}
+    </delete>
+    
+
+
+</mapper>

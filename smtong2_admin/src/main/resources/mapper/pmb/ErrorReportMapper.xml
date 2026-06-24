@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.pmb.mapper.ErrorReportMapper">
+
+	<sql id="Base_Column_list">
+		 a.id				
+		,a.plan_id			
+		,b.plan_name		
+		,a.report_type
+		,GET_CODE_NAME('report_type', a.report_type) AS reportTypeName
+		,a.report_content	
+		,a.memo				
+		,a.process_sp		
+		,GET_CODE_NAME('report_process_sp', a.process_sp) AS processSpName
+		,a.process_manager	
+		,d.user_name        AS managerName
+		,a.create_date		
+		,a.create_id		
+		,c.username
+		,a.modified_date	
+		,a.modified_id
+	</sql>
+	
+	<sql id="listWhereInfo">
+		<where>
+			<if test=" searchKeyword != null and !searchKeyword.equals('') ">
+				AND (a.report_content LIKE CONCAT('%', #{searchKeyword}, '%') OR b.plan_name LIKE CONCAT('%', #{searchKeyword}, '%') OR c.username LIKE CONCAT('%', #{searchKeyword}, '%'))
+			</if>
+			<if test=" searchProcessSp != null and searchProcessSp.size() != 0 ">
+				AND a.process_sp in 
+				<foreach collection = "searchProcessSp" item="code" index="index" separator="," open="(" close=")">
+				#{code}
+				</foreach>
+			</if>
+			<if test='searchStartDt != null and searchStartDt !=""'>
+				AND create_date  <![CDATA[>=]]> #{searchStartDt}
+			</if>
+			<if test='searchEndDt != null and searchEndDt !=""'>
+				AND create_date <![CDATA[<=]]> #{searchEndDt}
+			</if>
+		</where>
+	</sql>
+
+	
+	<select id="errorReportList" parameterType="kr.co.ucomp.web.pmb.dto.ErrorReportDto" resultType="kr.co.ucomp.web.pmb.entity.ErrorReportEntity">
+		SELECT
+		<include refid="Base_Column_list" />
+		FROM tb_pmb_plan_error_report a
+		LEFT JOIN tb_pmb_plan_list  b ON b.id = a.plan_id
+		LEFT JOIN tb_mbm_user       c ON c.id = a.create_id
+		LEFT JOIN tb_mbm_admin_user d ON d.id = a.process_manager
+		<include refid="listWhereInfo" />
+		ORDER BY FIELD(a.process_sp, '01', '02', '03') ASC, create_date DESC
+		LIMIT #{offset}, #{recordSize}
+	</select>
+	<select id="countErrorReportList" parameterType="kr.co.ucomp.web.pmb.dto.ErrorReportDto" resultType="java.lang.Long">
+		SELECT COUNT(1)
+		FROM tb_pmb_plan_error_report a
+		LEFT JOIN tb_pmb_plan_list  b ON b.id = a.plan_id
+		LEFT JOIN tb_mbm_user       c ON c.id = a.create_id
+		LEFT JOIN tb_mbm_admin_user d ON d.id = a.process_manager
+		<include refid="listWhereInfo" />
+	</select>
+	
+
+	<select id="errorReport" parameterType="kr.co.ucomp.web.pmb.entity.ErrorReportEntity" resultType="kr.co.ucomp.web.pmb.entity.ErrorReportEntity">
+		SELECT
+		<include refid="Base_Column_list" />
+		FROM tb_pmb_plan_error_report a
+		LEFT JOIN tb_pmb_plan_list  b ON b.id = a.plan_id
+		LEFT JOIN tb_mbm_user       c ON c.id = a.create_id
+		LEFT JOIN tb_mbm_admin_user d ON d.id = a.process_manager
+		WHERE a.id = #{id}
+	</select>
+
+	<insert id="insertErrorReport" parameterType="kr.co.ucomp.web.pmb.entity.ErrorReportEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO tb_pmb_plan_error_report (plan, report_content, memo, process_sp, process_manager, create_id)
+		VALUES (
+			#{planId},
+			#{reportContent},
+			#{memo},
+			#{processSp},
+			#{processManager},
+			#{createId}
+	   );
+	</insert>
+
+	<update id="updateErrorReport" parameterType="kr.co.ucomp.web.pmb.entity.ErrorReportEntity">
+		UPDATE tb_pmb_plan_error_report 
+		SET
+			 memo             = COALESCE(#{memo}            , memo)
+			,process_sp       = COALESCE(#{processSp}       , process_sp)
+			,process_manager  = COALESCE(#{processManager}  , process_manager)
+			,modified_id      = #{modifiedId}
+			,modified_date    = now() 
+		WHERE id = #{id}
+	</update>
+
+	<delete id="deleteErrorReport" parameterType="Long">
+		DELETE FROM tb_pmb_plan_error_report
+		WHERE id = #{id}
+	</delete>
+
+
+</mapper>

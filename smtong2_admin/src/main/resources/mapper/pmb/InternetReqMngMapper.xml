@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.pmb.mapper.InternetReqMngMapper">
+
+    <sql id="listWhereInfo">
+           <if test='keyword != null and keyword !=""'>
+               AND (
+               a.counsel_content LIKE CONCAT('%', #{keyword}, '%')
+               or CONVERT(AES_DECRYPT(FROM_BASE64(a.input_name), 'tb_pmb_internet_req_mng') USING utf8mb4) LIKE CONCAT('%', #{keyword}, '%')
+               or CONVERT(AES_DECRYPT(FROM_BASE64(a.input_number), 'tb_pmb_internet_req_mng') USING utf8mb4) LIKE CONCAT('%', #{keyword}, '%')
+               )
+           </if>
+
+            <if test='searchState != null and searchState !=""'>
+               AND a.req_state IN
+	        				<foreach item="stat" index="index" collection="_parameter.searchState.split(',')" open="(" separator="," close=")">
+	            			#{stat}
+	        			</foreach>
+           </if>
+
+					 <if test='outboundCenter != null and outboundCenter != ""'>
+						 AND a.outbound_center = #{outboundCenter}
+					 </if>
+
+		<!-- MNO-->
+    	<if test='searchMno != null and searchMno !=""'>
+    		AND c.id IN
+	        <foreach item="mno" index="index" collection="_parameter.searchMno.split(',')" open="(" separator="," close=")">
+	            #{mno}
+	        </foreach>
+    	</if>
+
+           <!-- 신청일 조회-->
+           <if test='searchStartDt != null and searchStartDt !=""'>
+               AND a.create_date  <![CDATA[>=]]> #{searchStartDt}
+           </if>
+           <if test='searchEndDt != null and searchEndDt !=""'>
+               AND a.create_date <![CDATA[<=]]> #{searchEndDt}
+           </if>
+
+			<choose>
+				<when test='searchSiteSp != null and searchSiteSp !=""'>
+					AND a.site_sp =  #{searchSiteSp}
+				</when>
+				<otherwise>
+					AND a.site_sp = '01'
+				</otherwise>
+			</choose>
+
+			<if test='searchIncomSp != null and searchIncomSp !=""'>
+				AND a.incom_sp =  #{searchIncomSp}
+			</if>
+
+			<if test='searchRdpMngId != null and searchRdpMngId !=""'>
+				AND a.rdp_mng_id =  #{searchRdpMngId}
+			</if>
+
+			<if test='searchisNewYn != null and searchisNewYn !=""'>
+				AND a.is_new =  #{searchisNewYn}
+			</if>
+    </sql>
+
+    <sql id="Base_Column_list_Info">
+		a.id
+		,a.req_user
+		, CONVERT(AES_DECRYPT(FROM_BASE64(a.input_name), 'tb_pmb_internet_req_mng') USING utf8mb4) input_name
+		, CONVERT(AES_DECRYPT(FROM_BASE64(a.input_number), 'tb_pmb_internet_req_mng') USING utf8mb4) input_number
+		<!-- ,AES_DECRYPT(FROM_BASE64(a.input_name), 'tb_pmb_internet_req_mng') input_name
+		,AES_DECRYPT(FROM_BASE64(a.input_number), 'tb_pmb_internet_req_mng') input_number -->
+		,a.input_plan_id
+		,a.req_state
+		,a.counsel_content
+		,a.proc_content
+		,a.site_sp
+		,a.incom_sp
+		,a.incom_url
+		,a.rdp_mng_id
+		,a.create_date
+		,a.create_id
+		,a.modified_date
+		,a.modified_id
+		,a.is_new
+		,a.hope_cons_time
+		,a.rel_comp
+		,a.outbound_center
+		,GET_WEB_USER_NM(a.create_id) as createNm
+		,GET_ADMIN_USER_NM(a.modified_id) as modifiedNm
+		,CASE WHEN input_plan_id > 0 THEN IFNULL(c.name,'미선택') ELSE '미선택' END AS internetPlanMno
+		,CASE WHEN input_plan_id > 0 THEN IFNULL(b.prod_name,'미선택') ELSE '미선택' END AS internetPlanNm
+		,CASE WHEN input_plan_id > 0 THEN IFNULL(b.internet_speed,'미선택') ELSE '미선택' END AS internetSpeed
+		,CASE WHEN input_plan_id > 0 THEN IFNULL(b.channel_count,'미선택') ELSE '미선택' END AS channelCount
+		,CASE WHEN input_plan_id > 0 THEN IFNULL(b.normal_price,'미선택') ELSE '미선택' END AS normalPrice
+		,CASE WHEN input_plan_id > 0 THEN IFNULL(b.combination_price,'미선택') ELSE '미선택' END AS combinationPrice
+		,CASE WHEN input_plan_id > 0 THEN IFNULL(b.normal_freeble_price,'미선택') ELSE '미선택' END AS normalFreeblePrice
+		,CASE WHEN input_plan_id > 0 THEN IFNULL(b.combination_freeble_price,'미선택') ELSE '미선택' END AS combinationFreeblePrice
+		,CASE WHEN input_plan_id > 0 THEN IFNULL((SELECT name FROM tb_pmb_internet_mno WHERE id = a.internet_mno_id LIMIT 1),'미선택') ELSE '미선택' END AS internetPlanMnoNew
+		,CASE WHEN input_plan_id > 0 THEN IFNULL(a.prod_name,'미선택') ELSE '미선택' END AS internetPlanNmNew
+		,CASE WHEN input_plan_id > 0 THEN IFNULL(a.tv_prod_name,'미선택') ELSE '미선택' END AS tvProdName
+		,CASE WHEN input_plan_id > 0 THEN IFNULL(a.channel_count,0) ELSE 0 END AS channelCountNew
+		,CASE WHEN input_plan_id > 0 THEN IFNULL(a.internet_speed,'미선택') ELSE '미선택' END AS internetSpeedNew
+		,CASE WHEN input_plan_id > 0 THEN IFNULL(a.combination_price,0) ELSE 0 END AS combinationPriceNew
+		,CASE WHEN input_plan_id > 0 THEN IFNULL(a.combination_freeble_price,0) ELSE 0 END AS combinationFreeblePriceNew
+    </sql>
+
+
+    <select id="getList" parameterType="kr.co.ucomp.web.pmb.dto.InternetReqMngSearchDto" resultType="kr.co.ucomp.web.pmb.entity.InternetReqMngEntity">
+     	SELECT *  FROM (
+	        SELECT
+	        <include refid="Base_Column_list_Info"/>
+	        FROM tb_pmb_internet_req_mng a LEFT OUTER JOIN  tb_pmb_internet_plan_list  b
+	        ON  a.input_Plan_id = b.id
+			LEFT OUTER JOIN  tb_pmb_internet_mno c
+			ON   IFNULL(b.internet_mno_id,0)=c.id
+			WHERE 1=1
+			<include refid="listWhereInfo"/>
+			ORDER BY a.id DESC
+		) tb
+		LIMIT #{offset}, #{recordSize}
+
+    </select>
+
+    <select id="getListWithOutLimit" parameterType="kr.co.ucomp.web.pmb.dto.InternetReqMngSearchDto" resultType="kr.co.ucomp.web.pmb.entity.InternetReqMngEntity">
+     	SELECT *  FROM (
+	        SELECT
+	        <include refid="Base_Column_list_Info"/>
+	        FROM tb_pmb_internet_req_mng a LEFT OUTER JOIN  tb_pmb_internet_plan_list  b
+	        ON  a.input_Plan_id = b.id
+			LEFT OUTER JOIN  tb_pmb_internet_mno c
+			ON   IFNULL(b.internet_mno_id,0)=c.id
+			WHERE 1=1
+			<include refid="listWhereInfo"/>
+			ORDER BY a.id DESC
+		) tb
+    </select>
+
+    <select id="getListCount" parameterType="kr.co.ucomp.web.pmb.dto.InternetReqMngSearchDto" resultType="Long">
+        SELECT COUNT(*)
+        FROM tb_pmb_internet_req_mng a LEFT OUTER JOIN  tb_pmb_internet_plan_list  b
+        ON  a.input_Plan_id = b.id
+		LEFT OUTER JOIN  tb_pmb_internet_mno c
+		ON   IFNULL(b.internet_mno_id,0)=c.id
+		WHERE 1=1
+        <include refid="listWhereInfo"/>
+    </select>
+
+    <select id="getDetail" parameterType="int" resultType="kr.co.ucomp.web.pmb.entity.InternetReqMngEntity">
+        SELECT <include refid="Base_Column_list_Info"/>
+       	FROM tb_pmb_internet_req_mng a LEFT OUTER JOIN  tb_pmb_internet_plan_list  b
+        ON  a.input_Plan_id = b.id
+		LEFT OUTER JOIN  tb_pmb_internet_mno c
+		ON   IFNULL(b.internet_mno_id,0)=c.id
+        WHERE a.id=#{id}
+    </select>
+
+
+
+    <update id="update" parameterType="kr.co.ucomp.web.pmb.entity.InternetReqMngEntity">
+        UPDATE tb_pmb_internet_req_mng SET
+        	counsel_content = #{counselContent}
+        	, proc_content = #{procContent}
+        	, req_state = #{reqState}
+	        ,modified_date  = now()
+			,modified_id    = #{modifiedId}
+        WHERE id=#{id}
+    </update>
+
+
+    <update id="updateState" parameterType="kr.co.ucomp.web.pmb.entity.InternetReqMngEntity">
+        UPDATE tb_pmb_internet_req_mng SET
+        	, req_state = #{reqState}
+	        ,modified_date  = now()
+			,modified_id    = #{modifiedId}
+        WHERE id=#{id}
+    </update>
+
+
+
+      <insert id="create" parameterType="kr.co.ucomp.web.pmb.entity.InternetReqMngEntity">
+       INSERT INTO tb_pmb_internet_req_mng(
+        		req_user
+        		, input_name
+        		, input_number
+        		, input_plan_id
+        		, req_state
+        		, site_sp
+        		, incom_sp
+        		, is_new
+        		, rel_comp
+        		, create_date
+        		, create_id
+						, outbound_center)
+        VALUES (
+                -1,
+				TO_BASE64(AES_ENCRYPT(#{inputName},'tb_pmb_internet_req_mng')),
+				TO_BASE64(AES_ENCRYPT(#{inputNumber},'tb_pmb_internet_req_mng')),
+                0,
+                'REQ',
+                '01',
+                '03',
+                #{isNew},
+                #{relComp},
+                now(),
+                -1,
+								#{outboundCenter}
+               )
+    </insert>
+
+
+
+</mapper>

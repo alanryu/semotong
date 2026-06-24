@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>간편개통 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+</head>
+
+<body>
+	<!-- 레이아웃이 없는 경우  -->
+	<div class="wrapper only-container">
+		<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-QU-page F-QU01-10-01-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">신분증 정보를 입력해주세요.</h2>
+							<p class="sec-explain">신분증에 표시된 부분을 확인해주세요.</p>
+						</div>
+						<div class="sec-body">
+							<!-- 탭 영역 -->
+							<div class="ui-tab tab-style1">
+								<ul class="tab-list" role="tablist">
+									<li class="tab-item" role="presentation">
+										<button class="tab-link active" id="FQU0110-01" data-bs-toggle="tab" data-bs-target="#FQU0110-01-pane" type="button" role="tab" aria-controls="FQU0110-01-pane" aria-selected="true">주민등록증</button>
+									</li>
+									<li class="tab-item" role="presentation">
+										<button class="tab-link" id="FQU0110-02" data-bs-toggle="tab" data-bs-target="#FQU0110-02-pane" type="button" role="tab" aria-controls="FQU0110-02-pane" aria-selected="false">운전면허증</button>
+									</li>
+								</ul>
+							</div>
+							<div class="tab-content">
+								<!-- 주민등록증 패널 -->
+								<div class="tab-pane fade show active" id="FQU0110-01-pane" role="tabpanel" aria-labelledby="FQU0110-01" tabindex="0">
+									<figure class="persnal-card">
+										<img src="../../assets/images/common/img-social-card.png" alt="주민등록증 예시" />
+									</figure>
+
+									<!-- 등록폼 -->
+									<!-- 2025-02-28 조찬기 : 이름, 주민번호 입력필드가 아닌것으로 변경  -->
+									<div class="basic-frm">
+										<!-- 이름 입력 -->
+										<div class="frm-field">
+											<div class="frm-title">
+												<label for="frmName" class="tit">이름</label>
+											</div>
+											<div class="frm-content">
+												<div class="ui-inp">
+													<!-- <input type="tel" name="" id="frmName" value="" placeholder="홍길동" title="" class="inp" /> -->
+													 <p class="inp-txt">세모통</p>
+												</div>
+											</div>
+										</div>
+										<!-- // 이름 입력 -->
+
+										<!-- 주민등록번호 입력 -->
+										<div class="frm-field">
+											<div class="frm-title">
+												<label for="frmSocialNo" class="tit">주민등록번호</label>
+											</div>
+											<div class="frm-content">
+												<div class="frm-group">
+													<div class="ui-inp">
+														<!-- <input type="tel" name="" id="frmSocialNo" value="" placeholder="YYMMDD" title="" class="inp" oninput="setRegularNumber(this)"/> -->
+														<p class="inp-txt">800101</p>
+													</div>
+													<span class="frm-split">-</span>
+													<div class="ui-inp">
+														<!-- <input type="password" name="" id="frmSocialNo" value="" placeholder="뒷자리(7자리)" title="" class="inp" oninput="setRegularNumber(this)"/> -->
+														<p class="inp-txt">*******</p>
+													</div>
+												</div>
+											</div>
+										</div>
+										<!-- // 주민등록번호 입력 -->
+
+										<!-- 발급일자 입력 -->
+										<div class="frm-field">
+											<div class="frm-title">
+												<label for="frmDate1" class="tit">발급일자</label>
+											</div>
+											<div class="frm-content">
+												<div class="ui-inp">
+													<input type="tel" name="" id="frmDate1" value="" placeholder="예) 20211012" title="" class="inp" oninput="setRegularNumber(this)"/>
+												</div>
+											</div>
+										</div>
+										<!-- // 발급일자 입력 -->
+									</div>
+									<!-- // 등록폼 -->
+								</div>
+								<!-- //주민등록증 패널 -->
+
+								 <!-- 운전면허증 패널 -->
+								<div class="tab-pane fade" id="FQU0110-02-pane" role="tabpanel" aria-labelledby="FQU0110-02" tabindex="0">
+									<figure class="persnal-card">
+										<img src="../../assets/images/common/img-car-card.png" alt="운전면허증 예시" />
+									</figure>
+
+									<!-- 등록폼 -->
+									<!-- 2025-02-28 조찬기 : 이름, 생년월일 입력필드가 아닌것으로 변경  -->
+									<div class="basic-frm">
+										<!-- 이름 입력 -->
+										<div class="frm-field">
+											<div class="frm-title">
+												<label for="frmName02" class="tit">이름</label>
+											</div>
+											<div class="frm-content">
+												<div class="ui-inp">
+													<!-- <input type="tel" name="" id="frmName02" value="" placeholder="홍길동" title="" class="inp" /> -->
+													<p class="inp-txt">세모통</p>
+												</div>
+											</div>
+										</div>
+										<!-- // 이름 입력 -->
+
+										<!-- 생년월일 입력 -->
+										<div class="frm-field">
+											<div class="frm-title">
+												<label for="frmBirthday" class="tit">생년월일</label>
+											</div>
+											<div class="frm-content">
+												<div class="ui-inp">
+													<!-- <input type="tel" name="" id="frmBirthday" value="" placeholder="예) 20211012" title="" class="inp" oninput="setRegularNumber(this)"/> -->
+													<p class="inp-txt">20211012</p>
+												</div>
+											</div>
+										</div>
+										<!-- // 생년월일 입력 -->
+
+										<!-- 운전면허번호 선택 -->
+										<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+										<div class="frm-field">
+											<div class="frm-title">
+												<label class="tit" for="frmCarNo">운전면허번호</label>
+											</div>
+											<div class="frm-content">
+												<div class="frm-group type-car">
+													<div class="ui-inp ">
+														<input type="tel" name="" id="frmCarNo" value="" placeholder="2자리" title="" class="inp" oninput="setRegularNumber(this)"/>
+													</div>
+													<div class="ui-inp">
+														<input type="tel" name="" value="" placeholder="2자리" title="" class="inp" oninput="setRegularNumber(this)"/>
+													</div>
+													<div class="ui-inp">
+														<input type="tel" name="" value="" placeholder="6자리" title="" class="inp" oninput="setRegularNumber(this)"/>
+													</div>
+													<div class="ui-inp">
+														<input type="tel" name="" value="" placeholder="2자리" title="" class="inp" oninput="setRegularNumber(this)"/>
+													</div>
+												</div>
+											</div>
+										</div>
+										<!-- // 운전면허번호 선택 -->
+
+										<!-- 발급일자 입력 -->
+										<div class="frm-field">
+											<div class="frm-title">
+												<label for="frmDate2" class="tit">발급일자</label>
+											</div>
+											<div class="frm-content">
+												<div class="ui-inp">
+													<input type="tel" name="" id="frmDate2" value="" placeholder="예) 20211012" title="" class="inp" oninput="setRegularNumber(this)"/>
+												</div>
+											</div>
+										</div>
+										<!-- // 발급일자 입력 -->
+
+										<!-- 전화번호 입력 -->
+										<div class="frm-field">
+											<div class="frm-title">
+												<label for="frmTitle" class="tit">일련번호</label>
+											</div>
+											<div class="frm-content">
+												<div class="ui-inp">
+													<input type="text" name="" id="frmTitle" value="" placeholder="예) A1B2CD (앞면 하단을 확인하세요)" title="" class="inp" />
+												</div>
+											</div>
+										</div>
+										<!-- // 전화번호 입력 -->
+									</div>
+									<!-- // 등록폼 -->
+								</div>
+								<!-- //운전면허증 -->
+							</div>
+							<!-- //탭 영역 -->
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" disabled>
+							<span>다음</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 플로팅 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+	</div>
+</body>
+
+</html>

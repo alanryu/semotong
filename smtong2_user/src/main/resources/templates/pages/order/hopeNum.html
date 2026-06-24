@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/order_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='약관동의'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ 
+ <script>
+	
+	
+	$( document ).ready(function() {
+			
+	   
+	});
+	
+	function chkInputValid() {
+		$('#btnNext').attr('disabled', 'disabled');
+		
+		var frm1stLength = $('#frm1st').val().length;		
+		var frm2ndLength = $('#frm2nd').val().length;		
+		
+		if(frm1stLength != 4) {
+			return;
+		}
+		
+		if(frm2ndLength != 4) {
+			return;
+		}
+		
+		$('#btnNext').removeAttr("disabled");		
+	}
+	
+	function goNext() {
+		$('#newPhoneNum1').val($('#frm1st').val());
+		$('#newPhoneNum2').val($('#frm2nd').val());
+		moveNextOrder('/order/custAdress');
+	}
+ </script>
+</th:block>
+
+<!-- Container -->
+<main role="main" class="container">
+<th:block th:include="pages/order/incOrderForm :: orderFormFragment"></th:block>
+<!-- content -->
+			<div class="content F-QU-page F-QU01-07-01-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">희망하시는 새로운 번호 뒷자리를 입력해주세요. <br>희망번호는 뒷자리에 적용돼요.</h2>
+							<p class="sec-explain">희망번호로 개통되지 않을 수 있어요.</p>
+						</div>
+						<div class="sec-body">
+							<!-- 등록폼 -->
+							<div class="basic-frm">
+								<!-- 1순위 입력 -->
+								<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label class="tit" for="frm1st">1순위</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="tel" name="" id="frm1st" value="" placeholder="번호를 입력해주세요." title="" class="inp" oninput="setRegularNumber(this);chkInputMax(this,'frm2nd');chkInputValid();" maxlength="4" />
+										</div>
+									</div>
+								</div>
+								<!-- // 1순위 입력 -->
+
+								<!-- 2순위 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frm2nd" class="tit">2순위</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="tel" name="" id="frm2nd" value="" placeholder="번호를 입력해주세요." title="" class="inp" oninput="setRegularNumber(this);chkInputValid();" maxlength="4" />
+										</div>
+									</div>
+								</div>
+								<!-- // 2순위 입력 -->
+							</div>
+							<!-- // 등록폼 -->
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" disabled id="btnNext" onclick="goNext();">
+							<span>다음</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 플로팅 섹션 -->
+			</div>
+			<!-- // content -->
+</main>
+
+	
+</html>

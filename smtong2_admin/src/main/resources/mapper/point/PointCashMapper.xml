@@ -1,0 +1,123 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.point.mapper.PointCashMapper">
+	
+	<sql id="Point_Column_list">
+			 c.id
+			,u.username ,kakao_user_id, AES_DECRYPT(FROM_BASE64(u.phone_number), 'tb_mbm_user') phoneNumber
+			,p.user_id
+			,c.point_id
+			,c.bank_code
+			,GET_CODE_NAME('bank_code', c.bank_code) AS bankName
+			,c.account_no
+			,c.account_name
+			,c.amount
+			,c.req_date
+			,c.status
+			,GET_CODE_NAME('point_cash_status', c.status) AS statusName
+			,c.memo
+			,c.create_date
+			,c.create_id
+			,GET_WEB_USER_NM(c.create_id) AS createName
+			,c.modified_date
+			,c.modified_id
+			,GET_ADMIN_USER_NM(c.modified_id) AS modifiedName
+	</sql>
+	<sql id="PointWhereInfo">
+		<where>
+			<if test='searchUserId != null and searchUserId !=""'>
+			AND u.id = #{searchUserId}
+			</if>
+			<if test='keyword != null and keyword !=""'>
+			AND (u.username LIKE CONCAT('%', #{keyword}, '%') OR u.kakao_user_id LIKE CONCAT('%', #{keyword}, '%'))
+			</if>
+			
+			<if test='status != null and status !=""'>
+			AND c.status = #{status}
+			</if>
+			
+			<!-- 기간 조회-->
+			<if test='searchStartDt != null and searchStartDt !=""'>
+			AND c.create_date  <![CDATA[>=]]> #{searchStartDt}
+			</if>
+			<if test='searchEndDt != null and searchEndDt !=""'>
+			AND c.create_date <![CDATA[<=]]> #{searchEndDt}
+			</if>
+		</where>
+	</sql>
+	
+	
+	<select id="getPointCash" parameterType="kr.co.ucomp.web.point.dto.PointCashDTO" resultType="kr.co.ucomp.web.point.entity.PointCashEntity">
+		SELECT
+		<include refid="Point_Column_list" />
+		FROM tb_mbm_user u
+		INNER JOIN tb_mbm_point 			p ON u.id = p.user_id
+		INNER JOIN tb_mbm_point_cash 	c ON p.id = c.point_id
+		<include refid="PointWhereInfo" />
+		ORDER BY c.id DESC
+		LIMIT #{offset}, #{recordSize}
+	</select>
+	<select id="getPointCashCount" parameterType="kr.co.ucomp.web.point.dto.PointCashDTO" resultType="integer">
+		SELECT
+			count(1)
+		FROM tb_mbm_user u
+		INNER JOIN tb_mbm_point 			p ON u.id = p.user_id
+		INNER JOIN tb_mbm_point_cash 	c ON p.id = c.point_id
+		<include refid="PointWhereInfo" />
+	</select>
+	
+	<select id="getPointCashById" parameterType="kr.co.ucomp.web.point.dto.PointCashDTO" resultType="kr.co.ucomp.web.point.entity.PointCashEntity">
+		SELECT
+		<include refid="Point_Column_list" />
+		FROM tb_mbm_user u
+		INNER JOIN tb_mbm_point 			p ON u.id = p.user_id
+		INNER JOIN tb_mbm_point_cash 	c ON p.id = c.point_id
+		WHERE c.id = #{searchCashId}
+	</select>
+	
+	<insert id="insertCash" parameterType="kr.co.ucomp.web.point.entity.PointCashEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+	INSERT INTO tb_mbm_point_cash(
+			 point_id
+			,bank_code
+			,account_no
+			,account_name
+			
+			,amount
+			,req_date
+			,status
+			
+			,memo
+			
+			,create_date
+			,create_id
+	)VALUES (
+			 #{pointId			}
+			,#{bankCode			}
+			,#{accountNo		}
+			,#{accountName		}
+			
+			,#{amount			}
+			,NOW()
+			,#{status			}
+			
+			,#{memo				}
+			
+			,NOW()
+			,#{createId			}
+		)
+	</insert>
+	
+	<update id="updateCash"  parameterType="kr.co.ucomp.web.point.entity.PointCashEntity" >
+		UPDATE tb_mbm_point_cash 
+		SET	
+ 			 status                 = #{status				}
+			,memo                   = #{memo			}
+			,modified_date          = NOW()
+			,modified_id            = #{modifiedId			}
+		WHERE id = #{id}
+	</update>
+
+
+
+</mapper>

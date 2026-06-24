@@ -1,0 +1,604 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 인터넷 홈
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 랜딩 페이지
+.F-I02-01-page {
+	// 페이지 여백
+	--sec-outer-margin: 50rem;
+
+	// 랜딩대표영역
+	.lending-main-sec {
+		padding-left: 0;
+		padding-right: 0;
+
+		.sec-inner {
+			position: relative;
+		}
+
+		.lending-logo {
+			position: absolute;
+			top: 0;
+			left: 0;
+			display: flex;
+			align-items: center;
+			height: $mobile-height-header;
+			@include out-sec;
+		}
+
+		.lending-visual {
+			img {
+				width: 100%;
+			}
+		}
+		.lending-desc {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: 40rem;
+			font-weight: 400;
+			font-size: 16rem;
+			line-height: 22rem;
+			text-align: center;
+
+			strong {
+				font-weight: 600;
+			}
+		}
+
+		.lending-consult {
+			position: relative;
+		}
+
+		.lending-form {
+			padding-top: 24rem;
+			padding-bottom: 24rem;
+			background-color: #F4F5F8;
+
+			@include out-sec;
+
+			.ui-inp-group {
+				display: flex;
+				flex-direction: column;
+				gap: 8rem;
+
+				.ui-inp {
+					width: 100%;
+				}
+			}
+
+			.ui-chk-group {
+				position: relative;
+				display: flex;
+				flex-direction: column;
+				gap: 6rem;
+				margin-top: 20rem;
+
+				.ui-chk {
+					width: 100%;
+				}
+
+				.ui-btn.open-modal {
+					position: absolute;
+					left: 28rem;
+					right: 20%;
+					z-index: 10;
+					bottom: 0;
+					height: 28rem;
+					background-color: transparent;
+				}
+			}
+
+			.ui-btn-group {
+				margin-top: 20rem;
+			}
+
+			.secret-desc {
+				margin-top: 30rem;
+				font-weight: 400;
+				font-size: 12rem;
+				line-height: 16rem;
+				color: #828588;
+				word-break: keep-all;
+			}
+		}
+
+		&.mint {
+			.sec-inner {
+				background-color: #D0F2F2;
+			}
+			.lending-desc {
+				background-color: #BADEDE;
+			}
+		}
+		&.purple {
+			.sec-inner {
+				background-color: #542FDD;
+			}
+			.lending-desc {
+				background-color: #DCD5FB;
+			}
+		}
+
+
+		@include media-tablet-xs {
+			&.responsive {
+				.sec-inner {
+					overflow: hidden;
+					border-radius: 12rem;
+				}
+
+				.lending-visual {
+					img {
+						width: 50%;
+					}
+				}
+
+				.lending-consult {
+					position: absolute;
+					left: 50%;
+					top: 50%;
+					transform: translateY(-50%);
+					width: calc(50% - 40rem);
+					border-radius: 8rem;
+					overflow: hidden;
+
+					.ui-inp .inp {
+						height: 40rem;
+						padding-top: 5rem;
+						padding-bottom: 5rem;
+						&.is-placeholder,
+						&::placeholder {
+							font-size: 13rem;
+						}
+					}
+				}
+
+				.lending-form {
+					padding: 20rem;
+					.ui-chk-group {
+						gap: 0;
+						margin-top: 12rem;
+					}
+					.ui-btn-group {
+						margin-top: 12rem;
+					}
+				}
+			}
+		}
+	}
+
+	// 햬택섹션
+	.benefit-sec {
+		margin-top: var(--sec-outer-margin);
+		@include sec-basic;
+
+		.sec-header {
+			.sec-tit {
+				display: block;
+				line-height: 28rem;
+				em {
+					color: $color-primary;
+				}
+			}
+		}
+
+		.sec-body {
+			.benefit-group {
+				position: relative;
+				& + .benefit-group {
+					margin-top: var(--sec-outer-margin);
+				}
+
+				.sec-stit {
+					display: flex;
+					align-items: flex-start;
+					gap: 8rem;
+					margin-bottom: 12rem;
+
+					.label {
+						flex: none;
+						position: relative;
+						top: 2rem;
+						display: inline-block;
+						padding: 2rem 8rem;
+						background-color: #000;
+						border-radius: 20rem;
+						font-weight: 600;
+						font-size: 12rem;
+						line-height: 16rem;
+						color: #fff;
+					}
+					.stit {
+						display: inline-block;
+						font-weight: 600;
+						font-size: 18rem;
+						line-height: 24rem;
+						color: #000;
+					}
+				}
+
+			}
+
+			.benefit-more {
+				margin-top: 24rem;
+				.btn-sub {
+					margin: 0;
+				}
+			}
+		}
+
+		.benefit-card-list {
+			@include benefit-card-list;
+		}
+
+		.benefit-card {
+			@include benefit-card;
+		}
+
+		.benefit-swiper {
+			position: relative;
+			.swiper {
+				margin:-20rem calc(-1 * ($mobile-outer-spacer / 2));
+				padding:20rem calc(+1 * ($mobile-outer-spacer / 2));
+			}
+
+			// 스와이프 버튼
+			.benefit-button-prev,
+			.benefit-button-next {
+				position: absolute;
+				top: calc(50% - 10rem);
+				right: 0;
+				z-index: 10;
+				transform: translate(50%, 50%);
+				width: 28rem;
+				height: 28rem;
+			}
+			.benefit-button-prev {
+				right: auto;
+				left: 0;
+				transform: translate(-50%, 50%) rotate(180deg);
+			}
+			.swiper-button-disabled { /* 8차 수정 : 추천딜 스와이프 버튼 추가(여기까지) */
+				display: none;
+			}
+		}
+	}
+
+	// s: 통신사 선택 섹션
+	.telecom-choice-sec {
+		margin-top: var(--sec-outer-margin);
+		@include sec-basic;
+
+		.telecom-list {
+			display: flex;
+			justify-content: space-between;
+			gap: 8rem;
+
+			.telecom-item {
+				width: 16%;
+				min-width: 56rem;
+				// max-width: 100rem;
+			}
+
+			.telecom-rdo {
+				position: relative;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 100%;
+				aspect-ratio: 1/1;
+				input {
+					position: absolute;
+					left: 0;
+					top: 0;
+					width: 100%;
+					height: 100%;
+					border-radius: 50%;
+					& {
+						+ .telecom-con {
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							width: 100%;
+							height: 100%;
+							border-radius: 50%;
+							background-color: #F4F5F8;
+
+							.ui-icn {
+								min-width: 60%;
+								min-height: 60%;
+								&::before {
+									mask-position: center center;
+									mask-size: contain;
+								}
+							}
+						}
+					}
+					&:checked {
+						+ .telecom-con {
+							background-color: $color-primary;
+							.ui-icn::before {
+								background-color: #fff;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// 인기 상품
+		.product-wrap {
+			margin-top: 24rem;
+
+			.sub-title {
+				margin-bottom: 12rem;
+				font-weight: 600;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #656565;
+			}
+
+			.product-swiper {
+				box-sizing: border-box;
+				margin:-20rem calc(-1 * $mobile-outer-spacer);
+				padding:20rem $mobile-outer-spacer;
+
+				.swiper-pagination {
+					position: static;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					margin-top: 20rem;
+					gap: 8rem;
+					&-bullet {
+						width: 10rem;
+						height: 10rem;
+						margin: 0;
+						border-radius: 10rem;
+						background-color: #EFF0F0;
+						opacity: 1;
+						transition: all 0.2s ease;
+						&-active {
+							width: 20rem;
+							background-color: $color-primary;
+						}
+					}
+				}
+				.product-button-prev,
+				.product-button-next {
+					position: absolute;
+					top: calc(50% - 40rem);
+					right: 24rem;
+					z-index: 10;
+					transform: translate(50%, 50%);
+					width: 28rem;
+					height: 28rem;
+				}
+
+				.product-button-prev {
+					right: auto;
+					left: 24rem;
+					transform: translate(-50%, 50%) rotate(180deg);
+				}
+
+				.swiper-button-disabled {
+					/* 8차 수정 : 추천딜 스와이프 버튼 추가(여기까지) */
+					display: none;
+				}
+			}
+			.product-box {
+				@include box-shadow-16;
+				padding: 24rem;
+
+				.product-header {
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+
+					.label {
+						display: inline-flex;
+						padding: 3rem 11rem;
+						border-radius: 30rem;
+						border: 1px solid $color-secondary;
+						font-weight: 600;
+						font-size: 12rem;
+						line-height: 16rem;
+						color: $color-secondary;
+					}
+					.title {
+						display: block;
+						margin-top: 8rem;
+						font-weight: 600;
+						font-size: 16rem;
+						line-height: 22rem;
+						color: #000;
+					}
+				}
+				.product-body {
+					padding: 20rem 0;
+					.product-colabo {
+						display: flex;
+						justify-content: center;
+						align-items: center;
+						gap: 24rem;
+						text-align: center;
+						.product-item {
+							font-weight: 400;
+							font-size: 12rem;
+							line-height: 16rem;
+							color: #000;
+						}
+					}
+				}
+				.product-footer {
+					text-align: center;
+
+					.product-charge {
+						.sale {
+							font-weight: 700;
+							font-size: 18rem;
+							line-height: 24rem;
+							color: $color-primary;
+						}
+						.original {
+							font-weight: 400;
+							font-size: 14rem;
+							line-height: 20rem;
+							color: #656565;
+						}
+					}
+					.product-action {
+						margin-top: 8rem;
+						.btn-sub {
+							margin: 0;
+							box-sizing: border-box;
+						}
+					}
+				}
+			}
+		}
+	}
+	// e: 통신사 선택 섹션
+
+	// s: 가입안내 섹션
+	.join-steps-sec {
+		@include sec-basic;
+		margin-top: var(--sec-outer-margin);
+
+		.join-steps {
+			padding: 20rem;
+			border-radius: 4rem;
+			background-color: #F4F5F8;
+			li {
+				position: relative;
+				display: flex;
+				padding-bottom: 26rem;
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #46484B;
+				&::after {
+					content:'';
+					position: absolute;
+					left: 11rem;
+					top: 28rem;
+					bottom: 4rem;
+					display: block;
+					width: 2rem;
+					background: url('../images/common/line-18-step.svg') repeat-y center center;
+				}
+				&:last-child {
+					padding-bottom: 0;
+					&::after {
+						display: none;
+					}
+				}
+				.num {
+					flex: none;
+					position: relative;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					width: 24rem;
+					height: 24rem;
+					margin-right: 10rem;
+					border-radius: 50%;
+					background-color: #CDC2F5;
+					font-weight: 700;
+					font-size: 14rem;
+					line-height: 20rem;
+					color: #542FDD;
+				}
+				.con  {
+					dt {
+						font-weight: 600;
+						font-size: 16rem;
+						line-height: 24rem;
+						color: #2A2B2D;
+					}
+					dd {
+						color: #63666A;
+					}
+				}
+			}
+		}
+	}
+	// e: 가입안내 섹션
+
+	// s: 자주묻는 질문 섹션
+	.faq-sec {
+		@include sec-basic;
+		margin-top: var(--sec-outer-margin);
+		margin-bottom: var(--sec-outer-margin);
+
+		// 자주묻는 질문 아코디언
+		.faq-accordion {
+			@include faq-accordion;
+		}
+		// 자주묻는 질문 아코디언
+	}
+	// e: 자주묻는 질문 섹션
+
+	// 전문가에게 설계받기
+	.consult-btm-sec {
+		position: sticky;
+		left: 0;
+		bottom: 0;
+		z-index: 100;
+		width: 100%;
+		margin-top: auto;
+		background-color: #fff;
+		border-radius: 20rem 20rem 0 0;
+		box-shadow: 0 -4rem 20rem 0 rgba(0,0,0,0.1);
+		padding-bottom: $safe-area-bottom;
+
+		.consult-action {
+			display: flex;
+			align-items: center;
+			padding: 20rem 0;
+			text-align: left;
+
+			.title {
+				flex: 1 1 auto;
+				width: 100%;
+				padding-right: 50rem;
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #000;
+				word-break: keep-all;
+			}
+			.ui-btn {
+				flex: 1 1 auto;
+				justify-content: space-between;
+				width: 100%;
+				height: 56rem;
+				min-width: 1px;
+				padding: 8rem 8rem 8rem 12rem;
+				text-align: left;
+				font-size: 14rem;
+				line-height: 20rem;
+				span {
+					word-break: keep-all;
+				}
+			}
+			@include media-mobile-xl {
+				br {
+					display: none;
+				}
+			}
+		}
+	}
+}
+// e: 랜딩 페이지
+
+// 팝오버
+.popover-style1.type-secretBtn {
+	z-index: 0 !important;
+	.popover-body {
+		padding-left: 24rem;
+		padding-right: 24rem;
+	}
+}

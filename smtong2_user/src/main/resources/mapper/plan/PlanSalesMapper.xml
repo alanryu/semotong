@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.ucomp.web.plan.mapper.PlanSalesMapper">
+	
+	<sql id="listWhere">
+		<where>
+			<if test="adminUserId != null and adminUserId != ''">
+				AND b.admin_id = #{adminUserId}
+			</if>
+			<if test="idx != null and idx != ''">
+				AND a.idx = #{idx}
+			</if>
+			<if test="useYn != null and useYn != ''">
+				AND a.use_yn = #{useYn}
+			</if>
+			
+			<if test="salesMngId != null and salesMngId != ''">
+				AND a.id = #{salesMngId}
+			</if>
+			
+		</where>
+	</sql>
+	
+	<sql id="Base_Column_list">
+		 a.id
+		,a.com_user_id
+		,a.title
+		,a.image_pc
+		,a.image_mo
+		,a.use_yn
+		,a.idx
+		,a.url
+		,a.create_date
+		,a.create_id
+		,a.modified_date
+		,a.modified_id
+	</sql>
+	
+	<select id="getPlanSales" parameterType="kr.co.ucomp.web.plan.dto.PlanSalesSearchDto" resultType="kr.co.ucomp.web.plan.entity.SalesPlanEntity">
+		
+		SELECT 
+			<include refid="Base_Column_list" />
+		FROM 
+			tb_pmb_plan_sales a
+		LEFT JOIN 
+			tb_mbm_admin_user b
+		ON
+			a.com_user_id = b.id
+		<include refid="listWhere" />
+		ORDER BY a.id DESC
+		LIMIT 1
+	</select>
+</mapper>

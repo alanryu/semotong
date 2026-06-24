@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>납부금액 선택 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<!-- 페이지 스크립트 영역 -->
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			// 모달 바로 볼 수 있도록 호출
+			var FCB030104Modal = new bootstrap.Modal(document.getElementById('FCB030104Modal'));
+			FCB030104Modal.show();
+		});
+	</script>
+</head>
+
+<body>
+	<div class="wrapper">
+		<div style="padding: 30rem;">
+			<!-- 트리거로 모달 띄우기 -->
+			<button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#FCB030104Modal">
+				MODAL OPEN
+			</button>
+		</div>
+	</div>
+
+	<!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+	-->
+	<!-- modal 납부금액 선택 -->
+	<div class="modal modal-full fade" id="FCB030104Modal" tabindex="-1" role="dialog" aria-labelledby="FCB030104ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-CB03-01-page">
+				<div class="modal-header">
+					<button type="button" class="ui-btn">
+						<i class="ui-icn icn-32-back-bk" aria-label="뒤로가기"></i>
+					</button>
+					<h3 class="modal-title blind" id="FCB030104ModalLabel">납부금액 선택</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-progress">
+					<!-- 진행율 프로그레스 -->
+					<div class="progress-step">
+						<span class="progress-value" aria-label="Step 4/6" style="width: calc((4 / 6) * 100%)"></span>
+					</div>
+					<!-- // 진행율 프로그레스 -->
+				</div>
+				<div class="modal-body">
+					<!-- 모통봇 소개 섹션 -->
+					<section class="cb-intro-sec">
+						<div class="sec-inner">
+							<div class="intro-img">
+								<i class="ui-icn icn-62-motong" aria-hidden="true"></i>
+							</div>
+							<div class="intro-con">
+								<p>고객님께 요금을 추천드리기 위해<br> 데이터가 얼마나 필요하신지 알아볼게요. </p>
+							</div>
+						</div>
+					</section>
+					<!-- // 모통봇 소개 섹션 -->
+
+					<!-- 챗봇 설문 섹션 -->
+					<section class="cb-survey-sec">
+						<div class="sec-inner">
+							<ul class="survey-list">
+								<li class="survey-item">
+									<label class="ui-rdo survey-rdo">
+										<input type="radio" name="frmSurvey" checked />
+										<span class="rdo"><span>핫스팟 이용이 많고 RPG 게임을 해요​. <br>100GB 이상​</span></span>
+									</label>
+								</li>
+								<li class="survey-item">
+									<label class="ui-rdo survey-rdo">
+										<input type="radio" name="frmSurvey" />
+										<span class="rdo"><span>고화질 영상, 유튜브를 많이 봐요. <br>50GB~100GB</span></span>
+									</label>
+								</li>
+								<li class="survey-item">
+									<label class="ui-rdo survey-rdo">
+										<input type="radio" name="frmSurvey" />
+										<span class="rdo"><span>동영상 위주로 봐요​. <br>10~50GB</span></span>
+									</label>
+								</li>
+								<li class="survey-item">
+									<label class="ui-rdo survey-rdo">
+										<input type="radio" name="frmSurvey" />
+										<span class="rdo"><span>검색, 카톡, 출퇴근길 음악을 들어요​. <br>5GB ~ 10GB</span></span>
+									</label>
+								</li>
+								<li class="survey-item">
+									<label class="ui-rdo survey-rdo">
+										<input type="radio" name="frmSurvey" />
+										<span class="rdo"><span>데이터는 와이파이를 주로 써요​. <br>~ 5GB</span></span>
+									</label>
+								</li>
+							</ul>
+						</div>
+					</section>
+					<!-- // 챗봇 설문 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary">
+						<span>처음으로</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal default -->
+</body>
+
+</html>

@@ -1,0 +1,44 @@
+@charset "utf-8";
+
+/*-------------------------------------------------------------------
+    @@ Basic
+-------------------------------------------------------------------*/
+/* Basic */
+.g-content {background-color:#fff;}
+
+/*-------------------------------------------------------------------
+    @@ Primary
+-------------------------------------------------------------------*/
+/* Default */
+.g-header {background-color:#333333;}
+.g-lnb > ul > li.is-current > a {color:#333333;}
+.g-snb .g-depth2 .g-node2.is-current > a,
+.g-snb .g-depth2 .g-node2 > a:focus,
+.g-snb .g-depth2 .g-node2 > a:hover {border-left-color:#333333;}
+.g-h4 {color:#333333;}
+.g-h4:before {background-color:#333333;}
+.g-txt-primary {color:#333333;}
+.g-example-wrap .g-example-header .g-example-btn.is-active,
+.g-example-wrap .g-example-header .g-example-btn.is-active + .g-example-copy {background-color:#333333;}
+a.g-top {background-color:#333333;}
+
+/* Active */
+.g-lnb > ul > li.is-current > a,
+.g-example-wrap .g-example-header .g-example-btn.is-active:hover,
+.g-example-wrap .g-example-header .g-example-btn.is-active + .g-example-copy:hover {background-color:#000000;}
+
+/* Invert */
+.g-logo a {color:#fff;}
+.g-lnb > ul > li > a {color:#fff}
+.g-lnb > ul > li.is-current > a {background-color:#fff;}
+.g-example-wrap .g-example-header .g-example-btn,
+.g-example-wrap .g-example-header .g-example-copy {color:#fff;}
+.g-btn-aside:before, .g-btn-aside:after, .g-btn-aside span {background-color:#fff;}
+
+/*-------------------------------------------------------------------
+    @@ Responsive
+-------------------------------------------------------------------*/
+@media only screen and (max-width: 820px) {
+.g-lnb > .g-node-title {color:#333333; background-color:#fff;}
+.g-lnb > ul > li {background-color:#333333;}
+}

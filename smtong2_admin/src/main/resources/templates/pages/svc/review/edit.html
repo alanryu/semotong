@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='07',menuId ='07'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<!--	<link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	
+	<script type="text/javascript">
+		document.addEventListener('DOMContentLoaded', () => {
+			
+		});
+		
+		function goList() {
+			window.location.href='/csm/review/list';
+		}
+		function stayThis() {
+			//window.location.href='/csm/review/list';
+			$("#manageMemo").focus();
+		}
+		
+		
+		function saveData() {
+			showConfirm( '등록하시겠습니까?',
+					() => { 
+						insupdProc(); 
+					},
+					() => { },
+					'리뷰관리'
+			)
+		}
+		
+		
+		/* 등록/수정 */
+		function insupdProc() {
+			
+			$("#manageMemo").val();
+			
+			var params = {
+					 id 		: $("#hId").val()
+					,manageMemo : $("#manageMemo").val()
+					,displayYn : $("input[name='displayYn']:checked").val()
+			}
+			$.ajax({
+				url : '/csm/review/ajaxUpdate'
+				,type : 'POST'
+				,async : false
+				,dataType : "json"
+				,contentType:"application/json"
+				,data : JSON.stringify(params)
+				,success 	: function (data) {
+					var adminName = '[[${result?.adminName}]]';
+					var alertTxt = '등록되었습니다.';
+					if(adminName != null && adminName != ''){
+						alertTxt = '수정되었습니다.';
+					}
+					showAlert(alertTxt, goList);
+				},
+				error 		: function(request, status, error){
+					//alert(error);
+				},
+				complete 	: function(){
+				}
+			});
+			
+		}
+		
+		
+		
+		//textarea 글자 수 제한
+		document.addEventListener("DOMContentLoaded", function() {
+			document.getElementById("manageMemo").addEventListener("keyup", function(event) {
+				//if (event.isComposing) return;
+				inputLimitLengthChecked(event.target, "applyButtonI", "countI", 200);
+			});
+		});
+		
+		// 길이 단위
+		function inputLimitLengthChecked( obj , btnId, countId, maxLen) {
+			var calLength = {
+					getLength : function( string ) {
+						if( string == null || string.length == 0 ) {
+							return 0;
+						}
+						return string.length;
+					}
+			};
+			if( calLength.getLength( obj.value ) > maxLen ) {
+				var str = obj.value.slice(0, maxLen);
+				obj.value = str;
+			} else if( calLength.getLength( obj.value ) == 0 ) {
+				//0 일 때 버튼 비활성 유지
+				$("[id = "+btnId+"]").attr("disabled", true);
+			} else {
+				$("[id = "+countId+"]").text(calLength.getLength( obj.value ));
+				if( calLength.getLength( obj.value ) > 0 && $("[id = "+btnId+"]").is(":disabled") ){
+					$("[id = "+btnId+"]").attr("disabled", false);
+				}
+			}
+		}
+
+		
+	</script>
+</th:block>
+
+<div class="main-content">
+	<div class="container-fluid">
+				<!-- 로케이션 & 제목 영역 추가 -->
+				<div class="page-header mb-4">
+					<div class="location mb-2">
+						<small class="text-secondary">
+							<i class="fas fa-home me-1"></i>
+							<a href="javascript:;">홈</a>
+							>
+							<a href="javascript:;">서비스 관리</a>
+							>
+							<a href="/svc/review/list">후기 관리</a>
+						</small>
+					</div>
+					<h2 class="page-title fs-4 mb-4">
+						후기 관리
+					</h2>
+				</div>
+				
+				<div class="search-section detail">
+					<input type="hidden" id="hId" name="hId" th:value="${result?.id}">
+					<div class="form-row full-width">
+						<div class="form-label">후기구분</div>
+						<div class="form-control-wrap">
+							<th:block th:if="${result?.reviewType eq 'SEMOTONG'}">
+								<span class="btn-txt-memo">세모통후기</span>
+							</th:block>
+							<th:block th:if="${result?.reviewType eq 'ORDER'}">
+								<span class="btn-txt-memo">상품후기</span>
+							</th:block>
+						</div>
+					</div>
+					<div class="form-row full-width">
+						<div class="form-label">요금제</div>
+						<div class="form-control-wrap">
+							<span class="btn-txt-memo" th:text="${result?.planName}" ></span>
+						</div>
+					</div>
+					<div class="form-row full-width">
+						<div class="form-label">별점</div>
+						<div class="form-check-group">
+						  <span class="btn-txt-memo" th:text="${result?.score}" ></span>
+						</div>
+					</div>
+					<div class="form-row full-width">
+						<div class="form-label">후기내용</div>
+						<div class="form-check-group">
+						  <span class="btn-txt-memo" th:text="${result?.content}" ></span>
+						</div>
+					</div>
+					<div class="form-row full-width">
+						<div class="form-label">메모</div>
+						<div class="form-control-wrap" style="width:100%;">
+							<textarea class="form-control" name="manageMemo" id="manageMemo" placeholder="내용을 입력하세요." th:text="${result?.manageMemo}"></textarea>
+							<p class="bytes"><em class="count" id="countI">0</em>/200</p>
+						</div>
+						
+					</div>
+					<div class="form-row full-width">
+						<div class="form-label">담당자</div>
+						<div class="form-control-wrap">
+							<span class="btn-txt-memo" th:text="${result?.adminName}" ></span>  <span class="btn-txt-memo" th:text="${result?.modifiedDate}"> </span>
+						</div>
+					</div>
+					
+					<div class="form-row full-width">
+	                     <div class="form-label">
+	                         게시여부
+	                     </div>
+	                     <div class="form-control-wrap">
+	                         <div class="form-check-group">
+	                             <div class="form-check">
+	                                 <input class="form-check-input" type="radio" id="displayYn01" name="displayYn" th:checked="${result?.displayYn eq 'Y'}" value="Y">
+	                                 <label class="form-check-label" for="displayYn01">Y</label>
+	                             </div>
+	                             <div class="form-check">
+	                                 <input class="form-check-input" type="radio" id="displayYn02" name="displayYn" th:checked="${result?.displayYn eq 'N'}" value="N" >
+	                                 <label class="form-check-label" for="displayYn02">N</label>
+	                             </div>
+	                         </div>
+	                     </div>
+	                 </div>  
+	                 
+	                 		           			
+				</div>
+	</div>
+	<div class="d-flex justify-content-center gap-2 mt-4 w-100 mb-5">
+		<button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">
+			  닫기
+		</button>
+		<button type="button" class="btn btn-lg btn-dark px-4 btn-sm" onclick="saveData();" id="applyButtonI" disabled>
+			  등록
+		</button>
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>

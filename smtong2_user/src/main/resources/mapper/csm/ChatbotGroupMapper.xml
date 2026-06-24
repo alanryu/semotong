@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.chatbot.mapper.ChatbotGroupMapper">
+
+
+    <sql id="listWhere">
+    	<!-- 등록일 조회-->
+    	<if test='searchStartDt != null and searchStartDt !=""'>
+			AND create_date  <![CDATA[>=]]> #{searchStartDt}
+		</if>
+		<if test='searchEndDt != null and searchEndDt !=""'>
+			AND create_date <![CDATA[<=]]> #{searchEndDt}
+		</if>
+		
+		<!-- 그룹 명 조회 -->
+   		<if test='keyword != null and keyword !=""'>
+			AND group_name LIKE CONCAT('%', #{keyword}, '%')
+		</if>		
+		
+    </sql>
+
+	<sql id="Base_Column_list">
+		id
+		,group_name
+		,mvno
+		,sup_data
+		,sub_qos
+		,order_no
+		,group_memo
+		,create_date
+		,create_id
+		,modified_date
+		,modified_id
+		,GET_ADMIN_USER_NM(create_id) as createNm
+		,GET_ADMIN_USER_NM(modified_id) as modifiedNm
+		,title
+
+	</sql>
+	
+
+    <select id="list" parameterType="kr.co.ucomp.web.chatbot.dto.SearchChatbotGroupDTO" resultType="kr.co.ucomp.web.chatbot.entity.ChatbotGroupEntity">
+        SELECT
+            <include refid="Base_Column_list" />
+        FROM
+            tb_svc_chatbot_plan_group a
+        WHERE 1=1
+        <include refid="listWhere"/>
+        order by order_no
+    </select>
+    
+    
+        <select id="listCount" parameterType="kr.co.ucomp.web.chatbot.dto.SearchChatbotGroupDTO" resultType="Long">
+        SELECT count(1)
+        FROM
+            tb_svc_chatbot_plan_group a
+        WHERE 1=1
+        <include refid="listWhere"/>
+    </select>
+
+    <select id="getDetail" parameterType="int" resultType="kr.co.ucomp.web.chatbot.entity.ChatbotGroupEntity">
+        SELECT
+             <include refid="Base_Column_list" />
+        FROM
+            tb_svc_chatbot_plan_group a
+        WHERE id = #{id}
+    </select>
+
+  
+
+
+</mapper>

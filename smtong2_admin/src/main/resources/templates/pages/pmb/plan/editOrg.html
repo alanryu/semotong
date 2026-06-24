@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='04',menuId ='01'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <script src="https://cdn.tiny.cloud/1/gyaqgxdy1ph642imxyhoar75hwnww75pnd9wdvhyd2xc27ot/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+
+
+
+
+<script type="text/javascript">
+	
+	$(document).ready(function(){
+		
+		
+	})
+	
+	
+	
+		// 화면 로드 시
+	document.addEventListener('DOMContentLoaded', function () {
+		
+		
+		var procMsg = "[[${procMsg}]]";
+
+		if(procMsg!="" || procMsg !="") {
+			if(procMsg == "sucess") {
+				showAlert("저장되었습니다.",goList);
+			} else {
+				alert(procMsg);
+			}
+			
+		}
+		
+		
+		document.querySelector('#companySelect').addEventListener('click', selectCompaney);
+		setSupData();
+		setPromoPeriod();
+		setSupVoice('1');
+		setsupSMS('1');
+		
+		
+		// 프로모션 기간 입력 시 입력값 생성
+		$("#promoPeriodIns").keyup(function(event){
+			setPromoPeriodIns();
+		});
+		
+		// 일 제공 데이터 입력 시 입력값 생성
+		$("#dailyDataIns").keyup(function(event){
+			setDailyDataIns();
+		});
+		
+		// 데이터 입력 시 입력값 생성
+		$("#supDataIns").keyup(function(event){
+			setSupDataIns();
+		});
+		
+		
+		$("#qosIns").keyup(function(event){
+			setQosIns();
+		});
+		
+		
+		var searchUUid = "[[${searchUUid}]]";
+		if(searchUUid !="") {
+			editDataInit();	
+		}
+		
+		
+		$("#supVoiceIns").keyup(function(event){
+			var supVoiceIns = $("#supVoiceIns").val();
+			
+			if(supVoiceIns.indexOf("분")<0)  {
+				supVoiceIns = supVoiceIns + "분";
+			} 
+			$("#voiceCall").val(supVoiceIns);
+		});
+		
+		$("#supSMSIns").keyup(function(event){
+			
+			var supSMSIns = $("#supSMSIns").val();
+			if(supSMSIns.indexOf("건")< 0)  {
+				supSMSIns = supSMSIns + "건";
+			}			
+			
+			$("#message").val($("#supSMSIns").val() + "건");
+		});
+		
+		
+	});
+	
+	function selectCompaney() {
+		
+		/* var modal = new bootstrap.Modal(document.getElementById('businessSelectModal'));
+		modal.dispose();  // 모달 강제로 닫기 */
+		selectCompany = $("#selectCompany").val();
+		if(selectCompany =="") {
+			alert("사업자를 선택하세요");
+		} else {
+			$("#companyId").val(selectCompany);
+			$("#telecom").val($("#selectCompany option:selected").attr("data-cname"));
+			$('.btn-close').trigger('click');
+		}
+		
+	}
+	
+	function goList() {
+		window.location.href='/pbm/plan/list';
+	}
+	
+	
+	function savePlanData() {
+
+		
+		var txt = '등록하시겠습니까?';
+		var nomalPrice = $("#normalPrice").val().trim() == "" ? "0" : $("#normalPrice").val();
+		var salePrice = $("#salePrice").val().trim() == "" ? "0" : $("#salePrice").val();
+		var afterPrice = $("#afterPrice").val().trim() == "" ? "0" : $("#afterPrice").val();
+		var period = $("#promotionPeriod").val().trim() == "" ? "0" : $("#promotionPeriod").val();
+		
+		var sum12 = 0; 
+		var sum24 = 0;
+		if(nomalPrice !="0" && afterPrice !="0") {
+			sum12 = calcSumMonPrice(nomalPrice,salePrice,afterPrice,period,12);
+			sum24 = calcSumMonPrice(nomalPrice,salePrice,afterPrice,period,24);	
+		}
+		
+		
+		$("#m12Price").val(sum12);
+		$("#m24Price").val(sum24);
+		
+		
+		showConfirm( txt,
+                () => { $("#submitForm").submit() },
+                () => { },
+                '요금제등록'
+         )
+	}
+	
+	// 할인기간 입력 구분 
+	function setPromoPeriod() {
+		
+		const sp = document.querySelector('input[name="promoPeriod"]:checked')?.value;
+		
+		$("#dvPromoPeriodIns").hide();
+		if(sp == "1") {
+			$("#promotionPeriod").val("");		
+		} else if(sp == "2") {
+			$("#promotionPeriod").val("평생");
+		} else if(sp == "3") {
+			$("#promotionPeriod").val("");
+			$("#dvPromoPeriodIns").show();	
+		}
+	}
+	
+	// 데이터 입력 구분 
+	function setSupData() {
+		
+		const sp = document.querySelector('input[name="supData"]:checked')?.value;
+		
+		$("#dvsupDataIns").hide();
+		if(sp == "1") {
+			$("#data").val("10238976");		
+		} else if(sp == "2") {
+			$("#data").val("0");
+			$("#dvsupDataIns").show();
+		} else if(sp == "3") {
+			$("#data").val("0");
+		}
+	}
+	
+	// 음성입력 구분
+	function setSupVoice(cSp) {
+		
+		const sp = document.querySelector('input[name="supVoice"]:checked')?.value;
+		$("#dvsupVoiceIns").hide();
+		if(sp == "1") {
+			$("#voiceCall").val("기본제공");		
+		} else if(sp == "2") {
+			$("#dvsupVoiceIns").show();
+			if(cSp=="2")  {
+				$("#supVoiceIns").val("");
+			} else {
+				$("#supVoiceIns").val($("#supVoiceIns").val().replace("분",""));	
+			} 
+			
+		}
+	}
+	
+	//SMS 입력 구분
+	function setsupSMS(cSp) {
+		
+		const sp = document.querySelector('input[name="supSMS"]:checked')?.value;
+		$("#dvsupSMSIns").hide();
+		if(sp == "1") {
+			$("#message").val("기본제공");		
+		} else if(sp == "2") {
+			$("#dvsupSMSIns").show();
+			if(cSp=="2") { 
+				$("#supSMSIns").val("");
+			} else {
+				$("#supSMSIns").val($("#supSMSIns").val().replace("건",""));	
+			}
+		}
+	}
+	
+	
+	
+	
+	//======================================= 입력 시 설정
+	
+	
+	// 프로모션 기간 입력 시 입력값 생성
+	function setPromoPeriodIns() {
+		
+		var inputVal = $("#promoPeriodIns").val().trim();
+		if(inputVal =="") {
+			$("#promotionPeriod").val("");
+		} else {
+			$("#promotionPeriod").val(inputVal + "개월");
+		}
+	}
+	
+	// 일 제공 데이터 입력 시 입력값 생성
+	function setDailyDataIns() {
+		var inputVal = $("#dailyDataIns").val().trim();
+		if(inputVal =="") {
+			$("#dailyData").val("0");
+		} else {
+			var unit = $("#dailyDataInsUnit").val();
+			if(unit == "GB") inputVal = inputVal * 1024;
+			$("#dailyData").val(inputVal);
+		}
+	}
+	
+	// 데이터 입력 시 입력값 생성
+	function setSupDataIns() {
+		var inputVal = $("#supDataIns").val().trim();
+		if(inputVal =="") {
+			$("#data").val("0");
+		} else {
+			var unit = $("#supDataInsUnit").val();
+			if(unit == "GB") inputVal = inputVal * 1024;
+			$("#data").val(inputVal);
+		}
+	}
+	
+	
+	function setQosIns() {
+		var inputVal = $("#qosIns").val().trim();
+		if(inputVal =="") {
+			$("#qos").val("0");
+		} else {
+			var unit = $("#qosInsUnit").val();
+			if(unit == "MBps") inputVal = inputVal * 1024;
+			$("#qos").val(inputVal);
+		}
+	}
+	
+	
+	
+	
+	
+	function editDataInit() {
+		
+		var promotionPeriod = "[[${record.promotionPeriod}]]";
+		if(promotionPeriod !="" && promotionPeriod !="평생") {
+			$("#promoPeriodIns").val(promotionPeriod.replace("개월",""))
+			setPromoPeriodIns();
+		}
+
+		
+		var data = "[[${record.data}]]";
+		if(data !="0" && data !="10238976") {
+			if(data > 1024) {
+				$("#supDataIns").val(data/1024);
+				$("#supDataInsUnit").val("GB");
+			} else {
+				$("#supDataInsUnit").val("MB");
+			}
+			setSupDataIns();
+		}
+		
+		
+		var dailyData = "[[${record.dailyData}]]";
+		if(dailyData !="0") {
+			if(dailyData > 1024) {
+				$("#dailyDataIns").val(dailyData/1024);
+				$("#dailyDataInsUnit").val("GB");
+			} else {
+				$("#dailyDataInsUnit").val("MB");
+			}
+			setDailyDataIns();
+		}
+		
+		var qos = "[[${record.qos}]]";
+		if(qos !="0") {
+			if(qos > 1024) {
+				$("#qosIns").val(qos/1024);
+				$("#qosInsUnit").val("MBps");
+			} else {
+				$("#qosInsUnit").val("KBps");
+			}
+			setDailyDataIns();
+		}
+		
+	}
+	
+	
+</script>
+
+</th:block>
+
+ <div class="main-content">
+            <div class="container-fluid">
+                <!-- 로케이션 & 제목 영역 추가 -->
+                <div class="page-header mb-4">
+                    <div class="location mb-2">
+                        <small class="text-secondary">
+                            <i class="fas fa-home me-1"></i>
+                           	<a href="javascript:;">홈</a> > <a href="/pbm/plan/list">상품관리</a> > <a href="/pbm/plan/list">요금제</a>
+                        </small>
+                    </div>
+                    <h2 class="page-title fs-4 mb-4" th:text="${record == null or record.id == 0} ? '요금제 등록' : '요금제 수정'"></h2>
+                </div>
+                 
+                <form method="POST" id="submitForm" th:object="${record}" th:action="${record == null or record.id == 0} ? '/pbm/plan/createOrg' : '/pbm/plan/updateOrg'">
+                <input type="hidden" th:field="*{id}" >
+                <input type="hidden" th:field="*{uuid}" >
+                <input type="hidden" th:field="*{m12Price}" >
+                <input type="hidden" th:field="*{m24Price}" >
+                
+                <input type="hidden" th:field="*{hiddenYn}" >
+                <input type="hidden" th:field="*{saleStatus}" >
+                <input type="hidden" th:field="*{isProtected}" >
+                <input type="hidden" th:field="*{planId}" >
+                
+                
+	             <div class="search-section detail">
+	             
+                    <div class="form-row full-width" th:unless="${record.uuid == null or record.uuid == ''}">
+                        <div class="form-label">수집 UUID</div>
+                        <div class="form-control-wrap">
+                          	[[${record.uuid}]]
+                        </div>
+                    </div>
+                    	             
+                    <div class="form-row " th:unless="${record == null or record.id == 0}">
+                        <div class="form-label">최초 생성일</div>
+                        <div class="form-control-wrap">
+                            [[${record.createDate}]] 
+                        </div>
+                    </div>
+                    
+                    <div class="form-row full-width">
+                    	<div class="form-label">제공업체</div>
+                    	
+                   		<div class="form-control-wrap flex-grow-1" style="display: flex;">
+                          <input type="hidden" th:field="*{companyId}">
+                          <input type="text" class="form-control" th:field="*{telecom}" readOnly style="min-width:500px ;width:500px">
+                          &nbsp;&nbsp;
+                          <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#businessSelectModal" id="btn-select-company"  th:if="${record == null or record.id == 0}">
+		                      <i class="fas fa-user-plus me-1"></i>
+		                      사업자 선택
+		                  </button>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="form-row">
+                        <div class="form-label">통신사</div>
+                        <div class="form-check-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="mno01" name="mno" th:checked="${record.mno eq 'SKT'}" value="SKT">
+                                <label class="form-check-label" for="mno01">SKT</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="mno02" name="mno" th:checked="${record.mno eq 'KT'}" value="KT">
+                                <label class="form-check-label" for="mno02">KT</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="mno03" name="mno" th:checked="${record.mno eq 'LGU'}" value="LGU">
+                                <label class="form-check-label" for="mno03">U+</label>
+                            </div>
+                        </div>
+                    </div>
+					<div class="form-row">
+                        <div class="form-label">네트워크</div>
+                        <div class="form-check-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="planType01" name="planType" th:checked="${record.planType eq '3G'}" value="3G">
+                                <label class="form-check-label" for="planType01">3G</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="planType02" name="planType" th:checked="${record.planType eq '5G'}" value="5G">
+                                <label class="form-check-label" for="planType02">5G</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="planType03" name="planType" th:checked="${record.planType eq 'LTE'}" value="LTE">
+                                <label class="form-check-label" for="planType03">LTE</label>
+                            </div>
+                        </div>
+                    </div>
+  					<div class="form-row full-width">
+                        <div class="form-label">입점사 링크(공통)</div>
+                         <div class="form-control-wrap col-9">
+                            <input type="text" class="form-control" placeholder="입점사 링크(공통) 입력"  th:field="*{url}" maxlength="1000">
+                        </div>
+                    </div>
+					
+					<div class="form-row full-width">
+					    <div class="form-label">입점사 링크(PC)</div>
+					     <div class="form-control-wrap col-9">
+					        <input type="text" class="form-control" placeholder="입점사 링크(PC) 입력"  th:field="*{pcUrl}" maxlength="1000">
+					    </div>
+					</div> 
+					
+					<div class="form-row full-width">
+					    <div class="form-label">입점사 링크(모바일)</div>
+					     <div class="form-control-wrap col-9">
+					        <input type="text" class="form-control" placeholder="입점사 링크(모바일) 입력"  th:field="*{moUrl}" maxlength="1000">
+					    </div>
+					</div> 
+															 
+                    <div class="form-row full">
+                        <div class="form-label">요금제명</div>
+                         <div class="form-control-wrap">
+                            <input type="text" class="form-control" placeholder="요금제 명 입력"  th:field="*{planName}" maxlength="200">
+                        </div>
+                    </div>
+                    
+					<div class="form-row">
+                        <div class="form-label">요금제코드</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" placeholder="요금제코드 입력"  th:field="*{planCode}" maxlength="20">
+                        </div>
+                    </div>
+                                        
+                    <div class="form-row">
+                        <div class="form-label">기본료</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control numberonly" placeholder="기본료 입력"  th:field="*{normalPrice}"  maxlength="6">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-label">할인가</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control numberonly" placeholder="할인가 입력"  th:field="*{salePrice}" maxlength="6">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-label">할인후 가격</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control numberonly" placeholder="할인후 가격 입력"  th:field="*{afterPrice}" maxlength="6">
+                        </div>
+                    </div> 
+                    
+                    <div class="form-row">
+                        <div class="form-label">프로모션 기간</div>
+                       <div class="form-check-group">
+                       		
+                       		<input type="hidden" th:field="*{promotionPeriod}">
+                       		
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="promoPeriod01" name="promoPeriod" th:checked="${record.promotionPeriod eq null or record.promotionPeriod eq ''}" onclick="setPromoPeriod()" value="1">
+                                
+                                <label class="form-check-label" for="promoPeriod01">없음</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="promoPeriod02" name="promoPeriod" th:checked="${record.promotionPeriod eq '평생'}" onclick="setPromoPeriod()" value="2">
+                                <label class="form-check-label" for="promoPeriod02">평생</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="promoPeriod03" name="promoPeriod" th:checked="${record.promotionPeriod ne null and record.promotionPeriod ne '' and record.promotionPeriod ne '평생'}" onclick="setPromoPeriod()" value="3">
+                                <label class="form-check-label" for="promoPeriod03">기간입력</label>
+                            </div>
+                            <div class="form-control-wrap" style="display:none" id="dvPromoPeriodIns">
+                            	<input type="text" class="form-control numberonly" style="min-width:50px;width:50px" maxlength="5" id="promoPeriodIns">
+                        	</div>
+                        </div>
+                    </div>
+
+					<div class="form-row">
+                        <div class="form-label">데이터</div>
+                        <div class="form-check-group">
+                        
+                        	<input type="hidden" th:field="*{data}">
+                        	 <div class="form-check">
+                                <input class="form-check-input" type="radio" id="supData03" name="supData" th:checked="${record.data == null or record.data eq 0}" onclick="setSupData()" value="3">
+                                <label class="form-check-label" for="supData03">없음</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="supData01" name="supData" th:checked="${record.data eq 10238976}" onclick="setSupData()" value="1">
+                                <label class="form-check-label" for="supData01">무제한</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="supData02" name="supData" th:checked="${record.data < 10238976 and record.data > 0}" onclick="setSupData()" value="2">
+                                <label class="form-check-label" for="supData02">일반</label>
+                            </div>
+                            <div class="form-control-wrap" style="display:none" id="dvsupDataIns">
+                            	<div class="cloneitems__btm">
+		                            <input type="text" class="form-control numberonly" style="min-width:100px;width:100px" maxlength="5" id="supDataIns" th:value="${record.data}">
+		                            <select class="form-select" style="width:120px;" id="supDataInsUnit">
+		                            	<option value="GB">GB</option>
+	                                    <option value="MB">MB</option>
+	                                 </select>
+                                </div>
+	                        </div>
+                    	</div>
+                    </div>
+                    
+					<div class="form-row">
+                        <div class="form-label">일별제공 데이터</div>
+                        <div class="form-check-group">
+                        	<input type="hidden" th:field="*{dailyData}">
+                            <div class="form-control-wrap" id="dvsupDailyDataIns">
+                            	<div class="cloneitems__btm">
+		                            <input type="text" class="form-control numberonly" style="min-width:100px;width:100px" maxlength="5" id="dailyDataIns" th:value="${record.dailyData}">
+		                            <select class="form-select" style="width:100px;" id="dailyDataInsUnit">
+	                                     <option value="GB">GB</option>
+	                                     <option value="MB">MB</option>	                                     
+	                                 </select>
+                                </div>
+	                        </div>
+                    	</div>
+                    </div>                    
+                    
+					<div class="form-row">
+                        <div class="form-label">QOS</div>
+                        <div class="form-control-wrap">
+                        	<div class="cloneitems__btm">
+                                 <div class="form-control-wrap">
+                                 	 <input type="hidden" th:field="*{qos}">
+                                     <input type="text" class="form-control numberonly" placeholder="QOS 입력"  id="qosIns" maxlength="6" style="min-width:100px;width:100px" th:value="${record.qos}">
+                                 </div>
+                                 <select class="form-select mb-2" style="width:100px;" id="qosInsUnit">
+                                 	 <option value="MBps">MBps</option>
+                                     <option value="KBps">KBps</option>
+                                 </select>
+                              </div>
+                        </div>
+                    </div>
+                    
+					<div class="form-row">
+                       	<div class="form-label">음성(분)</div>
+                       	 <input type="hidden" th:field="*{voiceCall}">
+                           <div class="form-check">
+                               <input class="form-check-input" type="radio" id="supVoice01" name="supVoice" th:checked="${record.voiceCall eq '기본제공'}" onclick="setSupVoice('2')" value="1">
+                               <label class="form-check-label" for="supVoice01">기본제공</label>
+                           </div>
+                           <div class="form-check">
+                               <input class="form-check-input" type="radio" id="supVoice02" name="supVoice" th:checked="${record.voiceCall ne '기본제공'}" onclick="setSupVoice('2')" value="2">
+                               <label class="form-check-label" for="supVoice02">일반</label>
+                           </div>
+                           <div class="form-control-wrap" style="display:none" id="dvsupVoiceIns">
+                           	<div class="cloneitems__btm">
+	                            <input type="text" class="form-control numberonly" style="min-width:100px;width:100px" maxlength="5" placeholder="음성제공 입력"  id="supVoiceIns" th:value="${record.voiceCall}">분
+                               </div>
+                        </div>
+                    </div>
+                    
+					<div class="form-row">
+                        <div class="form-label">SMS(건)</div>
+                        <input type="hidden" th:field="*{message}">
+                           <div class="form-check">
+                               <input class="form-check-input" type="radio" id="supSMS01" name="supSMS" th:checked="${record.message eq '기본제공'}" onclick="setsupSMS('2')" value="1">
+                               <label class="form-check-label" for="supSMS01">기본제공</label>
+                           </div>
+                           <div class="form-check">
+                               <input class="form-check-input" type="radio" id="supSMS02" name="supSMS" th:checked="${record.message ne '기본제공'}" onclick="setsupSMS('2')" value="2">
+                               <label class="form-check-label" for="supSMS02">일반</label>
+                           </div>
+                           <div class="form-control-wrap" style="display:none" id="dvsupSMSIns">
+                           	<div class="cloneitems__btm">
+	                            <input type="text" class="form-control numberonly" style="min-width:100px;width:100px" maxlength="5" placeholder="문자제공 입력"  id="supSMSIns" th:value="${record.message}">건
+                               </div>
+                        </div>
+                    </div>                                                           
+					<div class="form-row">
+                        <div class="form-label">부가음성</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" placeholder="부가음성 입력"  th:field="*{bugaCall}" maxlength="20">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-label">결합여부</div>
+                        <div class="form-check-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="combination01" name="combination" th:checked="${record.combination eq 'True'}" value="True">
+                                <label class="form-check-label" for="combination01">Y</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="combination02" name="combination" th:checked="${record.combination ne 'True'}" value="">
+                                <label class="form-check-label" for="combination02">N</label>
+                            </div>
+                        </div>
+                    </div>
+	            </div>
+            </form>
+            <div class="d-flex justify-content-center gap-2 mt-4 w-100 mb-5">
+                <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();"> 닫기 </button>
+                <button type="button" class="btn btn-lg btn-dark px-4 btn-sm" onclick="savePlanData();"> 등록 </button>
+            </div>
+		</div>
+	</div>
+	
+        <!-- Modal 팝업 -->
+      <div class="modal fade" id="businessSelectModal" tabindex="-1" aria-labelledby="businessSelectModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                  <div class="modal-header border-0 pb-0 mb-4">
+                      <h5 class="modal-title fs-6 fw-bold" id="businessSelectModalLabel">사업자 불러오기</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body pt-2 pb-4">
+                      <div class="form-row-modal">
+                          <div class="form-label-modal">사업자</div>
+                          <div class="form-control-wrap-modal">
+                              <select class="form-select" id="selectCompany">
+                               	<option selected value="">사업자 선택</option>
+                              	<th:block th:each="item,index : ${compnyList}">    
+                                  	<option th:value="${item.id}"  th:text="${item.name}" th:attr="data-cname=${item.name} , data-companyNm=${item.companyNm}, data-companyCode=${item.companyCode}, data-companyMno=${item.companyMno}">KG모바일</option>
+                                  </th:block>
+                              </select>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="modal-footer border-0 pt-0">
+                      <button type="button" class="btn btn-secondary px-4 btn-sm" data-bs-dismiss="modal">취소</button>
+                      <button type="button" class="btn btn-dark px-4 btm-sm" id="companySelect">확인</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+	
+</html>

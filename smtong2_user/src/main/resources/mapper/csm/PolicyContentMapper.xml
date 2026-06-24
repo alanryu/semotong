@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.csm.info.mapper.PolicyContentMapper">
+
+	<sql id="Base_Column_list">
+		id
+		,title
+		,content
+		,content_category
+		,app_date
+		,create_date
+		,create_id
+		,modified_date
+		,modified_id
+				
+	</sql>
+	
+	<select id="getList" parameterType="kr.co.ucomp.web.csm.info.dto.PolicyContentSearchDto" resultType="kr.co.ucomp.web.csm.info.entity.PolicyContentEntity">
+		  SELECT
+	            <include refid="Base_Column_list" />
+	        FROM
+	            tb_csm_policy_content 
+	        WHERE disp_yn = 1
+	        AND content_category =  #{searchPolSp}
+	        ORDER BY id DESC
+
+	</select>
+
+	<select id="getListCount" parameterType="kr.co.ucomp.web.csm.info.dto.PolicyContentSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+	        FROM
+				tb_csm_policy_content
+	       WHERE disp_yn = 1
+	       AND content_category =  #{searchPolSp}
+	</select>
+	
+	
+	<select id="getPolicyContent" parameterType="map" resultType="kr.co.ucomp.web.csm.info.entity.PolicyContentEntity">
+		SELECT
+	            <include refid="Base_Column_list" />
+	        FROM
+	            tb_csm_policy_content
+			<if test='polId == 0'>
+				WHERE app_date<![CDATA[<]]> Now()
+		        AND disp_yn = 1
+		        AND content_category = #{polSp}
+			</if>
+			<if test='polId != 0'>
+				WHERE id =  #{polId}
+			</if>	            
+	        order by app_date desc
+	        limit 1
+	</select>
+</mapper>

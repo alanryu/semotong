@@ -1,0 +1,218 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.mypage.mapper.PointHistoryMapper">
+	
+	<sql id="Point_History_Column_list">
+			 h.id
+			,p.user_id
+			,h.point_id
+			,h.dr_cr
+			,h.cr_point_type
+			,GET_CODE_NAME('point_type', h.cr_point_type) AS crPointTypeName		/* 대변, 적립 자본증가 */
+			,h.dr_point_type
+			,GET_CODE_NAME('point_type', h.dr_point_type) AS drPointTypeName		/* 차변, 지급 소멸 */
+			
+			,h.amount
+			,h.avail_amount
+			
+			,h.expiration_period_yn
+			,h.memo
+			
+			,h.create_date
+			,h.create_id
+	</sql>
+	<sql id="PointHistoryWhereInfo">
+		<where>
+			AND h.expiration_period_yn = 'Y'
+			<if test='searchUserId != null and searchUserId !=""'>
+				AND u.id = #{searchUserId}
+			</if>
+			<if test='drCr != null and drCr !=""'>
+				AND h.dr_cr = #{drCr}
+			</if>
+		</where>
+	</sql>
+	
+	
+	<select id="getMyPointHistory" parameterType="kr.co.ucomp.web.mypage.dto.PointHistoryDTO" resultType="kr.co.ucomp.web.mypage.entity.PointHistoryEntity">
+		/* getMyPointHistory */
+		SELECT
+		<include refid="Point_History_Column_list" />
+		FROM tb_mbm_user u
+		LEFT JOIN tb_mbm_point 			p ON u.id = p.user_id
+		LEFT JOIN tb_mbm_point_history 	h ON p.id = h.point_id
+		<include refid="PointHistoryWhereInfo" />
+		<choose>
+			<when test="searchOrderType == 'ASC'">
+				ORDER BY h.id ASC
+			</when>
+			<otherwise> 
+				ORDER BY h.id DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getMyPointHistoryById" parameterType="kr.co.ucomp.web.mypage.dto.PointHistoryDTO" resultType="kr.co.ucomp.web.mypage.entity.PointHistoryEntity">
+		SELECT
+		<include refid="Point_History_Column_list" />
+		FROM tb_mbm_user u
+		LEFT JOIN tb_mbm_point 			p ON u.id = p.user_id
+		LEFT JOIN tb_mbm_point_history 	h ON p.id = h.point_id
+		WHERE h.id = #{searchHistoryId}
+	</select>
+	
+	<update id="update"  parameterType="kr.co.ucomp.web.mypage.entity.PointHistoryEntity" >
+		/* PointHistoryEntity */
+		UPDATE tb_mbm_point_history 
+		SET	
+ 			 dr_cr				  = IFNULL(#{drCr					}, dr_cr			   	)
+			,dr_point_type		  = IFNULL(#{drPointType			}, dr_point_type	   	)
+			,amount				 = IFNULL(#{amount				}, amount			  	)
+			,avail_amount		   = IFNULL(#{availAmount			}, avail_amount			)
+		WHERE id = #{id}
+	</update>
+	
+ 	
+ 	<insert id="insert"  parameterType="kr.co.ucomp.web.mypage.entity.PointHistoryEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+		/* PointHistoryEntity */
+		INSERT 
+		INTO tb_mbm_point_history (
+								  point_id		, dr_cr		, cr_point_type		, dr_point_type
+								, admin_gift_yn
+								, amount
+								, avil_amount
+								
+								, memo
+								, create_date
+								, create_id
+		)VALUES(	
+				 #{pointId}
+				,#{drCr}
+				,#{crPointType}
+				,#{drPointType}
+				
+				,#{adminGiftYn}
+				,#{amount}
+				,#{amount}
+				
+				,#{memo}
+				,NOW()
+				,#{createId}
+		);
+	</insert>
+	
+	<insert id="insertDetail"  parameterType="kr.co.ucomp.web.mypage.entity.PointHistoryDetailEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+		/* PointHistoryDetailEntity */
+		INSERT 
+		INTO tb_mbm_point_history_detail (
+								  history_id
+								,dr_point_type
+								
+								, tot_amt
+								, act_amt
+								, rem_amt
+								
+								, npay_id
+								, cash_id
+								
+								, create_date
+								, create_id
+		)VALUES(	
+				 #{historyId}
+				,#{drPointType}
+				,#{totAmt}
+				,#{actAmt}
+				,#{remAmt}
+				
+				,#{npayId}
+				,#{cashId}
+				
+				,NOW()
+				,#{createId}
+		);
+	</insert>
+	
+	<insert id="insertPointHistory" parameterType="kr.co.ucomp.web.mypage.entity.PointHistoryEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO tb_mbm_point_history (
+			point_id, dr_cr, cr_point_type, dr_point_type, admin_gift_yn
+			,amount
+			,avil_amount
+			, memo, create_date, create_id
+		)
+		SELECT 
+			#{pointId}, #{drCr}, #{crPointType}, #{drPointType},#{adminGiftYn}
+			, #{amount}
+			, #{amount}
+			, #{memo}, NOW(), #{createId}
+		FROM DUAL
+		WHERE NOT EXISTS (
+			SELECT 1 FROM tb_mbm_point_history 
+			WHERE point_id = #{pointId} AND cr_point_type = 'REV'
+		);
+	</insert>
+	
+	
+	
+	
+	<select id="getMyPointHistoryNew" parameterType="kr.co.ucomp.web.mypage.dto.PointHistoryDTO" resultType="kr.co.ucomp.web.mypage.entity.PointHistoryEntity">
+		/* getMyPointHistoryNew */
+		SELECT 
+		    h.id, 
+		    p.user_id,
+		    h.point_id,
+		    h.dr_cr,
+		    GET_CODE_NAME('point_drcr', h.dr_cr) AS drCrName, 
+		    h.cr_point_type,
+		    GET_CODE_NAME('point_type', h.cr_point_type) AS crPointTypeName,
+		    
+		    h.amount AS display_amount,
+		    h.avail_amount,
+		    
+		    NULL AS act_amt,
+		    NULL AS detailDrPointTypeName,
+		    NULL AS dr_point_type,
+		    
+		    h.create_date,
+		    1 AS sort_order
+		FROM     tb_mbm_point p 
+		INNER JOIN tb_mbm_point_history h ON p.id = h.point_id
+		WHERE p.user_id = #{searchUserId}
+		
+		UNION ALL
+		
+		SELECT 
+		    h.id, 
+		    p.user_id,
+		    h.point_id,
+		    h.dr_cr,
+		    GET_CODE_NAME('point_drcr', h.dr_cr) AS drCrName, 
+		    h.cr_point_type,
+		    GET_CODE_NAME('point_type', h.cr_point_type) AS crPointTypeName,
+
+		    NULL AS display_amount,
+		    NULL AS avail_amount,
+		
+		    d.act_amt,
+		    GET_CODE_NAME('point_type', d.dr_point_type) AS detailDrPointTypeName,
+		    d.dr_point_type,
+		
+		    h.create_date,
+		    2 AS sort_order
+		FROM tb_mbm_point p 
+		INNER JOIN tb_mbm_point_history h ON p.id = h.point_id
+		LEFT JOIN  tb_mbm_point_history_detail d ON h.id = d.history_id
+		WHERE IFNULL(act_amt, 0) != 0
+		AND p.user_id = #{searchUserId}
+		ORDER BY id DESC, create_date, sort_order
+		
+	</select>
+	
+	
+	
+	
+
+
+
+
+</mapper>

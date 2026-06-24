@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='07',menuId ='0401'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<script th:src="|https://cdn.tiny.cloud/1/${@environment.getProperty('tinymce.apikey')}/tinymce/7/tinymce.min.js|"  referrerpolicy="origin" ></script>
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script type="text/javascript">
+
+	
+		document.addEventListener('DOMContentLoaded', () => {
+			var procMsg = "[[${procMsg}]]";
+			
+			if(procMsg!="" || procMsg !="") {
+				if(procMsg == "sucess") {
+					
+					var procSp = "[[${procSp}]]";
+					if(procSp =="c") {
+						showAlert("등록 되었습니다.",moveList);	
+					} else {
+						showAlert("수정 되었습니다.",moveList);
+					}
+					
+				} else {
+					alert(procMsg);
+				}
+				
+			}
+			var _mngid = "[[${record.id}]]";
+			if(_mngid== "0") {
+				$("#displayYn1").prop("checked",true)	
+			}
+			
+			initTinyEditor("edt_content"); // 지원 정보 에디터 초기화
+			chkInputCount();
+		});
+		
+		function saveData() {
+			showConfirm( '저장하시겠습니까?',
+                    () => { 
+                    	saveProc(); 
+                    },
+                    () => { },
+                    '공지관리'
+             )
+		}
+		
+		
+		function saveProc() {
+			$("#content").val(tinymce.get('edt_content').getContent());  // 지원 정보 에디터 값 저장용 textarea 로 전달
+			console.log($("#content").val());
+			$("#recordForm").submit();
+		}
+		
+		function goList() {
+			showConfirm( '입력한 내용이 저장되지 않습니다. 목록으로 돌아가시겠습니까?',
+                    () => { 
+                    	moveList();
+                    },
+                    () => { },
+                    '공지관리'
+             )
+		}
+		
+		
+		// 에디터 초기화 완료 후 callback 함수
+		function customInitEditor(editor,targer) {
+		    // 지원정보 에디터 db 값 세팅
+		    if("edt_content" == targer) {
+		    	editor.setContent($("#content").val());
+		    }
+		}
+		
+		function chkInputCount(){
+			 $("#titleInputLength").html("(" + $("#title").val().length + "/" + "50)");
+		}
+		
+		function moveList(){
+			window.location.href="/cms/notice/list"; 
+		}
+
+	</script>
+		
+</th:block>
+
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="location mb-2">
+            <small class="text-secondary">
+                <i class="fas fa-home me-1"></i>
+                <a href="#">홈</a> > <a href="/svc/mainbanner/dealList">서비스관리</a> > <a href="/cms/notice/list">게시판관리</a> > <a href="/cms/notice/list">공지</a>
+            </small>
+        </div>
+        <h2 class="page-title fs-4 mb-4">
+               공지사항 등록
+        </h2>
+
+        <!-- 입력 폼 섹션 -->
+		<form id="recordForm" th:object="${record}" method="POST" th:action="${record.id == null or record.id == 0} ? '/cms/notice/create' : '/cms/notice/update'">
+			<input type="hidden" th:field="*{id}" >
+	        <div class="search-section detail">
+	            <!-- 사업자명 -->
+	            <div class="form-row full-width">
+	                <div class="form-label">
+	                    제목<span class="required">*</span>
+	                </div>
+	                <div class="form-control-wrap-flex w80">
+	                    <input type="text" class="form-control" placeholder="제목을 등록해주세요(최대 50자)" th:field="*{title}" required maxlength="50" oninput="chkInputCount();">
+						<th:block th:if="${#fields.hasErrors('title')}" class="error"><span th:errors="*{title}" class="required">Field error</span></th:block>
+						<span id="titleInputLength"></span>
+	                </div>
+	            </div>
+		
+		            <!-- 회사 -->
+		            <div class="form-row full-width">
+		                <div class="form-label">
+		                    본문<span class="required">*</span>
+		                </div>
+		                <div class="form-control-wrap">
+		                	<textarea class="form-control" id="edt_content"></textarea>
+		                    <textarea class="form-control" th:field="*{content}" style="display:none"></textarea>
+							<th:block th:if="${#fields.hasErrors('content')}" class="error"><span th:errors="*{content}" class="required">Field error</span></th:block>
+		                </div>
+		            </div>
+		
+		           <!-- 노출 -->
+		            <div class="form-row full-width">
+		                <div class="form-label">
+		                   노출<span class="required">*</span>
+		                </div>
+						<div class="form-control-wrap">
+		                    <div class="form-check-group">
+		                        <div class="form-check form-switch mb-3">
+		                            <input class="form-check-input" type="checkbox" th:field="*{displayYn}" value="1">
+		                        </div>
+								<th:block th:if="${#fields.hasErrors('displayYn')}" class="error"><span th:errors="*{displayYn}" class="required">Field error</span></th:block>
+		                    </div>
+		                </div>
+		            </div>
+		            <!-- 상단고정 -->
+		            <div class="form-row full-width">
+		                <div class="form-label">
+		                   상단고정<span class="required">*</span>
+		                </div>
+						<div class="form-control-wrap">
+		                    <div class="form-check-group">
+		                        <div class="form-check form-switch mb-3">
+		                            <input class="form-check-input" type="checkbox" th:field="*{topYn}" value="1" >
+		                        </div>
+								<th:block th:if="${#fields.hasErrors('topYn')}" class="error"><span th:errors="*{topYn}" class="required">Field error</span></th:block>
+		                    </div>
+		                </div>
+		            </div>
+	            </div>
+            </form>
+        </div>
+        
+        <!-- 버튼 영역 -->
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">
+                닫기
+            </button>
+            <button type="button" class="btn btn-lg btn-dark px-4 btn-sm" onclick="saveData();">
+                저장
+            </button>
+        </div>
+    </div>
+</div>

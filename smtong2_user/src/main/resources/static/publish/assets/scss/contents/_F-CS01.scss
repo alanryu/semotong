@@ -1,0 +1,78 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 1:1 문의하기
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 신청한 요금제 페이지
+.F-CS01-page {
+
+	// 페이시 여백
+	padding-top: 20rem;
+	@include bottom-spacer;
+
+	// s: 모통봇 소개 섹션
+	.motongcb-intro-sec {
+		@include sec-basic;
+		margin-bottom: 24rem;
+
+		.sec-header {
+			.sec-tit {
+				position: relative;
+				display: flex;
+				align-items: center;
+				.ui-icn {
+					margin-right: 12rem;
+				}
+			}
+		}
+
+		.motongcb-intro-box {
+			padding: 20rem 16rem;
+			background-color: #F4F4F4;
+			border-radius: 2px;
+
+			dl {
+				dt {
+					padding-bottom: 12rem;
+					margin-bottom: 12rem;
+					font-weight: 600;
+					font-size: 14rem;
+					line-height: 20rem;
+					color: #36383A;
+					text-align: center;
+					border-bottom: 1px solid rgba(0,0,0,0.1);
+				}
+				dd {
+					position: relative;
+					padding-left: 12rem;
+					font-weight: 500;
+					font-size: 12rem;
+					line-height: 17rem;
+					color: #63666A;
+					&::before {
+						content: '';
+						display: block;
+						position: absolute;
+						left: 0;
+						top: 7rem;
+						width: 3rem;
+						height: 3rem;
+						background-color: #63666A;
+						border-radius: 50%;
+					}
+					& + dd {
+						margin-top: 6rem;
+					}
+				}
+			}
+		}
+	}
+	// e: 모통봇 소개 섹션
+
+	// s: 플로팅 섹션
+	.floating-sec {
+		@include floating-sec;
+	}
+	// e: 플로팅 섹션
+}
+// e: 신청한 요금제 페이지

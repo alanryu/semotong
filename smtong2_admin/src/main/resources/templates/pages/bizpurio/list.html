@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='11',menuId ='01'">
+	  
+<th:block layout:fragment="css">
+</th:block>
+
+<th:block layout:fragment="script">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script> 
+
+<script id="eventlistTmpl" type="text/x-jquery-tmpl">
+	<tr>
+		<!-- 번호 -->
+		<td>${id}</td>
+		<!-- 구분 -->
+		<td>${DEVICE}</td>
+		<!-- 메세지키 -->
+		<td>${MSGID} </td>
+		<!-- 수신인 -->
+		<td>{{html maskPhoneNumber(PHONE)}}</td>
+		<!-- 상태 -->
+		<td>${RESULT}</td>
+		<td>${UNIXTIME}</td>
+	</tr>
+</script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#keyword").focus();
+		currentPage = 1;
+		searchList();
+	})
+	
+
+	
+	function renderPage(page) {
+		currentPage = page;
+		searchList();
+	}
+	
+	function toggleDetailSearch(){
+		$("#periodType").val('CREATE')	.prop('selected', true);
+		
+		$("#keyword").val('');
+		periodButtonInit();
+		
+		
+		currentPage = 1;
+	}
+	
+	function searchList() {
+		//페이징 기본(필수)
+		var page = currentPage;
+		if(page =="" || page == null) page =1;
+		var _recordSize =  10;
+		
+		var params = {
+		 		keyword				: $("#keyword").val()							// 입력 검색어 
+		 		,searchStartDt		: $("#searchStartDt").val()						//BaseSearchDto
+		 		,searchEndDt		: $("#searchEndDt").val()						//BaseSearchDto
+		 		,alamSp			 	: $("input[name='alamSp']:checked").val()		// Y, N
+		 		,page				: page
+		 		,recordSize 		: _recordSize
+		}
+		
+		$.ajax({
+				url : '/bizpurio/ajaxList'
+				,type : 'POST'
+				,dataType : "json"
+				,contentType:"application/json"
+				,data : JSON.stringify(params)
+				,success: function (data) {
+					
+					var items = data.data
+					$('#searchList').empty();
+					if(data.totalCnt > 0) {
+												
+						$('#eventlistTmpl').tmpl(data.data).appendTo('#searchList');	
+					}
+					$('#totla_count').html("총 "+data.totalCnt+"건");
+					renderPagination(params.page, data.totalCnt, params.recordSize)
+				},
+				error : function(request, status, error){
+					alert(error);
+				},
+				complete:function(){
+					// $('#loading').addClass('display-none');
+				}
+		});
+	}
+	
+
+	
+	
+	
+	
+
+	function downloadExcel() {
+		//페이징 기본(필수)
+		//var page = currentPage;
+		//if(page =="" || page == null) page =1;
+		var page = 1;
+		//var _recordSize =  parseInt($("#recordSize").val());
+		var _recordSize =  9999;
+		if( !_isDateForm($("#searchStartDt").val()) ){
+			alert("올바른 날짜를 넣어주세요");
+			$("#searchStartDt").focus();
+			return;
+		}
+		if( !_isDateForm($("#searchEndDt").val()) ){
+			alert("올바른 날짜를 넣어주세요");
+			$("#searchEndDt").focus();
+			return;
+		}
+		var params = {
+				searchReviewType 		: $("input[name='searchReviewType']:checked").val()	// SEMOTONG, PLAN
+		 		,searchKeyword			: $("#keyword").val()							// 입력 검색어 
+		 		,searchPeriodType		: $("#periodType").val()						// CREATE only
+		 		,searchStartDate		: $("#searchStartDt").val()						//BaseSearchDto
+		 		,searchEndDate			: $("#searchEndDt").val()						//BaseSearchDto
+		 		,searchDisplayYn 		: $("input[name='useType']:checked").val()		// Y, N
+		 		,page					: page
+		 		,recordSize 			: _recordSize
+		}
+		
+		var _url = '/csm/review/exceldown';
+		
+		downloadExcelProc(params,_url,"ReviewList");
+		
+	}
+	
+	
+	
+
+</script>
+
+
+</th:block>
+
+<div class="main-content">
+	
+	<div class="container-fluid">
+		<!-- 로케이션 & 제목 영역 추가 -->
+		<div class="page-header mb-4">
+			<div class="location mb-2">
+				<small class="text-secondary">
+					<i class="fas fa-home me-1"></i>
+					<a href="javascript:;">홈</a>
+					>
+					<a href="javascript:;">카카오메시지</a>
+					>
+					<a href="/bizpurio/list">알림톡 발송내역</a>
+				</small>
+			</div>
+			<h2 class="page-title fs-4 mb-4">
+				알림톡 발송내역
+			</h2>
+		</div>
+		
+		<!-- 검색 구간 -->
+		<div class="search-section">
+			<div class="col-12 mb-2">
+				<div class="form-row">
+					<div class="form-label mb-0">검색어</div>
+					<div class="position-relative col-9">
+						<i
+							class="fas fa-search position-absolute"
+							style="left: 16px; top: 15px; color: #94a3b8;"></i>
+						<input type="text" class="form-control ps-5" id="keyword" placeholder="검색어를 입력하세요">
+					</div>
+				</div>
+			</div>
+			<div class="row align-items-center mb-3">
+				<div class="col-12">
+					<div class="d-flex align-items-center gap-3">
+						<div class="form-label mb-0">구분</div>
+						<div class="radio-group">
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="alamSp" id="alamSpApp" value = "" checked>
+								<label class="form-check-label" for="alamSpApp">전체</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="alamSp" id="alamSp01" value = "KAT">
+								<label class="form-check-label" for="alamSp01">알림톡</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="alamSp" id="alamSp02" value = "KFT">
+								<label class="form-check-label" for="alamSp02">친구톡</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="alamSp" id="alamSp03" value = "SMS">
+								<label class="form-check-label" for="alamSp03">SMS</label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row align-items-center mb-2">
+				<div class="form-row">
+					<div class="form-label mb-0">발송일</div>
+					<div class="d-flex align-items-center gap-3">
+						<div class="d-flex align-items-center gap-2">
+							<input type="date" class="form-control" style="width: 150px" id="searchStartDt">
+							<span class="text-secondary">-</span>
+							<input type="date" class="form-control" style="width: 150px" id="searchEndDt">
+						</div>
+						<div class="d-flex gap-2">
+							<button class="period-button" value="0">오늘</button>
+							<button class="period-button" value="7" id="defaultWeek">1주일</button>
+							<button class="period-button" value="30">1개월</button>
+							<button class="period-button" value="90">3개월</button>
+							<button class="period-button" value="180">6개월</button>
+							<button class="period-button" value="365">1년</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 검색 구간 -->
+
+			<div class="row">
+				<div class="col-12 text-end mt-2">
+					
+					<button class="btn btn-primary btn-sm" onclick="searchList();">
+						<i class="fas fa-search"></i>
+						검색
+					</button>
+					<button class="btn btn-light me-2 btn-sm" onclick="toggleDetailSearch()">
+						<i class="fas fa-redo"></i>
+						초기화
+					</button>
+				</div>
+			</div>
+		</div>
+		
+		
+		
+		
+		<!-- contents 영역 -->
+		<div class="table-section">
+			<div class="d-flex justify-content-between align-items-center mb-4">
+				<div class="d-flex align-items-center gap-3">
+					<div class="stats-badge">
+						<i class="fas fa-calculator me-1"></i>
+						<span id="totla_count">총 450건</span>
+					</div>
+				</div>
+				
+				<!-- <div class="header-actions">
+					<button class="btn btn-light btn-sm">
+						<i class="fas fa-download"></i>
+						다운로드
+					</button>
+				</div> -->
+			</div>
+			
+			<table class="table custom-table">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>구분</th>
+						<th>메세지키</th>
+						<th>수신인</th>
+						<th>상태</th>
+						<th>발송일시</th>
+					</tr>
+				</thead>
+				<tbody id="searchList">
+				</tbody>
+			</table>
+			
+			<div class="d-flex justify-content-left mt-4">
+				<ul class="pagination">
+				</ul>
+			</div>
+		</div>
+	</div>
+		
+	
+</div>

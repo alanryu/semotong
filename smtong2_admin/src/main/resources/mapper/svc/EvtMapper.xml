@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.svc.event.mapper.EvtMapper">
+	
+	<sql id="Base_Column_list">
+		 a.id				
+		,a.event_category	
+		,GET_CODE_NAME('evt_cate', a.event_category) AS eventCategoryNm
+		,a.event_mng_sp	
+		,a.title			
+		,a.event_thumbnail
+		,a.event_image	
+		,a.content		
+		,a.manager		
+		,a.start_date		AS startDate
+		,a.end_date			AS endDate
+		,DATE_FORMAT(a.start_date,  '%Y-%m-%d') AS stringStartDate
+		,DATE_FORMAT(a.end_date,  '%Y-%m-%d') AS stringEndDate
+		,IFNULL(a.event_notice_sp,'C') event_notice_sp
+		,a.event_notice_image
+		,a.event_notice_content
+		,a.use_yn
+		,a.create_date	
+		,a.create_id		
+		,a.modified_date	
+		,a.modified_id	
+
+	</sql>
+	
+	<sql id="listWhereInfo">
+		<where>
+			
+			<if test=" searchKeywordType != null and !searchKeywordType.equals('') and searchKeywordType.equals('ALL') and searchKeyword != null and !searchKeyword.equals('') ">
+				AND (a.title LIKE CONCAT('%', #{searchKeyword}, '%') OR b.user_name LIKE CONCAT('%', #{searchKeyword}, '%'))
+			</if>
+			<if test=" searchKeywordType != null and !searchKeywordType.equals('') and searchKeywordType.equals('TIT') and searchKeyword != null and !searchKeyword.equals('') ">
+				AND a.title LIKE CONCAT('%', #{searchKeyword}, '%')
+			</if>
+			<if test=" searchKeywordType != null and !searchKeywordType.equals('') and searchKeywordType.equals('CREATER') and searchKeyword != null and !searchKeyword.equals('') ">
+				AND b.user_name LIKE CONCAT('%', #{searchKeyword}, '%')
+			</if>
+			
+			<if test="searchPeriodType != null">
+				<if test=" searchPeriodType.equals('CREATE')">
+					AND a.create_date BETWEEN #{searchStartDate} AND CONCAT(#{searchEndDate}, ' 23:59:59')
+				</if>
+				<if test=" searchPeriodType.equals('START')">
+					AND a.start_date BETWEEN #{searchStartDate} AND CONCAT(#{searchEndDate}, ' 23:59:59')
+				</if>
+				<if test=" searchPeriodType.equals('END')">
+					AND a.end_date BETWEEN #{searchStartDate} AND CONCAT(#{searchEndDate}, ' 23:59:59')
+				</if>
+			</if>
+			
+			<if test=" searchCategory != null and searchCategory != '' and !searchCategory.equals('ALL') ">
+				AND a.event_category = #{searchCategory}
+			</if>
+			<if test=" searchUseYn != null and searchUseYn != '' and searchUseYn !='ALL' ">
+				AND a.use_yn = #{searchUseYn}
+			</if>
+			
+		</where>
+	</sql>
+	 		
+	
+	<select id="evtList" parameterType="kr.co.ucomp.web.svc.event.dto.EvtSearchDTO" resultType="kr.co.ucomp.web.svc.event.entity.EvtEntity">
+		SELECT
+		<include refid="Base_Column_list" />
+		FROM tb_evt_event a
+		LEFT JOIN tb_mbm_admin_user b ON a.create_id = b.id
+		<include refid="listWhereInfo" />
+		ORDER BY order_no 
+		LIMIT #{offset}, #{recordSize}
+	</select>
+	
+	<select id="evtCount" parameterType="kr.co.ucomp.web.svc.event.dto.EvtSearchDTO" resultType="java.lang.Long">
+		SELECT COUNT(1)
+		FROM tb_evt_event a
+		LEFT JOIN tb_mbm_admin_user b ON a.create_id = b.id
+		<include refid="listWhereInfo" />
+	</select>
+	
+	
+	<select id="evtById" parameterType="kr.co.ucomp.web.svc.event.dto.EvtSearchDTO" resultType="kr.co.ucomp.web.svc.event.entity.EvtEntity">
+		SELECT
+		<include refid="Base_Column_list" />
+		FROM tb_evt_event a
+		LEFT JOIN tb_mbm_admin_user b ON a.create_id = b.id
+		WHERE a.id = #{searchId}
+	</select>
+	
+	
+	<insert id="create"  parameterType="kr.co.ucomp.web.svc.event.entity.EvtEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+		INSERT INTO tb_evt_event (event_category, event_mng_sp, title, content
+								, event_thumbnail
+								, event_image
+								, manager, start_date, end_date
+								, event_notice_sp, event_notice_image ,event_notice_content
+								, use_yn,  create_id, modified_date
+		)VALUES(	
+				 #{eventCategory}
+				,#{eventMngSp}
+				,#{title}
+				,#{content}				
+				,#{eventThumbnail}
+				,#{eventImage}				
+				,#{manager}
+				,#{startDate}
+				,#{endDate}				
+				,#{eventNoticeSp}
+				,#{eventNoticeImage}
+				,#{eventNoticeContent}				
+				,#{useYn}
+				,#{createId}
+				,NULL
+		);
+	</insert>
+	
+	<update id="update"  parameterType="kr.co.ucomp.web.svc.event.entity.EvtEntity" >
+		UPDATE tb_evt_event 
+		SET		 title           =#{title}
+				
+				,event_category  =#{eventCategory}
+				,event_mng_sp    =#{eventMngSp}
+				
+				,start_date      =#{startDate}
+				,end_date        =#{endDate}
+				
+				,event_thumbnail =#{eventThumbnail}
+				,event_image     =#{eventImage}
+				
+				,content         =#{content}
+				,manager         =#{manager}
+				
+				
+				,event_notice_sp = #{eventNoticeSp}
+				,event_notice_image = #{eventNoticeImage}
+				,event_notice_content = #{eventNoticeContent}
+		
+				
+				,modified_date	=now()
+				,modified_id	=#{modifiedId}
+		WHERE id = #{id}
+	
+	</update>
+	
+	<delete id="delete" parameterType="kr.co.ucomp.web.svc.event.entity.EvtEntity">
+		DELETE FROM tb_evt_event
+		WHERE id = #{id}
+	</delete>
+	
+	<update id="updateUseYn"  parameterType="kr.co.ucomp.web.svc.event.entity.EvtEntity" >
+		
+		UPDATE tb_evt_event 
+		SET		 use_yn			=#{useYn}
+		WHERE id = #{id}
+	
+	</update>
+	
+	
+</mapper>

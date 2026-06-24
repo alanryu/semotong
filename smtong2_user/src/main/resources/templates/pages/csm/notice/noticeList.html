@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='공지사항', layoutSubTitleYN='Y', layoutFooterYn='Y'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ <script>
+		document.addEventListener("DOMContentLoaded", () => {
+			$("#viewpage").val(1);
+			getNoticeList();
+		})
+		
+		//엔터 검색 
+		function OnKeyEnter() {
+			if (window.event.keyCode == 13) {
+				$("#viewpage").val(1);			//엔터 검색은 무조건 처음으로 본다.
+				getNoticeList();
+			}
+		}
+		
+		//돋보기 검색
+		function getClickLensNoticeList() {
+			$("#viewpage").val(1);			//엔터 검색은 무조건 처음으로 본다.
+			getNoticeList();
+		}
+		
+		//Read More
+		function getNoticeMoreList() {
+			var page = $("#viewpage").val();
+			page = parseInt(page) +1;
+			$("#viewpage").val(page);
+			getNoticeList();
+		}
+		
+		function getNoticeList() {
+			var page = $("#viewpage").val();
+			if(page ==null|| page == "") page =1;
+	  		var pageSize = 10;
+	  		
+
+			var params = {
+			     keyword : $("#searchWord").val(),
+				 page : page,
+				 recordSize : pageSize
+			    }
+					  
+				$.ajax({
+				   url : '/cms/notice/list',
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+				   beforeSend: function(xhr){
+				       xhr.setRequestHeader(header,token);
+				    },
+					success: function (data) {
+						if(page == 1) {
+							$('#noticeList').empty();	
+						}
+						
+						if(data.totalCnt ==0) {
+							$('#nodataNoticeListTmpl').tmpl(null).appendTo('#noticeList');
+						} else {
+							$('#noticeListTmpl').tmpl(data.data).appendTo('#noticeList');	
+						}
+						
+						//readMoreBtn
+						var tCnt = data.totalCnt;
+						if(page * pageSize >= tCnt){
+							$('#readMoreBtn').hide();
+						}else{
+							$('#readMoreBtn').show();
+						}
+											
+				    },
+					error : function(request, status, error){
+						alertModalShow(error);
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+				});
+		}
+		
+		
+		
+		function goDetail(id) {
+			$(location).attr('href','/cms/notice/detail/' + id);
+		}
+	</script>
+	
+	<script id="nodataNoticeListTmpl" type="text/x-jquery-tmpl">
+	</script>
+
+	<script id="noticeListTmpl" type="text/x-jquery-tmpl">
+		<!-- 2차 수정 : 공지사항 고정게시글 추가 -->
+		<li class="notice-item">
+			{{if topYn == 1 }}
+				<a href="javascript:goDetail(${id});" class="notice-post is-pin">
+					<span class="notice-cont">
+						<strong class="tit"><i class="ui-icn icn-20-pin-gr" aria-label="고정"></i>${title}</strong>
+						<span class="date">{{html getDateStrDot(createDate)}}</span>
+					</span>
+					<i class="ui-icn icn-24-more-gr" aria-label="상세보기"></i>
+				</a>
+			{{else}}
+				<a href="javascript:goDetail(${id});" class="notice-post">
+					<span class="notice-cont">
+						<strong class="tit">${title}</strong>
+						<span class="date">{{html getDateStrDot(createDate)}}</span>
+					</span>
+					<i class="ui-icn icn-24-more-gr" aria-label="상세보기"></i>
+				</a>
+			{{/if}}
+			
+		</li>
+	</script>
+	
+
+</th:block>
+		<!-- Container -->
+		<main role="main" class="container">
+			<input type="hidden" id="viewpage"/>
+			<!-- content -->
+			<div class="content F-CS02-01-page">
+				<!-- 공지사항 목록 섹션 -->
+				<section class="notice-list-sec">
+					<div class="sec-inner">
+						<!-- 공지사항 검색 -->
+						<div class="notice-srch">
+							<div class="ui-inp">
+								<input type="text" name="" value="" placeholder="검색어를 입력해 주세요." class="inp" id="searchWord" onkeyup="OnKeyEnter()"/>
+								<div class="on-right">
+									<button type="button" class="ui-btn btn-srch" onclick="getClickLensNoticeList();">
+										<i class="ui-icn icn-20-srch-bk" aria-label="검색"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+						<!-- // 공지사항 검색 -->
+
+						<!-- 공지사항 목록 -->
+						<div class="notice-list-wrap">
+							<ul class="notice-list" id="noticeList">
+								
+							</ul>
+
+							<!-- Case 목록이 많은 경우 더보기 -->
+							<button type="button" class="ui-btn btn-more-list" onclick="getNoticeMoreList();" id="readMoreBtn">
+								<i class="ui-icn icn-16-more-list-gr" aria-hidden="true"></i>
+								<span>더보기</span>
+							</button>
+						</div>
+						<!-- // 공지사항 목록 -->
+					</div>
+				</section>
+				<!-- // 공지사항 목록 섹션 -->
+
+				<!-- 이벤트 섹션 -->
+				<section class="event-sec">
+					<div class="sec-inner">
+						<div class="swiper event-swiper">
+							<div class="swiper-wrapper">
+								<div class="swiper-slide" th:each="list : ${bannerList}">
+									<button type="button" class="event-bnr" th:attr="onclick=|navigateTo('${list.url}');|">
+										<img th:src="@{${list.imageMo}}" th:alt="${list.bannerAlt}" class="only-mo" />
+										<img th:src="@{${list.imagePc}}" th:alt="${list.bannerAlt}" class="only-pc" />
+									</button>
+								</div>
+							</div>
+							<div class="swiper-pagination"></div>
+						</div>
+					</div>
+				</section>
+				<!-- // 이벤트 섹션 -->
+
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/order_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='가입방식 선택'">
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ 
+ <script>
+	
+	
+	$( document ).ready(function() {
+		
+	   
+	});
+	
+	
+	function setEnterType(sp) {
+		$("#entrType").val(sp);
+		
+		moveNextOrder('/order/agreePolicy');
+	}
+	
+ </script>
+</th:block>
+
+<!-- Container -->
+<main role="main" class="container">
+<th:block th:include="pages/order/incOrderForm :: orderFormFragment"></th:block>
+<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-QU-page F-QU01-02-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">어떤 방법으로 <br>알뜰폰 가입을 진행할까요?</h2>
+						</div>
+						<div class="sec-body">
+							<ul class="survey-list">
+								<li class="survey-item">
+									<label class="ui-rdo survey-rdo">
+										<input type="radio" name="frmSurvey" onclick="setEnterType('02');"/>
+										<span class="rdo"><span>쓰던 번호 그대로 (번호 이동)</span></span>
+									</label>
+								</li>
+								<li class="survey-item">
+									<label class="ui-rdo survey-rdo">
+										<input type="radio" name="frmSurvey" onclick="setEnterType('01');"/>
+										<span class="rdo"><span>새로운 번호로 (신규 가입)</span></span>
+									</label>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+
+</main>
+
+	
+</html>

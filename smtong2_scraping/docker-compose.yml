@@ -1,0 +1,49 @@
+# =============================================================================
+# Docker Compose - Python Scraping Application
+# =============================================================================
+
+services:
+  scraping-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smtong2-scraping
+
+    # 포트 매핑
+    ports:
+      - "5001:5001"
+
+    # 환경변수 파일
+    env_file:
+      - .env
+
+    # 환경변수 (Chrome headless 모드 설정)
+    environment:
+      - TZ=Asia/Seoul
+      - CHROME_BIN=/usr/bin/google-chrome
+      - CHROMEDRIVER_PATH=/usr/bin/chromedriver
+
+    # 리소스 제한
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+
+    # 재시작 정책
+    restart: unless-stopped
+
+    # PID 1 좀비 프로세스 리핑을 위한 init 프로세스 (tini)
+    init: true
+
+    # 헬스체크
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    # 공유 메모리 크기 (Chrome 안정성을 위해 필요)
+    shm_size: '2gb'
+

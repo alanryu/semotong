@@ -1,0 +1,111 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 공지사항
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 공지사항 페이지
+.F-CS02-01-page {
+
+	// 페이시 여백
+	padding-top: 20rem;
+	@include bottom-spacer;
+
+	// s: 공지사항 목록 섹션
+	.notice-list-sec {
+		.notice-list-wrap {
+			margin-top: 24rem;
+
+			.notice-list {
+				border-top: 1px solid #2A2B2D;
+				/* 1차 수정 : 리스트 여백 취소 */
+				/*
+					margin-left: calc(#{$mobile-outer-spacer} * -1);
+					margin-right: calc(#{$mobile-outer-spacer} * -1);
+				*/
+
+				.notice-item {
+					border-bottom: 1px solid #EFF0F0;
+				}
+
+				.notice-post {
+					position: relative;
+					display: flex;
+					align-items: center;
+					gap: 16rem;
+					padding: 16rem;
+					padding-left: 8rem;
+					padding-right: 8rem;
+					&.is-pin {
+						background-color: #F4F5F8;
+						padding-left: 16rem;
+						padding-right: 8rem;
+					}
+
+					.notice-cont {
+						display: block;
+						flex:1 1 auto;
+						.tit {
+							display: flex;
+							font-weight: 600;
+							font-size: 16rem;
+							line-height: 24rem;
+							color: #2A2B2D;
+							@include ellipsis3;
+							.ui-icn {
+								flex: none;
+								margin-right: 4rem;
+							}
+						}
+						.date {
+							display: block;
+							margin-top: 4rem;
+							font-weight: 500;
+							font-size: 14rem;
+							line-height: 22rem;
+							color: #96989B;
+						}
+					}
+
+					> .ui-icn {
+						margin-right: -4rem;
+						flex: none;
+					}
+
+					&:hover {
+						.notice-cont {
+							.tit {
+								color: $color-primary;
+								text-decoration: underline;
+								text-underline-position: under;
+							}
+						}
+					}
+				}
+
+				/* 1차 수정 : 리스트 여백 취소 */
+				/*
+				@include media-tablet-xs {
+					margin-left: 0;
+					margin-right: 0;
+				}
+				*/
+			}
+		}
+	}
+	// e: 공지사항 목록 섹션
+
+	// s: 이벤트 섹션
+	.event-sec {
+		margin-top: 50rem;
+
+		.event-swiper {
+			@include event-swiper;
+		}
+
+		.event-bnr {
+			@include event-bnr;
+		}
+	}
+	// e: 이벤트 섹션
+}
+// e: 공지사항 페이지

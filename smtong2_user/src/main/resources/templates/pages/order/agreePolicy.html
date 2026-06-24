@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layout/order_layout}"
+  layout:fragment="Content"
+  th:with="subPageTitle ='약관동의'"
+>
+  <!-- index.html 고유 CSS 추가 -->
+  <th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+  </th:block>
+  <!-- index.html 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+    <script th:inline="javascript">
+      var orderReq = /*[[${orderReq}]]*/ "{}";
+
+      $(document).ready(function () {
+        if (orderReq.companyId == "22") {
+          //쉐이크모바일
+          const item2 = document.getElementById("terms-item2");
+          const item5 = document.getElementById("terms-item5");
+          item2.style.display = "none";
+          item5.style.display = "none";
+        }
+
+        document.getElementById("alert-terms0").addEventListener("change", function () {
+          const checkboxes = document.querySelectorAll('input[name="alert-terms"]');
+          checkboxes.forEach(function (checkbox) {
+            checkbox.checked = document.getElementById("alert-terms0").checked;
+          });
+          handleCheckboxChange();
+        });
+
+        const checkboxes = document.querySelectorAll('input[name="alert-terms"]:not(#alert-terms0)');
+        checkboxes.forEach(function (checkbox) {
+          checkbox.addEventListener("change", handleCheckboxChange);
+        });
+
+        document.getElementById("btnNext").addEventListener("click", function () {
+          var agreeTitle = "개인정보수집이용동의,개인정보제3자제공동의,고유식별정보처리동의,서비스이용약관,개인정보(위치정보포함)수집이용동의,서비스제공을위한개인정보처리위탁동의,개인신용정보조회동의";
+          var agreeYn = "Y,Y,Y,Y,Y,Y,Y";
+          if ($("#alert-terms8").prop("checked")) {
+            agreeTitle = agreeTitle + ",광고성이벤트혜택메시지발송동의";
+            agreeYn = agreeYn + ",Y";
+          }
+          $("#agreeTitle").val(agreeTitle);
+          $("#agreeYn").val(agreeYn);
+          moveNextOrder("/order/entrCustInfo");
+        });
+      });
+
+      function handleCheckboxChange() {
+        var isAllCheck = true;
+        for (var i = 1; i < 8; i++) {
+          if (!$("#alert-terms" + i).prop("checked")) {
+            isAllCheck = false;
+          }
+        }
+        if (isAllCheck) {
+          $("#btnNext").removeAttr("disabled");
+        } else {
+          $("#btnNext").attr("disabled", "disabled");
+        }
+      }
+
+      function openPolicyDetail(sp) {
+        if (orderReq.companyId == "19") {
+          //고고모바일
+          var baseUrl = window.location.protocol + "//" + window.location.host + "/inc/simpleOpenPolicy/";
+          var url = baseUrl + "F-TM" + sp + ".html";
+          window.open(url, "_blank");
+        } else if (orderReq.companyId == "22") {
+          //쉐이크모바일
+          if (sp == "05") {
+            sp = "05-02";
+          } else if (sp == "09") {
+            sp = "13";
+          }
+
+          var baseUrl = window.location.protocol + "//" + window.location.host + "/inc/simpleOpenPolicy/";
+          var url = baseUrl + "F-TM" + sp + ".html";
+          window.open(url, "_blank");
+        }
+      }
+    </script>
+  </th:block>
+
+  <!-- Container -->
+  <main role="main" class="container">
+    <th:block th:include="pages/order/incOrderForm :: orderFormFragment"></th:block>
+    <!-- content -->
+    <div class="content F-QU-page F-QU01-03-page">
+      <!-- 간편개통 섹션 -->
+      <section class="simple-open-sec">
+        <div class="sec-inner">
+          <div class="sec-header">
+            <h2 class="sec-tit">알뜰폰 신청을 위해 <br />약관에 동의해주세요.</h2>
+          </div>
+          <div class="sec-body">
+            <div class="agree-terms">
+              <div class="agree-terms-all">
+                <label class="ui-chk chk-style1 xl">
+                  <input type="checkbox" name="alert-terms" id="alert-terms0" />
+                  <span class="chk"><span>약관에 모두 동의 (선택 항목 포함)</span></span>
+                </label>
+              </div>
+              <div class="agree-terms-list">
+                <h3 class="agree-terms-tit">세모통 동의 항목</h3>
+                <div class="agree-terms-item">
+                  <label class="ui-chk chk-style1 xl">
+                    <input type="checkbox" name="alert-terms" id="alert-terms1" />
+                    <span class="chk"><span>(필수) 개인정보 수집 &middot; 이용동의</span></span>
+                  </label>
+                  <button type="button" class="btn btn-more" onclick="openPolicyDetail('06');">
+                    <i class="ui-icn icn-16-more-gr" aria-label="자세히 보기"></i>
+                  </button>
+                </div>
+                <div class="agree-terms-item">
+                  <label class="ui-chk chk-style1 xl">
+                    <input type="checkbox" name="alert-terms" id="alert-terms2" />
+                    <span class="chk"><span>(필수) 개인정보 제3자 제공 동의</span></span>
+                  </label>
+                  <button type="button" class="btn btn-more" onclick="openPolicyDetail('08');">
+                    <i class="ui-icn icn-16-more-gr" aria-label="자세히 보기"></i>
+                  </button>
+                </div>
+                <div class="agree-terms-item">
+                  <label class="ui-chk chk-style1 xl">
+                    <input type="checkbox" name="alert-terms" id="alert-terms3" />
+                    <span class="chk"><span>(필수) 고유식별정보 처리 동의</span></span>
+                  </label>
+                  <button type="button" class="btn btn-more" onclick="openPolicyDetail('10');">
+                    <i class="ui-icn icn-16-more-gr" aria-label="자세히 보기"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="agree-terms-list">
+                <h3 class="agree-terms-tit">통신사 동의 항목</h3>
+                <div class="agree-terms-item">
+                  <label class="ui-chk chk-style1 xl">
+                    <input type="checkbox" name="alert-terms" id="alert-terms4" />
+                    <span class="chk"><span>(필수) 서비스 이용약관</span></span>
+                  </label>
+                  <button type="button" class="btn btn-more" onclick="openPolicyDetail('05');">
+                    <i class="ui-icn icn-16-more-gr" aria-label="자세히 보기"></i>
+                  </button>
+                </div>
+                <div class="agree-terms-item" id="terms-item2">
+                  <label class="ui-chk chk-style1 xl">
+                    <input type="checkbox" name="alert-terms" id="alert-terms5" />
+                    <span class="chk"><span>(필수) 개인정보(위치정보포함)수집, 이용동의</span></span>
+                  </label>
+                  <button type="button" class="btn btn-more" onclick="openPolicyDetail('06');">
+                    <i class="ui-icn icn-16-more-gr" aria-label="자세히 보기"></i>
+                  </button>
+                </div>
+                <div class="agree-terms-item">
+                  <label class="ui-chk chk-style1 xl">
+                    <input type="checkbox" name="alert-terms" id="alert-terms6" />
+                    <span class="chk"><span>(필수) 서비스제공을 위한 개인정보 처리위탁 동의</span></span>
+                  </label>
+                  <button type="button" class="btn btn-more" onclick="openPolicyDetail('09');">
+                    <i class="ui-icn icn-16-more-gr" aria-label="자세히 보기"></i>
+                  </button>
+                </div>
+                <div class="agree-terms-item">
+                  <label class="ui-chk chk-style1 xl">
+                    <input type="checkbox" name="alert-terms" id="alert-terms7" />
+                    <span class="chk"><span>(필수) 개인신용정보 조회동의</span></span>
+                  </label>
+                  <button type="button" class="btn btn-more" onclick="openPolicyDetail('07');">
+                    <i class="ui-icn icn-16-more-gr" aria-label="자세히 보기"></i>
+                  </button>
+                </div>
+                <div class="agree-terms-item" id="terms-item5">
+                  <label class="ui-chk chk-style1 xl">
+                    <input type="checkbox" name="alert-terms" id="alert-terms8" />
+                    <span class="chk"><span>(선택) 광고성 이벤트, 혜택 메시지 발송 동의</span></span>
+                  </label>
+                  <button type="button" class="btn btn-more" onclick="openPolicyDetail('12');">
+                    <i class="ui-icn icn-16-more-gr" aria-label="자세히 보기"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- // 간편개통 섹션 -->
+
+      <!-- 플로팅 섹션 -->
+      <section class="floating-sec">
+        <div class="sec-inner">
+          <button type="button" class="ui-btn btn-action primary" disabled id="btnNext">
+            <span>다음</span>
+          </button>
+        </div>
+      </section>
+      <!-- // 페이지 섹션 -->
+    </div>
+    <!-- // content -->
+  </main>
+</html>

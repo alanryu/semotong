@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Order Form Fragment</title>
+</head>
+
+<body>
+    <div th:fragment="orderFormFragment">
+        <form th:action="@{/orders/}" th:object="${orderReq}" method="post" id="orderForm">
+            <input type="hidden" th:field="*{id}" />
+            <input type="hidden" th:field="*{companyId}" />
+            <input type="hidden" th:field="*{orderSeq}" />
+            <input type="hidden" th:field="*{orderDttm}" />
+            <input type="hidden" th:field="*{telecomCd}" />
+            <input type="hidden" th:field="*{prodDv}" />
+            <input type="hidden" th:field="*{planId}" />
+            <input type="hidden" th:field="*{planCd}" />
+            <input type="hidden" th:field="*{planNm}" />
+            <input type="hidden" th:field="*{settleDiv}" />
+            <input type="hidden" th:field="*{entrType}" />
+            <input type="hidden" th:field="*{customerType}" />
+            <input type="hidden" th:field="*{chargeReductType}" />
+            <input type="hidden" th:field="*{newPhoneNum1}" />
+            <input type="hidden" th:field="*{newPhoneNum2}" />
+            <input type="hidden" th:field="*{preTelecomCd}" />
+            <input type="hidden" th:field="*{preMvnoCd}" />
+            <input type="hidden" th:field="*{prePhoneNum}" />
+            <input type="hidden" th:field="*{numMovCertMethod}" />
+            <input type="hidden" th:field="*{numMovCertVal}" />
+            <input type="hidden" th:field="*{usimPayType}" />
+            <input type="hidden" th:field="*{usimModelNm}" />
+            <input type="hidden" th:field="*{usimSerialNum}" />
+            <input type="hidden" th:field="*{usimType}" />
+            <input type="hidden" th:field="*{usimBuy}" />
+            <input type="hidden" th:field="*{esimModel}" />
+            <input type="hidden" th:field="*{esimMemory}" />
+            <input type="hidden" th:field="*{esimNumber}" />
+            <input type="hidden" th:field="*{esimImei1}" />
+            <input type="hidden" th:field="*{esimImei2}" />
+            <input type="hidden" th:field="*{esimEid}" />
+            <input type="hidden" th:field="*{orderNm}" />
+            <input type="hidden" th:field="*{userSsn}" />
+            <input type="hidden" th:field="*{guardNm}" />
+            <input type="hidden" th:field="*{guardSsn}" />
+            <input type="hidden" th:field="*{guardRel}" />
+            <input type="hidden" th:field="*{userCountry}" />
+            <input type="hidden" th:field="*{identityMethod}" />
+            <input type="hidden" th:field="*{identityCi}" />
+            <input type="hidden" th:field="*{simpleCertSp}" />
+            <input type="hidden" th:field="*{orderPhone}" />
+            <input type="hidden" th:field="*{orderTel}" />
+            <input type="hidden" th:field="*{orderEmail}" />
+            <input type="hidden" th:field="*{orderZipCd}" />
+            <input type="hidden" th:field="*{orderAddr}" />
+            <input type="hidden" th:field="*{orderAddr1}" />
+            <input type="hidden" th:field="*{orderAddr2}" />
+            <input type="hidden" th:field="*{advanceBankCd}" />
+            <input type="hidden" th:field="*{advanceBankAcct}" />
+            <input type="hidden" th:field="*{advanceAmt}" />
+            <input type="hidden" th:field="*{billCd}" />
+            <input type="hidden" th:field="*{billZipCd}" />
+            <input type="hidden" th:field="*{billAddr1}" />
+            <input type="hidden" th:field="*{billAddr2}" />
+            <input type="hidden" th:field="*{billAddr}" />
+            <input type="hidden" th:field="*{recvNm}" />
+            <input type="hidden" th:field="*{recvPhone}" />
+            <input type="hidden" th:field="*{recvTel}" />
+            <input type="hidden" th:field="*{recvZipCd}" />
+            <input type="hidden" th:field="*{recvAddr}" />
+            <input type="hidden" th:field="*{recvAddr1}" />
+            <input type="hidden" th:field="*{recvAddr2}" />
+            <input type="hidden" th:field="*{tranReqCont}" />
+            <input type="hidden" th:field="*{mobileNm}" />
+            <input type="hidden" th:field="*{modelNm}" />
+            <input type="hidden" th:field="*{usedYn}" />
+            <input type="hidden" th:field="*{memorySize}" />
+            <input type="hidden" th:field="*{mobileColorCd}" />
+            <input type="hidden" th:field="*{mobilePrice}" />
+            <input type="hidden" th:field="*{mobileSuprtPrice}" />
+            <input type="hidden" th:field="*{mobileAddSuprtPrice}" />
+            <input type="hidden" th:field="*{instmntOrgPrice}" />
+            <input type="hidden" th:field="*{mobileSuprtChrgFee}" />
+            <input type="hidden" th:field="*{instmntMmCnt}" />
+            <input type="hidden" th:field="*{instmntChrgPrice}" />
+            <input type="hidden" th:field="*{mobileMmPayPrice}" />
+            <input type="hidden" th:field="*{contractMmCnt}" />
+            <input type="hidden" th:field="*{modelDiv}" />
+            <input type="hidden" th:field="*{basicPrice}" />
+            <input type="hidden" th:field="*{eventDiscPrice}" />
+            <input type="hidden" th:field="*{afterPrice}" />
+			<input type="hidden" th:field="*{promotionPeriod}" />
+            <input type="hidden" th:field="*{contractDiscPrice}" />            
+            <input type="hidden" th:field="*{monthPayPrice}" />
+            <input type="hidden" th:field="*{entrPrice}" />
+            <input type="hidden" th:field="*{entrPriceDisc}" />
+            <input type="hidden" th:field="*{usimPrice}" />
+            <input type="hidden" th:field="*{usimDiscPrice}" />
+            <input type="hidden" th:field="*{numMovFee}" />
+            <input type="hidden" th:field="*{settleMethod}" />
+            <input type="hidden" th:field="*{ownerNm}" />
+            <input type="hidden" th:field="*{bankCd}" />
+            <input type="hidden" th:field="*{bankAcctNo}" />
+            <input type="hidden" th:field="*{cardCd}" />
+            <input type="hidden" th:field="*{cardNum}" />
+            <input type="hidden" th:field="*{cardValidDt}" />
+            <input type="hidden" th:field="*{giftsNm}" />
+            <input type="hidden" th:field="*{orderState}" />
+            <input type="hidden" th:field="*{orderStateSub}" />
+            <input type="hidden" th:field="*{cancelRequestState}" />
+            <input type="hidden" th:field="*{updId}" />
+            <input type="hidden" th:field="*{orderCallCont}" />
+            <input type="hidden" th:field="*{lockAppCd}" />
+            <input type="hidden" th:field="*{disAuthJoinDiv}" />
+            <input type="hidden" th:field="*{driverNumber}" />
+            <input type="hidden" th:field="*{authOrgDt}" />
+            <input type="hidden" th:field="*{driverSecureNum}" />
+            <input type="hidden" th:field="*{customerIp}" />
+            <input type="hidden" th:field="*{agreeTitle}" />
+            <input type="hidden" th:field="*{agreeYn}" />
+            <input type="hidden" th:field="*{etcReqCont}" />
+            <input type="hidden" th:field="*{guardImg1}" />
+            <input type="hidden" th:field="*{guardImg2}" />
+            <input type="hidden" th:field="*{tranCompCd}" />
+            <input type="hidden" th:field="*{tranNo}" />
+            <input type="hidden" th:field="*{tranLinkUrl}" />
+            <input type="hidden" th:field="*{entrUserId}" />
+            <input type="hidden" th:field="*{pointPlanYn}" />
+            <input type="hidden" th:field="*{bizPlanMngId}" />
+            <input type="hidden" th:field="*{recomSp}" />
+            <input type="hidden" th:field="*{recomUserId}" />
+            <input type="hidden" th:field="*{orderSendYn}" />
+            <input type="hidden" th:field="*{orderDeleteYn}" />
+            <input type="hidden" th:field="*{orderSendDttm}" />
+            <input type="hidden" th:field="*{createDate}" />
+            <input type="hidden" th:field="*{createId}" />
+            <input type="hidden" th:field="*{modifiedDate}" />
+            <input type="hidden" th:field="*{modifiedId}" />
+            <input type="hidden" th:field="*{entrUserNm}" />
+            <input type="hidden" th:field="*{companyNm}" />
+            <input type="hidden" th:field="*{custCertYn}" />
+            <input type="hidden" th:field="*{custCertTxid}" />
+        </form>
+    </div>
+</body>
+</html>

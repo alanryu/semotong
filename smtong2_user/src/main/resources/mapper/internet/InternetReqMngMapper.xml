@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.internet.mapper.InternetReqMngMapper">
+
+    <sql id="listWhereInfo">
+        <where>
+            <if test='keyword != null and keyword !=""'>
+                AND counsel_content LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+
+            <!-- 게시기간 조회-->
+            <if test='searchStartDt != null and searchStartDt !=""'>
+                AND start_date  <![CDATA[>=]]> #{searchStartDt}
+            </if>
+            <if test='searchEndDt != null and searchEndDt !=""'>
+                AND end_date <![CDATA[<=]]> #{searchEndDt}
+            </if>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_list_Info">
+        id
+		,req_user
+        ,req_state
+        ,counsel_content
+        ,proc_content
+        ,site_sp
+		,create_date
+		,create_id
+		,GET_ADMIN_USER_NM(create_id) as createNm
+		,modified_date
+		,modified_id
+		,GET_ADMIN_USER_NM(modified_id) as modifiedNm
+    </sql>
+
+    <insert id="insertInternetReqMng" parameterType="kr.co.ucomp.web.internet.entity.InternetReqMngEntity">
+        INSERT INTO tb_pmb_internet_req_mng(
+        		req_user
+        		, input_name
+        		, input_number
+        		, input_plan_id
+        		, req_state
+        		, site_sp
+        		, incom_sp
+        		, incom_url
+        		, rdp_mng_id
+        		, counsel_content
+        		, proc_content
+        		, create_date
+        		, create_id)
+        VALUES (
+                #{reqUser},
+				TO_BASE64(AES_ENCRYPT(#{inputName},'tb_pmb_internet_req_mng')),
+				TO_BASE64(AES_ENCRYPT(#{inputNumber},'tb_pmb_internet_req_mng')),
+                #{inputPlanId},
+                'REQ',
+                #{siteSp},
+                #{incomSp},
+                #{incomUrl},
+                #{rdpMngId},
+                #{counselContent},
+                #{procContent},
+                now(),
+                #{reqUser}
+               )
+    </insert>
+
+
+    <select id="getLastOutboundCenter" resultType="String">
+        SELECT outbound_center
+        FROM tb_pmb_internet_req_mng
+        ORDER BY id DESC
+        LIMIT 1
+    </select>
+
+ <insert id="insertInternetReqNewMng" parameterType="kr.co.ucomp.web.internet.entity.InternetReqMngEntity">
+        INSERT INTO tb_pmb_internet_req_mng(
+        		req_user
+        		, input_name
+        		, input_number
+        		, input_plan_id
+        		, req_state
+        		, site_sp
+        		, incom_sp
+        		, incom_url
+        		, rdp_mng_id
+        		, is_new
+				,internet_mno_id
+				,prod_name
+				,combination_name
+				,prod_descript
+				,tv_prod_name
+				,channel_count
+				,internet_speed
+				,combination_price
+				,combination_freeble_price
+        		,hope_cons_time
+                ,outbound_center
+        		, create_date
+        		, create_id)
+        VALUES (
+                #{reqUser},
+				TO_BASE64(AES_ENCRYPT(#{inputName},'tb_pmb_internet_req_mng')),
+				TO_BASE64(AES_ENCRYPT(#{inputNumber},'tb_pmb_internet_req_mng')),
+                #{inputPlanId},
+                'REQ',
+                #{siteSp},
+                #{incomSp},
+                #{incomUrl},
+                #{rdpMngId},
+                'Y',
+                #{internetMnoId},
+				#{prodName},
+				#{combinationName},
+				#{prodDescript},
+				#{tvProdName},
+				#{channelCount},
+				#{internetSpeed},
+				#{combinationPrice},
+				#{combinationFreeblePrice},
+                #{hopeConsTime},
+                #{outboundCenter},
+                now(),
+                #{reqUser}
+               )
+    </insert>
+
+    <select
+            id="getInternetReqMngList"
+            parameterType="kr.co.ucomp.web.internet.dto.InternetReqMngSearchDto"
+            resultType="kr.co.ucomp.web.internet.entity.InternetReqMngEntity">
+        SELECT <include refid="Base_Column_list_Info"/>
+        FROM tb_pmb_internet_req_mng
+        WHERE 1=1
+        <include refid="listWhereInfo"/>
+    </select>
+
+
+
+    <select
+            id="getInternetReqMngCount"
+            parameterType="kr.co.ucomp.web.internet.dto.InternetReqMngSearchDto"
+            resultType="Long">
+        SELECT COUNT(*)
+        FROM tb_pmb_internet_req_mng
+        WHERE 1=1
+        <include refid="listWhereInfo"/>
+
+    </select>
+</mapper>

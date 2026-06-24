@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layout/default_layout}"
+  layout:fragment="Content"
+  th:with="subPageTitle ='', layoutSubTitleYN='N', layoutHeaderPrimaryYn='Y', layoutFooterYn='Y', layoutNavYn='Y', mainWrapper='Y', menuId='00', swiper='07' "
+>
+  <head>
+    <!-- index.html 고유 CSS 추가 -->
+    <th:block layout:fragment="css">
+      <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+    </th:block>
+    <!-- index.html 고유 스크립트 추가 -->
+    <th:block layout:fragment="script">
+      <script th:src="@{/js/libs/experienced.js}"></script>
+      <script th:src="@{/js/libs/unexperienced.js}"></script>
+
+      <!--    <script th:src="@{/js/page/home.js}"></script>-->
+    </th:block>
+  </head>
+
+  <script id="companyListMainTmpl" type="text/x-jquery-tmpl">
+     <div class="swiper-slide">
+    	<button type="button" class="partner-link" onclick="navigateTo('/mbm/company/companeyInfo?searchId=${id}');">
+    		<img src="${logoImg}" alt="${name}" />
+    	</button>
+    </div>
+  </script>
+
+  <script type="text/javascript">
+    var dimmedEndTime = 0;
+    var dealEndTime = 0;
+    var confirmModal;
+    var ChatbotMain;
+    var confirmModal;
+    var confirmModal2;
+	
+    $(document).ready(function () {
+		
+      /* cookie next page */
+      var goNextPage = getCookie("nextPage");
+
+      if (goNextPage != null) {
+        resetCookie("nextPage");
+        navigateTo(goNextPage);
+      }
+
+      /* 타임딜 딤드 종료 시간 */
+      dimmedEndTime = $("#dimmedTimer").val();
+      if (dimmedEndTime > 0) {
+        dimmedtime();
+        setInterval(dimmedtime, 1000);
+      }
+
+      dealEndTime = $("#dealTimer").val();
+      if (dealEndTime > 0) {
+        time();
+        setInterval(time, 1000);
+      }
+
+      companeyList();
+
+      var dealSwiper = new Swiper(".deal-swiper", {
+        threshold: 3,
+        slidesPerView: "auto",
+        spaceBetween: 10,
+        pagination: {
+          el: ".swiper-pagination",
+        },
+        // 8차 수정 : 추천딜 스와이프 버튼 옵션 추가
+        navigation: {
+          nextEl: ".deal-sec .deal-button-next",
+          prevEl: ".deal-sec .deal-button-prev",
+        },
+      });
+
+      let ratePlanASwiper = null;
+      function initSwiper() {
+        if (window.innerWidth >= 768 && !ratePlanASwiper) {
+          // 모바일 화면일 때 Swiper 초기화
+          ratePlanASwiper = new Swiper(".ratePlanA-swiper", {
+            threshold: 3,
+            slidesPerView: "auto",
+            spaceBetween: 10,
+            breakpoints: {
+              768: {
+                navigation: {
+                  nextEl: ".ratePlanA-sec .ratePlanA-button-next",
+                  prevEl: ".ratePlanA-sec .ratePlanA-button-prev",
+                },
+              },
+            },
+          });
+        } else if (window.innerWidth < 768 && ratePlanASwiper) {
+          ratePlanASwiper.destroy(true, true);
+          ratePlanASwiper = null;
+        }
+      }
+      initSwiper();
+      window.addEventListener("resize", initSwiper);
+
+      // 챗봇 관련 ====================================
+      /* modal 창 닫기 버튼 클릭 */
+      $(".chatbot-close").on("click", function () {
+        confirmModal = new bootstrap.Modal(document.getElementById("confirmModal"));
+        confirmModal.show();
+      });
+
+      /* modal 창 닫기 */
+      $("#win-close").on("click", function () {
+        confirmModal.hide();
+        ChatbotMain.hide();
+		hideshowFloat('s');
+      });
+
+      /* modal footer 클릭 (처음으로) */
+      $("#first-btn").on("click", function () {
+        confirmModal2 = new bootstrap.Modal(document.getElementById("confirmModal-2"));
+        confirmModal2.show();
+      });
+
+      /* 처음으로 이동 (페이지 리로드)*/
+      $("#go-first").on("click", function () {
+        callHtml("step0");
+        confirmModal2.hide();
+      });
+
+      /* 다른 요금제를 안내해 드릴까요? 버튼 */
+      $(document).on("click", "#more-list-main", function () {
+        var type = $(this).data("type");
+
+        window.location.href = "/pbm/plan/planList/" + type;
+        window.close();
+      });
+
+      setPopover("ui-popover popover-style1");
+
+      /* 뒤로가기 버튼 클릭 action */
+      $("#btn-back").on("click", function () {
+        /* 현재 위치 */
+        var stat = $("#step").val();
+
+        if (stat == "experienced" || stat == "step1") {
+          //알뜰폰 사용 유경험자 / 알뜰폰 사용 무경험자 1스텝
+          location.reload();
+        } else if (stat == "step2") {
+          $("#step").val("step1");
+          callHtml("step1");
+        } else if (stat == "step3") {
+          $("#step").val("step2");
+          callHtml("step2");
+        } else if (stat == "step4") {
+          $("#step").val("step3");
+          callHtml("step3");
+        } else if (stat == "step5") {
+          $("#step").val("step4");
+          callHtml("step4");
+        } else if (stat == "step6") {
+          if (param.hostType == "mno") {
+            $("#step").val("step4");
+            callHtml("step4");
+          } else {
+            $("#step").val("step5");
+            callHtml("step5");
+          }
+        } else if (stat == "step7") {
+          $("#step").val("step6");
+          callHtml("step6");
+        }
+      });
+
+      step0RdoLisner();
+      // 챗봇관련 =======================
+
+      if (shouldShowModal()) {
+        showEventModal();
+      }
+
+      handleDontShowToday();
+	  
+	  
+	  
+	  
+	  //s: 2025-07-02 조찬기 : 메인 비주얼 수정
+	  let visualSwiper;
+	  let currentMode = null; // 'mobile' 또는 'desktop' 기억용
+
+	  function initVisualSwiper() {
+	  	const isMobile = window.innerWidth < 720;
+	  	const newMode = isMobile ? 'mobile' : 'desktop';
+
+	  	if (currentMode === newMode) return; // 같은 상태면 재초기화 안함
+	  	currentMode = newMode;
+
+	  	// 기존 인스턴스 제거
+	  	if (visualSwiper) {
+	  		visualSwiper.destroy(true, true); // true: DOM도 제거
+	  	}
+
+	  	// Swiper 다시 생성
+		visualSwiper = new Swiper(".visual-swiper", {
+			threshold: 3,
+			spaceBetween: 0,
+			slidesPerView: 1,
+			loop: true,
+			effect: "fade",
+			autoplay: {
+				delay: 4000,
+				disableOnInteraction: false
+			},
+			pagination: {
+				el: ".swiper-pagination", // 필요시 모바일/PC 분리 가능
+				type: isMobile ? "fraction" : "bullets",
+				clickable: true
+			},
+			on: {
+				// 2025-07-17 조찬기 : 스크립트 const controlerEl 추가
+				slideChangeTransitionStart: function () {
+					const activeSlide = this.slides[this.activeIndex];
+					const visualEl = activeSlide.querySelector(".visual");
+					const headerMobile = document.querySelector(".header-mobile");
+					const controlerEl = document.querySelector(".visual-swiper .swiper-controler");
+
+					if (visualEl) {
+						const theme = visualEl.getAttribute("data-theme");
+						headerMobile.classList.remove("is-black", "is-white");
+						controlerEl.classList.remove("is-black", "is-white");
+
+						if (theme === "black") {
+							headerMobile.classList.add("is-black");
+							controlerEl.classList.add("is-black");
+						} else if (theme === "white") {
+							headerMobile.classList.add("is-white");
+							controlerEl.classList.add("is-white");
+						}
+					}
+				}
+			}
+		});
+	  }
+
+	  // 초기 실행
+	  initVisualSwiper();
+	  
+	  
+	  // resize 이벤트에 따라 재초기화 (디바운싱 포함)
+	  let resizeTimer;
+	  window.addEventListener("resize", () => {
+	  clearTimeout(resizeTimer);
+	  	resizeTimer = setTimeout(() => {
+	  		initVisualSwiper();
+	  	}, 150);
+	  });
+	  
+	  
+	  // 비주얼 스와이프 재생/정지
+	  const playPauseBtn = document.querySelector("#playPauseBtn");
+
+	  // 초기 상태: 자동 재생 중이니 재생 상태로 표시
+	  let isPlaying = true;
+	  updateButton();
+
+	  // 버튼 텍스트 업데이트 함수
+	  function updateButton() {
+	  	if (isPlaying) {
+	  		playPauseBtn.classList.add("is-playing");
+	  		playPauseBtn.classList.remove("is-paused");
+	  	} else {
+	  		playPauseBtn.classList.add("is-paused");
+	  		playPauseBtn.classList.remove("is-playing");
+	  	}
+	  }
+
+	  // 버튼 클릭 이벤트
+	  playPauseBtn.addEventListener("click", () => {
+	  	if (isPlaying) {
+	  		visualSwiper.autoplay.stop();
+	  		isPlaying = false;
+	  	} else {
+	  		visualSwiper.autoplay.start();
+	  		isPlaying = true;
+	  	}
+	  	updateButton();
+	  });
+	  //e: 2025-07-02 조찬기 : 메인 비주얼 수정
+	  
+	  
+	  	  
+    });
+
+    function shouldShowModal() {
+      const hideUntil = localStorage.getItem("hideModalUntil");
+      if (hideUntil) {
+        const hideDate = new Date(hideUntil);
+        const now = new Date();
+        return now > hideDate;
+      }
+      return true;
+    }
+
+    function handleDontShowToday() {
+      const checkbox = document.getElementById("sCheck11");
+      const modal = document.getElementById("eventModal");
+
+      modal.addEventListener("hidden.bs.modal", function () {
+        if (checkbox.checked) {
+          const tomorrow = new Date();
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          tomorrow.setHours(0, 0, 0, 0);
+
+          localStorage.setItem("hideModalUntil", tomorrow.toISOString());
+        }
+      });
+    }
+
+    function updateModalContent(popupList) {
+      const swiperWrapper = document.querySelector(".event-layer-bnr .swiper-wrapper");
+
+      // 기존 슬라이드 제거
+      swiperWrapper.innerHTML = "";
+
+      // 새로운 슬라이드 생성
+      popupList.forEach((popup) => {
+        const slide = document.createElement("div");
+        slide.className = "swiper-slide";
+
+        if (popup.linkUrl && popup.linkUrl.trim() !== "") {
+          // 링크가 있는 경우 a 태그 사용
+          slide.innerHTML = `
+            <a href="${popup.linkUrl}" target="${popup.target}">
+              <img src="${popup.imageMobileUrl}" alt="${popup.name}" class="only-mo" />
+              <img src="${popup.imagePcUrl}" alt="${popup.name}" class="only-pc" />
+            </a>
+          `;
+        } else {
+          // 링크가 없는 경우 img 태그만 사용
+          slide.innerHTML = `
+            <img src="${popup.imageMobileUrl}" alt="${popup.name}" class="only-mo" />
+            <img src="${popup.imagePcUrl}" alt="${popup.name}" class="only-pc" />
+          `;
+        }
+
+        swiperWrapper.appendChild(slide);
+      });
+    }
+
+    function initializeSwiper() {
+      // 기존 스와이퍼 인스턴스가 있다면 제거
+      const existingSwiper = document.querySelector(".event-layer-bnr .swiper").swiper;
+      if (existingSwiper) {
+        existingSwiper.destroy(true, true);
+      }
+
+      // 새로운 스와이퍼 초기화
+      const eventLayerSwiper = new Swiper(".event-layer-bnr .swiper", {
+        loop: true,
+        navigation: {
+          nextEl: ".swiper-button-next",
+          prevEl: ".swiper-button-prev",
+        },
+        pagination: {
+          el: ".event-layer-bnr .swiper-pagination",
+          type: "fraction",
+        },
+      });
+    }
+
+    function showEventModal() {
+      $.ajax({
+        url: "/svc/popup/list",
+        type: "GET",
+        dataType: "json",
+        success: function (data) {
+          if (data.code === 200 && data.data && data.data.length > 0) {
+            updateModalContent(data.data);
+
+            var eventModalEl = document.getElementById("eventModal");
+            var eventModal = new bootstrap.Modal(eventModalEl);
+            eventModal.show();
+			hideshowFloat('h');
+            eventModalEl.addEventListener("shown.bs.modal", function () {
+              initializeSwiper();
+            });
+          } else {
+            console.log("표시할 팝업이 없습니다.");
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error("팝업 데이터 로드 실패");
+        },
+      });
+    }
+
+    function dimmedtime() {
+      if (dimmedEndTime > 0) {
+        var hour =
+          parseInt(dimmedEndTime / 3600) < 10 ? "0" + parseInt(dimmedEndTime / 3600) : parseInt(dimmedEndTime / 3600);
+        var min =
+          parseInt((dimmedEndTime % 3600) / 60) < 10
+            ? "0" + parseInt((dimmedEndTime % 3600) / 60)
+            : parseInt((dimmedEndTime % 3600) / 60);
+        var sec = dimmedEndTime % 60 < 10 ? "0" + (dimmedEndTime % 60) : dimmedEndTime % 60;
+
+        var h = hour.toString().split("");
+        if (h.length > 2) {
+          $("#dh-1").text(h[0]);
+          $("#dh-2").text(h[1]);
+          $("#dh-3").text(h[2]);
+        } else {
+          $("#dh-1").text("0");
+          $("#dh-2").text(h[0]);
+          $("#dh-3").text(h[1]);
+        }
+        var m = min.toString().split("");
+        $("#dm-1").text(m[0]);
+        $("#dm-2").text(m[1]);
+        var s = sec.toString().split("");
+        $("#ds-1").text(s[0]);
+        $("#ds-2").text(s[1]);
+
+        dimmedEndTime--;
+        /* 시간종료되면 딤드 제거 */
+      } else {
+        $(".deal-before").remove();
+      }
+    }
+
+    function time() {
+      var hour = parseInt(dealEndTime / 3600) < 10 ? "0" + parseInt(dealEndTime / 3600) : parseInt(dealEndTime / 3600);
+      var min =
+        parseInt((dealEndTime % 3600) / 60) < 10
+          ? "0" + parseInt((dealEndTime % 3600) / 60)
+          : parseInt((dealEndTime % 3600) / 60);
+      var sec = dealEndTime % 60 < 10 ? "0" + (dealEndTime % 60) : dealEndTime % 60;
+
+      var h = hour.toString().split("");
+      if (h.length > 2) {
+        $("#th-1").text(h[0]);
+        $("#th-2").text(h[1]);
+        $("#th-3").text(h[2]);
+      } else {
+        $("#th-1").text("0");
+        $("#th-2").text(h[0]);
+        $("#th-3").text(h[1]);
+      }
+      var m = min.toString().split("");
+      $("#tm-1").text(m[0]);
+      $("#tm-2").text(m[1]);
+      var s = sec.toString().split("");
+      $("#ts-1").text(s[0]);
+      $("#ts-2").text(s[1]);
+
+      dealEndTime--;
+    }
+
+    function companeyList() {
+      var params = {
+        keyword: "",
+        useYn: "1",
+        recordSize: 100,
+      };
+
+      $.ajax({
+        url: "/mbm/company/list",
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify(params),
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader(header, token);
+        },
+        success: function (data) {
+          $("#partnerList").empty();
+
+          $("#companyListMainTmpl").tmpl(data.data).appendTo(".partnerList");
+
+          var partnerSwiper = new Swiper(".partner-swiper-test", {
+            threshold: 3,
+            spaceBetween: 10,
+            // slidesPerGroup: 4,
+            slidesPerView: "auto",
+            loop: true,
+            autoplay: {
+              delay: 0,
+              disableOnInteraction: false,
+            },
+            speed: 4000, // 1차 수정 : 최대한 느리게 (IOS 멈춤현상)
+            freeMode: true,
+            allowTouchMove: false, // 터치 스와이프 비활성화
+            keyboard: {
+              enabled: false, // 키보드 제어 비활성화
+            },
+          });
+        },
+        error: function (request, status, error) {
+          alertModalShow(error, "");
+        },
+        complete: function () {
+          // $('#loading').addClass('display-none');
+        },
+      });
+    }
+
+    function bannerPlan(id) {
+      $(location).attr("href", "/main/bannPlanList?id=" + id);
+    }
+
+    function goDetailMain(id, hostNm, url, bannerurl) {
+      var path = "mvno";
+
+      if (hostNm == "SKT" || hostNm == "KT" || hostNm == "U+") {
+        path = "mno";
+      }
+
+      if (url == "" || url == "null") {
+        /* if(bannerurl =="") {
+    	navigateTo('/pbm/plan/planDetail/' + path + '?planid=' + id);
+    } else {
+    	navigateTo(bannerurl);
+    }  */
+        //navigateTo(bannerurl);
+        navigateTo("/pbm/plan/planDetail/" + path + "?planid=" + id);
+      } else {
+        navigateTo(url);
+      }
+    }
+
+    function goMainDealLink(url, type) {
+      if (type == "01") {
+        $(location).attr("href", url);
+      } else {
+        window.open(url);
+      }
+    }
+
+	
+	function hideshowFloat(sp) {
+		if(sp =='h') {
+			$(".floating-menu").hide();	
+		} else {
+			$(".floating-menu").show();
+		}
+			
+	}
+	
+	
+    // 챗봇 관련 ========================
+    function openChat() {
+      callHtml("step0");
+      ChatbotMain = new bootstrap.Modal(document.getElementById("ChatbotMain"));
+      ChatbotMain.show();
+	  hideshowFloat('h'); 
+    }
+
+    function step0RdoLisner() {
+      /* index화면에서 최초 클릭 */
+      $("#ui-chatbot-x").on("click", function () {
+        callHtml("step1");
+        $("#btn-back").attr("data-step", "step1");
+        $("#btn-back").show();
+      });
+
+      /* index화면에서 최초 클릭 */
+      $("#ui-chatbot-o").on("click", function () {
+        $.ajax({
+          url: "/svc/chatbot/experienced",
+          method: "get",
+          dataType: "html",
+          success: function (data) {
+            /* modal body css 변경 */
+            $(".modal-content").removeClass().addClass("modal-content F-CB02-01-page");
+
+            /* modal body에 컨텐츠 덮어쓰기 */
+            $("#modal-contents").html(data);
+
+            /* modal footer 보여주기 */
+            $("#btGoFirst").show();
+
+            /* 뒤로가기버튼 */
+            $("#btn-back").show();
+            $("#step").val("experienced");
+          },
+        });
+      });
+    }
+  </script>
+  <!-- Container -->
+  <main role="main" class="container">
+    <!-- content -->
+    <div class="content F-M01-page">
+	  
+	  <!-- 메인 비주얼 섹션 -->
+		<section class="visual-sec">
+			<div class="swiper visual-swiper">
+				<div class="swiper-wrapper">
+					<div class="swiper-slide"  th:each="item : ${bigBannerList}">
+						<div class="visual" th:style="|background-color: ${item.bgColor};|"
+						     th:attr="data-theme=${item.logoColor == 'W' ? 'white' : 'black'}">
+							<a th:href="@{${item.url}}" class="visual-link">
+								<img th:src="@{${item.imagePc}}" th:alt="${item.bannerAlt}" class="only-pc"/>
+								<img th:src="@{${item.imageMo}}" th:alt="${item.bannerAlt}" class="only-mo"/>
+							</a>
+						</div>
+					</div>
+				</div>
+				
+				<div class="swiper-controler">
+					<div class="in-sec">
+						<div class="swiper-controler-group">
+							<div class="swiper-pagination"></div>
+							<div class="swiper-autoplay">
+								<button type="button" class="ui-btn is-playing" id="playPauseBtn"></button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- // 비주얼 섹션 -->
+	  
+	  
+	  
+	  
+	  
+
+      <!-- 메인 타임딜 섹션 -->
+      <section class="deal-sec time-deal">
+        <!-- 3차 수정 : 메인 레이아웃 변경 sec-outer 추가 -->
+        <th:block th:if="${dimmedSec gt 0}">
+          <!-- Case 타임딜 오픈 전 (퍼블 확인용으로 3초뒤 숨김처리) -->
+          <div class="deal-before sec-outer" id="dealBefore">
+            <div class="sec-inner">
+              <div class="sec-header">
+                <!-- <h2 class="sec-tit">세모통 얼리버드 추천딜<i class="ui-icn icn-24-clock"></i></h2> -->
+                <h2 class="sec-tit">세모통 타임딜<i class="ui-icn icn-24-clock-wh"></i></h2>
+                <p class="sec-explain" th:text="${timeDeal.dim_title}"></p>
+              </div>
+              <div class="sec-body">
+                <div class="deal-timer">
+                  <input type="hidden" id="dimmedTimer" th:value="${dimmedSec}" />
+                  <div class="timer-labels">
+                    <span class="label-num"><span id="dh-1">0</span></span>
+                    <span class="label-num"><span id="dh-2">0</span></span>
+                    <span class="label-num"><span id="dh-3">0</span></span>
+                    <span class="label-split" aria-label=":"></span>
+                    <span class="label-num"><span id="dm-1">0</span></span>
+                    <span class="label-num"><span id="dm-2">0</span></span>
+                    <span class="label-split" aria-label=":"></span>
+                    <span class="label-num"><span id="ds-1">0</span></span>
+                    <span class="label-num"><span id="ds-2">0</span></span>
+                    <span class="label-text">후</span>
+                    <span class="label-text">오픈됩니다!</span>
+                  </div>
+                </div>
+                <div class="deal-share">
+                  <div class="deal-share-char">
+                    <img src="/images/common/img-80-int-char.png" alt="" />
+                  </div>
+                  <div class="deal-share-box">
+                    <p class="tit"><em>세모통 타임딜</em> 공유하기</p>
+                    <button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#shareModalMain">
+                      <i class="ui-icn icn-20-plan-share-gr" aria-label="공유하기"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- //Case 타임딜 오픈 전 -->
+        </th:block>
+        <!-- Case 타임딜 오픈 후 -->
+        <th:block th:if="${timeDeal != null}">
+          <div class="sec-outer">
+            <div class="sec-inner">
+              <div class="sec-header">
+                <h2 class="sec-tit">세모통 타임딜<i class="ui-icn icn-24-clock"></i></h2>
+                <button
+                  type="button"
+                  class="ui-btn btn-more static"
+                  th:attr="onclick=|location.href='/event/eventDetail/${timeDeal.eventId}'|"
+                >
+                  <span>전체보기</span>
+                  <i class="ui-icn icn-14-more-pr" aria-label="더보기"></i>
+                </button>
+                <button
+                  type="button"
+                  class="ui-btn btn-more"
+                  data-bs-toggle="modal"
+                  data-bs-target="#FM01P01Modal"
+                  th:if="${timeDeal.pop_image !=null && timeDeal.pop_image !='' }"
+                >
+                  <span>타임딜?</span>
+                </button>
+              </div>
+              <div class="sec-body">
+                <div class="deal-timer">
+                  <p class="timer-txt" th:text="${timeDeal.title}"></p>
+                  <input type="hidden" id="dealTimer" th:value="${sec}" />
+                  <div class="timer-labels">
+                    <span class="label-num"><span id="th-1">0</span></span>
+                    <span class="label-num"><span id="th-2">0</span></span>
+                    <span class="label-num"><span id="th-3">0</span></span>
+                    <span class="label-split" aria-label=":"></span>
+                    <span class="label-num"><span id="tm-1">0</span></span>
+                    <span class="label-num"><span id="tm-2">0</span></span>
+                    <span class="label-split" aria-label=":"></span>
+                    <span class="label-num"><span id="ts-1">0</span></span>
+                    <span class="label-num"><span id="ts-2">0</span></span>
+                  </div>
+                </div>
+
+                <!-- 추천딜 목록 -->
+                <div class="swiper deal-swiper">
+                  <div class="swiper-wrapper">
+                    <div class="swiper-slide" th:each="timeDealList : ${timeDealList}">
+                      <!-- 추천딜 상품 -->
+                      <div
+                        class="deal-card"
+                        role="button"
+                        tabindex="0"
+                        th:attr="onclick=|goDetailMain(${timeDealList.plan_id},'${timeDealList.company_nm}','${timeDealList.link_url}','${timeDeal.link_url}');|"
+                      >
+                        <div class="card-body">
+                          <div class="card-label">
+                            <em class="label-best" th:if="${timeDealList.type eq 'BEST'}">BEST</em>
+                            <em class="label-best" th:if="${timeDealList.type eq 'RECOM'}">추천</em>
+                          </div>
+                          <h3 class="card-info" th:text="${timeDealList.plan_content}"></h3>
+                          <p class="card-tit" style="white-space: normal">
+                            <th:block th:if="${timeDealList.plan_name_smt_sub == null or timeDealList.plan_name_smt_sub == ''}">
+                              <th:block th:if="${timeDealList.sup_data_val == 10238976}"> 무제한 </th:block>
+                              <th:block th:if="${timeDealList.sup_data_val < 10238976}">
+                                <th:block th:if="${timeDealList.sup_data_val >= 1024}">
+                                  월 <th:block th:text="${#numbers.formatDecimal(timeDealList.sup_data_val / 1024.0, 0, (timeDealList.sup_data_val % 1024 == 0) ? 0 : 1)}"></th:block> GB
+                                </th:block>
+                                <th:block th:if="${timeDealList.sup_data_val < 1024}">
+                                  월 <th:block th:text="${timeDealList.sup_data_val}"></th:block> MB
+                                </th:block>
+                              </th:block>
+                              <th:block th:if="${timeDealList.daily_data > 0}">
+                                + 매일
+                                <th:block th:if="${timeDealList.daily_data >= 1024}">
+                                  <th:block th:text="${timeDealList.daily_data / 1024}"></th:block> GB
+                                </th:block>
+                                <th:block th:if="${timeDealList.daily_data < 1024}">
+                                  <th:block th:text="${timeDealList.daily_data}"></th:block> MB
+                                </th:block>
+                              </th:block>
+                              <th:block th:if="${timeDealList.sup_qos > 0}">
+                                +
+                                <th:block th:if="${timeDealList.sup_qos >= 1024}">
+                                  <th:block th:text="${timeDealList.sup_qos / 1024}"></th:block> MBps
+                                </th:block>
+                                <th:block th:if="${timeDealList.sup_qos < 1024}">
+                                  <th:block th:text="${timeDealList.sup_qos}"></th:block> KBps
+                                </th:block>
+                              </th:block>
+                            </th:block>
+
+                            <th:block th:unless="${timeDealList.plan_name_smt_sub == null or timeDealList.plan_name_smt_sub == ''}">
+                              <th:block th:text="${timeDealList.plan_name_smt_sub}"></th:block>
+                            </th:block>
+                          </p>
+                        </div>
+                        <div class="card-footer" th:classappend="${timeDealList.secondView} ? has-point : ''">
+                          <p class="card-partner"><img th:src="@{${timeDealList.logo_img}}" /></p>
+                          <th:block th:if="${timeDealList.secondView}">
+                            <p class="card-point"><em class="tit">실제체감가</em> [[${timeDealList.second_price}]]</p>
+                          </th:block>
+                          <th:block th:unless="${timeDealList.secondView}">
+                            <p
+                              class="card-charge"
+                              th:text="|월 ${#numbers.formatInteger(timeDealList.sale_price, 0, 'COMMA')}원|"
+                            >
+                              월 18,700원
+                            </p>
+                          </th:block>
+                        </div>
+                      </div>
+                      <!-- 추천딜 상품 -->
+                    </div>
+                  </div>
+                </div>
+                <!-- 8차 수정 : 추천딜 스와이프 버튼 추가 -->
+                <button type="button" class="ui-btn deal-button-prev">
+                  <i class="ui-icn icn-28-arw" aria-label="Prev"></i>
+                </button>
+                <button type="button" class="ui-btn deal-button-next">
+                  <i class="ui-icn icn-28-arw" aria-label="Next"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- //Case 타임딜 오픈 후 -->
+        </th:block>
+      </section>
+      <!-- // 타임딜 섹션 -->
+
+      <!-- 메인 추천딜 섹션 -->
+      <section class="deal-sec">
+        <!-- 3차 수정 : 메인 레이아웃 변경 sec-outer 추가 -->
+        <th:block th:if="${timeDeal == null && mainDeal != null}">
+          <div class="sec-outer">
+            <div class="sec-inner">
+              <div class="sec-header">
+                <h2 class="sec-tit">세모통 추천딜</h2>
+                <th:block th:if="${mainDeal.link_url != null && mainDeal.link_url != ''}">
+                  <button
+                    type="button"
+                    class="ui-btn btn-more"
+                    th:attr="onclick=|goMainDealLink('${mainDeal.link_url}','${mainDeal.link_type}')|"
+                  >
+                    <span>전체보기</span>
+                    <i class="ui-icn icn-14-more-pr" aria-label="더보기"></i>
+                  </button>
+                </th:block>
+              </div>
+              <div class="sec-body">
+                <div class="deal-timer">
+                  <p class="timer-txt" th:text="${mainDeal.title}"></p>
+                </div>
+
+                <!-- 추천딜 목록 -->
+                <div class="swiper deal-swiper">
+                  <div class="swiper-wrapper">
+                    <div class="swiper-slide" th:each="mainDealList, status : ${mainDealList}">
+                      <!-- 추천딜 상품 -->
+                      <div
+                        class="deal-card"
+                        role="button"
+                        th:tabindex="${status.index}"
+                        th:attr="onclick=|goDetailMain(${mainDealList.plan_id},'${mainDealList.company_nm}','${mainDealList.link_url}','${mainDeal.link_url}');|"
+                      >
+                        <div class="card-body">
+                          <div class="card-label">
+                            <em class="label-best" th:if="${mainDealList.type eq 'BEST'}">BEST</em>
+                            <em class="label-best" th:if="${mainDealList.type eq 'RECOM'}">추천</em>
+                          </div>
+                          <h3 class="card-info" th:text="${mainDealList.plan_content}"></h3>
+                          <p class="card-tit" style="white-space: normal">
+                            <th:block th:if="${mainDealList.plan_name_smt_sub == null or mainDealList.plan_name_smt_sub == ''}">
+                              <th:block th:if="${mainDealList.sup_data_val == 10238976}"> 무제한 </th:block>
+							  
+                              <th:block th:if="${mainDealList.sup_data_val < 10238976}">
+                                <th:block th:if="${mainDealList.sup_data_val >= 1024}">
+                                  월 <th:block th:text="${#numbers.formatDecimal(mainDealList.sup_data_val / 1024.0, 0, (mainDealList.sup_data_val % 1024 == 0) ? 0 : 1)}"></th:block>GB
+                                </th:block>
+                                <th:block th:if="${mainDealList.sup_data_val < 1024}">
+                                  월 <th:block th:text="${mainDealList.sup_data_val}"></th:block>MB
+                                </th:block>
+                              </th:block>
+                              <th:block th:if="${mainDealList.daily_data > 0}">
+                                + 매일
+                                <th:block th:if="${mainDealList.daily_data >= 1024}">
+                                  <th:block th:text="${mainDealList.daily_data / 1024}"></th:block>GB
+                                </th:block>
+                                <th:block th:if="${mainDealList.daily_data < 1024}">
+                                  <th:block th:text="${mainDealList.daily_data}"></th:block>MB
+                                </th:block>
+                              </th:block>
+                              <th:block th:if="${mainDealList.sup_qos > 0}">
+                                +
+                                <th:block th:if="${mainDealList.sup_qos >= 1024}">
+                                  <th:block th:text="${mainDealList.sup_qos / 1024}"></th:block>MBps
+                                </th:block>
+                                <th:block th:if="${mainDealList.sup_qos < 1024}">
+                                  <th:block th:text="${mainDealList.sup_qos}"></th:block>KBps
+                                </th:block>
+                              </th:block>
+                            </th:block>
+
+                            <th:block th:unless="${mainDealList.plan_name_smt_sub == null or mainDealList.plan_name_smt_sub == ''}" >
+                              <th:block th:text="${mainDealList.plan_name_smt_sub}"></th:block>
+                            </th:block>
+                          </p>
+                        </div>
+                        <div class="card-footer" th:classappend="${mainDealList.secondView} ? has-point : ''">
+                          <p class="card-partner">
+                            <img th:src="@{${mainDealList.logo_img}}" th:alt="${mainDealList.company_nm}" />
+                          </p>
+
+                          <th:block th:if="${mainDealList.secondView}">
+                            <p class="card-point"><em class="tit">실제체감가</em> [[${mainDealList.second_price}]]</p>
+                          </th:block>
+                          <th:block th:unless="${mainDealList.secondView}">
+                            <p
+                              class="card-charge"
+                              th:text="|월 ${#numbers.formatInteger(mainDealList.sale_price, 0, 'COMMA')}원|"
+                            >
+                              월 18,700원
+                            </p>
+                          </th:block>
+                        </div>
+                      </div>
+                      <!-- 추천딜 상품 -->
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="ui-btn deal-button-prev">
+                  <i class="ui-icn icn-28-arw" aria-label="Prev"></i>
+                </button>
+                <button type="button" class="ui-btn deal-button-next">
+                  <i class="ui-icn icn-28-arw" aria-label="Next"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </th:block>
+      </section>
+      <!-- // 추천딜 섹션 -->
+
+      <!-- 내게 맞는 요금제 섹션 -->
+      <section class="ratePlanA-sec">
+        <div class="sec-inner">
+          <div class="sec-header">
+            <h2 class="sec-tit">데이터 얼마나 사용하세요?</h2>
+          </div>
+          <div class="sec-body">
+            <!-- 요금제 공통 타입 A : 요금제 리스트 타입 -->
+            <!-- 4차 수정 : 내게 맞는 요금제 현행화 -->
+            <div class="swiper ratePlanA-swiper">
+              <ul class="ratePlanA-list swiper-wrapper">
+                <li
+                  class="ratePlanA-item swiper-slide"
+                  th:each="recomItem, status : ${recomPlanList}"
+                  th:onclick="|navigateTo('/pbm/plan/recomPlanList?mngId=${recomItem.id}')|"
+                >
+                  <div class="ratePlanA-card" role="button" tabindex="0">
+                    <div class="card-thumb">
+                      <img th:src="@{${recomItem.iconImage}}" alt="" />
+                    </div>
+                    <div class="card-body">
+                      <p class="card-tit"><strong th:text="${recomItem.title}">가성비</strong></p>
+                      <p
+                        class="card-charge"
+                        th:text="|월 ${#numbers.formatInteger(recomItem.lowestPrice, 0, 'COMMA')}원|"
+                      >
+                        월 4,400원 ~
+                      </p>
+                      <p class="card-explain"><span class="only-pc" th:utext="${recomItem.subTitlePc}">와이파이를 주로 사용하는<br />실속 사용자 추천</span><span class="only-mo" th:utext="${recomItem.subTitleMo}">와이파이를 주로 사용하는 실속 사용자 추천</span></p>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <button type="button" class="ui-btn ratePlanA-button-prev">
+              <i class="ui-icn icn-28-arw" aria-label="Prev"></i>
+            </button>
+            <button type="button" class="ui-btn ratePlanA-button-next">
+              <i class="ui-icn icn-28-arw" aria-label="Next"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+      <!-- 내게 맞는 요금제 섹션 -->
+
+      <!-- 요금제 추천 섹션 -->
+      <section class="recom-sec">
+        <div class="sec-inner">
+          <div class="sec-header">
+            <h2 class="sec-tit">이런 요금제는 어떠세요?</h2>
+          </div>
+          <div class="sec-body">
+            <ul class="recom-list">
+              <li class="recom-item" th:each="list : ${chargeBannerList}">
+                <th:block th:if="${#strings.isEmpty(list.bannPlanIds)}">
+                  <img
+                    th:src="@{${list.imageMo}}"
+                    th:alt="${list.bannerAlt}"
+                    class="only-mo"
+                    th:attr="onclick=|navigateTo('${list.url}');|"
+                    role="button"
+                  />
+                  <img
+                    th:src="@{${list.imagePc}}"
+                    th:alt="${list.bannerAlt}"
+                    class="only-pc"
+                    th:attr="onclick=|navigateTo('${list.url}');|"
+                    role="button"
+                  />
+                </th:block>
+                <th:block th:if="${not #strings.isEmpty(list.bannPlanIds)}">
+                  <img
+                    th:src="@{${list.imageMo}}"
+                    th:alt="${list.bannerAlt}"
+                    class="only-mo"
+                    th:attr="onclick=|bannerPlan('${list.id}')|"
+                    role="button"
+                  />
+                  <img
+                    th:src="@{${list.imagePc}}"
+                    th:alt="${list.bannerAlt}"
+                    class="only-pc"
+                    th:attr="onclick=|bannerPlan('${list.id}')|"
+                    role="button"
+                  />
+                </th:block>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+      <!-- // 요금제 추천 섹션 -->
+
+      <!-- 이벤트 섹션 -->
+      <!-- 2차 수정 : 이벤트 배너 위치 변경 -->
+      <section class="event-sec">
+        <div class="sec-inner">
+          <!-- 7차 수정 : 이벤트 목록 구조 적용 -->
+          <ul class="event-list">
+            <li class="event-item" th:each="list : ${middleBannerList}">
+              <button type="button" class="event-bnr" th:attr="onclick=|navigateTo('${list.url}');|">
+                <img th:src="@{${list.imageMo}}" th:alt="${list.bannerAlt}" class="only-mo" />
+                <img th:src="@{${list.imagePc}}" th:alt="${list.bannerAlt}" class="only-pc" />
+              </button>
+            </li>
+          </ul>
+        </div>
+      </section>
+      <!-- // 이벤트 섹션 -->
+
+      <!-- 특별한 이벤트 섹션 -->
+      <section class="special-event-sec">
+        <div class="sec-inner">
+          <div class="sec-header">
+            <h2 class="sec-tit">세모통 이벤트</h2>
+            <button type="button" class="ui-btn btn-more" onclick="location.href='/event/eventList'">
+              <span>더보기</span>
+              <i class="ui-icn icn-14-more-gr" aria-label="더보기"></i>
+            </button>
+          </div>
+          <div class="sec-body">
+            <ul class="special-event-list">
+              <li class="special-event-item" th:each="list : ${eventBannerList}">
+                <button type="button" class="special-event-bnr" th:attr="onclick=|navigateTo('${list.url}');|">
+                  <img th:src="@{${list.imageMo}}" th:alt="${list.bannerAlt}" class="only-mo" />
+                  <img th:src="@{${list.imagePc}}" th:alt="${list.bannerAlt}" class="only-pc" />
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+      <!-- // 특별한 이벤트 섹션 -->
+
+      <!-- 리뷰 섹션 -->
+      <section class="review-sec">
+        <div class="sec-inner">
+          <div class="sec-header">
+            <h2 class="sec-tit">세모통 고객님들의 리뷰예요</h2>
+            <button type="button" class="ui-btn btn-more" onclick="ReviewPopOpen();">
+              <span>더보기</span>
+              <i class="ui-icn icn-14-more-gr" aria-label="더보기"></i>
+            </button>
+          </div>
+          <div class="sec-body">
+            <!-- 리뷰 스와이프 -->
+            <div class="swiper review-swiper">
+              <div class="swiper-wrapper">
+                <div class="swiper-slide" th:each="itm : ${rvresultList}" onclick="ReviewPopOpen();">
+                  <!-- 3차 수정 : 리뷰 role="button" 적용 -->
+                  <div class="review-card" role="button">
+                    <div class="card-telecom">
+                      <img th:src="@{${itm.planLogoImg}}" th:alt="${itm.companyNm}" />
+                    </div>
+                    <div class="card-rating" aria-label="평점 5점">
+                      <i class="ui-icn icn-16-star-bl" aria-hidden="true"></i>
+                      <strong class="val" th:text="${itm.score}"></strong>
+                    </div>
+                    <p class="card-name" th:text="${@maskingUtils.maskName(itm.username)}"></p>
+                    <p class="card-cont" th:text="${itm.content}"></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- // 리뷰 리스트 -->
+          </div>
+        </div>
+      </section>
+      <!-- // 리뷰 섹션 -->
+
+      <!-- 파트너사 섹션 -->
+      <section class="partner-sec">
+        <div class="sec-inner">
+          <div class="sec-header">
+            <h2 class="sec-tit">세모통의 파트너사를 소개합니다.</h2>
+            <button type="button" class="ui-btn btn-more" onclick="navigateTo('/mbm/company/companeyList');">
+              <span>더보기</span>
+              <i class="ui-icn icn-14-more-gr" aria-label="더보기"></i>
+            </button>
+          </div>
+          <div class="sec-body">
+            <!-- 파트너사 -->
+            <div class="swiper partner-swiper partner-swiper-test">
+              <div class="swiper-wrapper partnerList"></div>
+            </div>
+            <!-- // 파트너사 공통 -->
+          </div>
+        </div>
+      </section>
+      <!-- // 파트너사 섹션 -->
+    </div>
+    <!-- // content -->
+  </main>
+  <!-- // Container -->
+
+  <!-- modal default -->
+  <div
+    class="modal modal-default fade"
+    id="FM01P01Modal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="FM01P01ModalLabel"
+    aria-hidden="true"
+    th:if="${timeDeal != null}"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content F-M01-P01-page">
+        <div class="modal-header">
+          <h3 class="modal-title blind" id="FM01P01ModalLabel">타임딜 안내</h3>
+          <button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <i class="ui-icn icn-32-close-wh" aria-label="닫기"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- 이벤트 혜택 섹션 -->
+          <section class="timedeal-sec">
+            <div class="sec-inner">
+              <div class="timedeal-head">
+                <img th:src="@{${timeDeal.pop_image}}" th:alt="${timeDeal.title}" />
+              </div>
+            </div>
+          </section>
+          <!-- // 이벤트 혜택 섹션 -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- // modal default -->
+
+  <!-- 공유하기 Modal Alert -->
+  <div
+    class="modal modal-alert fade sharemodal"
+    id="shareModalMain"
+    tabindex="-1"
+    role="alertdialog"
+    aria-labelledby="shareModalMainLabel"
+    aria-hidden="true"
+  >
+    <!-- <div class="modal modal-alert fade sharemodal" id="shareModal" tabindex="-1" role="alertdialog" aria-labelledby="shareModalLabel" style="display:none;"> -->
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="shareModalMainLabel">공유하기</h3>
+        </div>
+        <div class="modal-body">
+          <section class="share-sec">
+            <button type="button" class="ui-btn" id="kakaoShareBtn" onclick="createKakaoBtnMain();">
+              <i class="ui-icn icn-80-kakao" aria-hidden="true"></i>
+              <span>카카오톡</span>
+            </button>
+            <button type="button" class="ui-btn" onclick="urlCopyBtn('main');" id="urlCopyBtnId">
+              <i class="ui-icn icn-80-copy" aria-hidden="true"></i>
+              <span>URL 복사</span>
+            </button>
+          </section>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal" id="closeShareModal">
+            <span>닫기</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- // 공유하기 Modal Alert -->
+
+  <!-- ==================================== 챗봇 ================================= -->
+
+  <!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+	-->
+  <!-- modal default -->
+  <div
+    class="modal fade modal-full"
+    id="ChatbotMain"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="ChatbotMainLabel"
+    aria-hidden="true"
+    data-bs-backdrop="static"
+  >
+    <input type="hidden" id="step" value="step1" />
+    <!-- 현재 페이지 표시 -->
+    <div class="modal-dialog">
+      <div class="modal-content F-CB01-page" id="modal-content-css">
+        <div class="modal-header">
+          <button type="button" class="ui-btn" id="btn-back" style="display: none">
+            <i class="ui-icn icn-32-back-bk" aria-label="뒤로가기"></i>
+          </button>
+          <h3 class="modal-title blind" id="ChatbotMainLabel">추천 챗봇</h3>
+          <button type="button" class="ui-btn btn-close chatbot-close" aria-label="Close">
+            <i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+          </button>
+        </div>
+        <div class="modal-progress" style="display: none">
+          <!-- 진행율 프로그레스 -->
+          <div class="progress-step">
+            <span class="progress-value" aria-label="Step 1/6" style="width: 25%"></span>
+          </div>
+          <!-- // 진행율 프로그레스 -->
+        </div>
+        <div class="modal-body" id="modal-contents">
+          <!-- 모통봇 소개 섹션 -->
+          <section class="cb-intro-sec">
+            <div class="sec-inner">
+              <div class="intro-img">
+                <i class="ui-icn icn-62-motong" aria-hidden="true"></i>
+              </div>
+              <div class="intro-con">
+                <p>
+                  안녕하세요. 고객님께 딱 맞는<br />
+                  요금을 추천해드릴 모통봇 이에요.
+                </p>
+                <p>모통봇이 알아서 잘 딱 깔끔하고<br />센스있게 알려드릴게요.</p>
+              </div>
+            </div>
+          </section>
+          <!-- // 모통봇 소개 섹션 -->
+
+          <!-- 사용자 유형선택 섹션 -->
+          <section class="cb-selection-sec">
+            <div class="sec-inner">
+              <p class="selection-tit">알뜰폰, 잘 알고 계세요?</p>
+              <div class="selection-frm">
+                <!-- 선택된 상태 : is-selected 클래스 -->
+                <label class="selection-rdo" id="ui-chatbot-o">
+                  <img src="/images/common/img-chatbot-o.png" alt="Yes" />
+                  <span class="ui-rdo">
+                    <input
+                      type="radio"
+                      name="frmTypeRadio1"
+                      onchange="setRadioSelected('frmTypeRadio1', '.selection-rdo')"
+                    />
+                    <span class="rdo"
+                      ><span><em>네,</em> 알뜰폰 사용해 본 적이 <br />있어서 잘 알아요.</span></span
+                    >
+                  </span>
+                </label>
+                <label class="selection-rdo" id="ui-chatbot-x">
+                  <img src="/images/common/img-chatbot-x.png" alt="No" />
+                  <span class="ui-rdo">
+                    <input
+                      type="radio"
+                      name="frmTypeRadio1"
+                      onchange="setRadioSelected('frmTypeRadio1', '.selection-rdo')"
+                    />
+                    <span class="rdo"
+                      ><span><em>아니오.</em> 알뜰폰이 <br />처음이에요.</span></span
+                    >
+                  </span>
+                </label>
+              </div>
+            </div>
+          </section>
+          <!-- // 사용자 유형선택 섹션 -->
+        </div>
+
+        <div class="modal-footer" style="display: none" id="btGoFirst">
+          <button type="button" class="ui-btn btn-action primary" id="first-btn">
+            <span>처음으로</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- // modal default -->
+
+  <!-- Modal Confirm -->
+  <div
+    class="modal modal-confirm fade"
+    id="confirmModal-2"
+    tabindex="-1"
+    role="alertdialog"
+    data-bs-backdrop="static"
+    aria-labelledby="confirmModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          <section class="msg-sec">
+            <h4 class="sec-tit">처음부터 다시 시작하시겠어요?</h4>
+            <!-- <p class="sec-txt"><span class="txt-primary">Confirm 설명 텍스트</span>가 들어가는 영역입니다.</p> -->
+          </section>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal">
+            <span>계속 할게요</span>
+          </button>
+          <button type="button" class="ui-btn btn-modal primary" id="go-first">
+            <span>네</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- // Modal Confirm -->
+
+  <!-- Modal Confirm -->
+  <div
+    class="modal modal-confirm fade"
+    id="confirmModal"
+    tabindex="-1"
+    role="alertdialog"
+    data-bs-backdrop="static"
+    aria-labelledby="confirmModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          <section class="msg-sec">
+            <h4 class="sec-tit">요금을 추천해드리는 중이에요. 그만 하시겠어요?</h4>
+            <!-- <p class="sec-txt"><span class="txt-primary">Confirm 설명 텍스트</span>가 들어가는 영역입니다.</p> -->
+          </section>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal">
+            <span>계속 할게요</span>
+          </button>
+          <button type="button" class="ui-btn btn-modal primary" id="win-close">
+            <span>네</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- // Modal Confirm -->
+
+  <!--
+		[모달 가이드]
+		모달 효과 : fade (공통)
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+		// 1차 수정 : fade-pc 사용안함, fade 공통으로 사용
+	-->
+  <!-- modal default -->
+  <div
+    class="modal fade modal-basic"
+    id="eventModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="eventModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content F-M01-P02-page">
+        <div class="modal-body mar-b0">
+          <!-- 컨텐츠 섹션 -->
+          <section class="event-layer-sec">
+            <div class="event-layer-bnr">
+              <div class="swiper">
+                <div class="swiper-wrapper">
+                  <div class="swiper-slide">
+                    <a href="#">
+                      <img th:src="@{/images/upload/@bnr-main-modal-pc.png}" alt="" class="only-mo" />
+                      <img th:src="@{/images/upload/@bnr-main-modal-pc.png}" alt="" class="only-pc" />
+                    </a>
+                  </div>
+                  <div class="swiper-slide">
+                    <a href="#">
+                      <img th:src="@{/images/upload/@bnr-main-modal-pc.png}" alt="" class="only-mo" />
+                      <img th:src="@{/images/upload/@bnr-main-modal-pc.png}" alt="" class="only-pc" />
+                    </a>
+                  </div>
+                  <div class="swiper-slide">
+                    <a href="#">
+                      <img th:src="@{/images/upload/@bnr-main-modal-pc.png}" alt="" class="only-mo" />
+                      <img th:src="@{/images/upload/@bnr-main-modal-pc.png}" alt="" class="only-pc" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="swiper-pagination"></div>
+            </div>
+            <div class="event-layer-close">
+              <label class="ui-chk chk-style1">
+                <input type="checkbox" name="sCheck1" id="sCheck11" />
+                <span class="chk"><span>오늘 하루 보지 않기</span></span>
+              </label>
+              <button type="button" data-bs-dismiss="modal" aria-label="Close" onclick="hideshowFloat('s');">
+                <i class="ui-icn icn-24-close-bk" aria-hidden="true"></i>
+                <span class="blind">닫기</span>
+              </button>
+            </div>
+          </section>
+          <!-- // 컨텐츠 섹션 -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- // modal default -->
+</html>

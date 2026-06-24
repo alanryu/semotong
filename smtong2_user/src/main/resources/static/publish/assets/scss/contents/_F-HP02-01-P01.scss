@@ -1,0 +1,56 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 핸드폰
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 핸드폰 페이지
+.F-HP02-01-P01-page {
+	// s: 상담신청 섹션
+	.consult-frm-sec {
+		padding-top: 16rem;
+
+		.sec-header {
+			font-weight: 600;
+			font-size: 18rem;
+		}
+		.sec-body {
+			margin-top: 16rem;
+		}
+		.consult-msg {
+			position: relative;
+			padding: 12rem 16rem;
+			border-radius: 4rem;
+			background-color: #EFF0F0;
+			word-break: keep-all;
+			dt {
+				font-weight: 600;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #828588;
+			}
+			dd {
+				margin-top: 2rem;
+				font-weight: 500;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #36383A;
+				& + dt {
+					margin-top: 10rem;
+				}
+			}
+		}
+		.consult-frm {
+			margin-top: 32rem;
+			@include basic-frm;
+		}
+
+		.consult-links {
+			display: flex;
+			justify-content: center;
+			gap: 12rem;
+			margin-top: 32rem;
+		}
+	}
+	// e: 상담신청 섹션
+}
+// e: 핸드폰 페이지

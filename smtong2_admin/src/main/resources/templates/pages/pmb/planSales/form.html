@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='08',menuId ='01'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+
+	<script type="text/javascript">
+		var url = $(location).attr('href');
+		var searchParams = new URL(url).searchParams;
+		var id = searchParams.get('id');
+
+		$(document).ready(function(){
+			/* 요금제 추가 버튼 */
+			$('#bnfAddBtn').on('click', function(){
+
+				if ( $('input[name=planChk]').length < 20 ) {
+					$('.bnf-select__overlay, .bnf-select').show();
+				}
+			});
+
+			/* 요금제 닫기 버튼 */
+			$('.plan-add-cls').on('click', function(){
+				$('.bnf-select__overlay, .bnf-select').hide();
+			});
+
+			/* 요금제 추가 레이어팝업 등록 버튼 */
+			$('#plan-add').on('click', function(){
+				var id = $('input[name=popPlanList]:checked').val();
+				var jsonStr = $('input[name=popPlanList]:checked').data('json');
+
+				var addFlg = true;
+				$('.add-uuid').each(function(){
+					if ( $(this).text() == jsonStr.uuid ) {
+						addFlg = false;
+					}
+				})
+
+				if (addFlg) {
+					if ( id != undefined ) {
+						var html = '';
+						html += '<tr class="bnf-select__row">';
+						html += '    <td class="bnf-select__td">';
+						html += '        <input type="hidden" name="bannerPlanList" value="0">';
+						html += '        <input type="hidden" name="planlist" value="' + id + '">';
+						html += '        <input type="checkbox" name="planChk" class="bnf-select__radio" value="Y">';
+						html += '    </td>';
+						html += '    <td class="bnf-select__td add-uuid">' + jsonStr.uuid + '</td>';
+						html += '    <td class="bnf-select__td">';
+						html += '        <a href="javascirpt:;">' + jsonStr.planName + '</a>';
+						html += '    </td>';
+						html += '</tr>';
+
+						$('#plan-add-chk').append(html);
+						$('.bnf-select__overlay, .bnf-select').hide();
+					}
+				} else {
+					const modalEl = document.getElementById('commonAlertModalForm');
+					const modal = new bootstrap.Modal(modalEl);
+					modal.show();
+				}
+			});
+
+			/* 요금제 검색 enter */
+			$('#keyword').on('keyup', function(key){
+				if (key.keyCode == 13) {
+					schPlanList();
+				}
+			});
+
+			/* 수정 */
+			if ( id != null && id != '' ) {
+				$('#fileText1').val($('#orgImagePc').val());
+				$('#salesId').prop('readonly', true);
+				$('.btn-proc').html('수정');
+				$('#findSales').hide();
+				if ( $('#orgImagePc').val() != '' ) {
+					$('#img-del-btn').show();
+				}
+			}
+
+
+			/* 파일 change 이벤트 */
+			$('#fileInput1').on('change', function(){
+				if ( $(this).val() != '' ) {
+					$('#img-del-btn').show();
+					$('#imageDelete').val('N');
+				} else {
+					$('#img-del-btn').hide();
+				}
+			});
+
+			/* 파일 삭제 버튼 */
+			$('#img-del-btn').on('click', function(){
+				$('#fileInput1, #fileText1').val('');
+				$('#img-del-btn, #preview1').hide();
+				$('#imageDelete').val('Y');
+			});
+
+			/* 등록 확인 버튼 */
+			$('#confirm').on('click', function(){
+				$(location).attr('href', '/pmb/plan-sales/list');
+			});
+
+
+			/* 영업자 찾기 버튼 */
+			$('#findSales').on('click', function(){
+					$('.sales-select__overlay, .sales-select').show();
+					schSalesList();
+			});
+
+			/* 영업자 닫기 버튼 */
+			$('.sales-add-cls').on('click', function(){
+					$('.sales-select__overlay, .sales-select').hide();
+			});
+
+			/* 영업자 선택 등록 버튼 */
+			$('#sales-add').on('click', function(){
+					var selectedSales = $('input[name=popSalesList]:checked');
+					if (selectedSales.length > 0) {
+							var salesData = selectedSales.data('json');
+							$('#salesId').val(salesData.adminId);
+							$('.sales-select__overlay, .sales-select').hide();
+					}
+			});
+
+			/* 영업자 검색 enter */
+			$('#salesKeyword').on('keyup', function(key){
+					if (key.keyCode == 13) {
+							schSalesList();
+					}
+			});
+
+
+				/* 영업자 테이블 로우 클릭 이벤트 */
+			$(document).on('click', '.sales-select__row', function(){
+					// 클릭된 로우의 라디오 버튼 선택
+					$(this).find('input[name=popSalesList]').prop('checked', true);
+
+					// 다른 로우들의 선택 상태 제거
+					$('.sales-select__row').removeClass('selected');
+					// 현재 로우에 선택 상태 추가
+					$(this).addClass('selected');
+			});
+
+			/* 영업자 테이블 로우 더블클릭으로 바로 선택 */
+			$(document).on('dblclick', '.sales-select__row', function(){
+					// 클릭된 로우의 라디오 버튼 선택
+					$(this).find('input[name=popSalesList]').prop('checked', true);
+
+					// 바로 선택 처리
+					var selectedSales = $(this).find('input[name=popSalesList]');
+					if (selectedSales.length > 0) {
+							var salesData = selectedSales.data('json');
+							$('#salesId').val(salesData.adminId);
+							$('.sales-select__overlay, .sales-select').hide();
+					}
+			});
+
+		})
+
+		 /* 영업자 검색 @@@@@@@@@@@@@@@*/
+    function schSalesList() {
+        var params = {
+            keyword: $('#salesKeyword').val()
+        }
+
+        $.ajax({
+            url: '/pmb/plan-sales/saleslist',
+            type: 'post',
+            data: JSON.stringify(params),
+            dataType: 'json',
+            contentType: 'application/json',
+            async: false,
+            success: function (data) {
+
+            	console.log("🚀 ~ schSalesList ~ data:", data.data)
+							$('#sales-area').empty();
+							$('#sales-list').tmpl(data.data).appendTo('#sales-area');
+
+            },
+            error: function(request, status, error){
+                alert(error);
+            },
+            complete: function(){
+            }
+        });
+    }
+
+		/* 등록/수정 프로세스 */
+		function insupdProc(){
+
+			var flag = true;
+
+			if( $.trim($('#title').val()) != '' ) {
+				$('#req-title').find('.required').remove();
+			} else {
+				$('#req-title').find('.required').remove();
+				$('#req-title').append('<span class="required">제목을을 입력해주세요.</span>');
+				flag = false;
+			}
+
+			var formData = new FormData($('#form')[0]);
+
+			var bannerPlanList = []
+			$('input[name=bannerPlanList]').each(function(){
+				bannerPlanList.push($(this).val());
+			});
+			formData.append('bannerPlanListArr', bannerPlanList);
+
+			var planList = [];
+			$('input[name=planlist]').each(function(){
+				planList.push($(this).val());
+			});
+			formData.append('planListArr', planList);
+
+			if ( planList.length > 0 ) {
+				$('#req-plan-list').find('.required').remove();
+			} else {
+				$('#req-plan-list').find('.required').remove();
+				$('#req-plan-list').append('<span class="required">최소 하나의 요금제를 등록해주세요.</span>');
+				flag = false;
+			}
+
+			var planChk = [];
+			$('input[name=planChk]').each(function(){
+				planChk.push('Y');
+			});
+			formData.append('planChkArr', planChk);
+
+			if ( flag ) {
+				$.ajax({
+					url 		: '/pmb/plan-sales/insUpdProc',
+					type 		: 'post',
+					enctype 	: 'multipart/form-data',
+					data 		: formData,
+					async 		: false,
+					contentType : false,
+					processData : false,
+					success 	: function (data) {
+
+						var alertTxt = '등록되었습니다';
+
+						if ( id != null && id != '' ) {
+							alertTxt = '수정되었습니다.';
+						}
+						showAlert(alertTxt);
+					},
+					error 		: function(request, status, error){
+						alert(request.responseJSON.message);
+					},
+					complete 	: function(){
+					}
+				});
+			}
+		}
+
+		/* 요금제 검색 */
+		function schPlanList() {
+
+			var params = {
+				  searchMno 		: $('#searchMno').val()
+				, searchNetrok 		: $('#searchPlanType').val()
+				, searchCompany		: $('#searchHost').val()
+				, keyword 			: $('#keyword').val()
+			}
+
+			$.ajax({
+				url 		: '/pmb/plan-sales/planlist',
+				type 		: 'post',
+				data 		: JSON.stringify(params),
+				dataType 	: 'json',
+				contentType : 'application/json',
+				async 		: false,
+				success 	: function (data) {
+					$('#plan-area').empty();
+
+					$('#plan-list').tmpl(data.data).appendTo('#plan-area');
+				},
+				error 		: function(request, status, error){
+					alert(error);
+				},
+				complete 	: function(){
+				}
+			});
+		}
+
+		/* 요금제 상품 삭제 */
+		function planDelete(){
+
+			var delList = [];
+			$('input[name=planChk]:checked').each(function(){
+				delList.push($(this).val());
+			});
+
+			if ( id != null && id != '' ) {
+				if ( delList.length > 0 ) {
+
+					showConfirm('삭제하시겠습니까?',
+							() => {
+								$.ajax({
+								   url 		: '/pmb/plan-sales/planDelete',
+								   type 	: 'DELETE',
+								   data 	: {delId: delList.join(',')},
+								   async 	: false,
+								   success 	: function (data) {
+									   location.reload();
+								   },
+								   error 	: function(request, status, error){
+							       		alert(error);
+							       },
+							       complete :function(){
+							       }
+								});
+							},
+							() => {},
+							''
+					)
+				}
+			} else {
+
+				if ( delList.length > 0 ) {
+
+					$('input[name=planChk]:checked').each(function(){
+						$(this).parent().parent().remove();
+					});
+				}
+			}
+		}
+
+		function formClose() {
+			location.href='/pmb/plan-sales/list';
+		}
+	</script>
+
+</th:block>
+
+<div class="main-content">
+
+	<div class="container-fluid">
+
+		<!-- 로케이션 & 제목 영역 추가 -->
+        <div class="page-header mb-4">
+            <div class="location mb-2">
+                <small class="text-secondary">
+                    <i class="fas fa-home me-1"></i>
+                    <a href="javascript:;">홈</a>
+                    >
+                    <a href="javascript:;">영업관리</a>
+                    >
+                    <a href="javascript:;">영업상품 관리</a>
+                </small>
+            </div>
+            <h2 class="page-title fs-4 mb-4">
+                영업 상품 등록
+            </h2>
+        </div>
+
+        <form name="form" id="form">
+        <input type="hidden" name="id" id="id" th:value="${entity?.id}"/>
+        <div class="search-section detail">
+        	<div class="form-row full-width">
+	            <div class="form-label">영업자</div>
+	            <div class="form-control-wrap">
+	                <input type="text" class="form-control" th:value="${session.loginUser.adminId}" placeholder="" id="salesId" name="salesId">
+									<div class="file-info c_red">
+		                영업자 아이디 변경은 생성시만 가능 합니다.
+		            </div>
+	            </div>
+							<button type="button" class="btn btn-secondary" style="min-width:90px; margin-bottom:30px;" id="findSales">영업자 찾기</button>
+
+	        </div>
+
+	        <div class="form-row full-width">
+	            <div class="form-label">제목<span class="required">*</span></div>
+	            <div class="form-control-wrap" id="req-title">
+	                <input type="text" class="form-control" id="title" name="title" th:value="${entity?.title}" >
+	            </div>
+	        </div>
+
+	        <div class="form-row full-width">
+		        <div class="form-label">이미지 등록</div>
+		        <div class="form-control-wrap" id="req-imagePc">
+		            <div class="file-input-wrap">
+		            	<input type="hidden" id="imageDelete" name="imageDelete" value="N"/>
+		            	<input type="hidden" id="orgImagePc" th:value="${entity?.orgImagePc}">
+		                <input type="text" class="form-control" readonly id="fileText1">
+		                <input type="file" name="imagePc" id="fileInput1" class="file-input" style="display: none;" accept="image/*">
+		                <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput1').click()" style="min-width:70px">찾기</button>
+		                <button type="button" class="btn btn-danger" style="min-width: 70px; display:none;" id="img-del-btn">삭제</button>
+		            </div>
+		            <div class="file-info c_red">
+		                이미지 형식의 파일만 업로드 가능합니다. (jpg, png, jpeg) / 권장 사이즈: 지정해주세요
+		            </div>
+		            <div class="preview-wrap">
+		            	<img id="preview1" class="preview-image" th:src="@{${entity?.imagePc}}" style="display:none;">
+		            </div>
+		        </div>
+		    </div>
+
+	        <div class="form-row full-width">
+                <div class="form-label">사용여부</div>
+                <div class="form-control-wrap">
+                    <div class="form-check form-switch">
+                       	<input class="form-check-input" type="checkbox" name="useYn" role="switch" id="flexSwitchCheckLarge" style="transform: scale(1.5);" value="1" th:checked="${entity?.useYn}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row full-width">
+                <div class="form-label">URL</div>
+                <div class="form-check-group">
+                	<th:block th:if="${entity?.url != null}">
+                		<input type="text" class="form-control" th:value="|https://www.smtong.co.kr${entity?.url}|" placeholder="등록 후 자동으로 노출" readonly>
+                	</th:block>
+                    <th:block th:unless="${entity?.url != null}">
+                    	<input type="text" class="form-control" value="" placeholder="등록 후 자동으로 노출" readonly>
+                    </th:block>
+                </div>
+            </div>
+
+            <div class="form-row full-width">
+                <div class="form-label">생성일</div>
+                <div class="form-check-group">
+                    <input type="text" class="form-control" th:value="${#temporals.format(entity?.createDate, 'yyyy.MM.dd HH:mm:ss')}" placeholder="등록 후 자동으로 노출" readonly>
+                </div>
+            </div>
+
+            <div class="form-row full-width">
+            	<div class="form-label mb-0">요금제등록<span class="required">*</span></div>
+		        <div class="form-control-wrap" id="req-plan-list">
+		            <p>요금제는 최대 20개까지 등록 가능합니다.</p>
+		            <div class="flex">
+		                <button type="button" class="btn btn-secondary" style="min-width:110px; margin-bottom:20px;" id="bnfAddBtn">요금제 추가</button>
+		                <button type="button" class="btn btn-danger" style="min-width:110px; margin-bottom:20px;" id="bnfDelBtn" onClick="planDelete();">상품 삭제</button>
+		            </div>
+
+		            <table class="bnf-select__table">
+		                <thead>
+		                    <tr>
+		                        <th class="bnf-select__th" style="width: 50px">
+		                            <input type="checkbox" id="chkall">
+		                        </th>
+		                        <th class="bnf-select__th">UUID</th>
+		                        <th class="bnf-select__th">요금제명</th>
+		                    </tr>
+		                </thead>
+		                <tbody id="plan-add-chk">
+		                    <tr class="bnf-select__row" th:each="salesPlanList : ${salesPlanList}">
+		                        <td class="bnf-select__td">
+		                        	<input type="hidden" name="bannerPlanList" th:value="${salesPlanList.id}">
+		                        	<input type="hidden" name="planlist" th:value="${salesPlanList.planId}">
+		                            <!-- <input type="checkbox" name=planChk class="bnf-select__radio" th:value="${bannerPlanList.id}" th:checked="${bannerPlanList.useYn eq 'Y'}"> -->
+		                            <input type="checkbox" name=planChk class="bnf-select__radio" th:value="${salesPlanList.id}">
+		                        </td>
+		                        <td class="bnf-select__td add-uuid" th:text="${salesPlanList.uuid}">Amobile06784</td>
+		                        <td class="bnf-select__td">
+		                            <a href="javascirpt:;" th:text="${salesPlanList.planName}">이야기 스탠다드S 11휴GB+</a>
+		                        </td>
+		                    </tr>
+		                </tbody>
+		            </table>
+		        </div>
+	        </div>
+        </div>
+		</form>
+	</div>
+
+	<!-- 버튼 영역 -->
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="formClose()">
+            닫기
+        </button>
+        <button type="button" class="btn btn-lg btn-dark px-4 btn-sm btn-proc" onclick="insupdProc()">
+            등록
+        </button>
+    </div>
+
+	<script id="plan-list" type="text/x-jquery-tmpl">
+		<tr class="bnf-select__row">
+	        <td class="bnf-select__td">
+	            <input type="radio" name="popPlanList" class="bnf-select__radio" value="${id}" data-json='{"uuid":"${uuid}", "planName":"${planNameSmt}"}'>
+				<input type="hidden" id="plan-uuid" value="${uuid}"/>
+	        </td>
+	        <td class="bnf-select__td">${mno}</td>
+	        <td class="bnf-select__td">${planType}</td>
+	        <td class="bnf-select__td">${hostNm}</td>
+	        <td class="bnf-select__td">
+	            <a href="javascirpt:;">${planName}</a>
+	        </td>
+	        <td class="bnf-select__td">{{html getPriceStr(afterPrice)}}</td>
+	        <td class="bnf-select__td">{{html getPriceStr(salePrice)}}</td>
+	        <td class="bnf-select__td">${promotionPeriod}</td>
+	        <td class="bnf-select__td">{{html getDataStr(supDataVal)}}</td>
+	        <td class="bnf-select__td">{{html getQosStr(supQos)}}</td>
+	        <td class="bnf-select__td">{{html getDateStr(modifiedDate)}}</td>
+	    </tr>
+	</script>
+
+    <div class="bnf-select__overlay"></div>
+    <div class="bnf-select" style="width:1000px;">
+	    <div class="bnf-select__header">
+	        <div class="bnf-select__title">요금제 선택</div>
+	        <span class="bnf-select__close plan-add-cls">&times;</span>
+	    </div>
+
+	    <!-- <form name="schform" id="schform"> -->
+	    <div class="bnf-select__search">
+	        <select class="form-select" name="searchMno" id="searchMno" style="height:52px; width:120px;">
+	            <option value="">MNO 전체</option>
+	            <option value="KT">KT</option>
+	            <option value="SKT">SKT</option>
+	            <option value="LGU">U+</option>
+	        </select>
+	        <select class="form-select" name="searchPlanType" id="searchPlanType" style="height:52px; width:120px;">
+	            <option value="">네트워크 전체</option>
+	            <option value="LTE">LTE</option>
+	            <option value="5G">5G</option>
+	        </select>
+	        <select class="form-select" name="searchHost" id="searchHost" style="height:52px; width:120px;">
+	            <option value="">사업자 전체</option>
+	            <option th:each="list : ${companyList}"
+	                			th:value="${list.id}"
+	                			th:utext="${list.name}">통신사 선택</option>
+	        </select>
+	        <input type="text" class="bnf-select__input" name="keyword" id="keyword" placeholder="요금제명을 입력해주세요.">
+	        <button type="button" class="bnf-select__search-btn" onClick="schPlanList()">검색</button>
+	    </div>
+	    <!-- </form> -->
+	    <div class="bnf-select__table__outer">
+	        <table class="bnf-select__table">
+	            <thead>
+	                <tr>
+	                    <th class="bnf-select__th" style="width: 50px">구분</th>
+	                    <th class="bnf-select__th" style="width: 100px">MNO</th>
+	                    <th class="bnf-select__th">네트워크</th>
+	                    <th class="bnf-select__th">사업자</th>
+	                    <th class="bnf-select__th">요금제명</th>
+	                    <th class="bnf-select__th">기본료</th>
+	                    <th class="bnf-select__th">할인금액</th>
+	                    <th class="bnf-select__th">할인기간</th>
+	                    <th class="bnf-select__th">데이터</th>
+	                    <th class="bnf-select__th">QoS</th>
+	                    <th class="bnf-select__th">최근 수정일</th>
+	                </tr>
+	            </thead>
+	            <tbody id="plan-area">
+	            </tbody>
+	        </table>
+	    </div>
+	    <div class="bnf-select__footer">
+	        <button class="bnf-select__btn bnf-select__btn--apply plan-add-cls">닫기</button>
+	        <button class="bnf-select__btn bnf-select__btn--confirm bg_blue" id="plan-add">등록</button>
+	    </div>
+	</div>
+</div>
+
+<div class="modal fade" id="commonAlertModalForm" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+	<div class="modal-dialog modal-dialog-centered modal-sm">
+		<div class="modal-content">
+			<div class="modal-header border-0 pb-0">
+			</div>
+			<div class="modal-body text-center pb-4">
+				이미 추가되어있는 요금제 입니다.
+			</div>
+			<div class="modal-footer border-0 pt-0 justify-content-center">
+				<button type="button" class="btn btn-dark px-4 btn-sm" onclick="$('#commonAlertModalForm').modal('hide');">확인</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+
+
+<!-- 영업자 선택 팝업 템플릿 -->
+<script id="sales-list" type="text/x-jquery-tmpl">
+    <tr class="sales-select__row">
+        <td class="sales-select__td">
+            <input type="radio" name="popSalesList" class="sales-select__radio" value="${id}" data-json='{"adminId":"${adminId}", "userName":"${userName}", "comGroup":"${comGroup}", "phoneNumber":"${phoneNumber}", "email":"${email}"}'>
+        </td>
+        <td class="sales-select__td">${adminId}</td>
+				<td class="sales-select__td">${userName}</td>
+        <td class="sales-select__td">${comGroup}</td>
+        <td class="sales-select__td">${phoneNumber}</td>
+        <td class="sales-select__td">${email}</td>
+    </tr>
+</script>
+
+<!-- 영업자 선택 팝업 -->
+<div class="sales-select__overlay"></div>
+<div class="sales-select" style="width:960px;">
+	<div class="sales-select__header">
+			<div class="sales-select__title">영업자 선택</div>
+			<span class="sales-select__close sales-add-cls">&times;</span>
+	</div>
+
+	<div class="sales-select__search">
+			<input type="text" class="sales-select__input" name="salesKeyword" id="salesKeyword" placeholder="이름 또는 아이디를 입력해주세요.">
+			<button type="button" class="sales-select__search-btn" onClick="schSalesList()">검색</button>
+	</div>
+
+	<div class="sales-select__table__outer" style="height:500px;">
+			<table class="sales-select__table">
+					<thead>
+							<tr>
+									<th class="sales-select__th" style="width: 50px">구분</th>
+									<th class="sales-select__th">아이디</th>
+									<th class="sales-select__th">이름</th>
+									<th class="sales-select__th">소속</th>
+									<th class="sales-select__th">전화번호</th>
+									<th class="sales-select__th">이메일</th>
+							</tr>
+					</thead>
+					<tbody id="sales-area">
+					</tbody>
+			</table>
+	</div>
+
+	<div class="sales-select__footer">
+			<button class="sales-select__btn sales-select__btn--apply sales-add-cls">닫기</button>
+			<button class="sales-select__btn sales-select__btn--confirm bg_blue" id="sales-add">선택</button>
+	</div>
+</div>
+
+</html>

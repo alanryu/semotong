@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>이용 패턴 유형 선택 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<!-- 페이지 스크립트 영역 -->
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			// 모달 바로 볼 수 있도록 호출
+			var FCB0304Modal = new bootstrap.Modal(document.getElementById('FCB0304Modal'));
+			FCB0304Modal.show();
+		});
+
+		function openConfirm(id) {
+			var confirmModal = new bootstrap.Modal(document.getElementById(id));
+			confirmModal.show();
+		}
+	</script>
+</head>
+
+<body>
+	<div class="wrapper">
+		<div style="padding: 30rem;">
+			<!-- 트리거로 모달 띄우기 -->
+			<button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#FCB0304Modal">
+				MODAL OPEN
+			</button>
+		</div>
+	</div>
+
+	<!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+	-->
+	<!-- modal 이용 패턴 유형 선택 -->
+	<div class="modal modal-full fade" id="FCB0304Modal" tabindex="-1" role="dialog" aria-labelledby="FCB0304ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-CB03-04-page">
+				<div class="modal-header">
+					<button type="button" class="ui-btn">
+						<i class="ui-icn icn-32-back-bk" aria-label="뒤로가기"></i>
+					</button>
+					<h3 class="modal-title blind" id="FCB0304ModalLabel">이용 패턴 유형 선택</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-progress">
+					<!-- 진행율 프로그레스 -->
+					<div class="progress-step">
+						<span class="progress-value" aria-label="Step 4/4" style="width: 100%"></span>
+					</div>
+					<!-- // 진행율 프로그레스 -->
+				</div>
+				<div class="modal-body">
+					<!-- 모통봇 소개 섹션 -->
+					<section class="cb-intro-sec">
+						<div class="sec-inner">
+							<div class="intro-img">
+								<i class="ui-icn icn-62-motong" aria-hidden="true"></i>
+							</div>
+							<div class="intro-con">
+								<p>마지막 질문이에요!</p>
+								<p>고객님께 요금을 추천드리기 위해<br> 데이터가 얼마나 필요하신지 알아볼게요. </p>
+							</div>
+						</div>
+					</section>
+					<!-- // 모통봇 소개 섹션 -->
+
+					<!-- 요금제 섹션 -->
+					<section class="cb-ratePlanA-sec">
+						<div class="sec-inner">
+							<!-- 요금제 공통 타입 A : 요금제 리스트 타입 -->
+							<ul class="ratePlanA-list">
+								<li class="ratePlanA-item">
+									<div class="ratePlanA-card" role="button" tabindex="0">
+										<div class="card-thumb">
+											<img src="../../assets/images/common/img-plan-price-kakao.png" alt="" />
+										</div>
+										<div class="card-body">
+											<p class="card-tit"><strong>웹서핑, 카톡을<br>주로 사용해요.</strong></p>
+											<p class="card-tag">#추천 #합리파</p>
+											<p class="card-charge">월 0원 부터</p>
+											<p class="card-data"><strong>7GB+</strong></p>
+										</div>
+									</div>
+								</li>
+								<li class="ratePlanA-item">
+									<div class="ratePlanA-card" role="button" tabindex="0">
+										<div class="card-thumb">
+											<img src="../../assets/images/common/img-plan-price-melon.png" alt="" />
+										</div>
+										<div class="card-body">
+											<p class="card-tit"><strong>웹툰이나<br>음악을 들어요.</strong></p>
+											<p class="card-tag">#음악 #동영상</p>
+											<p class="card-charge">월 15,900원 부터</p>
+											<p class="card-data"><strong>15GB+</strong></p>
+										</div>
+									</div>
+								</li>
+								<li class="ratePlanA-item">
+									<div class="ratePlanA-card" role="button" tabindex="0">
+										<div class="card-thumb">
+											<img src="../../assets/images/common/img-plan-price-youtube.png" alt="" />
+										</div>
+										<div class="card-body">
+											<p class="card-tit"><strong>동영상을 시청하거나<br>게임을 자주해요.</strong></p>
+											<p class="card-tag">#게임 #무제한</p>
+											<p class="card-charge">월 21,900원 부터</p>
+											<p class="card-data"><strong>71GB+</strong></p>
+										</div>
+									</div>
+								</li>
+								<li class="ratePlanA-item">
+									<div class="ratePlanA-card" role="button" tabindex="0">
+										<div class="card-thumb">
+											<img src="../../assets/images/common/img-plan-price-low.png" alt="" />
+										</div>
+										<div class="card-body">
+											<p class="card-tit"><strong>저렴한 요금을<br>찾고 있어요.</strong></p>
+											<p class="card-tag">#저렴 #세컨폰</p>
+											<p class="card-charge">월 110원 부터</p>
+											<p class="card-data"><strong>갓성비</strong></p>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<!-- // 요금제 공통 타입 A : 요금제 리스트 타입 -->
+						</div>
+					</section>
+					<!-- // 요금제 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<!--
+						풀팝업도 모달이고, 컨펌팝업도 모달인경우 커스텀이 필요합니다.
+						즉, 모달에서 모달을 기존 모달을 유지하기 위해서는 onclick 으로 직접 띄웁니다.
+						딤도 모달 띄운 순서대로 개수가 쌓입니다. 이것은 나중에 생긴것이 위로 올라오도록 CSS로 처리 하였습니다.
+						3중 모달은 특이 케이스이으로 2중 모달까지만 대응 했습니다.
+
+						2중 모달 테스트를 위해 적용한 것이며,
+						alert, confirm 가이드는 아래의 파일을 참고 바랍니다.
+						html/common/modal-alert.html
+						html/common/modal-confirm.html
+					-->
+					<button type="button" class="ui-btn btn-action primary" onclick="openConfirm('confirmModal')">
+						<span>처음으로</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal default -->
+
+
+	<!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+	-->
+	<!-- Modal Confirm -->
+	<div class="modal modal-confirm fade" id="confirmModal" tabindex="-1" role="alertdialog" data-bs-backdrop="static" aria-labelledby="confirmModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title blind" id="confirmModalLabel">Confirm Message</h1>
+				</div>
+				<div class="modal-body">
+					<section class="msg-sec">
+						<!-- <h4 class="sec-tit">Confirm 제목 텍스트가 들어가는 영역입니다.</h4> -->
+						<p class="sec-txt">처음부터 다시 시작하시겠어요?</p>
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal">
+						<span>Cancel</span>
+					</button>
+					<button type="button" class="ui-btn btn-modal primary" data-bs-dismiss="modal">
+						<span>Save</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // Modal Confirm -->
+
+</body>
+
+</html>

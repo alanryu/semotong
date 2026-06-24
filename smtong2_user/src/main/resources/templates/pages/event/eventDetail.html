@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='이벤트 목록', layoutSubTitleYN='Y', layoutFooterYn='Y', menuId='04'">
+
+
+<th:block layout:fragment="css">
+</th:block>
+
+
+<th:block layout:fragment="script">
+	<script>
+	
+	$( document ).ready(function() {
+		getEvtPlanlist();
+	})
+
+
+	function goList(){
+		$(location).attr( 'href', "/event/eventList?gbn=" + $("#gbn").val() );	//$('#nowpage').val(1);
+	}
+	
+	
+
+	function getEvtPlanlist() {
+		var hId 		= $('#hId').val()		;
+		var params = {searchEventId : hId}
+		$.ajax({
+			url : '/event/getEvtPlanlist',
+			type : 'POST',
+			dataType : "json",
+			contentType:"application/json",
+			data : JSON.stringify(params),
+			beforeSend: function(xhr){
+				xhr.setRequestHeader(header,token);
+			},
+			success: function (data) {
+				
+				if(data.totalCnt != 0){
+					$('.ratePlanC-sec').show();
+					$.each(data.data, function(idx, obj){
+						obj.displayPrice = 0;
+					});
+					$('#planListTmpl').tmpl(data.data).appendTo('#eventPlanList');
+					
+					setPopover('ui-popover popover-style1'); //동적 리스트 생성후 툴팁 function 다시로드 
+				} else {
+					$('.ratePlanC-sec').hide();
+				}
+			},
+			error : function(request, status, error){
+				alertModalShow(error);
+			},
+			complete:function(){
+			}
+		});
+	}
+
+</script>
+
+</th:block>
+	<input type="hidden" id="gbn" 		name="gbn" 		th:value="${gbn}" >
+	<input type="hidden" id="hId" 		name="hId" 		th:value="${ent.id}" >
+	<input type="hidden" id="title" 	name="hTitle" 	th:value="${ent.title}" >
+		<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-E01-03-page">
+				<!-- 이벤트 상세 섹션 -->
+				<section class="event-detail-sec">
+					<div class="sec-inner">
+						<div class="event-detail">
+							<div class="detail-header">
+								<h2 class="tit"><strong  th:text="${ent.title}"></strong></h2>
+								<p class="date">
+									<span class="date" th:text="${#dates.format(ent.startDate, 'yyyy-MM-dd')}"></span>~<span class="date" th:text="${#dates.format(ent.endDate, 'yyyy-MM-dd')}"></span>
+								</p>
+								
+								<!-- 2025-03-27 조찬기 : 공유하기 추가 -->
+								<button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#shareLinkModal" onclick="kakaoLinkInit(document.getElementById('title').value, '', window.location.href)">
+									<i class="ui-icn icn-20-plan-share-gr" aria-label="공유하기"></i>
+								</button>
+								
+							</div>
+							<div class="detail-body">
+								<div class="data-view">
+									<img th:src="${ent.eventImage}" alt="" th:if="${ent.eventMngSp eq 'i'}"/>
+									<p th:utext="${ent.content}" th:if="${ent.eventMngSp eq 'c'}"></p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- // 이벤트 상세 섹션 -->
+				
+				<!-- 2025-02-04 조찬기 : 요금제 목록 추가 -->
+				<!-- 요금제 공통 타입 C : 요금제 상품 리스트 -->
+				<section class="ratePlanC-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">이벤트 대상 요금제에요.</h2>
+						</div>
+						<div class="sec-body">								
+							<ul class="ratePlanC-list" id="eventPlanList">
+							</ul>
+						</div>
+					</div>
+				</section>
+				
+				
+				<!-- 유의사항 -->
+				<!-- 2025-07-02 조찬기 : 유의사항 추가 -->
+				<section class="note-sec">
+					<div class="sec-inner">
+						<!-- 요금제상세 아코디언 -->
+						<div class="note-acco" id="noteAccordion">
+							<div class="acco-item">
+								<h2 class="acco-header">
+									<button class="acco-button collapsed" type="button" data-bs-toggle="collapse"
+										data-bs-target="#noteAccordion3" aria-expanded="false" aria-controls="noteAccordion3">
+										<span>유의사항</span>
+										<i class="ui-icn icn-32-acco-arw" aria-label="Toggle"></i>
+									</button>
+								</h2>
+								<div id="noteAccordion3" class="acco-collapse collapse" data-bs-parent="#noteAccordion">
+									<div class="acco-body">
+										<div class="acco-data">
+											<p th:utext="${ent.eventNoticeContent}" th:if="${ent.eventNoticeSp eq 'C'}"></p>
+											<img th:src="${ent.eventNoticeImage}" alt="" th:if="${ent.eventNoticeSp eq 'I'}"/>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- // 요금제상세 아코디언 -->
+					</div>
+				</section>
+				<!-- // 유의사항 -->
+								
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" onclick="javascript:goList();">
+							<span>목록</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 플로팅 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+
+
+</html>

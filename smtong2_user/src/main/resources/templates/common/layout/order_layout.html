@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lagn="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	
+	<title>알뜰폰 요금제 비교 | 최저가 추천 및 번호이동 | 세모통</title>
+
+	<meta name="keywords" content="알뜰폰, 알뜰폰 요금제, 최저가 요금제, 인터넷 결합, 번호이동, USIM, 통신비 절약, MVNO, 세모통" />
+	<meta name="description" content="통신호갱 없는 세상, 세모통에서 알뜰폰 요금제를 비교하고 최저가 추천을 받아보세요. USIM 신규가입 및 번호 이동을 쉽고 빠르게 할 수 있습니다!" />
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+	<!-- Open Graph (SNS 공유 최적화) -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="알뜰폰 요금제 비교 | 최저가 추천 및 번호이동 | 세모통" />
+	<meta property="og:description" content="알뜰폰 최저가 요금제를 찾고 계신가요? 세모통에서 간편하게 비교하고 USIM 신규가입, 번호이동까지 한 번에 해결하세요!" />
+	<meta property="og:image" th:content="${baseUrl} + '/images/common/semotong-og-image.jpg'" />
+	<meta property="og:url" th:content="${baseUrl}" />
+	<meta property="og:site_name" content="세모통" />
+
+	<script type="application/ld+json" th:inline="javascript">
+	{
+	  "@context": "https://schema.org",
+	  "@type": "WebSite",
+	  "name": "세모통",
+	  "url": [[${baseUrl + '/'}]],
+	  "description": "세모통에서 알뜰폰 요금제를 비교하고 최저가 추천을 받아보세요. USIM 신규가입 및 번호이동을 쉽고 빠르게 할 수 있습니다!",
+	  "potentialAction": {
+	    "@type": "SearchAction",
+	    "target": [[${baseUrl + '/pbm/plan/planList/mvno?q={search_term_string}'}]],
+	    "query-input": "required name=search_term_string"
+	  }
+	}
+	</script>
+		
+<!-- 	<link rel="stylesheet" type="text/css" href="//cdn.tiny.cloud/1/no-origin/tinymce/7.6.1-131/skins/content/default/content.css" />
+	<link rel="stylesheet" type="text/css" href="//cdn.tiny.cloud/1/no-origin/tinymce/7.6.1-131/skins/ui/oxide/skin.min.css" /> -->
+
+	<link rel="stylesheet" type="text/css" th:href="@{/css/semotong.css}" />
+	
+
+	<script th:src="@{/js/libs/jquery.min.js}"></script>
+	<script th:src="@{/js/libs/librurys.min.js}"></script>
+	<script th:src="@{/js/libs/jquery.tmpl.min.js}"></script>
+	<script th:src="@{/js/ui/ui.common.js}"></script>
+	<script th:src="@{/js/ui/commonUtil.js}"></script>
+	<!-- 페이지 스크립트 영역 -->
+	<!-- Swiper Librarys -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.0.0/swiper-bundle.min.css" />
+	<th:block th:if="${swiper == '07'}">
+		<script src="https://cdn.jsdelivr.net/npm/swiper@7.0.0/swiper-bundle.min.js"></script>
+	</th:block>
+	<th:block th:if="${swiper != '07'}">
+		<script src="https://cdn.jsdelivr.net/npm/swiper@11.0.0/swiper-bundle.min.js"></script>
+	</th:block>
+	<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+
+	<script>
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+
+		
+		$("#btn_back").hide();
+		
+		// 오류제보 폼 팝업
+		function writeErrReport(planId) {
+			var isLogin ="[[${session.isLoginYn}]]";
+			if(isLogin == 'Y') {
+				$("#planId").val(planId);
+				var FP0201P01Modal = new bootstrap.Modal(document.getElementById('FP0201P01Modal'));
+				FP0201P01Modal.show();
+
+				// hidden - focus error 대응
+				const modalBtn	= document.getElementById('createErrReportBtnId');
+				modalBtn.addEventListener('click', () => {
+					modalBtn.blur();
+				});
+				
+			} else {
+				alertModalShow("요금제 신청을 위해 로그인을 해주세요.", "로그인",goLogin);
+			}	
+		}
+		
+		// 오류 제보 하기
+		function createErrReport() {
+			$("#reportType").val($("input[name='chkReportType']:checked").val());
+			
+			var reportContent 			= $('#reportContent').val();
+			
+			if(reportContent == null || reportContent == '' || reportContent.length < 1){
+				alertModalShow("불편했던 내용을 알려주세요.", "오류제보");
+				$('#reportContent').focus();
+				return;
+			}
+			
+			var params = {
+				planId :  $("#planId").val(),
+				reportType : $("#reportType").val(),
+				reportContent : $("#reportContent").val(),
+				processSp: "01"
+		    }
+		
+			$.ajax({
+			   url : '/pbm/error-report/create',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+			   beforeSend: function(xhr){
+			       xhr.setRequestHeader(header,token);
+			    },
+				success: function (data) {
+
+					if(data.code == 201) {
+						//알려주셔서 감사합니다.
+						var FP0201P02Modal = new bootstrap.Modal(document.getElementById('FP0201P02Modal'));
+						FP0201P02Modal.show();
+						
+						const modalBtn	= document.getElementById('FP0201P02ModalCloseBtn');
+						modalBtn.addEventListener('click', () => {
+							modalBtn.blur();
+						});
+					} else {
+						alertModalShow(data.message, "");
+					}
+					
+			    },
+				error : function(request, status, error){
+					alertModalShow(error,"");
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+			});
+		}
+
+		// 자주묻는 질문 리스트
+		function getFaqList(cateCode,searchKewword) {
+	  		var page = 1;
+	  		var pageSize = 10;
+
+			var params = {
+			     keyword : searchKewword,
+			     displayYn : 1,
+			     categoryId : cateCode,
+				 page : page,
+				 recordSize : pageSize
+			    }
+					  
+				$.ajax({
+				   url : '/cms/faq/list',
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+				   beforeSend: function(xhr){
+				       xhr.setRequestHeader(header,token);
+				    },
+					success: function (data) {
+						if(page == 1) {
+							$('#faqAccordion').empty();	
+						}
+						if(data.totalCnt ==0) {
+							$('#nodataFaqListTmpl').tmpl(params).appendTo('#faqAccordion');
+						} else {
+							$('#faqListTmpl').tmpl(data.data).appendTo('#faqAccordion');	
+						}
+				    },
+					error : function(request, status, error){
+						alertModalShow(error,"");
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+				});
+		}
+		
+		
+		function goOneToOne() {
+			var isLogin ="[[${session.isLoginYn}]]";
+			if(isLogin == 'Y') {
+				location.href = "/csm/onetoone/onetoone";
+			} else {
+				location.href = "/users/mypage";
+			}	
+		}
+		
+		
+		
+		/* qos 팝업 */
+		function openQosModal(id) {
+			var QosModal = new bootstrap.Modal(document.getElementById(id));
+			QosModal.show();
+		}
+		
+		/* 글자 수 체크(Byte체크 아님) */
+		function writeCheck() {
+			
+			var length = $('#reportContent').val().length;
+			if ( length > 500 ) {
+				var val = $('#reportContent').val().substring(0,500);
+				$('#reportContent').val(val);
+			}
+			
+			$('#count').html(length);
+		}
+		
+		
+		function moveNextOrder(url) {
+			$("#orderForm").attr("action",url);
+			$("#orderForm").submit();
+		}
+		
+		
+	</script>
+
+	<!-- Google Tag Manager -->
+	<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+	'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+	})(window,document,'script','dataLayer','[[${googleTagManagerId}]]');</script>
+	<!-- End Google Tag Manager -->
+
+	
+	<!-- faq 조회 데이터 없음 -->
+	<script id="nodataFaqListTmpl" type="text/x-jquery-tmpl">
+	<!-- Case 검색시 노출 -->
+	<div class="faq-toolbar">
+		<p class="count">"${keyword}" 검색 결과 0개</p>
+	</div>
+	<!-- Case 검색시 노출 -->
+	<!-- Case 검색결과 없음 -->
+	<div class="nodata">
+		<i class="ui-icn icn-110-nodata-cry" aria-hidden="true"></i>
+		<p class="nodata-tit"><strong>검색 결과가 없네요.</strong></p>
+		<p class="nodata-txt">원하시는 내용이 없으신가요?</p>
+		<p class="nodata-txt">1:1 문의로 질문해주세요.</p>
+		<button type="button" class="ui-btn btn-sub primary xl">
+			<span>1:1 문의하러 가기</span>
+		</button>
+	</div>
+	<!-- //faq 조회 데이터 없음-->
+	</script>
+
+
+	<!-- //  요금제 조회 데이터 없음 -->
+	<!-- 
+		private String inquiry;
+	private String ansContent;
+	private String faqCategory;
+	private String faqCategoryNm;
+	private String displayYn;
+	
+	 -->
+		<!-- faq 조회리스트 템블릿 -->
+	<script id="faqListTmpl" type="text/x-jquery-tmpl">
+		<div class="acco-item">
+				<h3 class="acco-header">
+					<button class="acco-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqAccordion${id}"
+						aria-expanded="false" aria-controls="faqAccordion${id}">
+						<strong class="part">${faqCategoryNm}</strong>
+						<span>${inquiry}</span>
+						<i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+					</button>
+				</h3>
+				<div id="faqAccordion${id}" class="acco-collapse collapse" data-bs-parent="#faqAccordion${id}">
+					<div class="acco-body">
+						<div class="acco-answer">
+							<p>{{html ansContent}}</p>
+						</div>
+						<div class="faq-inquery">
+							<p>도움이 되셨나요? 더 자세하게 알고 싶으시다면!</p>
+							<button type="button" class="ui-btn btn-sub primary xl" onclick="goOneToOne()">
+								<span>1:1 문의하러 가기</span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+	</script>
+	
+	<!-- 요금제 조회 데이터 없음 -->
+	<script id="nodataPlanListTmpl" type="text/x-jquery-tmpl">
+		<div class="nodata">
+			<i class="ui-icn icn-100-nodata-recom" aria-hidden="true"></i>
+			<p class="nodata-tit"><strong>조회된 요금제가 없어요.</strong></p>
+		</div>
+	</script>
+	<!-- //  요금제 조회 데이터 없음 -->
+	
+	<!-- 최근본 요금제 조회 데이터 없음 -->
+	<script id="nodataLastPlanListTmpl" type="text/x-jquery-tmpl">
+		<div class="nodata">
+			<i class="ui-icn icn-100-nodata-recent" aria-hidden="true"></i>
+			<p class="nodata-tit"><strong>최근 본 요금제가 없어요.</strong></p>
+		</div>
+	</script>
+	<!-- // 최근본 요금제 조회 데이터 없음 -->
+	
+	
+		
+		
+	
+	<!-- 리뷰리스트 텝플릿 -->
+	<script id="reviewListTmpl" type="text/x-jquery-tmpl">
+		<li class="review-item">
+			<div class="review-card">
+				<p class="review-name">{{html maskName(username)}}</p>
+				<p class="review-sat">
+					<i class="ui-icn icn-16-star-pr" aria-hidden="true"></i>
+					<strong class="val">${score}.0</strong>
+				</p>
+				<p class="review-con">
+					${content}
+				</p>
+			</div>
+		</li>
+	</script>
+
+	<th:block layout:fragment="css"></th:block>
+    <!-- content script -->
+    <th:block layout:fragment="script"></th:block>
+</head>
+<body>
+	
+	<!-- Google Tag Manager (noscript) -->
+	<noscript><iframe th:src="'https://www.googletagmanager.com/ns.html?id=' + ${googleTagManagerId}" 
+	height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+	<!-- End Google Tag Manager (noscript) -->
+
+
+	<div class="wrapper only-container">
+		
+		<!-- content fragment 사용 -->
+		<th:block layout:fragment="Content"></th:block>
+		
+		
+	</div>
+	
+	
+	<!-- 공통 모달-->
+	<!-- 정렬 modal select -->
+	<div class="modal modal-select fade" id="selectSortPlanModal" tabindex="-1" role="dialog" aria-labelledby="selectSortPlanModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="selectSortPlanModalLabel">정렬기준 선택</h3>
+					<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 콤보박스 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<!-- modal-select 공통 -->
+							<ul class="select-listbox" role="listbox" id="planSearchSortSp">
+								<!-- 이미 선택목록이 있는 경우 class="is-selected" 추가 -->
+								<!-- <li class="is-selected" role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this,'',getPlanList)">추천순</li> 2차 수정 : 모든화면 추천순제외 -->
+								<li class="is-selected" role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this,'',getPlanListReset)" value="RE">추천 순</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this,'',getPlanListReset)" value="SP">낮은 가격 순</li>
+								<!-- <li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this,'',getPlanList)">선택 많은 순</li> -->
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this,'',getPlanListReset)" value="AP">할인기간 후 낮은 가격 순</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this,'',getPlanListReset)" value="DATA">데이터 많은 순</li>
+							</ul>
+						</div>
+					</section>
+					<!-- // 콤보박스 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 정렬 modal select -->
+
+	
+
+	<!-- modal 제보문의 -->
+	<div class="modal modal-confirm fade" id="FP0201P01Modal" tabindex="-1" role="dialog" aria-labelledby="FP0201P01ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-P02-01-P01-page">
+				<div class="modal-header">
+					<h3 class="modal-title blind" id="confirmModalLabel">Confirm Message</h3>
+				</div>
+				<div class="modal-body">
+					<!-- 컨텐츠 섹션 -->
+
+					<section class="msg-sec">
+							<input type="hidden" id="planId" name="planId">
+							<input type="hidden" id="reportType" name="reportType">
+							<input type="hidden" id="processSp" name="processSp">
+					
+							<p class="sec-tit">고객님, 잘못된 정보가<br> 제공되어 죄송합니다.</p>
+							<p class="sec-txt">어떤 내용인지 알려주시겠어요?</p>
+							<ul class="report-list">
+								<li class="report-item">
+									<label class="ui-rdo rdo-style1 type-block">
+										<input type="radio" name="chkReportType" onchange="setRadioSelected('chkReportType', '.rdo-style1')" value="01" checked/>
+										<span class="rdo"><span>서비스 오류</span></span>
+									</label>
+								</li>
+								<li class="report-item">
+									<label class="ui-rdo rdo-style1 type-block">
+										<input type="radio" name="chkReportType" onchange="setRadioSelected('chkReportType', '.rdo-style1')" value="02"/>
+										<span class="rdo"><span>요금제 / 인터넷 정보</span></span>
+									</label>
+								</li>
+								<li class="report-item">
+									<label class="ui-rdo rdo-style1 type-block">
+										<input type="radio" name="chkReportType" onchange="setRadioSelected('chkReportType', '.rdo-style1')" value="03"/>
+										<span class="rdo"><span>이벤트 / 사은품 정보</span></span>
+									</label>
+								</li>
+								<li class="report-item">
+									<label class="ui-rdo rdo-style1 type-block">
+										<input type="radio" name="chkReportType" onchange="setRadioSelected('chkReportType', '.rdo-style1')" value="04"/>
+										<span class="rdo"><span>기타</span></span>
+									</label>
+								</li>
+								<li class="report-item">
+									<div class="ui-textarea">
+										<textarea name="reportContent" id="reportContent" cols="50" rows="4" class="textarea" placeholder="불편했던 내용을 써주세요. (필수)" onKeyup="writeCheck()"></textarea>
+										<p class="bytes"><em class="count" id="count">0</em>/500</p>
+									</div>
+								</li>
+							</ul>						
+					</section>
+					<!-- // 컨텐츠 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal">
+						<span>취소하기</span>
+					</button>
+					<button type="button" class="ui-btn btn-modal primary" data-bs-dismiss="modal" onclick="createErrReport();" id="createErrReportBtnId">
+						<span>보내기</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal 제보문의 -->
+	
+			<!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+	-->
+	<!-- modal 제보완료 -->
+	<div class="modal modal-alert fade" id="FP0201P02Modal" tabindex="-1" role="alertdialog" data-bs-backdrop="static" aria-labelledby="FP0201P02ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<!-- alert 공통인 경우: F-P02-01-P01-page 페이지 구분 불필요 -->
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title blind" id="confirmModalLabel">Confirm Message</h3>
+				</div>
+				<div class="modal-body">
+					<!-- 컨텐츠 섹션 -->
+					<section class="msg-sec">
+						<p class="sec-tit">알려주셔서 감사합니다.</p>
+						<p class="sec-txt">
+							감사합니다. 고객님 <br>알려주신 내용은 빠르게 반영하겠습니다. <br>제보해주셔서 감사합니다.
+						</p>
+					</section>
+					<!-- // 컨텐츠 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal primary" data-bs-dismiss="modal" id="FP0201P02ModalCloseBtn">
+						<span>확인</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal 제보완료 -->
+	
+	
+	<!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+	-->
+	<!-- modal default -->
+	<div class="modal modal-full fade-pc" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-M04-02-P01-page">
+				<div class="modal-header">
+					<h3 class="modal-title blind" id="reviewModalLabel">후기</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 후기 소개 섹션 -->
+					<section class="review-intro-sec">
+						<div class="sec-inner">
+							<div class="intro-img">
+								<i class="ui-icn icn-62-motong" aria-hidden="true"></i>
+							</div>
+							<div class="intro-con">
+								<p>세모통을 사용하시는<br>고객님의 소중한 후기예요.</p>
+							</div>
+						</div>
+					</section>
+					<!-- // 후기 소개 섹션 -->
+
+					<!-- 리뷰 섹션 -->
+					<section class="review-sec">
+						<div class="sec-inner">
+							<!-- 이용자 리뷰 평점 -->
+							<div class="review-user-sat">
+								<ul class="review-list" id="reviewList">
+
+									
+								</ul>
+								<button type="button" class="ui-btn btn-more-list" onclick="getReviewListMore();" id="btnMoreReviewList" style="display:none;">
+									<i class="ui-icn icn-16-more-list-gr"></i>
+									<span>더보기</span>
+								</button>
+							</div>
+							<!-- // 이용자 리뷰 평점 -->
+						</div>
+					</section>
+					<!-- // 리뷰 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal default -->
+	
+
+
+	<!-- 공유하기 Modal Alert -->
+	<div class="modal modal-alert fade sharemodal" id="shareModal" tabindex="-1" role="alertdialog" aria-labelledby="shareModalLabel" aria-hidden="true">
+	<!-- <div class="modal modal-alert fade sharemodal" id="shareModal" tabindex="-1" role="alertdialog" aria-labelledby="shareModalLabel" style="display:none;"> -->
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="shareModalLabel">공유하기</h3>
+				</div>
+				<div class="modal-body">
+					<section class="share-sec">
+						<button type="button" class="ui-btn" id="kakaoShareBtn" onclick="createKakaoBtn();">
+							<i class="ui-icn icn-80-kakao" aria-hidden="true"></i>
+							<span>카카오톡</span>
+						</button>
+						<button type="button" class="ui-btn" onclick="urlCopyBtn();" id="urlCopyBtnId">
+							<i class="ui-icn icn-80-copy" aria-hidden="true"></i>
+							<span>URL 복사</span>
+						</button>
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal" id="closeShareModal">
+						<span>닫기</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 공유하기 Modal Alert -->
+	
+	
+	<!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+	-->
+	<!-- Modal Alert -->
+	<div class="modal modal-alert fade" id="alertModal" tabindex="-1" role="alertdialog" data-bs-backdrop="static" aria-labelledby="alertModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title blind" id="alertModalLabel">Alert Message</h3>
+				</div>
+				<div class="modal-body">
+					<section class="msg-sec">
+						<h4 class="sec-tit">Alert 제목 텍스트가 들어가는 영역입니다.</h4>
+						<p class="sec-txt"><span class="txt-primary"></span></p>
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal primary" data-bs-dismiss="modal" id="alertModalCloseId">
+						<span>확인</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
+	<!-- Modal Confirm -->
+	<div class="modal modal-confirm fade" id="confirmModal" tabindex="-1" role="alertdialog" data-bs-backdrop="static" aria-labelledby="confirmModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title blind" id="confirmModalLabel">Confirm Message</h3>
+				</div>
+				<div class="modal-body">
+					<section class="msg-sec">
+						<h4 class="sec-tit" id="confirmModal_Title">Confirm 제목 텍스트가 들어가는 영역입니다.</h4>
+						<p class="sec-txt" id="commonConfirmMessage"></p>
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal"  id="confirmModalCancelBtn">
+						<span>아니요</span>
+					</button>
+					<button type="button" class="ui-btn btn-modal primary" data-bs-dismiss="modal" id="confirmModalConfirmBtn">
+						<span>예</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // Modal Confirm -->
+		
+	<!-- 5차 수정 : QoS 팝업 추가 -->
+	<div class="modal modal-basic fade" id="QosModal" tabindex="-1" role="dialog" aria-labelledby="QosModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="QosModalLabel">QoS(데이터 소진 시 속도) </h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<section class="qos-sec">
+						<table class="qos-table">
+							<caption>
+								<strong>QoS(데이터 소진 시 속도) 표</strong>
+								<p>속도, 인터넷, 유튜브 재생 속도 로 구성됨</p>
+							</caption>
+							<colgroup>
+								<col style="width: 80rem;" />
+								<col style="width: auto;" />
+								<col style="width: 80rem;" />
+							</colgroup>
+							<thead>
+								<tr>
+									<th scope="col">전송 속도</th>
+									<th scope="col">인터넷</th>
+									<th scope="col">재생 속도</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>1Mbps</td>
+									<td>텍스트와 용량이 작은 <br>이미지 페이지 이용 가능</td>
+									<td>480p</td>
+								</tr>
+								<tr>
+									<td>3Mbps</td>
+									<td>용량이 큰 이미지 파일 등 <br>큰 불편함 없이 이용 가능</td>
+									<td>720p</td>
+								</tr>
+								<tr>
+									<td>5Mbps</td>
+									<td>대부분 쾌적하게 이용 가능</td>
+									<td>1080p</td>
+								</tr>
+							</tbody>
+						</table>
+					</section>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
+		<!-- loader -->
+	<!-- 노출시 is-visible 클래스 추가 -->
+	<div class="loader-section is-visible" aria-live="true" id="cmmLoadingBar" style="display:none">
+		<span class="loader" aria-label="로딩중"></span>
+	</div>
+	<!-- //loader -->
+	
+	
+</body>
+</html>

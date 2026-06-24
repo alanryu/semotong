@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.csm.banner.mapper.PopupMapper">
+
+	<select id="popupList" resultType="kr.co.ucomp.web.csm.banner.entity.PopupEntity">
+		SELECT
+      id
+      , name
+      , image_pc_url
+      , image_mobile_url
+      , start_date
+      , end_date
+      , link_url
+      , sort
+      , target
+		FROM
+			tb_svc_popup
+		WHERE use_yn = 'Y'
+      AND NOW() <![CDATA[>=]]> start_date
+			AND NOW() <![CDATA[<=]]> end_date
+		ORDER BY
+			sort ASC
+	</select>
+
+</mapper>

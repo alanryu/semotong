@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='07',menuId ='08'">
+
+<th:block layout:fragment="css">
+</th:block>
+
+<th:block layout:fragment="script">
+<script type="text/javascript">
+	document.addEventListener('DOMContentLoaded', () => {
+		
+	});
+
+	function goList() {
+		window.location.href='/pbm/error-report/list';
+	}
+	function saveData() {
+		showConfirm( '등록하시겠습니까?',
+				() => { 
+					insupdProc(); 
+				},
+				() => { },
+				'잘못된정보관리'
+		)
+	}
+	
+	
+	function insupdProc(){
+		
+		var hId = $("#reqId").val();
+		var prc = $('input[name="elProcessSp"]:checked').val();
+		var mem = $("#counselContent").val();
+		
+		var params = {
+				id 			: hId
+				,memo 		: mem
+				,processSp 	: prc
+				}
+		console.log(params);
+		$.ajax({
+			url : '/pbm/error-report/ajaxUpdate'
+			,type 	: 'POST'
+			,dataType : "json"
+			,contentType:"application/json"
+			,data : JSON.stringify(params)
+			,success 	: function (data) {
+				var adminName = '[[${result?.managerName}]]';
+				var alertTxt = '등록되었습니다.';
+				if(adminName != null && adminName != ''){
+					alertTxt = '수정되었습니다.';
+				}
+				showAlert(alertTxt, goList);
+			}
+			,error : function(request, status, error){
+					showAlert(error, stayThis);
+			}
+			,complete:function(){
+			}
+		});
+		
+	}
+	
+	
+	//counselContent
+	
+	
+		
+</script>
+
+</th:block>
+	
+<div class="main-content">
+	<div class="container-fluid">
+		<div class="location mb-2">
+			<small class="text-secondary">
+				<i class="fas fa-home me-1"></i>
+				<a href="/">홈</a> > <a href="/pbm/error-report/list">서비스관리</a> > <a href="/pbm/error-report/list">잘못된정보관리</a>
+			</small>
+		</div>
+		<h2 class="page-title fs-4 mb-4">
+			잘못된정보관리 상세
+		</h2>
+
+	   		<input type="hidden" th:value="${result.id}" id="reqId">
+			<div class="search-section detail">
+				<!-- 신청일시 -->
+				<div class="form-row">
+					<div class="form-label"> 작성일시 </div>
+					<div class="form-control-wrap" th:text="${result.createDate}"> </div>
+				</div>
+	  			<!-- 완료일시 -->
+				<div class="form-row">
+					<div class="form-label"> 처리일시 </div>
+					<th:block th:if="${result.processSp != '03'}">
+						<div class="form-control-wrap"> </div>
+					</th:block>
+					<th:block th:unless="${result.processSp == '03'}">
+						<div class="form-control-wrap" th:text="${result.modifiedDate}"> </div>
+					</th:block>
+				</div>
+				
+				
+				<!-- 신청자 -->
+				<div class="form-row  full-width">
+					<div class="form-label"> 신고자 </div>
+					<div class="form-control-wrap" th:text="${result.username}"> </div>
+				</div>
+				
+				<!-- 상태 -->
+				<div class="form-row full-width">
+					<div class="form-label"> 상태 </div>
+					<!-- <div class="form-control-wrap" th:text="${result.processSpName}"></div> -->
+					<div class="form-control-wrap">
+						<div class="form-check-group">
+							<div class="form-check">
+								<input class="form-check-input" type="radio" id="eMngSpA"			name="elProcessSp" th:checked="${result?.processSp eq '01'}" value="01">
+								<label class="form-check-label" for="eMngSpA">신고</label>
+							</div>
+							<div class="form-check">
+								<input class="form-check-input" type="radio" id="eMngSpB"			name="elProcessSp" th:checked="${result?.processSp eq '02'}" value="02">
+								<label class="form-check-label" for="eMngSpB">처리중</label>
+							</div>
+							<div class="form-check">
+								<input class="form-check-input" type="radio" id="eMngSpC"			name="elProcessSp" th:checked="${result?.processSp eq '03'}" value="03">
+								<label class="form-check-label" for="eMngSpC">처리완료</label>
+							</div>
+						</div>
+					</div>
+				
+				</div>
+				
+				
+				<!--  -->
+				<div class="form-row">
+					<div class="form-label"> 상품 </div>
+					<div class="form-control-wrap" th:text="${result.planName}"> </div>
+				</div>
+				<!--  -->
+				 <div class="form-row">
+					<div class="form-label"> 내용 </div>
+					<div class="form-control-wrap" th:text="${result.reportContent}"> </div>
+				</div>
+				
+				<div class="form-row full-width">
+					<div class="form-label"> 내부메모 </div>
+					<div class="form-control-wrap" style="width:100%;">
+						<div class="form-check-group">
+							<textarea  placeholder="상담내용을 입력하세요." class="form-control" id="counselContent" th:text="${result.memo}"></textarea>
+						</div>
+					</div>
+				</div>  
+				
+				<div class="form-row full-width">
+					<div class="form-label"> 담당자 </div>
+					<div class="form-control-wrap" th:text="${result.managerName}"> </div>
+				</div>									   
+		</div>
+		
+		<!-- 버튼 영역 -->
+		<div class="d-flex justify-content-center gap-2 mt-4">
+			<button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">
+				취소
+			</button>
+			<button type="button" class="btn btn-lg btn-dark px-4 btn-sm" onclick="saveData();" id="applyButtonI">
+				등록
+			</button>
+		</div>
+	</div>
+</div>

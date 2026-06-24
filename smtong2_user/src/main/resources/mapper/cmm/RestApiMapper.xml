@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.common.restapi.mapper.RestApiMapper">
+
+
+	<insert id="createLog"  parameterType="kr.co.ucomp.common.restapi.entity.RestApiLogEntity">
+	
+	INSERT INTO tb_cmm_restapi_log (api_code,api_name,api_url,req_msg,res_body,res_msg,create_date) 
+	VALUES(	#{apiCode},
+			#{apiName},
+			#{apiUrl},
+			#{reqMsg},
+			#{resBody},
+			#{resMsg},
+			Now()
+	);
+	
+	</insert>
+	
+	
+	<select id="getToken" parameterType="Map"  resultType="kr.co.ucomp.common.restapi.entity.RestApiTokenMngEntity">
+		select token_code,token_name,token_val,create_dttm,expired_dttm
+		from tb_cmm_restapi_token_info
+		where token_code = #{tokenCode}
+		and expired_dttm <![CDATA[>]]> Now()
+	</select>
+	
+	<insert id="createToken"  parameterType="kr.co.ucomp.common.restapi.entity.RestApiTokenMngEntity">
+	
+	INSERT INTO tb_cmm_restapi_token_info (token_code,token_name,token_val,create_dttm,expired_dttm) 
+	VALUES(	#{tokenCode},
+			#{tokenName},
+			#{tokenVal},
+			Now(),
+			#{expiredDttm}
+	);
+	
+	</insert>
+	
+	<update id="deleteToken"  parameterType="Map">
+	
+	DELETE FROM tb_cmm_restapi_token_info  WHERE token_code = #{tokenCode};
+	
+	</update>	
+	
+</mapper>

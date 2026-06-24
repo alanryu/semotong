@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.pmb.mapper.PlanCateMngMapper">
+
+
+   <select id="getCatelist" parameterType="kr.co.ucomp.web.pmb.dto.PlanCateMngDto" resultType="kr.co.ucomp.web.pmb.entity.PlanCateMngEntity">
+		SELECT 
+			CODE AS cate_code, 
+			code_name cate_name,
+			etc1 AS cate_sp,
+			use_yn,
+			(SELECT b.code_name FROM tb_pmb_plan_tag_category a, tb_cmm_code b WHERE cate_id =a.code AND a.tag_id = b.code AND b.code_group = 'plan_tag_code' ORDER BY b.order_no LIMIT 1 ) tag_name,
+			(SELECT count(b.code) FROM tb_pmb_plan_tag_category a, tb_cmm_code b WHERE cate_id =a.code AND a.tag_id = b.code AND b.code_group = 'plan_tag_code' ) tag_count,
+			 (
+				SELECT COUNT(1) 
+				FROM tb_pmb_plan_list 
+				WHERE sale_status = 1
+				AND disp_yn = 1 
+				AND (plan_tag1 IN (SELECT b.code FROM tb_pmb_plan_tag_category a, tb_cmm_code b WHERE cate_id =a.code AND a.tag_id = b.code AND b.code_group = 'plan_tag_code' and b.use_yn = 'Y')
+			 			OR plan_tag2 IN (SELECT b.code FROM tb_pmb_plan_tag_category a, tb_cmm_code b WHERE cate_id =a.code AND a.tag_id = b.code AND b.code_group = 'plan_tag_code' and b.use_yn = 'Y')
+						OR plan_tag3 IN (SELECT b.code FROM tb_pmb_plan_tag_category a, tb_cmm_code b WHERE cate_id =a.code AND a.tag_id = b.code AND b.code_group = 'plan_tag_code' and b.use_yn = 'Y')
+						OR plan_tag4 IN (SELECT b.code FROM tb_pmb_plan_tag_category a, tb_cmm_code b WHERE cate_id =a.code AND a.tag_id = b.code AND b.code_group = 'plan_tag_code' and b.use_yn = 'Y')
+						OR plan_tag5 IN (SELECT b.code FROM tb_pmb_plan_tag_category a, tb_cmm_code b WHERE cate_id =a.code AND a.tag_id = b.code AND b.code_group = 'plan_tag_code' and b.use_yn = 'Y')
+				)
+			 ) plan_cnt,
+			 order_no
+		FROM tb_cmm_code a
+		WHERE code_group = 'plan_tag_code_group'
+		<if test='searchCateGroupSp != null and searchCateGroupSp !=""'>
+			AND etc1 = #{searchCateGroupSp}
+		</if>		 
+		ORDER BY order_no,code
+    </select>
+
+    <select id="getCateListCount" parameterType="kr.co.ucomp.web.pmb.dto.PlanCateMngDto" resultType="Long">
+		SELECT 
+			 COUNT(*)
+		FROM tb_cmm_code a
+		WHERE code_group = 'plan_tag_code_group' 
+		<if test='searchCateGroupSp != null and searchCateGroupSp !=""'>
+			AND etc1 = #{searchCateGroupSp}
+		</if>	
+    </select>
+    
+
+
+    <select id="getTaglist" parameterType="kr.co.ucomp.web.pmb.dto.PlanCateMngDto" resultType="kr.co.ucomp.web.pmb.entity.PlanCateMngEntity">
+			SELECT b.code,
+			       b.code_name,
+			       b.order_no
+			FROM tb_pmb_plan_tag_category a, tb_cmm_code b 
+			WHERE a.cate_id =#{searchCateCode}
+			AND a.tag_id = b.code 
+			AND b.code_group = 'plan_tag_code' 
+			and b.use_yn = 'Y'
+    </select>
+
+    
+
+    <insert id="create" parameterType="kr.co.ucomp.web.pmb.entity.PlanCateMngEntity">
+	INSERT INTO tb_cmm_code (code_group, code, code_name, code_desc, order_no, etc1, use_yn,  create_id,  modified_id) 
+	VALUES(	
+		#{codeGroup},
+		#{code},
+		#{codeName},
+		#{codeDesc},
+		#{orderNo},
+		#{etc1},
+		#{useYn},
+		#{createId},
+		#{modifiedId}
+	);
+    </insert>
+
+
+
+   <insert id="update" parameterType="kr.co.ucomp.web.pmb.entity.PlanCateMngEntity">
+	UPDATE tb_cmm_code 
+	SET modified_id =  #{modifiedId},
+		<if test='useYn != null and useYn !=""'>
+			use_yn = #{useYn},
+		</if>
+		<if test='orderNo != null and orderNo !=""'>
+			order_no = #{orderNo},
+		</if>
+		<if test='codeName != null and codeName !=""'>
+			code_name = #{codeName},
+			code_desc = #{codeName},
+		</if>
+		<if test='etc1 != null and etc1 !=""'>
+			etc1 = #{etc1},
+		</if>		
+		modified_date = NOW()	
+	  WHERE code_group = #{codeGroup}
+      AND code=#{code}
+    </insert>
+
+    <delete id="delete" parameterType="Map">
+        DELETE FROM tb_cmm_code
+        WHERE code_group = #{codeGroup}
+        AND code=#{code}
+    </delete>
+    
+    
+    
+    <update id="updatePlanTag"  parameterType="kr.co.ucomp.web.pmb.dto.PlanUpdateDto" >
+		UPDATE tb_pmb_plan_list SET
+					modified_id=#{modifiedId}, 
+					plan_tag1=#{planTag1},
+					plan_tag2=#{planTag2}, 
+					plan_tag3=#{planTag3},
+					plan_tag4=#{planTag4}, 
+					plan_tag5=#{planTag5}, 
+					modified_date=NOW()
+		WHERE id=#{id};
+	</update>
+	
+	
+	
+	
+	<select id="maxTagCode" parameterType="map" resultType="string">
+        SELECT MAX(CODE) 
+        FROM tb_cmm_code 
+        WHERE code_group = 'plan_tag_code' 
+    </select>
+    
+    
+    <select id="maxCateCode" resultType="string">
+        SELECT MAX(CODE) 
+        FROM tb_cmm_code 
+        WHERE code_group = 'plan_tag_code_group' 
+    </select>
+
+
+
+    <delete id="deleteTagCateMap" parameterType="map">
+        DELETE FROM tb_pmb_plan_tag_category WHERE cate_id = #{cateCode}
+    </delete>
+    
+    <delete id="insertTagCateMap" parameterType="map">
+        INSERT INTO tb_pmb_plan_tag_category(cate_id,tag_id) 
+        VALUES (
+	        #{cateCode},
+	        #{tagCode}
+        )
+    </delete>
+    
+
+</mapper>

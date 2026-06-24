@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.csm.banner.mapper.BannerPlanMapper">
+
+
+    <sql id="listWhere">
+    	<!-- 배너 명 조회 -->
+   		<if test='searchBannerId != null and searchBannerId !=""'>
+			AND banner_id = #{searchBannerId}
+		</if>		
+
+    </sql>
+
+	<sql id="Base_Column_list">
+		id
+		,banner_id
+		,plan_id
+	</sql>
+	
+
+    <select id="list" parameterType="kr.co.ucomp.web.csm.banner.dto.BannerPlanCreateDTO" resultType="kr.co.ucomp.web.csm.banner.entity.BannerPlanEntity">
+        SELECT
+            <include refid="Base_Column_list" />
+        FROM
+            tb_svc_banner_plan_list
+        WHERE 1=1
+        <include refid="listWhere"/>
+        order by id desc
+    </select>
+    
+    
+        <select id="listCount" parameterType="kr.co.ucomp.web.csm.banner.dto.BannerPlanCreateDTO" resultType="Long">
+        SELECT count(1)
+        FROM
+            tb_svc_banner_plan_list
+        WHERE 1=1
+        <include refid="listWhere"/>
+    </select>
+
+    <insert id="create" parameterType="kr.co.ucomp.web.csm.banner.dto.BannerPlanCreateDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_svc_banner_plan_list (
+          	banner_id
+			,plan_id
+        ) VALUES (
+            #{bannerId},
+            #{planId}
+        )
+    </insert>
+
+  
+    <delete id="delete" parameterType="int">
+        DELETE FROM tb_svc_banner_plan_list
+        WHERE id = #{id}
+    </delete>
+
+
+</mapper>

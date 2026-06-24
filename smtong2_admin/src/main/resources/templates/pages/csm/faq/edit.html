@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='07',menuId ='0402'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<script th:src="|https://cdn.tiny.cloud/1/${@environment.getProperty('tinymce.apikey')}/tinymce/7/tinymce.min.js|"  referrerpolicy="origin" ></script>
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script type="text/javascript">
+
+	
+		document.addEventListener('DOMContentLoaded', () => {
+			var procMsg = "[[${procMsg}]]";
+			if(procMsg!="" || procMsg !="") {
+				if(procMsg == "sucess") {
+					
+					var procSp = "[[${procSp}]]";
+					if(procSp =="c") {
+						showAlert("등록 되었습니다.",moveList);	
+					} else {
+						showAlert("수정 되었습니다.",moveList);
+					}
+				} else {
+					alert(procMsg);
+				}
+			}
+			var _mngid = "[[${record.id}]]";
+			if(_mngid== "0") {
+				$("#displayYn1").prop("checked",true);
+			}
+			initTinyEditor("edt_ansContent"); // 지원 정보 에디터 초기화
+		});
+		
+		// 에디터 초기화 완료 후 callback 함수
+		function customInitEditor(editor,targer) {
+		    // 지원정보 에디터 db 값 세팅
+		    if("edt_ansContent" == targer) {
+		    	editor.setContent($("#ansContent").val());
+		    }
+		}
+		
+		function saveData() {
+			if($("#faqCategory").val() =="") {
+				showAlert("카테고리를 선택 하세요.");
+				return;
+			}
+			
+			if($("#inquiry").val() =="") {
+				showAlert("질문을 입력 하세요.");
+				return;
+			}
+			
+			
+			showConfirm( '저장 하시겠습니까?',
+                    () => { 
+                    	saveProc(); 
+                    },
+                    () => { },
+                    'faq관리'
+             )
+		}
+		
+		
+		function saveProc() {
+			
+			$("#ansContent").val(tinymce.get('edt_ansContent').getContent());  // 지원 정보 에디터 값 저장용 textarea 로 전달
+			
+			$("#recordForm").submit();
+		}
+		
+		
+		function goList(delId) {
+			showConfirm( '입력한 내용이 저장되지 않습니다. 목록으로 돌아가시겠습니까?',
+                    () => { 
+                    	moveList(); 
+                    },
+                    () => { },
+                    'faq관리'
+             )
+		}
+		
+		
+		function moveList() {
+			window.location.href="/cms/faq/list"; 
+		}
+		
+		
+		
+
+	</script>
+		
+</th:block>
+
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="location mb-2">
+            <small class="text-secondary">
+                <i class="fas fa-home me-1"></i>
+                <a href="#">홈</a> > <a href="/svc/mainbanner/dealList">서비스관리</a> > <a href="/cms/notice/list">게시판관리</a> > <a href="/cms/faq/list">FAQ</a>
+            </small>
+        </div>
+        <h2 class="page-title fs-4 mb-4">
+               FAQ 등록
+        </h2>
+
+        <!-- 입력 폼 섹션 -->
+		<form id="recordForm" th:object="${record}" method="POST" th:action="${record == null or record.id == 0} ? '/cms/faq/create' : '/cms/faq/update'">
+			<input type="hidden" th:field="*{id}" >
+	        <div class="search-section detail">
+	        		<!-- 카테고리 -->
+		            <div class="form-row full-width">
+		                <div class="form-label">
+		                    카테고리<span class="required">*</span>
+		                </div>
+		                <div class="form-control-wrap">
+							<select class="form-select" style="width: 120px" th:field="*{faqCategory}">
+                               	<option value="">카테고리</option>
+                                   <th:block th:each="item : ${codeList}"> 
+			                    <option  th:value="${item.code}" th:text="${item.codeName}"></option>
+			                    </th:block>
+                            </select>
+                            <th:block th:if="${#fields.hasErrors('faqCategory')}" class="error"><span th:errors="*{faqCategory}" class="required">Field error</span></th:block>
+		                </div>
+		            </div>
+		            <!-- 질문 -->
+		            <div class="form-row full-width">
+		                <div class="form-label">
+		                    질문<span class="required">*</span>
+		                </div>
+		                <div class="form-control-wrap">
+		                    <input type="text" class="form-control" placeholder="질문을 등록해주세요." th:field="*{inquiry}" required maxlength="500">
+							<th:block th:if="${#fields.hasErrors('inquiry')}" class="error"><span th:errors="*{inquiry}" class="required">Field error</span></th:block>
+		                </div>
+		            </div>
+		
+		            <!-- 답변 -->
+		            <div class="form-row full-width">
+		                <div class="form-label">
+		                    답변<span class="required">*</span>
+		                </div>
+		                <div class="form-control-wrap">
+		                	<textarea class="form-control" id="edt_ansContent"></textarea>
+		                    <textarea class="form-control" th:field="*{ansContent}"style="display:none"></textarea>
+							<th:block th:if="${#fields.hasErrors('ansContent')}" class="error"><span th:errors="*{ansContent}" class="required">Field error</span></th:block>
+		                </div>
+		            </div>
+		
+		           <!-- 노출 -->
+		            <div class="form-row full-width">
+		                <div class="form-label">
+		                   노출<span class="required">*</span>
+		                </div>
+						<div class="form-control-wrap">
+		                    <div class="form-check-group">
+		                        <div class="form-check form-switch mb-3">
+		                            <input class="form-check-input" name="displayYn" id="displayYn" type="checkbox" th:field="*{displayYn}" value="1" >
+		                        </div>
+								<th:block th:if="${#fields.hasErrors('displayYn')}" class="error"><span th:errors="*{displayYn}" class="required">Field error</span></th:block>
+		                    </div>
+		                </div>
+		            </div>
+	            </div>
+            </form>
+        </div>
+        
+        <!-- 버튼 영역 -->
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">
+                닫기
+            </button>
+            <button type="button" class="btn btn-lg btn-dark px-4 btn-sm" onclick="saveData();">
+                저장
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.svc.banner.mapper.BannerMapper">
+
+
+    <sql id="listWhere">
+		
+		<!-- 등록일 조회-->
+    	<if test='searchStartDt != null and searchStartDt !=""'>
+			AND create_date  <![CDATA[>=]]> #{searchStartDt}
+		</if>		
+    	<if test='searchEndDt != null and searchEndDt !=""'>
+			AND create_date <![CDATA[<=]]> #{searchEndDt}
+		</if>
+		
+		<!-- 게시상태 조회-->
+		<if test="(isDispStatusBef != null and isDispStatusBef == 1) 
+			or (isDispStatusDsp != null and isDispStatusDsp == 1)
+			or (isDispStatusEnd != null and isDispStatusEnd == 1)">
+		
+			<trim prefix="AND (" prefixOverrides="OR" suffix=")">
+				<!-- 게시전-->
+		    	<if test='isDispStatusBef != null and isDispStatusBef == 1'>
+			        OR start_date <![CDATA[>]]> Now()
+			    </if>
+			    
+			    <!-- 게시-->
+			    <if test='isDispStatusDsp != null and isDispStatusDsp == 1'>
+			        OR 
+			        	( 
+			        		( start_date <![CDATA[<=]]> Now() AND end_date <![CDATA[>=]]> Now() )
+			        		OR
+			        		( status = 'ALWAYS' ) 
+			        	)
+			    </if>
+			    <!-- 게시 종료-->
+			    <if test='isDispStatusEnd != null and isDispStatusEnd == 1'>
+			        OR end_date <![CDATA[<]]> Now()
+			    </if>
+			</trim>
+		</if>
+
+		<!-- 배너 명 조회 -->
+   		<if test='keyword != null and keyword !=""'>
+			AND banner_name LIKE CONCAT('%', #{keyword}, '%')
+		</if>		
+
+		<!-- 배너 type 조회 조회 -->
+   		<if test='searchBannerType != null and searchBannerType !=""'>
+			AND type = #{searchBannerType}
+		</if>
+		
+		<!-- 사용여부 조회 -->
+		<if test='searchUseYn != null and searchUseYn !=""'>
+			AND use_yn = #{searchUseYn}
+		</if>
+		
+    </sql>
+
+	<sql id="Base_Column_list">
+		id
+		,status
+		,type
+		,banner_name
+		,image_pc
+		,image_mo
+		,sort
+		,url
+		,url_target
+		,banner_alt
+		,start_date
+		,end_date
+		,use_yn
+		,logo_color
+		,bg_color
+		,create_date
+		,create_id
+		,modified_date
+		,modified_id
+		,GET_ADMIN_USER_NM(create_id) as createNm
+		,GET_ADMIN_USER_NM(modified_id) as modifiedNm
+		,(select count(1) from tb_svc_banner_plan_list where banner_id = a.id) bannPlanCnt
+		,(select GROUP_CONCAT(plan_id) from tb_svc_banner_plan_list where banner_id = a.id) bannPlanIds
+
+	</sql>
+	
+
+    <select id="list" parameterType="kr.co.ucomp.web.svc.banner.dto.BannerSearchDto" resultType="kr.co.ucomp.web.svc.banner.entity.BannerEntity">
+        SELECT
+            <include refid="Base_Column_list" />
+        FROM
+            tb_svc_banner_mng a
+        WHERE 1=1
+        <include refid="listWhere"/>
+        
+        <if test='searchOrderSp != null and searchOrderSp !=""'>
+			<choose>
+				<when test="searchOrderSp == '01'">  
+					ORDER BY sort , id desc
+				</when>
+				<otherwise> 
+					ORDER BY id desc
+				</otherwise>
+			</choose>
+        </if>
+        	
+        
+        LIMIT #{offset}, #{recordSize}
+    </select>
+    
+    
+    <select id="listCount" parameterType="kr.co.ucomp.web.svc.banner.dto.BannerSearchDto" resultType="Long">
+        SELECT count(1)
+        FROM
+            tb_svc_banner_mng a
+        WHERE 1=1
+        <include refid="listWhere"/>
+    </select>
+    
+    <select id="listWithoutLimit" parameterType="kr.co.ucomp.web.svc.banner.dto.BannerSearchDto" resultType="kr.co.ucomp.web.svc.banner.entity.BannerEntity">
+    	SELECT
+            <include refid="Base_Column_list" />
+            ,CASE
+	      	 WHEN start_date <![CDATA[>]]> NOW() THEN 0
+	      	 WHEN ( start_date <![CDATA[<=]]> Now() AND end_date <![CDATA[>=]]> NOW() ) OR (status = 'ALWAYS') THEN 1
+				 WHEN end_date <![CDATA[<]]> Now() THEN 2
+			 END AS order_no
+        FROM
+            tb_svc_banner_mng a
+        WHERE 1=1
+        <include refid="listWhere"/>
+        order by 
+        <if test='searchBannerType != null and searchBannerType !=""'>
+        	<if test='searchBannerType.equalsIgnoreCase("02")'>
+        		sort asc,
+        	</if>
+        </if>
+        	id desc
+        <if test='searchBannerType != null and searchBannerType !=""'>
+        	<if test='!searchBannerType.equalsIgnoreCase("02")'>
+        		, order_no asc
+        	</if>
+        </if>
+    </select>
+
+    <select id="getDetail" parameterType="Long" resultType="kr.co.ucomp.web.svc.banner.entity.BannerEntity">
+        SELECT
+             <include refid="Base_Column_list" />
+        FROM
+            tb_svc_banner_mng a
+        WHERE id = #{id}
+    </select>
+
+    <insert id="create" parameterType="kr.co.ucomp.web.svc.banner.entity.BannerEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_svc_banner_mng (
+            status,
+            type,
+            banner_name,
+            image_pc,
+            image_mo,
+            sort,
+            url,
+            url_target,
+            banner_alt,
+            start_date,
+            end_date,
+			
+			logo_color,
+            bg_color,   
+            
+            create_id,
+            modified_id
+        ) VALUES (
+            #{status},
+            #{type},
+            #{bannerName},
+            #{imagePc},
+            #{imageMo},
+            #{sort},
+            #{url},
+            #{urlTarget},
+            #{bannerAlt},
+            #{startDate},
+            #{endDate},            
+            #{logoColor},
+            #{bgColor},            
+            #{createId},
+            #{modifiedId}
+        )
+    </insert>
+
+    <update id="update" parameterType="kr.co.ucomp.web.svc.banner.entity.BannerEntity">
+             UPDATE tb_svc_banner_mng
+	        SET
+	            status = #{status},
+	            type = #{type},
+	            banner_name = #{bannerName},
+	            image_pc = #{imagePc},
+	            image_mo = #{imageMo},
+	            sort = #{sort},
+	            url = #{url},
+	            url_target = #{urlTarget},
+	            banner_alt = #{bannerAlt},
+	            start_date = #{startDate},
+	            end_date = #{endDate},	            
+	            logo_color = #{logoColor},
+	            bg_color = #{bgColor},	            
+	            modified_id = #{modifiedId},
+	            use_yn = #{useYn}
+	        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="Long">
+        DELETE FROM tb_svc_banner_mng
+        WHERE id = #{id}
+    </delete>
+
+	<select id="getUseCnt" parameterType="kr.co.ucomp.web.svc.banner.entity.BannerEntity" resultType="int">
+		SELECT COUNT(1) 
+		FROM tb_svc_banner_mng
+		WHERE 1 = 1 
+		AND type = #{type} 
+		AND use_yn ='Y'
+		AND ( ( start_date <![CDATA[<=]]> NOW() AND end_date <![CDATA[>=]]> NOW() ) OR ( status = 'ALWAYS' ) )
+		AND id != #{id}
+	</select>
+</mapper>

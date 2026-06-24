@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.pmb.mapper.ScrapingLogMapper">
+	<sql id="baseColList">
+		 id
+		,cycle_id
+		,log_type
+		,GET_CODE_NAME('log_type', log_type) AS logTypeName
+		,function_name
+		,log_time
+		,message
+	</sql>
+	<sql id="listWhere">
+		<where>
+	 		<!-- 로그타입 -->
+			<if test='searchLogType != null and searchLogType !="ALL"'>
+				AND log_type = #{searchLogType}
+			</if>
+		</where>
+	</sql>
+	<!-- 	
+	private Long 	searchId;
+	private Integer searchCycleId;
+	private String	searchLogType;
+	private String	searchfunctionName;
+	private String	searchMessage;
+	 -->
+
+
+	<select id="getScrapingLogList" parameterType="kr.co.ucomp.web.pmb.dto.ScrapingLogSearchDto" resultType="kr.co.ucomp.web.pmb.entity.ScrapingLogEntity">
+		SELECT
+		<include refid="baseColList" />
+		FROM tb_pmb_scraping_logs
+		<include refid="listWhere" />
+		ORDER BY id DESC
+		LIMIT #{offset}, #{recordSize}
+	</select>
+
+	<select id="getScrapingLogListCnt" parameterType="kr.co.ucomp.web.pmb.dto.ScrapingLogSearchDto" resultType="long">
+		SELECT COUNT(1)
+		FROM tb_pmb_scraping_logs
+		<include refid="listWhere" />
+	</select>
+	
+	<select id="getScrapingLog" parameterType="kr.co.ucomp.web.pmb.dto.ScrapingLogSearchDto" resultType="kr.co.ucomp.web.pmb.entity.ScrapingLogEntity">
+		SELECT
+		<include refid="baseColList" />
+		FROM tb_pmb_scraping_logs
+		WHERE id = #{searchId}
+	</select>
+	
+	
+	<select id="getPlanId" parameterType="kr.co.ucomp.web.pmb.dto.ScrapingLogSearchDto" resultType="kr.co.ucomp.web.pmb.entity.PlanEntity">
+		SELECT id
+		FROM tb_pmb_plan_list
+		WHERE uuid = #{searchUuid}
+	</select>
+	
+	<select id="getPlanIds" parameterType="kr.co.ucomp.web.pmb.dto.ScrapingLogSearchDto" resultType="kr.co.ucomp.web.pmb.entity.PlanEntity">
+		SELECT id
+		FROM tb_pmb_plan_list
+		<if test='searchUuid != null and searchUuid !=""'>
+		WHERE uuid IN
+		<foreach item="uuid" index="index" collection="_parameter.searchUuid.split(',')" open="(" separator="," close=")">
+		#{uuid}
+		</foreach>
+		</if>
+	</select>
+	
+	
+	<select id="getPlanListColumnInfo" resultType="kr.co.ucomp.web.cmm.entity.ColumnInfoEntity">
+		SELECT TABLE_NAME     AS tableName
+		     , COLUMN_NAME    AS columnName
+		     , COLUMN_COMMENT AS columnComment
+		FROM   INFORMATION_SCHEMA.COLUMNS
+		WHERE  TABLE_NAME = 'tb_pmb_plan_list'
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	<insert id="insertScrapingLog" parameterType="kr.co.ucomp.web.pmb.entity.ScrapingLogEntity">
+		INSERT INTO tb_pmb_scraping_logs (
+		 cycle_id, log_type, function_name, log_time, message
+		)
+		VALUES (
+			#{cycleId},
+			#{logType},
+			#{functionName},
+			#{logTime},
+			#{message}
+		)
+	</insert>
+	
+	
+</mapper>

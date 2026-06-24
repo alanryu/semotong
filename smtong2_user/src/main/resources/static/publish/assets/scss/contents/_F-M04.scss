@@ -1,0 +1,101 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 세모통 파트너사
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 세모통 파트너사 페이지
+.F-M04-page {
+
+	// 페이지별 섹션 여백 설정
+	padding-top: 20rem;
+	--sec-outer-margin: 50rem;
+	@include bottom-spacer;
+
+	// s: 세모통 파트너사 섹션
+	.partner-sec {
+		@include sec-basic;
+
+		.partner-srch {
+			margin-bottom: 40rem;
+		}
+
+		.partner-list-wrap {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			padding: 4rem 10rem 0 10rem; /* 2차 수정 : 검색제외 여백수정 */
+
+			.partner-tit {
+				width: 100%;
+				margin-bottom: 10rem;
+				text-align: left;
+				font-weight: 500;
+				font-size: 16rem;
+				line-height: 20rem;
+				color: #63666A;
+			}
+			.partner-list {
+				display: grid;
+				grid-template-columns: 1fr 1fr 1fr;
+				gap: 30rem 40rem;
+				.partner-item {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+				}
+				.partner-link {
+					display: block;
+					width: 72rem;
+					height: calc(20rem * 1.25);
+					img {
+						height: 100%;
+					}
+				}
+				@include media-mobile-xl {
+					grid-template-columns: 1fr 1fr 1fr 1fr;
+				}
+				@include media-min-width(600px) {
+					gap: 30rem 50rem;
+					.partner-link {
+						width: calc(72rem * 1.25);
+						height: calc(20rem * 1.25);
+					}
+				}
+				@include media-min-width(700px) {
+					grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+				}
+			}
+
+			// Case 검색된 상태
+			.partner-list.is-srched {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: flex-start;
+				justify-content: flex-start;
+				margin-right: auto;
+				gap: 16rem;
+				min-height: 300rem;
+				padding-bottom: 250rem;
+				.partner-link {
+					width: auto;
+					height: auto;
+					padding: 8rem 16rem;
+					border-radius: 30rem;
+					background-color: #EFF0F0;
+					img {
+						height: calc(20rem * 1.25);
+					}
+				}
+			}
+
+			// Case 검색결과 없음
+			.nodata {
+				height: 300rem;
+				@include nodata;
+			}
+		}
+	}
+	// e: 세모통 파트너사 섹션
+
+}
+// e: 세모통 파트너사 페이지

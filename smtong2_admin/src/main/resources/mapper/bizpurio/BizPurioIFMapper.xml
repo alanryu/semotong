@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.bizpurio.mapper.BizPurioIFMapper">
+
+
+	<sql id="listWhere">
+			<if test='alamSp != null and alamSp !=""'>
+				AND MEDIA = #{alamSp}
+			</if>
+			
+			<!-- 기간 조회-->
+          <if test='searchStartDt != null and searchStartDt !=""'>
+              AND UNIXTIME  <![CDATA[>=]]> UNIX_TIMESTAMP(#{searchStartDt}) 
+          </if>
+          <if test='searchEndDt != null and searchEndDt !=""'>
+              AND UNIXTIME <![CDATA[<=]]> UNIX_TIMESTAMP(#{searchEndDt})
+          </if>
+          
+          <if test='keyword != null and keyword !=""'>
+    		AND PHONE LIKE CONCAT('%', #{keyword}, '%')
+    	 </if> 
+	</sql>
+	
+	<!--  ========================================= code group manage ============================================================ -->
+	<sql id="Base_Column_list_Group">
+		id
+		,GET_CODE_NAME('biz_alam_type', UPPER(DEVICE)) AS DEVICE
+		,CMSGID
+		,MSGID
+		,PHONE
+		,MEDIA
+		,TO_NAME
+		,FROM_UNIXTIME(UNIXTIME) UNIXTIME
+		,GET_CODE_NAME('biz_alam_state', RESULT) AS RESULT
+		,USERDATA
+		,WAPINFO
+		,TELRES
+		,TELTIME
+		,KAORES
+		,KAOTIME
+		,RCSRES
+		,RCSTIME
+		,RETRY_FLAG
+		,RESEND_FLAG
+		,REFKEY
+		,create_date				
+	</sql>
+	
+	<select id="getList" parameterType="kr.co.ucomp.web.bizpurio.dto.BizPurioMsgResDto" resultType="kr.co.ucomp.web.bizpurio.entity.BizPurioMsgResEntity">
+		  SELECT
+	            <include refid="Base_Column_list_Group" />
+	        FROM
+	            tb_cmm_bizpurioSendRes
+	        WHERE 1=1
+	        <include refid="listWhere" />
+	        ORDER BY id desc
+	        LIMIT #{offset}, #{recordSize}
+
+	</select>
+
+	<select id="getListCount" parameterType="kr.co.ucomp.web.bizpurio.dto.BizPurioMsgResDto" resultType="Long">
+		  SELECT
+	            count(1)
+	        FROM
+	            tb_cmm_bizpurioSendRes
+	        WHERE 1=1
+	        <include refid="listWhere" />
+	</select>
+	
+	
+	
+	
+</mapper>

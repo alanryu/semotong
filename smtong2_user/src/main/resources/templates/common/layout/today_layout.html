@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lagn="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+
+	<title th:text="${metaTitle != null ? metaTitle : '알뜰폰 요금제 비교 | 최저가 추천 및 번호이동 | 세모통'}"></title>
+	<meta name="keywords" 		th:content="${metaKeywords != null ? metaKeywords : '알뜰폰, 알뜰폰 요금제, 최저가 요금제, 인터넷 결합, 번호이동, USIM, 통신비 절약, MVNO, 세모통'}">
+	<meta name="description" 	th:content="${metaDescription != null ? metaDescription : '통신호갱 없는 세상, 세모통에서 알뜰폰 요금제를 비교하고 최저가 추천을 받아보세요. USIM 신규가입 및 번호 이동을 쉽고 빠르게 할 수 있습니다!'}">
+	
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+	<!-- Open Graph (SNS 공유 최적화) -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="알뜰폰 요금제 비교 | 최저가 추천 및 번호이동 | 세모통" />
+	<meta property="og:description" content="알뜰폰 최저가 요금제를 찾고 계신가요? 세모통에서 간편하게 비교하고 USIM 신규가입, 번호이동까지 한 번에 해결하세요!" />
+	<meta property="og:image" th:content="${baseUrl} + '/images/common/semotong-og-image.jpg'" />
+	<meta property="og:url" th:content="${baseUrl}" />
+	<meta property="og:site_name" content="세모통" />
+
+	<script type="application/ld+json" id="site-product-ld" th:inline="javascript">
+	{
+	  "@context": "https://schema.org",
+	  "@type": "WebSite",
+	  "name": "세모통",
+	  "url": [[${baseUrl + '/'}]],
+	  "logo": [[${baseUrl + '/images/common/img-logo-header-wh.svg'}]],
+	  "description": "세모통에서 알뜰폰 요금제를 비교하고 최저가 추천을 받아보세요. USIM 신규가입 및 번호이동을 쉽고 빠르게 할 수 있습니다!",
+	  "potentialAction": {
+	    "@type": "SearchAction",
+	    "target": [[${baseUrl + '/pbm/plan/planList/mvno?q={search_term_string}'}]],
+	    "query-input": "required name=search_term_string"
+	  }
+	}
+	</script>
+		
+
+	<link rel="stylesheet" type="text/css" th:href="@{/css/semotong_ponitto.css}" />
+	
+
+	<script th:src="@{/js/libs/jquery.min.js}"></script>
+	<script th:src="@{/js/libs/librurys.min.js}"></script>
+	<script th:src="@{/js/libs/jquery.tmpl.min.js}"></script>
+	<script th:src="@{/js/ui/ui.common.js}"></script>
+	<script th:src="@{/js/ui/commonUtil.js}"></script>
+	<!-- 페이지 스크립트 영역 -->
+	<!-- Swiper Librarys -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.0.0/swiper-bundle.min.css" />
+	<th:block th:if="${swiper == '07'}">
+		<script src="https://cdn.jsdelivr.net/npm/swiper@7.0.0/swiper-bundle.min.js"></script>
+	</th:block>
+	<th:block th:if="${swiper != '07'}">
+		<script src="https://cdn.jsdelivr.net/npm/swiper@11.0.0/swiper-bundle.min.js"></script>
+	</th:block>
+	<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+
+	<script>
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+
+		
+		
+	</script>
+
+	<!-- Google Tag Manager -->
+	<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+	'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+	})(window,document,'script','dataLayer','[[${googleTagManagerId}]]');</script>
+	<!-- End Google Tag Manager -->
+
+	
+	<th:block layout:fragment="css"></th:block>
+    <!-- content script -->
+    <th:block layout:fragment="script"></th:block>
+</head>
+<body>
+	
+	<!-- Google Tag Manager (noscript) -->
+	<noscript><iframe th:src="'https://www.googletagmanager.com/ns.html?id=' + ${googleTagManagerId}" 
+	height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+	<!-- End Google Tag Manager (noscript) -->
+
+	<div class="wrapper sub-wrapper">
+	    <!-- header fragment 사용 -->
+		<th:block th:replace="~{common/fragment/headerToday :: HeaderFragment}"></th:block>
+		
+		<th:block th:replace="~{common/fragment/asideToday :: asideFragment}"></th:block>
+		
+		
+		<!-- content fragment 사용 -->
+		<th:block layout:fragment="Content"></th:block>
+		
+		<!-- footer fragment 사용 -->
+		<th:block th:replace="~{common/fragment/footer :: FooterFragment}"></th:block>
+		
+		
+	</div>
+	
+	
+	
+	<!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+	-->
+	<!-- Modal Alert -->
+	<div class="modal modal-alert fade" id="alertModal" tabindex="-1" role="alertdialog" data-bs-backdrop="static" aria-labelledby="alertModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title blind" id="alertModalLabel">Alert Message</h3>
+				</div>
+				<div class="modal-body">
+					<section class="msg-sec">
+						<h4 class="sec-tit">Alert 제목 텍스트가 들어가는 영역입니다.</h4>
+						<p class="sec-txt"><span class="txt-primary"></span></p>
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal primary" data-bs-dismiss="modal" id="alertModalCloseId">
+						<span>확인</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
+	<!-- Modal Confirm -->
+	<div class="modal modal-confirm fade" id="confirmModal" tabindex="-1" role="alertdialog" data-bs-backdrop="static" aria-labelledby="confirmModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title blind" id="confirmModalLabel">Confirm Message</h3>
+				</div>
+				<div class="modal-body">
+					<section class="msg-sec">
+						<h4 class="sec-tit" id="confirmModal_Title">Confirm 제목 텍스트가 들어가는 영역입니다.</h4>
+						<p class="sec-txt" id="commonConfirmMessage"></p>
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal"  id="confirmModalCancelBtn">
+						<span>아니요</span>
+					</button>
+					<button type="button" class="ui-btn btn-modal primary" data-bs-dismiss="modal" id="confirmModalConfirmBtn">
+						<span>예</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // Modal Confirm -->
+		
+	<!-- 5차 수정 : QoS 팝업 추가 -->
+	<div class="modal modal-basic fade" id="QosModal" tabindex="-1" role="dialog" aria-labelledby="QosModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="QosModalLabel">QoS(데이터 소진 시 속도) </h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<section class="qos-sec">
+						<table class="qos-table">
+							<caption>
+								<strong>QoS(데이터 소진 시 속도) 표</strong>
+								<p>속도, 인터넷, 유튜브 재생 속도 로 구성됨</p>
+							</caption>
+							<colgroup>
+								<col style="width: 80rem;" />
+								<col style="width: auto;" />
+								<col style="width: 80rem;" />
+							</colgroup>
+							<thead>
+								<tr>
+									<th scope="col">전송 속도</th>
+									<th scope="col">인터넷</th>
+									<th scope="col">재생 속도</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>1Mbps</td>
+									<td>텍스트와 용량이 작은 <br>이미지 페이지 이용 가능</td>
+									<td>480p</td>
+								</tr>
+								<tr>
+									<td>3Mbps</td>
+									<td>용량이 큰 이미지 파일 등 <br>큰 불편함 없이 이용 가능</td>
+									<td>720p</td>
+								</tr>
+								<tr>
+									<td>5Mbps</td>
+									<td>대부분 쾌적하게 이용 가능</td>
+									<td>1080p</td>
+								</tr>
+							</tbody>
+						</table>
+					</section>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</body>
+</html>

@@ -1,0 +1,107 @@
+<html lagn="ko" 
+      xmlns:th="http://www.thymeleaf.org" 
+      th:fragment="HeaderFragment">
+	
+<!-- Header Deaktop -->
+		<header class="header-desktop">
+			<div class="header-skip">
+				<a href="#content">본문 바로가기</a>
+			</div>
+
+			<div class="header-sec">
+				<!-- 2025-05-08 조찬기 : PC GNB 메뉴정리 -->
+				<nav class="header-nav">
+					<ul class="nav-list">
+						<li class="nav-item">
+							<a href="https://b2bdirect.todaycommsmall.kr/model/model_list.php?mp=11&mpjp=1" role="link" class="ui-btn nav-link">
+								<span>모바일</span>
+							</a>
+							<ul class="nav-depth2">
+								<li>
+									<a href="https://b2bdirect.todaycommsmall.kr/model/model_list.php?mp=11&mpjp=1">갤럭시</a>
+								</li>
+								<li>
+									<a href="https://b2bdirect.todaycommsmall.kr/model/model_list.php?mp=12&mpjp=2">아이폰</a>
+								</li>
+								<li>
+									<a href="https://b2bdirect.todaycommsmall.kr/model/model_list.php?mp=13">키즈폰</a>
+								</li>
+							</ul>
+						</li>
+						<li class="nav-item">
+							<a th:href="${baseUrl} + '/internet/internetReq/02'" role="link" class="ui-btn nav-link">
+								<span>인터넷+TV</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="https://b2bdirect.todaycommsmall.kr/model/model_list.php?mp=9" role="link" class="ui-btn nav-link">
+								<span>워치</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="https://b2bdirect.todaycommsmall.kr/corporation.php" role="link" class="ui-btn nav-link">
+								<span>기업전용</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="https://b2bdirect.todaycommsmall.kr/customer/faq.php" role="link" class="ui-btn nav-link">
+								<span>고객센터</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
+				<h1 class="title">
+					<a href="https://b2bdirect.todaycommsmall.kr/" class="logo"><span class="blind">포니또</span></a>
+				</h1>
+				<div class="header-util">
+					<ul class="service-list">
+						<li class="service-item">
+							<a href="https://b2bdirect.todaycommsmall.kr/event/event_list.php" role="link" class="ui-btn service-link">
+								<span>이벤트</span>
+							</a>
+						</li>
+						<li class="service-item">
+							<a href="https://b2bdirect.todaycommsmall.kr/review/review_list.php" role="link" class="ui-btn service-link">
+								<span>구매후기</span>
+							</a>
+						</li>
+						<li class="service-item">
+							<a href="https://b2bdirect.todaycommsmall.kr/model/order/order_search.php" role="link" class="ui-btn service-link">
+								<span>주문조회</span>
+							</a>
+						</li>
+					</ul>
+					<ul class="member-list">
+						<li class="member-item">
+							<a href="https://b2bdirect.todaycommsmall.kr/login/" role="link" class="ui-btn member-link outlined">
+								<span>로그인</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</header>
+		<!-- // Header Deaktop -->
+
+	<!-- Header Mobile -->
+		<!-- 모바일 헤더에 로고가 나오는 케이스에 한하여 모바일전용 클래스 only-mo 적용 -->
+		<header class="header-mobile">
+			<section class="header-sec">
+				<h1 class="title">
+					<!-- 로고 베타 추가 -->
+					<a href="https://b2bdirect.todaycommsmall.kr/" class="logo"><span class="blind">포니또</span></a>
+					<!-- <span class="logo-beta"><img src="../../assets/images/common/img-logo-header-beta.png" alt=""></span> -->
+				</h1>
+				<button type="button" class="ui-btn btn-aside" data-bs-toggle="modal" data-bs-target="#asideModal">
+					<i class="ui-icn icn-32-anb-bk" aria-label="메뉴열기"></i>
+				</button>
+			</section>
+			<!-- // Mobile Header -->
+		</header>
+		<!-- // Header -->
+
+	
+<script>
+
+</script>	
+</html>

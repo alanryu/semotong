@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	 xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	 layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='04',menuId ='0303'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script id="searchListTmpl" type="text/x-jquery-tmpl">
+		<tr style="cursor: pointer;">
+		    <td id="mnoId" >${id}</td>
+			<td>${name}</td>
+			<td><a href="/pmb/internetplanNew/edit?searchId=${id}">상세보기</a></td>
+			<td>
+				<div class="form-check form-switch mb-3">
+			    	 <input class="form-check-input" type="checkbox" role="switch" {{if newUseYn == 'Y'}}checked="true"{{/if}} onclick="useYnProc('${id}', this)" style="transform: scale(1.5);">
+				</div>
+			</td>
+			<!-- 순서 -->
+			<td class="order-item"  name="orderTd">
+				{{if arrow == 'd'}}
+					<button class="btn btn-dark order-set" data-arrow="down">▼</button>
+				{{else arrow == 'u'}}
+					<button class="btn btn-dark order-set" data-arrow="up">▲</button>
+				{{else}}
+					<button class="btn btn-dark order-set" data-arrow="up">▲</button>
+					<button class="btn btn-dark order-set" data-arrow="down">▼</button>
+				{{/if}}
+			</td>			
+		</tr>
+	</script>
+	<script type="text/javascript">
+		function goDetail(id) {
+			window.location.href = "/pmb/internetplan/edit?searchId=" + id;
+		}
+	
+		document.addEventListener('DOMContentLoaded', () => {
+			searchList();
+			
+			
+			$(document).on('click', '.order-set', function(){
+					
+					var arrow = $(this).data('arrow');
+					
+					var row = $(this).parent().parent();
+					var num = row.index();
+					
+					var max = $('#searchList').find('tr').length;
+					
+					if ( arrow == 'down' ) {
+						
+						if ( num >= max ) {
+							return false;
+						} else {
+							row.next().after(row);
+						}
+					} else if ( arrow == 'up' ) {
+						
+						if(num == 0) { 
+							return false;
+						} else {
+							row.prev().before(row);
+						}
+					}
+					
+					/* 전체 화살표 방향 다시 설정 및 정렬데이터 setting */
+
+					$('#searchList').find('tr').each(function(idx){
+						var html = '';
+						if ( idx == 0 ) {
+							html += '<button class="btn btn-dark order-set" data-arrow="down">▼</button>';
+							$(this).find('td').last().html(html);
+						} else if ( idx === max - 1 ) {
+							html += '<button class="btn btn-dark order-set" data-arrow="up">▲</button>';
+							$(this).find('td').last().html(html);
+						} else {
+							html += '<button class="btn btn-dark order-set" data-arrow="up">▲</button>';
+							html += '<button class="btn btn-dark order-set" data-arrow="down" style="margin-left:5px">▼</button>';
+							$(this).find('td').last().html(html);
+						}
+						
+						
+						var _id = $(this).find('#mnoId').text();
+						var params = {
+							id : _id,
+							orderNo : idx +1							 
+						}
+						
+						$.ajax({
+							url : '/pmb/internetplanNew/ajaxUpdateMno',
+							type : 'POST',
+							dataType : "json",
+							contentType:"application/json",
+							data : JSON.stringify(params),
+							success 	: function (data) {
+								
+							},
+							error 		: function(request, status, error){
+								showAlert(error);
+							},
+							complete 	: function(){
+							}
+						});
+						
+						
+					});
+					
+				});			
+			
+		});
+		
+
+
+		function searchList() {
+			
+			var params = {
+				 
+			    }
+					  
+				$.ajax({
+				   url : '/pmb/internetplanNew/ajaxListMno',
+				  type : 'POST',
+				  dataType : "json",
+				  contentType:"application/json",
+				   data : JSON.stringify(params),
+				   success: function (data) {
+					   $('#searchList').empty();
+						var totalCnt = data.totalCnt;
+						if(data.totalCnt > 0) {
+							
+							
+							let filteredData = data.data.filter(function(obj, idx) {
+							    return obj.id !== 0;  // id가 0이 아닌 항목만 남김
+							});
+							
+							$.each(filteredData, function(idx, obj){
+								
+								/* 순서 방향 설정 */
+								if ( idx == 0 ) obj.arrow = 'd'
+								else if ( idx == totalCnt-1) obj.arrow = 'u'
+								else obj.arrow = 'b';
+							});
+																				
+							$('#searchListTmpl').tmpl(filteredData).appendTo('#searchList');
+						}
+						
+				    },
+					error : function(request, status, error){
+					  showAlert(request);
+				   },
+				   complete:function(){
+					 // $('#loading').addClass('display-none');
+				   }
+				});
+		}
+		
+				
+
+		
+		
+		/* 사용/미사용 체크 */
+		function useYnProc(id, element) {
+			
+			var useYn = $(element).is(':checked') ? "Y" : "N";
+			
+			var params = {
+			  id : id, 
+			  newUseYn : useYn
+			};
+			
+			$.ajax({
+			   url 		: '/pmb/internetplanNew/ajaxUpdateMno',
+			   type 	: 'POST',
+			   data 	: JSON.stringify(params),
+			   contentType: 'application/json',
+			   success 	: function (data) {
+				   
+				   console.log(data);
+				   searchList();
+			    },
+				error 	: function(request, status, error){
+		            alert(error);
+		        },
+		        complete:function(){
+		        }
+			});
+			
+			$(element).is(':checked')
+		}
+				
+
+		
+	</script>
+</th:block>
+
+<div class="main-content">
+	   <div class="container-fluid">
+		   <!-- 로케이션 & 제목 영역 추가 -->
+		  <div class="page-header mb-4">
+			 <div class="location mb-2">
+				<small class="text-secondary">
+				    <i class="fas fa-home me-1"></i>
+				    <a href="/mbm/adminuser/list">홈</a> > <a href="/pbm/plan/list">상품관리</a> > <a href="/pmb/internetplanNew/list">인터넷</a>
+				</small>
+			 </div>
+			 <h2 class="page-title fs-4 mb-4">인터넷 상품 노출 관리(세모통)_new</h2>
+		  </div>
+	
+		  <div class="table-section">
+			 <table class="table custom-table">
+				<thead>
+				    <tr>
+					   <th>No</th>
+					   <th>Mno</th>
+					   <th>상품관리</th>
+					   <th>사용여부</th>
+					   <th>순서</th>					   
+				    </tr>
+				</thead>
+				<tbody id="searchList">
+				   
+				</tbody>
+			 </table>
+
+			 <div class="d-flex justify-content-left mt-4">
+				<ul class="pagination">
+				    
+				</ul>
+			 </div>
+		 </div>
+	</div>
+</DIV>

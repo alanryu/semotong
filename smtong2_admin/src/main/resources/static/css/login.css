@@ -1,0 +1,139 @@
+@charset "UTF-8";
+
+body {
+  background-color: #f0f2f5;
+  font-family: 'Roboto', sans-serif;
+}
+
+.login-card {
+  background: white;
+  padding: 48px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .1), 0 8px 16px rgba(0, 0, 0, .1);
+  width: 100%;
+  max-width: 550px;
+  margin: 0 20px;
+}
+
+.logo-img {
+  height: 40px;
+  margin-bottom: 8px;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 500;
+  color: #202124;
+}
+
+/* Floating label inputs */
+.floating-input {
+  position: relative;
+}
+
+.floating-input input {
+  height: 52px;
+  padding: 16px 16px 8px 16px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.floating-input label {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: white;
+  padding: 0 4px;
+  color: #5f6368;
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.floating-input input:focus,
+.floating-input input:not(:placeholder-shown) {
+  border: 2px solid #1a73e8;
+  padding-top: 16px;
+}
+
+.floating-input input:focus ~ label,
+.floating-input input:not(:placeholder-shown) ~ label {
+  top: 0;
+  font-size: 13px;
+  color: #1a73e8;
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: #1a73e8;
+  border-color: #1a73e8;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  background-color: #1557b0;
+  border-color: #1557b0;
+}
+
+/* Checkbox styles */
+.form-check {
+  margin-left: 4px;
+}
+
+.form-check-input {
+  border-color: #5f6368;
+}
+
+.form-check-input:checked {
+  background-color: #1a73e8;
+  border-color: #1a73e8;
+}
+
+.form-check-label {
+  color: #5f6368;
+  font-size: 14px;
+}
+
+/* Link styles */
+a {
+  color: #1a73e8;
+}
+
+a:hover {
+  color: #1557b0;
+}
+
+.timer {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #dc3545;
+}
+
+.verification-input {
+  position: relative;
+}
+
+.resend-btn {
+  color: #6c757d;
+  text-decoration: none;
+  font-size: 14px;
+  position:relative;
+  top:-20px;
+}
+
+.resend-btn:hover {
+  color: #495057;
+}
+
+.instruction-text {
+  color: #6c757d;
+  font-size: 14px;
+}
+.btn-dark {
+  height:48px;
+}

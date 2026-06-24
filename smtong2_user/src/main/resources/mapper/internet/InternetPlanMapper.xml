@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.internet.mapper.InternetPlanMapper">
+
+	
+	<sql id="Base_Column_list_Info">
+		 id
+		,internet_mno_id
+		,prod_name
+		,channel_count
+		,internet_speed
+		,GET_CODE_NAME('internet_speed', internet_speed) AS internetSpeedName
+		,normal_price
+		,combination_price
+		,normal_freeble_price
+		,combination_freeble_price
+		,use_yn
+		,manager
+		,create_date
+		,create_id
+		,GET_ADMIN_USER_NM(create_id) as createNm
+		,modified_date
+		,modified_id
+		,GET_ADMIN_USER_NM(modified_id) as modifiedNm
+		,stress_txt
+	</sql>
+	
+	<sql id="listWhereInfo">
+		<where>
+			AND use_yn = 'Y'
+			<if test='searchInternetMno != null and searchInternetMno !=""'>
+				AND internet_mno_id = #{searchInternetMno}
+			</if>
+			
+			<if test='searchProdName != null and searchProdName !=""'>
+				AND prod_name = #{searchProdName}
+			</if>
+			<if test='searchChannelCount != null and searchChannelCount !=""'>
+				AND channel_count = #{searchChannelCount}
+			</if>
+			
+			<if test='searchInternetSpeed != null and searchInternetSpeed !=""'>
+				AND internet_speed = #{searchInternetSpeed}
+			</if>
+			
+			<choose>
+				<when test='searchSiteSp != null and searchSiteSp !=""'>
+					AND site_sp =  #{searchSiteSp}
+				</when>
+				<otherwise>
+					AND site_sp = '01'
+				</otherwise>
+			</choose>
+			
+		</where>
+	</sql>
+	
+	<select id="listPlanName" parameterType="kr.co.ucomp.web.internet.dto.InternetPlanSearchDTO" resultType="kr.co.ucomp.web.internet.entity.InternetPlanEntity">
+		SELECT
+			 DISTINCT prod_name ,channel_count
+		FROM tb_pmb_internet_plan_list
+		<include refid="listWhereInfo" />
+	</select>
+	
+	<select id="list" parameterType="kr.co.ucomp.web.internet.dto.InternetPlanSearchDTO" resultType="kr.co.ucomp.web.internet.entity.InternetPlanEntity">
+		SELECT
+			<include refid="Base_Column_list_Info" />
+		FROM tb_pmb_internet_plan_list
+		<include refid="listWhereInfo" />
+		ORDER BY id ASC
+	</select>
+	
+	<select id="count" parameterType="kr.co.ucomp.web.internet.dto.InternetPlanSearchDTO" resultType="java.lang.Long">
+		SELECT COUNT(1)
+		FROM tb_pmb_internet_plan_list
+		<include refid="listWhereInfo" />
+	</select>
+	
+	
+	
+	
+	
+	<select id="byId" parameterType="kr.co.ucomp.web.internet.dto.InternetPlanSearchDTO" resultType="kr.co.ucomp.web.internet.entity.InternetPlanEntity">
+		SELECT
+			<include refid="Base_Column_list_Info" />
+		FROM tb_pmb_internet_plan_list
+		WHERE id = #{searchId}
+	</select>
+	
+	
+	
+		
+	<select id="getInternetMno" parameterType="int" resultType="kr.co.ucomp.web.internet.entity.InternetPlanMnoEntity">
+		SELECT
+			id
+			,name
+			,mno_logo
+			,manager
+			,use_yn
+			,alam_rcv_num
+		FROM tb_pmb_internet_mno
+		WHERE id = #{id}
+	</select>
+	
+	
+	
+	<select id="getRDPDetail" parameterType="int" resultType="kr.co.ucomp.web.internet.entity.InternetRdpMngEntity">
+		SELECT
+			id
+			,title
+			,top_banner
+			,foot_banner
+			,foot_bar_text
+			,btn_cta
+			,btn_color
+			,use_yn
+			,rd_url
+			,create_date
+			,create_id
+			,modified_date
+			,modified_id
+			,GET_ADMIN_USER_NM(create_id) as createNm
+			,GET_ADMIN_USER_NM(modified_id) as modifiedNm 
+		FROM tb_pmb_internet_rdp
+		WHERE id = #{id}
+	</select>
+	
+	
+</mapper>

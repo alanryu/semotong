@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/order_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='약관동의'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ 
+ <script>
+	
+	
+	$( document ).ready(function() {
+		
+	   
+	});
+	
+	function selUsimType(sp) {
+		$("#usimType").val(sp);
+		$('#btnNext').removeAttr("disabled");
+		
+	}
+	function goNext() {
+		moveNextOrder('/order/indentifyCert');	
+	}
+	
+ </script>
+</th:block>
+
+<!-- Container -->
+<main role="main" class="container">
+<th:block th:include="pages/order/incOrderForm :: orderFormFragment"></th:block>
+<!-- content -->
+			<div class="content F-QU-page F-QU01-07-03-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">필요하신 유심을 선택해주세요.</h2>
+							<p class="sec-explain">유심에 따라 비용이 부과될 수 있어요.</p>
+						</div>
+						<div class="sec-body">
+							<ul class="survey-list">
+								<li class="survey-item">
+									<label class="ui-rdo survey-rdo">
+										<input type="radio" name="frmSurvey" onclick="selUsimType('G')"/>
+										<span class="rdo"><span>일반 유심으로 구매할게요.</span><small class="txt-primary">무료</small></span>
+									</label>
+								</li>
+								<li class="survey-item">
+									<label class="ui-rdo survey-rdo">
+										<input type="radio" name="frmSurvey" onclick="selUsimType('N')"/>
+										<span class="rdo"><span>NFC 유심으로 구매할게요.</span><small>7,700원</small></span>
+									</label>
+								</li>
+							</ul>
+							<div class="help-service">
+								<span class="label-info">
+									<i class="ui-icn icn-16-info-gr" aria-hidden="true"></i>
+									<span>금융결제나 교통카드를 사용하신다면 NFC 유심을 구매하세요.</span>
+								</span>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" disabled id="btnNext" onclick="goNext()">
+							<span>다음</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 페이지 섹션 -->
+			</div>
+			<!-- // content -->
+</main>
+
+	
+</html>

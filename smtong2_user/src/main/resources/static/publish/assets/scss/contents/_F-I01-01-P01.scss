@@ -1,0 +1,77 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 인터넷 상담신청
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 인터넷 상담신청 페이지
+.F-I01-01-P01-page {
+	// s: 상담신청 섹션
+	.consult-frm-sec {
+		padding-top: 16rem;
+
+		.sec-header {
+			font-weight: 600;
+			font-size: 18rem;
+		}
+		.sec-body {
+			margin-top: 8rem;
+		}
+		.consult-msg {
+			position: relative;
+			display: flex;
+			gap: 8rem;
+			padding: 10rem 16rem;
+			border-radius: 4rem;
+			background-color: #EFF0F0;
+			font-weight: 500;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: #63666A;
+			word-break: keep-all;
+			.ui-icn {
+				position: relative;
+				top: 3rem;
+				flex:none;
+			}
+		}
+		.consult-frm {
+			margin-top: 20rem;
+			@include basic-frm;
+		}
+
+		.consult-links {
+			display: flex;
+			justify-content: center;
+			gap: 12rem;
+			margin-top: 32rem;
+		}
+
+		.consult-terms { /* 6차 수정 : 동의여부 구조로 변경 (여기부터) */
+			display: flex;
+			flex-direction: column;
+			gap: 2rem;
+			margin-top: 32rem;
+			.consult-terms-all {
+				padding-bottom: 8rem;
+				margin-bottom: 6rem;
+				border-bottom: 1px solid #EFF0F0;
+				.chk-style1 .chk > span {
+					font-weight: 700;
+					font-size: 16rem;
+					color: #222;
+				}
+			}
+			.consult-terms-item {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				.btn-more { /* 6차 수정 : 동의여부 구조로 변경 (여기까지) */
+					width: 28rem;
+					height: 28rem;
+				}
+			}
+		}
+	}
+	// e: 상담신청 섹션
+}
+// e: 인터넷 상담신청 페이지

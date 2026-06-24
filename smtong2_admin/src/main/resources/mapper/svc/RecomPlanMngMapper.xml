@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.svc.recomplan.mapper.RecomPlanMngMapper">
+
+	<sql id="listWhereInfo">
+		<where>
+			<if test='keyword != null and keyword !=""'>
+				AND (title LIKE CONCAT('%', #{keyword}, '%') OR sub_title_pc LIKE CONCAT('%', #{keyword}, '%') OR sub_title_mo LIKE CONCAT('%', #{keyword}, '%'))
+			</if>
+			<if test='useYn != null and useYn !=-1'>
+				AND use_yn = #{useYn}
+			</if>
+			
+			<if test='searchStartDt != null and searchStartDt !=""'>
+				AND create_date  <![CDATA[>=]]> #{searchStartDt}
+			</if>
+			<if test='searchEndDt != null and searchEndDt !=""'>
+				AND create_date <![CDATA[<=]]> #{searchEndDt}
+			</if>
+			
+		</where>
+	</sql>
+
+
+	<!--  ========================================= recom plan info manage ============================================================ -->
+	<sql id="Base_Column_list_Info">
+		id
+		,title
+		,sub_title_pc
+		,sub_title_mo
+		,icon_image
+		,descript1
+		,descript2
+		,descript3
+		,descript4
+		,descript5
+		,use_yn
+		,order_no
+		,create_date
+		,create_id
+		,GET_ADMIN_USER_NM(a.create_id) as createNm		
+		,modified_date
+		,modified_id
+		,GET_ADMIN_USER_NM(a.modified_id) as modifiedNm
+		,(SELECT COUNT(1) FROM tb_pmb_recomplan_planlist WHERE mng_id = a.id) planLisCnt
+	</sql>
+
+   	<select id="infolist" parameterType="kr.co.ucomp.web.svc.recomplan.dto.RecomPlanMngSearchDto" resultType="kr.co.ucomp.web.svc.recomplan.entity.RecomPlanEntity">
+		  SELECT
+	            <include refid="Base_Column_list_Info" />
+	        FROM
+	           tb_pmb_recomplan_mng a
+	        <include refid="listWhereInfo" />
+	         ORDER BY  Order_no , id  desc
+	        LIMIT #{offset}, #{recordSize}
+
+	</select>
+
+	<select id="infolistCount" parameterType="kr.co.ucomp.web.svc.recomplan.dto.RecomPlanMngSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+	        FROM
+	            tb_pmb_recomplan_mng a
+	        <include refid="listWhereInfo" />
+	</select>
+
+	<select id="infoDetail" parameterType="int" resultType="kr.co.ucomp.web.svc.recomplan.entity.RecomPlanEntity">
+		SELECT
+	            <include refid="Base_Column_list_Info" />
+	        FROM
+	            tb_pmb_recomplan_mng a
+	        WHERE id=#{id}
+	</select>
+
+    <insert id="createInfo" parameterType="kr.co.ucomp.web.svc.recomplan.entity.RecomPlanEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO tb_pmb_recomplan_mng (
+		            id,
+		            title,
+		            sub_title_pc,
+		            sub_title_mo,
+		            icon_image,
+		            descript1,
+		            descript2,
+		            descript3,
+		            descript4,
+		            descript5,
+		            use_yn,
+		            order_no,
+		            create_date,
+		            create_id
+		        ) VALUES (
+		            #{id},
+		            #{title},
+		            #{subTitlePc},
+		            #{subTitleMo},
+		            #{iconImage},
+		            #{descript1},
+		            #{descript2},
+		            #{descript3},
+		            #{descript4},
+		            #{descript5},
+		            #{useYn},
+		            #{orderNo},
+		            NOW(),
+		            #{createId}
+		        )
+
+    </insert>
+
+    <update id="updateInfo" parameterType="kr.co.ucomp.web.svc.recomplan.entity.RecomPlanEntity">
+        UPDATE tb_pmb_recomplan_mng SET
+        	modified_date = NOW(),
+        	
+			<if test='title != null and title !=""'>
+				title = #{title},
+			</if>
+			<if test='subTitlePc != null and subTitlePc !=""'>
+				sub_title_pc = #{subTitlePc},
+			</if>			        	
+			<if test='subTitleMo != null and subTitleMo !=""'>
+				sub_title_mo = #{subTitleMo},
+			</if>
+			<if test='iconImage != null and iconImage !=""'>
+				icon_image = #{iconImage},
+			</if>			
+			<if test='descript1 != null and descript1 !=""'>
+				 descript1 = #{descript1},
+			</if>      
+			<if test='descript2 != null and descript2 !=""'>
+				 descript2 = #{descript2},
+			</if>
+			<if test='descript3 != null and descript3 !=""'>
+				 descript3 = #{descript3},
+			</if>			            
+			<if test='descript4 != null and descript4 !=""'>
+				 descript4 = #{descript4},
+			</if>	            
+			<if test='descript5 != null and descript5 !=""'>
+				 descript5 = #{descript5},
+			</if>           
+			<if test='useYn != null'>
+				 use_yn = #{useYn},
+			</if>
+			<if test='orderNo != null'>
+				 order_no = #{orderNo},
+			</if>          
+            
+            modified_id = #{modifiedId}
+		WHERE id = #{id}
+    </update>
+
+    <delete id="deleteInfo" parameterType="int">
+        DELETE FROM tb_pmb_recomplan_mng
+        WHERE id=#{id}
+    </delete>
+
+
+	<!--  ========================================= recom plan mapping manage ============================================================ -->
+
+
+	<sql id="listWhereMap">
+		<if test='keyword != null and keyword !=""'>
+			AND c.title LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+
+		<if test='useYn != null and useYn !=""'>
+			AND c.use_yn = #{useYn}
+		</if>
+
+		<if test='mngid != null and mngid !=""'>
+			AND a.mng_id = #{mngid}
+		</if>
+
+	</sql>
+
+	<sql id="Base_Column_list_map">
+		a.id
+		,a.plan_id
+		,a.mng_id
+		,a.order_no
+		,b.plan_name as planName
+		,c.title as recomTitle
+		,b.mno
+		,GET_COMPANY_NM(b.host) AS planHostNm
+		,b.plan_type as planType
+		,b.sup_data_val as supDataVal
+		,b.daily_data as dailyData
+		,b.sup_qos as supQos
+		,b.normal_price as normalPrice
+		,b.sale_price as salePrice
+		,b.after_price as afterPrice
+		,b.promotion_period as promotionPeriod
+	</sql>
+
+   	<select id="maplist" parameterType="kr.co.ucomp.web.svc.recomplan.dto.RecomPlanMngSearchDto" resultType="kr.co.ucomp.web.svc.recomplan.entity.RecomPlanPlanListEntity">
+		  SELECT
+	            <include refid="Base_Column_list_map" />
+			FROM tb_pmb_recomplan_planlist a,  tb_pmb_plan_list b, tb_pmb_recomplan_mng c
+			WHERE a.plan_id = b.id
+			AND a.mng_id = c.id
+	        <include refid="listWhereMap" />
+	        ORDER BY a.order_no asc ,a.id desc
+	        LIMIT #{offset}, #{recordSize}
+
+	</select>
+
+
+	<select id="maplistCount" parameterType="kr.co.ucomp.web.svc.recomplan.dto.RecomPlanMngSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+			FROM tb_pmb_recomplan_planlist a,  tb_pmb_plan_list b, tb_pmb_recomplan_mng c
+			WHERE a.plan_id = b.id
+			AND a.mng_id = c.id
+	        <include refid="listWhereMap" />
+	</select>
+
+	<select id="mapDetail" parameterType="int" resultType="kr.co.ucomp.web.svc.recomplan.entity.RecomPlanPlanListEntity">
+		SELECT
+	            <include refid="Base_Column_list_map" />
+			FROM tb_pmb_recomplan_planlist a,  tb_pmb_plan_list b, tb_pmb_recomplan_mng c
+			WHERE a.plan_id = b.id
+			AND a.mng_id = c.id
+	        AND a.id=#{id}
+	</select>
+
+    <insert id="createmap" parameterType="kr.co.ucomp.web.svc.recomplan.entity.RecomPlanPlanListEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_pmb_recomplan_planlist (plan_id, mng_id,order_no)
+        VALUES (
+	        #{planId},
+	        #{mngId},
+	        #{orderNo}
+        )
+    </insert>
+
+    <update id="updatemap" parameterType="kr.co.ucomp.web.svc.recomplan.entity.RecomPlanPlanListEntity">
+        UPDATE tb_pmb_recomplan_planlist SET
+            plan_id = #{planId},
+            mng_id = #{mngId},
+            order_no = #{orderNo}
+        WHERE id=#{id}
+    </update>
+
+
+    <update id="updatemapOrder" parameterType="kr.co.ucomp.web.svc.recomplan.entity.RecomPlanPlanListEntity">
+        UPDATE tb_pmb_recomplan_planlist SET
+            order_no = #{orderNo}
+        WHERE id=#{id}
+    </update>
+
+    <delete id="deletemap" parameterType="int">
+        DELETE FROM tb_pmb_recomplan_planlist
+        WHERE id=#{id}
+    </delete>
+    
+    
+       <delete id="deletemapListByMngId" parameterType="int">
+        DELETE FROM tb_pmb_recomplan_planlist
+        WHERE mng_id=#{id}
+    </delete>
+
+
+	<!--  ========================================= recom plan mapping manage ============================================================ -->
+
+
+</mapper>

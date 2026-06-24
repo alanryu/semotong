@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Toast | 세모통 스타일가이드</title>
+	<meta http-equiv="X-UA-Compatible" content="ie=edge chrome=1" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="프로젝트가이드, 세모통 스타일가이드" />
+	<meta name="description" content="프로젝트가이드, 세모통 스타일가이드" />
+	<link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 인크루드 설정용도(개발적용안함) -->
+	<link rel="stylesheet" type="text/css" href="css/guide.css" /><!-- 가이드전용 -->
+</head>
+
+<body>
+	<div class="wrapper sub_page">
+		<!-- Header -->
+		<div data-include="include_header.html"></div>
+		<!-- // Header -->
+
+		<!-- Container -->
+		<div class="container">
+			<main id="content" class="content" role="main">
+				<div class="content-body">
+					<div class="out-sec in-sec">
+						<h1 class="g-h1">Toast</h1>
+					</div>
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">기본 구조</h2>
+						</div>
+						<div class="g-section-body">
+							<ul class="g-desc">
+								<li><a href="https://getbootstrap.com/docs/5.3/components/toasts/" target="_blank" class="g-link">https://getbootstrap.com/docs/5.3/components/toasts/</a></li>
+								<li>탭 기능 : data-bs-toggle="tab" data-bs-target="#패널아이디"</li>
+							</ul>
+							<xmp>
+<button type="button" class="ui-btn" id="liveToastBtn">Show live toast</button>
+
+<div class="toast-container">
+	<div id="liveToast" class="ui-toast fade" role="alert" aria-live="assertive" aria-atomic="true" data-bs-animation="true">
+		<div class="toast-body">
+			<p>Hello, world! This is a toast message.</p>
+			<button type="button" class="ui-btn-close" data-bs-dismiss="toast">닫기</button>
+		</div>
+	</div>
+</div>
+
+<script>
+	const toastTrigger = document.getElementById('liveToastBtn')
+	const toastLiveExample = document.getElementById('liveToast')
+
+	if (toastTrigger) {
+		const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
+		toastTrigger.addEventListener('click', () => {
+			toastBootstrap.show()
+		})
+	}
+</script>
+							</xmp>
+						</div>
+					</section>
+					<!-- // Section -->
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">Styles</h2>
+						</div>
+						<div class="g-section-body">
+							<button type="button" class="ui-btn btn-basic primary" id="liveToastBtn">Show live toast</button>
+
+							<div class="toast-container">
+								<div id="liveToast" class="ui-toast fade" role="alert" aria-live="assertive" aria-atomic="true" data-bs-animation="true">
+									<div class="toast-body">
+										<p>Hello, world! This is a toast message.</p>
+										<button type="button" class="ui-btn-close" data-bs-dismiss="toast">닫기</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+					<!-- // Section -->
+				</div>
+			</main>
+		</div>
+		<!-- // Container -->
+
+		<!-- Footer (include_footer.html) -->
+		<div data-include="include_footer.html"></div>
+		<!-- // Footer -->
+	</div>
+
+	<script>
+		// https://getbootstrap.com/docs/5.3/components/toasts/
+		const toastTrigger = document.getElementById('liveToastBtn')
+		const toastLiveExample = document.getElementById('liveToast')
+
+		if (toastTrigger) {
+			const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
+			toastTrigger.addEventListener('click', () => {
+				toastBootstrap.show()
+			})
+		}
+	</script>
+
+</body>
+
+</html>

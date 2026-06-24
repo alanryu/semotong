@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>세모통</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            rel="stylesheet">
+        <link href="../../css/design.css" rel="stylesheet">
+    </head>
+    <body>
+
+        <button class="gift-manager__btn bg_green" id="giftManageBtn">사은품관리</button>
+        <button class="gift-btn-modify">수정</button>
+
+
+        <div class="gift-manager__modal" id="giftManageModal">
+            <div class="gift-manager__modal-content" style="width:100%">
+                <div class="gift-manager__modal-header">
+                    <div class="gift-manager__modal-title">사은품 관리</div>
+                    <span class="gift-select__close">&times;</span>
+                </div>
+                <div class="gift-select__search">
+                    <input type="text" class="gift-select__input" placeholder="제목을 검색하세요.">
+                    <button class="gift-select__search-btn">검색</button>
+                </div>
+
+                <div class="gift-select__table__outer">
+                    <table class="gift-select__table">
+                        <thead>
+                            <tr>
+                                <th class="gift-select__th" style="width: 50px">No</th>
+                                <th class="gift-select__th" style="width: 100px">상태</th>
+                                <th class="gift-select__th">제목</th>
+                                <th class="gift-select__th">설명 내용</th>
+                                <th class="gift-select__th" style="width:100px">등록일</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="gift-select__row">
+                                <td class="gift-select__td">35</td>
+                                <td class="gift-select__td">노출</td>
+                                <td class="gift-select__td">3대 마트 상품권 3만원 제공</td>
+                                <td class="gift-select__td">사은품에 대한 설명을 등록하고, 등록된 내용이 노출되는 영역입니다.</td>
+                                <td class="gift-select__td">2022.04.21- 15:21:15</td>
+                            </tr>
+                            <tr class="gift-select__row">
+                                <td class="gift-select__td">35</td>
+                                <td class="gift-select__td">노출</td>
+                                <td class="gift-select__td">3대 마트 상품권 3만원 제공</td>
+                                <td class="gift-select__td">사은품에 대한 설명을 등록하고, 등록된 내용이 노출되는 영역입니다.</td>
+                                <td class="gift-select__td">2022.04.21- 15:21:15</td>
+                            </tr>
+                            <tr class="gift-select__row">
+                                <td class="gift-select__td">35</td>
+                                <td class="gift-select__td">노출</td>
+                                <td class="gift-select__td">3대 마트 상품권 3만원 제공</td>
+                                <td class="gift-select__td">사은품에 대한 설명을 등록하고, 등록된 내용이 노출되는 영역입니다.</td>
+                                <td class="gift-select__td">2022.04.21- 15:21:15</td>
+                            </tr>
+                            <tr class="gift-select__row">
+                                <td class="gift-select__td">35</td>
+                                <td class="gift-select__td">노출</td>
+                                <td class="gift-select__td">3대 마트 상품권 3만원 제공</td>
+                                <td class="gift-select__td">사은품에 대한 설명을 등록하고, 등록된 내용이 노출되는 영역입니다.</td>
+                                <td class="gift-select__td">2022.04.21- 15:21:15</td>
+                            </tr>
+                            <tr class="gift-select__row">
+                                <td class="gift-select__td">35</td>
+                                <td class="gift-select__td">노출</td>
+                                <td class="gift-select__td">3대 마트 상품권 3만원 제공</td>
+                                <td class="gift-select__td">사은품에 대한 설명을 등록하고, 등록된 내용이 노출되는 영역입니다.</td>
+                                <td class="gift-select__td">2022.04.21- 15:21:15</td>
+                            </tr>
+                            <tr class="gift-select__row">
+                                <td class="gift-select__td">35</td>
+                                <td class="gift-select__td">노출</td>
+                                <td class="gift-select__td">3대 마트 상품권 3만원 제공</td>
+                                <td class="gift-select__td">사은품에 대한 설명을 등록하고, 등록된 내용이 노출되는 영역입니다.</td>
+                                <td class="gift-select__td">2022.04.21- 15:21:15</td>
+                            </tr>
+                            <tr class="gift-select__row">
+                                <td class="gift-select__td">35</td>
+                                <td class="gift-select__td">노출</td>
+                                <td class="gift-select__td">3대 마트 상품권 3만원 제공</td>
+                                <td class="gift-select__td">사은품에 대한 설명을 등록하고, 등록된 내용이 노출되는 영역입니다.</td>
+                                <td class="gift-select__td">2022.04.21- 15:21:15</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="gift-select__footer">
+                    <button class="gift-select__btn gift-select__btn--apply gift-select-close2">닫기</button>
+                    <button class="gift-select__btn gift-select__btn--confirm" id="btnGiftAdd">등록</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gift add Modal -->
+        <div class="gift-manager__modal" id="giftAddModal" style="max-width:1200px">
+            <div class="gift-manager__modal-content">
+                <div class="gift-manager__modal-header">
+                    <div class="gift-manager__modal-title">사은품 등록</div>
+                    <span class="gift-select__close">&times;</span>
+                </div>
+                <div class="custom-table-outer">
+                    <table class="table custom-table">
+                        <tr>
+                            <th>상태</th>
+                            <td>
+                                <div class="form-control-wrap">
+                                    <div class="form-check-group">
+                                        <div class="form-check">
+                                            <input
+                                                class="form-check-input"
+                                                type="radio"
+                                                name="giftexposure"
+                                                id="giftexpShow1"
+                                                checked="checked">
+                                            <label class="form-check-label" for="expShow">노출</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input
+                                                class="form-check-input"
+                                                type="radio"
+                                                name="giftexposure"
+                                                id="giftexpHide1">
+                                            <label class="form-check-label" for="expHide">비노출</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>제목</th>
+                            <td>
+                                <input type="text" class="form-control" placeholder="제목을 입력하세요.">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>내용</th>
+                            <td>
+                                <textarea name="" id="" class="form-control" placeholder="내용을 입력하세요."></textarea>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="gift-select__footer">
+                    <button class="gift-select__btn gift-select__btn--apply gift-select-close3">취소</button>
+                    <button class="gift-select__btn gift-select__btn--confirm bg_blue">등록</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gift modify Modal -->
+        <div class="gift-manager__modal" id="giftModifyModal">
+            <div class="gift-manager__modal-content">
+                <div class="gift-manager__modal-header">
+                    <div class="gift-manager__modal-title">사은품 수정</div>
+                    <span class="gift-select__close">&times;</span>
+                </div>
+                <div class="custom-table-outer">
+                    <table class="table custom-table">
+                        <tr>
+                            <th>상태</th>
+                            <td>
+                                <div class="form-control-wrap">
+                                    <div class="form-check-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="giftexposure" id="giftexpShow2" checked>
+                                            <label class="form-check-label" for="expShow">노출</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="giftexposure" id="giftexpHide2">
+                                            <label class="form-check-label" for="expHide">비노출</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>내용</th>
+                            <td>
+                                <textarea name="" id="" class="form-control" placeholder="내용을 입력하세요."></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>제목</th>
+                            <td>
+                                <input type="text" class="form-control" placeholder="제목을 입력하세요.">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>등록일</th>
+                            <td>
+                                2023.12.17-08:21
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="gift-select__footer">
+                    <button class="gift-select__btn gift-select__btn--apply gift-select-close4">취소</button>
+                    <button class="gift-select__btn gift-select__btn--confirm bg_green">수정</button>
+                </div>
+            </div>
+        </div>
+        <!-- //사은품 팝업 -->
+
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script src="../../js/script.js"></script>
+    </body>
+</html>

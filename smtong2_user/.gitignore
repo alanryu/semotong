@@ -1,0 +1,58 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 빌드 디렉토리 무시
+/target/
+/build/
+.gradle/
+
+# Eclipse/STS 프로젝트 파일 무시
+*.classpath
+*.project
+*.settings/
+bin/** 
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+
+# OS 생성 파일 무시
+.DS_Store
+Thumbs.db
+
+# 로그 파일 무시
+*.log
+
+# 컴파일된 파일 무시
+*.class
+
+# IDEs
+.idea/
+*.iml
+*.iws
+.classpath
+.project
+.settings/
+.vscode/
+
+# Logs
+*.log
+logs/
+
+# Cache
+.cache/
+
+# Test Reports
+/test-output/
+
+# Claude
+.claude/
+.claudeignore
+CLAUDE.md
+
+# Deploy
+deploy/

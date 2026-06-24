@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='세모통 백서', layoutSubTitleYN='Y', layoutFooterYn='Y', menuId='01' ">
+	  
+  <!-- index.html 고유 CSS 추가 -->
+  <th:block layout:fragment="css">
+      <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+  </th:block>
+  <!-- index.html 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+   <!--    <script th:src="@{/js/page/home.js}"></script>-->
+   <script>
+  	
+  	
+  	$( document ).ready(function() {
+		
+  	});
+  	
+  	
+  	function goList() {
+  		navigateTo('/csm/baekseo/baekseoList');
+  	}
+   </script>
+  </th:block>
+  
+ <!-- Container -->
+<main role="main" class="container">
+	<!-- content -->
+	<div class="content">
+		
+		<div class="tab-content">
+			
+
+			<!-- 세모통 백서 탭 -->
+			<div class="F-G02-01-page tab-pane fade show active" id="tab-12-pane" role="tabpanel" aria-labelledby="tab-12" tabindex="0">
+				<!-- 4차 수정 : 공지사항 상세와 동일하게 전체 변경 -->
+				<!-- 세모통백서 상세 섹션 -->
+				<section class="notice-detail-sec">
+					<div class="sec-inner">
+						<div class="notice-detail">
+							<div class="detail-header">
+								<h2 class="tit"><strong th:text="${detail.title}"></strong></h2>
+							</div>
+							<div class="detail-body">
+								<div class="data-view" th:utext="${detail.content}">
+									
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- // 세모통백서 상세 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" onclick="goList();">
+							<span>목록</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 플로팅 섹션 -->
+			</div>
+			<!-- // 세모통 백서 탭 -->
+
+
+		</div>
+	</div>
+	<!-- // content -->
+</main>
+<!-- // Container -->
+  
+  
+</html>

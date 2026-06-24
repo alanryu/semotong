@@ -1,0 +1,27 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 유심 선택
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 유심 선택
+.F-QU01-07-page {
+	.help-service {
+		margin-top: 30rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 30rem;
+	}
+
+	.btn-info {
+		gap: 6rem;
+		padding: 8rem 14rem;
+		border-radius: 20rem;
+		background-color: #F4F5F8;
+		font-weight: 500;
+		font-size: 14rem;
+		line-height: 20rem;
+		color: #5A5D60;
+	}
+}
+// e: 유심 선택

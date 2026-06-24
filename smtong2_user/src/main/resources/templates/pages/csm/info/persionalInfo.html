@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='개인정보 처리방침' , layoutSubTitleYN='Y'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ <!--    <script th:src="@{/js/page/home.js}"></script>-->
+ <script type="text/javascript">
+ 	function selAppDt(obj) {
+ 		console.log(obj);
+ 		
+ 		const dataId = obj.getAttribute("data-id");
+ 		window.location.href = "/cms/policy-content/persionalInfo?polId="+dataId;
+ 	}
+ 
+ </script>
+</th:block>
+<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			 <div class="content F-TM02-page">
+				<!-- //개인정보처리방침 섹션 -->
+				<section class="terms-sec">
+					<div class="sec-inner">
+
+						<!-- //개인정보처리방침 -->
+						<div class="terms-content">
+							<div class="terms-title">
+								<h2>개인정보처리방침</h2>
+								<div class="ui-sel h-36">
+									<button type="button" id="frmTerms" class="sel" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#FHP010101Modal" onclick="">
+										<span>[[${#dates.format(record.appDate, 'yyyy.MM.dd')}]] 시행</span>
+										<i class="ui-icn icn-16-select-arw" aria-hidden="true"></i>
+									</button>
+								</div>
+								<!-- // 시행일 선택 -->
+							</div>
+							<th:block th:utext="${record.content}">
+								
+							</th:block>
+						</div>
+						<!-- // 개인정보처리방침 -->
+					</div>
+				</section>
+				<!-- // 개인정보처리방침 섹션 -->
+			</div>
+			<!-- // content -->
+			
+		</main> 
+		<!-- // Container -->
+		
+	<!-- 시행일 modal select -->
+	<div class="modal modal-select fade" id="FHP010101Modal" tabindex="-1" role="dialog" aria-labelledby="FHP010101ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FHP010101ModalLabel">시행일 선택</h3>
+					<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 콤보박스 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<!-- modal-select 공통 -->
+							<ul class="select-listbox" role="listbox">
+								<!-- 이미 선택목록이 있는 경우 class="is-selected" 추가 -->
+								<li th:each="itm : ${polList}" 
+							        th:classappend="${itm.id == record.id} ? 'is-selected'"  
+							        role="option" 
+							        tabindex="0"
+							        th:attr="data-id=${itm.id}"
+							        data-bs-dismiss="modal" 
+							        th:onclick="'setSelectValued(\'#frmTerms\', this, \'is-selected\',selAppDt)'"
+							        th:text="${#dates.format(itm.appDate, 'yy.MM.dd') + ' 시행'}">
+							    </li>
+							</ul>
+						</div>
+					</section>
+					<!-- // 콤보박스 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 시행일 modal select -->
+			
+</html>

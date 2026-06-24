@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='신청한 요금제', layoutSubTitleYN='Y', menuId='05'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+<script>
+	$( document ).ready(function() {
+		getAppliedPlanList("");
+	})
+
+	
+	//신청한 요금제 
+	function getAppliedPlanList(ordState) {
+		var params = {
+				keyword : "",
+				searchType : "2",
+				searchOrderState : ordState}
+		$.ajax({
+			url : '/order/getAppliedPlanList',
+			type : 'POST',
+			dataType : "json",
+			contentType:"application/json",
+			data : JSON.stringify(params),
+			beforeSend: function(xhr){
+			    xhr.setRequestHeader(header,token);
+			},
+			success: function (data) {
+				
+				$.each(data.data, function(idx, obj){
+					obj.displayPrice = 0;
+				});
+				$('#myPlanList').empty();
+				$('#ratePlanTmpl').tmpl(data.data).appendTo('#myPlanList');
+			},
+			error : function(request, status, error){
+				alertModalShow(error,"");
+			},
+			complete:function(){
+				// $('#loading').addClass('display-none');
+			}
+		});
+	}
+	
+	
+</script>
+
+<script id="ratePlanTmpl" type="text/x-jquery-tmpl">
+<li class="ratePlanD-item">
+		<!-- 요금제 공통 타입 D : 요금제 상품 상세 -->
+		<div class="ratePlanD-card">
+			<div class="card-body">
+				{{if orderState =='06'}}
+					<p class="card-opening">{{html openCompDttm.substr(0,10).replaceAll("-",".")}} ${orderStateNm}</p>	
+				{{else}}
+					<p class="card-opening">{{html formatDate(orderStateDttm)}} ${orderStateNm}</p>
+				{{/if}}
+				<div class="card-tit">
+					<strong>
+						{{if planNameSmtSub == null || planNameSmtSub == ''}}
+							{{if supDataVal == 10238976}}
+								무제한
+							{{else}}
+								월 {{html getDataStr(supDataVal)}}
+							{{/if}}
+							{{if dailyData > 0}}
+								+ 매일 {{html getDataStr(dailyData)}}
+							{{/if}}
+							{{if supQos > 0}}
+								+ {{html getQosStr(supQos)}}
+							{{/if}}
+						{{else}}
+							${planNameSmtSub}
+						{{/if}}
+					</strong>
+
+					{{if supQos > 0}}
+					<button type="button" class="ui-btn" onclick="openQosModal('QosModal')">
+						<i class="ui-icn icn-16-plan-quse-gr" aria-label="툴팁"></i>
+					</button>
+					{{/if}}
+				</div>
+				<div class="card-name">
+					<p>{{html getPlanNm(planName,planNameSmt)}}</p>
+				</div>
+				<div class="card-info">
+					<span class="label"><i class="ui-icn icn-12-tel-gr" aria-hidden="true"></i>{{html getCallStr(supCallVal)}}</span>
+					<span class="split" aria-hidden="true"></span>
+					<span class="label"><i class="ui-icn icn-12-mail-gr" aria-hidden="true"></i>{{html getSmsStr(supSmsVal)}}</span>
+					<span class="split" aria-hidden="true"></span>
+					<span class="label"><i class="ui-icn icn-12-antena-gr" aria-hidden="true"></i>${planType}</span>
+					<span class="split" aria-hidden="true"></span>
+					<span class="label"><i class="ui-icn icn-12-wifi-gr" aria-hidden="true"></i>${mno}</span>
+				</div>
+			</div>
+			<div class="card-footer">
+				<div class="card-charge">
+					<div class="brand"><img src="${planLogoImg}" alt="{hostNm} snowman" /></div>
+					<div class="charge">
+						<p class="charge-tit">{{html getPriceStr(salePrice)}}</p>
+						{{if secondPrice != null && secondPrice != ''}}
+							<p class="charge-point"><em class="tit">실제 체감가</em>${secondPrice}</p>
+						{{/if}}
+						{{if promotionPeriodVal == 9999}}
+							<p class="charge-txt">${promotionPeriod} </p>
+						{{else promotionPeriodVal > 0 && afterPrice >0}}
+							<p class="charge-txt">{{html getDiscountStr(promotionPeriod, afterPrice)}}</p>
+						{{/if}}
+					</div>
+				</div>
+			</div>
+			<!-- 카드 클릭영역  -->
+			<button type="button" class="card-button" onclick="javascript:goPlanDetail('${id}','${hostNm}');">
+				<span class="blind">요금제 자세히 보기</span>
+			</button>
+		</div>
+		<!-- // 요금제 공통 타입 D : 요금제 상품 상세 -->
+	</li>
+</script>
+
+	
+</th:block>
+
+	<!-- Container -->
+	<main role="main" class="container">
+		<!-- content -->
+			<div class="content F-MY01-05-page">
+				<!-- 상품 리스트 섹션 -->
+				<!-- 1차 수정 : 제목 추가 및 ratePlanD 으로 변경 -->
+				<section class="ratePlanD-sec">
+					<div class="sec-inner">
+						<!-- 2025-02-26 조찬기 : 개통완료 제목삭제 -->
+						<!-- <div class="sec-header">
+							<h2 class="sec-tit">개통 완료</h2>
+						</div> -->
+						<div class="sec-body">
+							<!-- 요금제 공통 타입 D : 요금제 상품 리스트 -->
+							<div class="ratePlanD-list-wrap">
+								<!-- 2025-02-26 조찬기 : 요금제 목록 Sort 추가 -->
+								<!-- 요금제 상품 툴바 -->
+								<div class="ratePlanC-toolbar">
+									<div class="sort">
+										<button type="button" class="ui-btn" id="frmSort" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#selectSortModal">
+											<i class="ui-icn icn-16-sort-gr" aria-hidden="true"></i>
+											<span>전체</span>
+											<i class="ui-icn icn-16-select-arw" aria-hidden="true"></i>
+										</button>
+									</div>
+								</div>
+								<!-- // 요금제 상품 툴바 -->
+								<ul class="ratePlanD-list" id="myPlanList">
+
+									
+								</ul>
+
+							</div>
+							<!-- // 요금제 공통 타입 D : 요금제 상품 리스트 -->
+						</div>
+					</div>
+				</section>
+				<!-- // 상품 리스트 섹션 -->
+			</div>
+			<!-- // content -->
+	</main>
+	<!-- // Container -->
+	
+	
+	<!-- 정렬 modal select -->
+	<div class="modal modal-select fade" id="selectSortModal" tabindex="-1" role="dialog" aria-labelledby="selectSortModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="selectSortModalLabel">정렬기준 선택</h3>
+					<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 콤보박스 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<!-- modal-select 공통 -->
+							<ul class="select-listbox" role="listbox">
+								<!-- setSelectValued 는 퍼블 확인용입니다. -->
+								<!-- 이미 선택목록이 있는 경우 class="is-selected" 추가 -->
+								<li class="is-selected" role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this);getAppliedPlanList();">전체</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this);getAppliedPlanList('01');">신청완료</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this);getAppliedPlanList('03');">배송중</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this);getAppliedPlanList('06');">개통완료</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this);getAppliedPlanList('99');">개통취소</li>
+							</ul>
+						</div>
+					</section>
+					<!-- // 콤보박스 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 정렬 modal select -->
+	
+</html>

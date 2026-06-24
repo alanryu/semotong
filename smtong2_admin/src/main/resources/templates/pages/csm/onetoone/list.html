@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='07',menuId ='0403'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+	 <script id="searchListTmpl" type="text/x-jquery-tmpl">
+		<tr>
+		    <td>${id}</td>
+		    <td>{{html getStateNm(status)}}</td>
+			<td>${categoryNm}</td>
+			<td><a href="/csm/onetoone/edit?searchId=${id}">${inqueryTitle}</a></td>
+			<td>${createUserName}</td>
+		    <td>
+   				<div class="form-check form-switch mb-3">
+					{{if displayYn == 'Y' }}
+                    	<input class="form-check-input form-check-switch" type="checkbox" role="switch" id="flexSwitchCheckLarge" style="transform: scale(1.5);" value="${id}" checked>
+					{{else}}
+						<input class="form-check-input form-check-switch" type="checkbox" role="switch" id="flexSwitchCheckLarge" style="transform: scale(1.5);" value="${id}">
+					{{/if}}
+                </div>
+            </td>
+		    <td>${responseNm}</td>
+			<td>{{html getScoreNm(score)}}</td>
+			<td>${responseInquery}</td>
+		    <td>{{html dateToString(createDate)}}</td>
+		</tr>
+	</script>
+	
+              
+	<script type="text/javascript">
+	
+		
+	
+		document.addEventListener('DOMContentLoaded', function () {
+			currentPage =1;
+			searchList();
+		});
+		
+		function changeCombo(){
+			currentPage = 1;
+			searchList()
+		}
+		
+		function getStateNm(sp) {
+			var res = "";
+			if(sp == "02") {
+				 res = "답변완료";
+			} else if(sp == "03") {
+				 res = "의견완료";
+			} else {
+				 res = "문의완료";
+			}
+			return res;
+		}
+		
+		function getScoreNm(sp) {
+			var res = "";
+			console.log(sp);
+			if(sp == "1") {
+				 res = "매우만족";
+			} else if(sp == "2") {
+				 res = "만족";
+			} else if(sp == "3") {
+				 res = "불만족";
+			}
+			return res;
+		}
+		
+		function renderPage(page) {
+			currentPage = page;
+			searchList();
+		}
+		
+		
+		function updateDisplay(mngId,displayYn) {
+			
+			var params = {
+					 id : parseInt(mngId),
+					 displayYn : displayYn
+				}
+			console.log(params);
+			$.ajax({
+				   url : '/csm/onetoone/ajaxUpdate',
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+					success: function (data) {
+						
+				    },
+					error : function(request, status, error){
+			            alert(error);
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+			});
+		}
+		
+		function searchList() {
+			
+			var page = currentPage;
+			if(page =="" || page == null) page =1;
+			var _recordSize =  parseInt($("#recordSize").val());
+			 
+			var params = {
+				 searchCategory : 	$("#searchCategory").val(),
+				 searhState : 		$('input[name="searhState"]:checked').val(),
+				 searhDisplayYn : 	$('input[name="searhDisplayYn"]:checked').val(),
+				 keyword : 			$("#keyword").val(),
+				 searchScore : 		getCheckedCompanies("searhScore"),
+				 searchStartDt : 	$("#searchStartDt").val(),
+				 searchEndDt : 		$("#searchEndDt").val(),
+				 page : page,
+				 recordSize : _recordSize
+			}
+			
+			$.ajax({
+					   url : '/csm/onetoone/ajaxlist',
+				       type : 'POST',
+				       dataType : "json",
+				       contentType:"application/json",
+					   data : JSON.stringify(params),
+						success: function (data) {
+							$('#searchList').empty();
+							$('#listCount').html("총 " + data.totalCnt +"건" );
+							if(data.totalCnt > 0) {
+								$('#searchListTmpl').tmpl(data.data).appendTo('#searchList');
+								handleSwichCheckboxSelect();
+								renderPagination(page,data.totalCnt,_recordSize);
+							}
+					    },
+						error : function(request, status, error){
+				            alert(error);
+				        },
+				        complete:function(){
+				           // $('#loading').addClass('display-none');
+				        }
+					});
+		}
+		
+		function handleSwichCheckboxSelect() {
+			  
+			const bodyCheckboxes = document.querySelectorAll('tbody .form-check-switch');
+			 
+			bodyCheckboxes.forEach(check => {
+		      check.addEventListener('change', function() {
+		          var mngId = $(this).val();
+		          var displayYn = "" ;
+		          if($(this).prop("checked")) {
+		        	  var displayYn = "Y" ;  
+		          } else {
+		        	  var displayYn = "N" ;
+		          }
+		          updateDisplay(mngId,displayYn);
+		      });
+		    });
+		}
+
+		function selCheckBox(id) {
+
+			if(id=="") {
+				$("input[id^='searhScore']").prop("checked", false);
+				$("#searhScore01").prop("checked", true);
+			} else {
+				$("#searhScore01").prop("checked", false);
+			}
+			 
+		}
+		
+		function toggleSearchInit(){
+			$("#keyword").val('');
+			
+			$("#searchCategory").val("").prop('selected', true); // 카테고리
+			$("#searhState01").prop('checked', true); // 상태
+			$("#searhDisplayYn01").prop('checked', true); // 노출
+			selCheckBox(""); //만족도
+			//$('.period-button[value="7"]').trigger("click");
+			periodButtonInit();
+			currentPage = 1;
+		}
+		
+		function dateToString(date) {
+			var str = '';
+			if ( date != null ) {
+				var temp = moment(date);
+				str = temp.format('YYYY.MM.DD HH:mm:ss');
+			}
+			return str;
+		}
+		
+		
+		function updateAlamRcv() {
+			var params = {
+					codeGroup : "common_env_code",
+					code : 		"admin_alam_onetoone",
+					etc1 : 	$('#alamRcvList').val()
+			}
+				
+			$.ajax({
+				   url : '/cmm/cmmcode/code/update',
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+					success: function (data) {
+						showAlert("알람 수신인이 업데이트 되었습니다.",closeAlamPop);
+				    },
+					error : function(request, status, error){
+			            alert(error);
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+			});
+		}
+		
+		function closeAlamPop() {
+			$("#btnClosePop").click();
+		}
+	</script>
+</th:block>
+
+<div class="main-content">
+            <div class="container-fluid">
+                 <!-- 로케이션 & 제목 영역 추가 -->
+                <div class="page-header mb-4">
+                    <div class="location mb-2">
+                        <small class="text-secondary">
+                            <i class="fas fa-home me-1"></i>
+                            <a href="#">홈</a> > <a href="/svc/mainbanner/dealList">서비스관리</a> > <a href="/cms/notice/list">게시판관리</a> > <a href="/csm/onetoone/list">1:1문의</a>
+                        </small>
+                    </div>
+                    <h2 class="page-title fs-4 mb-4">1:1문의관리</h2>
+                </div>
+                
+                <div class="search-section">
+                	<div class="row align-items-center mb-2">
+                        <div class="form-row full-width">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="form-label mb-0">카테고리</div>
+                                <select class="form-select" style="width: 120px" id="searchCategory">
+                                	<option value="">카테고리</option>
+                                    <th:block th:each="item : ${codeList}"> 
+				                    <option  th:value="${item.code}" th:text="${item.codeName}"></option>
+				                    </th:block>
+                                </select>
+                            </div>
+                        </div>
+                    </div>  
+                    <div class="row align-items-center mb-2">
+                        <div class="form-row full-width">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="form-label mb-0">문의일</div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="date" class="form-control" style="width: 150px" id="searchStartDt">
+                                    <span class="text-secondary">-</span>
+                                    <input type="date" class="form-control" style="width: 150px" id="searchEndDt">
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="period-button" value="0">오늘</button>
+                                    <button class="period-button" value="7">1주일</button>
+                                    <button class="period-button" value="30">1개월</button>
+                                    <button class="period-button" value="90">3개월</button>
+                                    <button class="period-button" value="180">6개월</button>
+                                    <button class="period-button" value="365">1년</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-3">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="form-label mb-0">상태</div>
+                                <div class="radio-group">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="searhState" id="searhState01" value="" checked>
+                                        <label class="form-check-label" for="searhState01">전체</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="searhState" id="searhState02" value="01">
+                                        <label class="form-check-label" for="searhState02">문의완료</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="searhState" id="searhState03" value="02">
+                                        <label class="form-check-label" for="searhState03">답변완료</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="searhState" id="searhState04" value="03">
+                                        <label class="form-check-label" for="searhState04">의견완료</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-3">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="form-label mb-0">노출</div>
+                                <div class="radio-group">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="searhDisplayYn" id="searhDisplayYn01" value="" checked>
+                                        <label class="form-check-label" for="searhDisplayYn01">전체</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="searhDisplayYn" id="searhDisplayYn02" value="Y">
+                                        <label class="form-check-label" for="searhDisplayYn02">노출</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="searhDisplayYn" id="searhDisplayYn03" value="N">
+                                        <label class="form-check-label" for="searhDisplayYn03">비노출</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="row align-items-center mb-3">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="form-label mb-0">만족도</div>
+                                <div class="radio-group">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searhScore" id="searhScore01" value="" checked onclick="selCheckBox('')">
+                                        <label class="form-check-label" for="searhScore01">전체</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searhScore" id="searhScore02" value="1" onclick="selCheckBox('1')">
+                                        <label class="form-check-label" for="searhScore02">매우만족</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searhScore" id="searhScore03" value="2" onclick="selCheckBox('2')">
+                                        <label class="form-check-label" for="searhScore03">만족</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="searhScore" id="searhScore04" value="3" onclick="selCheckBox('3')">
+                                        <label class="form-check-label" for="searhScore04">불만족</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+ 					<!-- 검색어 -->
+                    <div class="col-12 mb-2">
+                        <div class="form-row full-width">
+                            <div class="form-label mb-0">검색조건</div>
+                            <div class="position-relative col-9">
+                                <i class="fas fa-search position-absolute" style="left: 16px; top: 15.5px; color: #94a3b8;"></i>
+                                <input type="text" class="form-control ps-5" placeholder="검색어를 입력하세요" id="keyword">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 text-end mt-2">
+                            <button class="btn btn-light me-2 btn-sm" onclick="toggleSearchInit();">
+                                <i class="fas fa-redo"></i>
+                                초기화
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="searchList();">
+                                <i class="fas fa-search"></i>
+                                검색
+                            </button>
+							<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                                 <i class="fas fa-comment"></i>
+                                 알람 수신인 관리
+                             </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="stats-badge">
+                                <i class="fas fa-calculator me-1"></i>
+                                <span id="listCount"></span>
+                            </div>
+                            <select class="form-select" style="width: 100px" id="recordSize" onchange="changeCombo()">
+                                <option value="10">10개씩</option>
+								<option value="20">20개씩</option>
+								<option value="30">30개씩</option>
+								<option value="40">40개씩</option>
+								<option value="50">50개씩</option>
+                            </select>
+                        </div>
+                        <div class="header-actions">
+                        	<!--
+                            <button class="btn btn-light btn-sm">
+                                <i class="fas fa-download"></i>
+                                다운로드
+                            </button>
+                             <button class="btn btn-primary btn-sm" onclick="location.href='/csm/onetoone/edit'">
+                                <i class="fas fa-plus"></i>
+                                신규등록
+                            </button> -->
+                        </div>
+                    </div>
+
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th style="width:5%">번호</th>
+                                <th style="width:5%">상태</th>
+                                <th style="width:10%">카테고리</th>
+                                <th>제목</th>
+                                <th style="width:10%">작성자</th>
+                                <th style="width:3%">노출</th>
+                                <th style="width:8%">담당자</th>
+                                <th style="width:8%">만족도</th>
+                                <th style="width:10%">고객의견</th>
+                                <th style="width:10%">등록일</th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchList">
+                            
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-left mt-4">
+                        <ul class="pagination">
+                            
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            
+ <!-- Modal 팝업 : 업로드 -->
+        <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header border-0 pb-0 mb-4">
+                        <h5 class="modal-title fs-6 fw-bold" id="uploadModalLabel">알람수신인 설정</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="uploadform">
+                     <div class="modal-body pt-2 pb-4">
+                         <div class="form-row-modal">
+                             <div class="form-label-modal" style="width:80px">수신인<br>('/'구분 입력)</div>
+                             <div class="form-control-wrap-modal">
+                                <input type="text" id="alamRcvList" class="form-control" th:value="${alamCode.etc1}"/>
+                             </div>
+                         </div>
+                     </div>
+                    </form>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-secondary px-4 btm-sm" data-bs-dismiss="modal" id="btnClosePop">취소</button>
+                        <button type="button" class="btn btn-dark px-4 btm-sm" onclick="updateAlamRcv();">적용</button>
+                    </div>
+                </div>
+            </div>
+        </div>            
+</DIV>

@@ -1,0 +1,268 @@
+<html lagn="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:fragment="leftmenuFragment">
+  <div class="sidebarWrapper">
+    <div class="left-sidebar">
+      <div class="admin-profile">
+        <div class="profile-letter">A</div>
+        <div>
+          관리자 - [[${session.loginUser.adminUserName}]]
+          <br />
+          <!-- <small class="text-muted">UPDATE - [[${#temporals.format(session.loginUser.modifiedDate, 'yyyy-MM-dd HH:mm:ss')}]]</small>
+                     <br> -->
+          <button type="button" class="btn btn-primary btn-logout" onclick="logoutconfirm();">로그아웃</button>
+        </div>
+      </div>
+
+      <ul class="menu-list">
+        <!-- 계정권한관리 -->
+        <li class="menu-item" th:classappend="${menuIdGroup} == '01' ? active" sec:authorize="hasAnyAuthority('ALL','ADMIN_MEM')">
+          <a href="/mbm/adminuser/list" class="menu-link">
+            <i class="fas fa-user-cog"></i>
+            <span>계정권한관리</span>
+          </a>
+        </li>
+        <!-- 회원관리 -->
+        <li class="menu-item" th:classappend="${menuIdGroup} == '02' ? active" sec:authorize="hasAnyAuthority('ALL','USER_MNG')">
+          <a href="/mbm/users/list" class="menu-link">
+            <i class="fas fa-users"></i>
+            <span>회원관리</span>
+          </a>
+        </li>
+        <!-- 입점사관리 -->
+        <li class="menu-item has-submenu" th:classappend="${menuIdGroup} == '03' ? open" sec:authorize="hasAnyAuthority('ALL','COMPANY_MNG')">
+          <a href="/mbm/company/list" class="menu-link">
+            <i class="fas fa-building"></i>
+            <span>입점사관리</span>
+            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+          </a>
+          <ul class="submenu">
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '03' and ${menuId} == '01' ? active">
+              <a href="/mbm/company/list" class="submenu-link">사업자 목록</a>
+            </li>
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '03' and ${menuId} == '02' ? active">
+              <a href="/mbm/companyuser/list" class="submenu-link">입점사 관리</a>
+            </li>
+          </ul>
+        </li>
+        <!-- 포인트관리 -->
+        <!-- <li class="menu-item has-submenu active open"> -->
+        <li class="menu-item has-submenu" th:classappend="${menuIdGroup} == '09' ? open" sec:authorize="hasAnyAuthority('ALL','POINT_MNG')">
+          <a href="#" class="menu-link">
+            <i class="fas fa-coins"></i>
+            <span>포인트관리</span>
+            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+          </a>
+          <ul class="submenu">
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '09' and ${menuId} == '01' ? active">
+              <a href="/point/history/list" class="submenu-link">포인트내역</a>
+            </li>
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '09' and ${menuId} == '02' ? active">
+              <a href="/point/npay/list" class="submenu-link">네이버페이 교환목록</a>
+            </li>
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '09' and ${menuId} == '03' ? active">
+              <a href="/point/cash/list" class="submenu-link">캐시백 신청목록</a>
+            </li>
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '09' and ${menuId} == '04' ? active">
+              <a href="/point/plan/list" class="submenu-link">포인트 요금제 신청목록</a>
+            </li>
+          </ul>
+        </li>
+        <!-- 상품관리 -->
+        <li class="menu-item has-submenu" th:classappend="${menuIdGroup} == '04' ? open" sec:authorize="hasAnyAuthority('ALL','PROD_MNG')">
+          <a href="/pbm/plan/list" class="menu-link">
+            <i class="fas fa-box"></i>
+            <span>상품관리</span>
+            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+          </a>
+          <ul class="submenu">
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '04' and ${menuId} == '05' ? active">
+              <a href="/pbm/benefit/list" class="submenu-link">혜택</a>
+            </li>
+
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '04' and ${menuId} == '01' ? active">
+              <a href="/pbm/plan/list" class="submenu-link">요금제</a>
+            </li>
+
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '04' and ${menuId} == '04' ? active" th:if="${session.loginUser.authType == 'ADMIN' or session.loginUser.authType == 'MANAGE'}">
+              <a href="/pbm/plan/planOrderMng/list" class="submenu-link">요금제 추천관리</a>
+            </li>
+
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '04' and ${menuId} == '02' ? active" th:if="${session.loginUser.authType == 'ADMIN' or session.loginUser.authType == 'MANAGE'}">
+              <a href="/pmb/scraping/list" class="submenu-link">스크래핑 관리</a>
+            </li>
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '04' and ${menuId} == '0301' ? active" th:if="${session.loginUser.authType == 'ADMIN' or session.loginUser.authType == 'MANAGE'}">
+              <a href="/pmb/internetplan/list/01" class="submenu-link">인터넷-세모통</a>
+            </li>
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '04' and ${menuId} == '0303' ? active" th:if="${session.loginUser.authType == 'ADMIN' or session.loginUser.authType == 'MANAGE'}">
+              <a href="/pmb/internetplanNew/list" class="submenu-link">인터넷-세모통(New)</a>
+            </li>
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '04' and ${menuId} == '0302' ? active" th:if="${session.loginUser.authType == 'ADMIN' or session.loginUser.authType == 'MANAGE'}">
+              <a href="/pmb/internetplan/list/02" class="submenu-link">인터넷-포니또</a>
+            </li>
+
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '04' and ${menuId} == '06' ? active">
+              <a href="/pbm/popPlan/list" class="submenu-link">인기요금제 관리</a>
+            </li>
+          </ul>
+        </li>
+        <!-- 신청관리 -->
+        <li class="menu-item has-submenu" th:classappend="${menuIdGroup} == '05' ? open" sec:authorize="hasAnyAuthority('ALL', 'REQ_MNG')">
+          <a href="/pmb/plan-request/list" class="menu-link">
+            <i class="fas fa-clipboard-list"></i>
+            <span>신청관리</span>
+            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+          </a>
+          <ul class="submenu">
+            <li
+              class="submenu-item"
+              th:classappend="${menuIdGroup} == '05' and ${menuId} == '01' ? active"
+              th:if="${(session.loginUser.authType == 'ADMIN' or session.loginUser.authType == 'MANAGE' or session.loginUser.simpleOpenYn != '1') and session.loginUser.authType != 'MKT' and session.loginUser.authType != 'INTERNET' and session.loginUser.authType != 'INTERNET2' and session.loginUser.authType != 'SKYLIFE'}"
+            >
+              <a href="/pmb/plan-request/list" class="submenu-link">요금제 신청</a>
+            </li>
+            <li
+              class="submenu-item"
+              th:classappend="${menuIdGroup} == '05' and ${menuId} == '03' ? active"
+              th:if="${(session.loginUser.authType == 'ADMIN' or session.loginUser.authType == 'MANAGE' or session.loginUser.simpleOpenYn == '1') and session.loginUser.authType != 'INTERNET' and session.loginUser.authType != 'INTERNET2'}"
+            >
+              <a href="/pbm/order/list" class="submenu-link">간편개통 신청내역</a>
+            </li>
+            <li
+              class="submenu-item"
+              th:classappend="${menuIdGroup} == '05' and ${menuId} == '0201' ? active"
+              th:if="${session.loginUser.authType == 'ADMIN' or session.loginUser.authType == 'MANAGE' or session.loginUser.authType == 'INTERNET' or session.loginUser.authType == 'MKT' or session.loginUser.authType == 'SKYLIFE'}"
+            >
+              <a href="/pmb/internetreq/listNew" class="submenu-link">인터넷 신청-세모통</a>
+            </li>
+            <li
+              class="submenu-item"
+              th:classappend="${menuIdGroup} == '05' and ${menuId} == '02012' ? active"
+              th:if="${session.loginUser.authType == 'ADMIN' or session.loginUser.authType == 'MANAGE' or session.loginUser.authType == 'INTERNET2' or session.loginUser.authType == 'MKT' or session.loginUser.authType == 'SKYLIFE'}"
+            >
+              <a href="/pmb/internetreq/listNew2" class="submenu-link">인터넷 신청CS-세모통</a>
+            </li>
+
+            <li
+              class="submenu-item"
+              th:classappend="${menuIdGroup} == '05' and ${menuId} == '0202' ? active"
+              th:if="${session.loginUser.authType == 'ADMIN' or session.loginUser.authType == 'MANAGE' or session.loginUser.authType == 'INTERNET' }"
+            >
+              <a href="/pmb/internetreq/list/02" class="submenu-link">인터넷 신청-포니또</a>
+            </li>
+          </ul>
+        </li>
+        <!-- 실적관리 -->
+        <li
+          class="menu-item"
+          th:classappend="${menuIdGroup} == '10' ? active"
+          sec:authorize="hasAnyAuthority('ALL','SETTLE_MNG')"
+          th:if="${session.loginUser.authType == 'ADMIN' or session.loginUser.authType == 'MANAGE' or session.loginUser.simpleOpenYn != '1'}"
+        >
+          <a href="/stl/earning/list" class="menu-link">
+            <i class="fas fa-calculator"></i>
+            <span>실적관리</span>
+          </a>
+        </li>
+        <li class="menu-item has-submenu" th:classappend="${menuIdGroup} == '08' ? open" sec:authorize="hasAnyAuthority('ALL','SALES_MNG')">
+          <a href="/pmb/plan-sales/list" class="menu-link">
+            <i class="fas fa-chart-line"></i>
+            <span>영업관리</span>
+            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+          </a>
+          <ul class="submenu">
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '08' and ${menuId} == '01' ? active">
+              <a href="/pmb/plan-sales/list" class="submenu-link">영업상품 관리</a>
+            </li>
+          </ul>
+        </li>
+        <!-- 카카오메시지 -->
+        <li class="menu-item has-submenu" th:classappend="${menuIdGroup} == '11' ? active" sec:authorize="hasAnyAuthority('ALL','MESSAGE_MNG')">
+          <a href="/bizpurio/list" class="menu-link">
+            <i class="fas fa-comment"></i>
+            <span>카카오메시지</span>
+            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+          </a>
+          <ul class="submenu">
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '11' and ${menuId} == '01' ? active">
+              <a href="/bizpurio/list" class="submenu-link">카카오메시지</a>
+            </li>
+          </ul>
+        </li>
+        <!-- 서비스관리 -->
+        <li class="menu-item has-submenu" th:classappend="${menuIdGroup} == '07' ? open" sec:authorize="hasAnyAuthority('ALL','SERVICE_MNG')">
+          <a href="/svc/mainbanner/dealList" class="menu-link">
+            <i class="fas fa-cog"></i>
+            <span>서비스관리</span>
+            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+          </a>
+          <ul class="submenu">
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '07' and ${#strings.contains(menuId, '01')} ? active" th:unless="${session.loginUser.authType == 'MKT'}">
+              <a href="javascript:;" class="submenu-link">배너관리</a>
+              <ul class="subsubmenu">
+                <li th:classappend="${menuIdGroup} == '07' and ${menuId} == '0101' ? active">
+                  <a href="/svc/mainbanner/list?type=07" class="subsubmenu-link">메인</a>
+                </li>
+                <li th:classappend="${menuIdGroup} == '07' and ${menuId} == '0102' ? active">
+                  <a href="/svc/mainbanner/list?type=05" class="subsubmenu-link">결합</a>
+                </li>
+                <li th:classappend="${menuIdGroup} == '07' and ${menuId} == '0103' ? active">
+                  <a href="/svc/mainbanner/list?type=06" class="subsubmenu-link">챗봇</a>
+                </li>
+                <li th:classappend="${menuIdGroup} == '07' and ${menuId} == '0104' ? active">
+                  <a href="/svc/mainbanner/popupList" class="subsubmenu-link">레이어팝업</a>
+                </li>
+              </ul>
+            </li>
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '07' and ${menuId} == '04' ? open" th:unless="${session.loginUser.authType == 'MKT'}">
+              <a href="javascript:;" class="submenu-link">게시판관리</a>
+              <ul class="subsubmenu">
+                <li th:classappend="${menuIdGroup} == '07' and ${menuId} == '0401' ? active">
+                  <a href="/cms/notice/list" class="subsubmenu-link">공지사항</a>
+                </li>
+                <li th:classappend="${menuIdGroup} == '07' and ${menuId} == '0402' ? active">
+                  <a href="/cms/faq/list" class="subsubmenu-link">FAQ</a>
+                </li>
+                <li th:classappend="${menuIdGroup} == '07' and ${menuId} == '0403' ? active">
+                  <a href="/csm/onetoone/list" class="subsubmenu-link">1:1문의</a>
+                </li>
+              </ul>
+            </li>
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '07' and ${menuId} == '05' ? active" th:unless="${session.loginUser.authType == 'MKT'}">
+              <a href="/svc/event/list" class="submenu-link">이벤트관리</a>
+            </li>
+
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '07' and ${menuId} == '12' ? active">
+              <a href="/svc/internetrdp/list" class="submenu-link">랜딩페이지 관리</a>
+            </li>
+
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '07' and ${menuId} == '06' ? active" th:unless="${session.loginUser.authType == 'MKT'}">
+              <a href="/csm/baekseo/list" class="submenu-link">세모통 설명서</a>
+            </li>
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '07' and ${menuId} == '07' ? active" th:unless="${session.loginUser.authType == 'MKT'}">
+              <a href="/csm/review/list" class="submenu-link">후기관리</a>
+            </li>
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '07' and ${menuId} == '08' ? active" th:unless="${session.loginUser.authType == 'MKT'}">
+              <a href="/pbm/error-report/list" class="submenu-link">잘못된 정보 관리</a>
+            </li>
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '07' and ${menuId} == '09' ? active" th:unless="${session.loginUser.authType == 'MKT'}">
+              <a href="/svc/chatbotGroup/list" class="submenu-link">챗봇요금제관리</a>
+            </li>
+            <li class="submenu-item" th:classappend="${menuIdGroup} == '07' and ${menuId} == '10' ? active" th:unless="${session.loginUser.authType == 'MKT'}">
+              <a href="javascript:;" class="submenu-link">푸터관리</a>
+              <ul class="subsubmenu">
+                <li th:classappend="${menuIdGroup} == '07' and ${menuId} == '1101' ? active">
+                  <a href="/cms/policy-content/list/01" class="subsubmenu-link">이용약관</a>
+                </li>
+                <li th:classappend="${menuIdGroup} == '07' and ${menuId} == '1102' ? active">
+                  <a href="/cms/policy-content/list/02" class="subsubmenu-link">개인정보 처리방침</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <button class="toggle-sidebar">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+</html>

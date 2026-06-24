@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	 th:with="menuIdGroup ='04',menuId =${'03' + siteSp}">
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script type="text/javascript">
+
+	
+	document.addEventListener('DOMContentLoaded', () => {
+		var searchId = "[[${searchId}]]";
+		if(searchId == null || searchId == "") {
+			showAlert("잘못된 접근입니다.",goList);
+		}
+	
+	});
+	
+		
+	
+	
+		function saveData() {
+		  
+		  showConfirm( '저장 하시겠습니까?', () => {
+	                  saveProc();
+	              },
+	              () => {
+	                  
+	                  // 취소 시 실행할 로직
+	              },
+	              "인터넷 상품 저장"
+	        )
+	              
+		}
+		function saveProc() { 
+			const prodDv = document.querySelectorAll('[id^="dvIntProd"]');
+			for(var i=0;i<prodDv.length;i++) {
+				
+				var combinationName = $("#combinationName"+i).val();
+				var prodDescript = $("#prodDescript"+i).val();
+				var tvProdName = $("#tvProdName"+i).val();
+				var channelCount = $("#channelCount"+i).val();
+				var combinationPrice = $("#combinationPrice"+i).val();
+				var combinationFreeblePrice = $("#combinationFreeblePrice"+i).val();
+				var internetSpeed = $('input:radio[name=internetSpeed'+i+']:checked').val();
+				var orderNo = $("#orderNo"+i).val();
+				var internetMnoId = "[[${searchId}]]"; 
+				var useYn = $('input:radio[name=useYn_'+i+']:checked').val();
+				
+				
+				
+				
+				
+				var prodName = "";
+				if(tvProdName.trim() == "") {
+					prodName = "인터넷";
+				}  else {
+					prodName = "인터넷 + " + tvProdName;	
+				}
+				
+				
+				var params = {
+				  id : $("#planId"+i).val(),
+				  prodName: prodName,
+				  internetMnoId : internetMnoId, 
+				  combinationName : combinationName,
+				  prodDescript : prodDescript,
+				  internetSpeed : internetSpeed,
+				  tvProdName : tvProdName,
+				  channelCount : channelCount,
+				  combinationPrice : combinationPrice,
+				  combinationFreeblePrice : combinationFreeblePrice,
+				  useYn : useYn,
+				  orderNo : orderNo
+				};
+				
+				$.ajax({
+				   url 		: '/pmb/internetplanNew/ajaxUpdateMnoPlan',
+				   type 	: 'POST',
+				   data 	: JSON.stringify(params),
+				   contentType: 'application/json',
+				   async: false,
+				   success 	: function (data) {
+					   if(prodDv.length -1 == i) {
+						showAlert("수정되었습니다.",refresh);
+					   }
+					   
+
+				    },
+					error 	: function(request, status, error){
+			            alert(error);
+			        },
+			        complete:function(){
+			        }
+				});				
+				
+			}
+						
+		}
+		
+		function refresh(){
+			window.location.href="/pmb/internetplanNew/edit?searchId=[[${searchId}]]";
+		}
+		
+		function goList(){
+			window.location.href="/pmb/internetplanNew/list";
+		}
+	</script>
+		
+</th:block>
+
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="location mb-2">
+            <small class="text-secondary">
+                <i class="fas fa-home me-1"></i>
+                <a href="/mbm/adminuser/list">홈</a> > <a href="/pbm/plan/list">상품관리</a> > <a th:href="@{/pmb/internetplanNew/list}">인터넷</a>
+            </small>
+        </div>
+        <h2 class="page-title fs-4 mb-4">[[${compny.name}]] 인터넷 상품</h2>
+	        <div class="search-section detail">
+				
+	            <div class="form-row  full-width"  th:each="plan,index : ${planList}">
+				   <input type="hidden" th:id="|planId${index.index}|" th:value="${plan.id}">	
+	               <div class="form-label" th:text="|상품${index.index + 1}|" th:id="|dvIntProd${index.index}|">  </div>
+	                <div class="form-control-wrap" > 
+						<table>
+							<!-- 사용여부 -->
+							<tr>
+								<td> 사용여부<span class="required">*</span></td>
+								<td>
+									<div class="form-check-group">
+				                        <div class="form-check">
+				                            <input class="form-check-input" type="radio"  th:name="|useYn_${index.index}|" th:id="|useYn_${index.index}01|" value="Y" th:checked="${plan.useYn == 'Y'}" >
+				                            <label class="form-check-label" th:for="|useYn_${index.index}01|">사용</label>
+				                        </div>
+				                        <div class="form-check">
+				                            <input class="form-check-input" type="radio" th:name="|useYn_${index.index}|" th:id="|useYn_${index.index}02|" value="N" th:checked="${plan.useYn == 'N'}">
+				                            <label class="form-check-label" th:for="|useYn_${index.index}02|">미사용</label>
+				                        </div>
+				                    </div>
+								</td>
+							</tr>								
+							<tr>
+								<td>조합명<span class="required">*</span></td>
+								<td><input type="text" th:id="|combinationName${index.index}|"  class="form-control" placeholder="타이틀을 입력해 주세요." th:value="${plan.combinationName}" maxlength="200" /></td>
+							</tr>
+							<tr>
+								<td>한줄설명<span class="required">*</span></td>
+								<td><input type="text" th:id="|prodDescript${index.index}|" class="form-control" placeholder="한줄설명을 입력해 주세요." th:value="${plan.prodDescript}" maxlength="200" /></td>
+							</tr>
+							<tr>
+								<td>인터넷 속도<span class="required">*</span></td>
+								<td>
+									<div class="form-check-group">
+										<div class="form-check">
+					                         <input class="form-check-input" type="radio" th:id="|internetSpeed${index.index}_01|" th:name="|internetSpeed${index.index}|" th:checked="${plan.internetSpeed == 'S100'}" value="S100">
+					                         <label class="form-check-label" th:for="|internetSpeed${index.index}_01|">100Mbps</label>
+					                     </div>
+					                      <div class="form-check">
+					                         <input class="form-check-input" type="radio" th:id="|internetSpeed${index.index}_02|" th:name="|internetSpeed${index.index}|" th:checked="${plan.internetSpeed == 'S200'}" value="S200">
+					                         <label class="form-check-label" th:for="|internetSpeed${index.index}_02|">200Mbps</label>
+					                     </div>
+					                      <div class="form-check">
+					                         <input class="form-check-input" type="radio" th:id="|internetSpeed${index.index}_03|" th:name="|internetSpeed${index.index}|" th:checked="${plan.internetSpeed == 'S500'}" value="S500">
+					                         <label class="form-check-label" th:for="|internetSpeed${index.index}_03|">500Mbps</label>
+					                     </div>
+					                      <div class="form-check">
+					                         <input class="form-check-input" type="radio" th:id="|internetSpeed${index.index}_04|" th:name="|internetSpeed${index.index}|" th:checked="${plan.internetSpeed == 'S1000'}" value="S1000">
+					                         <label class="form-check-label" th:for="|internetSpeed${index.index}_04|">1Gbps</label>
+					                     </div>
+					                </div>
+								</td>
+							</tr>
+							
+							<tr>
+								<td>TV 상품명</td>
+								<td><input type="text" th:id="|tvProdName${index.index}|" class="form-control" placeholder="TV 상품명을 입력해 주세요." th:value="${plan.tvProdName}" maxlength="200" /></td>
+							</tr>
+							<tr>
+								<td>TV 채널 수</td>
+								<td><input type="text" th:id="|channelCount${index.index}|" class="form-control numberonly" placeholder="TV 채널 수를 입력해 주세요.(숫자만 입력)" th:value="${plan.channelCount}" maxlength="5" style="min-width:250px;width:250px;display:inline"/> 채널</td>
+							</tr>
+							
+							<tr>
+								<td>가격<span class="required">*</span></td>
+								<td><input type="text" th:id="|combinationPrice${index.index}|" class="form-control numberonly" placeholder="가격을 입력해 주세요.(숫자만 입력)" th:value="${plan.combinationPrice}" maxlength="200" style="min-width:250px;width:250px;display:inline" />원</td>
+							</tr>
+							<tr>
+								<td>현금사은품 가격<span class="required">*</span></td>
+								<td><input type="text" th:id="|combinationFreeblePrice${index.index}|" class="form-control numberonly" placeholder="현금사은품 가격을 입력해 주세요.(숫자만 입력)" th:value="${plan.combinationFreeblePrice}" maxlength="5"  style="min-width:250px;width:250px;display:inline"/> 만원</td>
+							</tr>
+							<tr>
+								<td>순서<span class="required">*</span></td>
+								<td><input type="text" th:id="|orderNo${index.index}|" class="form-control numberonly" placeholder="순서를 입력해 주세요.(숫자만 입력)" th:value="${plan.orderNo}" maxlength="5" style="min-width:250px;width:250px;display:inline"/></td>
+							</tr>																					
+						</table>
+						
+						
+					</div>
+	            </div>
+      	  </div>
+        
+        <!-- 버튼 영역 -->
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">
+                목록
+            </button>
+            <button type="button" class="btn btn-lg btn-dark px-4 btn-sm" onclick="saveData();">
+                저장
+            </button>     
+        </div>
+    </div>
+</div>

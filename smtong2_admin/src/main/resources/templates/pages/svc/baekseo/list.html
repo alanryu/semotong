@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='07',menuId ='06'">
+	  
+<th:block layout:fragment="css">
+</th:block>
+
+<th:block layout:fragment="script">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script> 
+
+<script id="eventlistTmpl" type="text/x-jquery-tmpl">
+	<tr>
+		<!-- 번호 -->
+		<td>${rIdx}</td>
+		<!-- 편집 -->
+		<td>
+			<div class="d-flex gap-2">
+				<button class="action-btn btn-sm" onclick="location.href='/csm/baekseo/goUpdatePage/${id}'">
+					<i class="fas fa-edit me-1"></i>
+					수정
+				</button>
+				{{if contentSp == '01'}}
+				<!--
+				<button class="action-btn btn-sm" onclick="deleteRow('${id}', '${title}');" disabled> 
+					<i class="fas fa-trash me-1"></i>
+					삭제
+				</button>
+				-->
+				{{/if}}
+				{{if contentSp == '02'}}
+				<button class="action-btn btn-sm" onclick="deleteRow('${id}', '${title}');"> 
+					<i class="fas fa-trash me-1"></i>
+					삭제
+				</button>
+				{{/if}}
+			</div>
+		</td>
+		<!-- 구분 -->
+		<td>{{if contentSp == '01'}}설명서{{/if}}{{if contentSp == '02'}}백서{{/if}}</td>
+		<!-- 제목 -->
+		<td><a href="/csm/baekseo/goUpdatePage/${id}">${title}</a></td>
+		<!-- 게시 Y/N -->
+		<td>
+			<div class="form-check form-switch mb-3">
+				<input class="form-check-input" type="checkbox" role="switch" value="${displaySp}" {{if displaySp == '1'}}checked="true"{{/if}} onclick="displaySpProc('${id}', this)" style="transform: scale(1.5);">
+			</div>
+		</td>
+		<td>{{html dateToStringDash(displayStartDttm)}}</td>
+		<td>{{html dateToStringDash(displayEndDttm)}}</td>
+		<td>${userName}</td>
+		<td>{{html dateToStringDot(createDate)}}</td>
+	</tr>
+</script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		
+		$("#keyword").focus();
+		//페이징 기본(필수)
+		currentPage = 1;
+		searchList();
+	})
+	
+	function goInsert(){
+		window.location.href='/csm/baekseo/goUpdatePage/0';
+	}
+	
+	
+	function renderPage(page) {
+		currentPage = page;
+		searchList();
+	}
+	
+	function toggleDetailSearch(){
+		$("#searchKeywordType")	.val('ALL')		.prop('selected', true);
+		$("#periodType")		.val('CREATE')	.prop('selected', true);
+		
+		$("#keyword").val('');
+		periodButtonInit();
+		
+		currentPage = 1;
+	}
+	
+	function searchList() {
+		
+		//페이징 기본(필수)
+		var page = currentPage;
+		if(page =="" || page == null) page =1;
+		
+		//var _recordSize =  parseInt($("#recordSize").val());
+		var _recordSize =  10;
+		
+		
+		if( !_isDateForm($("#searchStartDt").val()) ){
+			alert("올바른 날짜를 넣어주세요");
+			$("#searchStartDt").focus();
+			return;
+		}
+		if( !_isDateForm($("#searchEndDt").val()) ){
+			alert("올바른 날짜를 넣어주세요");
+			$("#searchEndDt").focus();
+			return;
+		}
+		
+		var params = {
+		 		searchKeywordType 		: $("#searchKeywordType").val()					// ALL, TIT, CREATER
+		 		,searchKeyword			: $("#keyword").val()							// 입력 검색어 
+		 		,searchPeriodType		: $("#periodType").val()						// CREATE, START, END,  등록, 시작, 종료 중 무엇으로 조회
+		 		,searchStartDate		: $("#searchStartDt").val()						//BaseSearchDto
+		 		,searchEndDate			: $("#searchEndDt").val()						//BaseSearchDto
+		 		,page					: page
+		 		,recordSize 			: _recordSize
+		}
+		
+		$.ajax({
+				url : '/csm/baekseo/ajaxList'
+				,type : 'POST'
+				,dataType : "json"
+				,contentType:"application/json"
+				,data : JSON.stringify(params)
+				,success: function (data) {
+					
+					var items = data.data
+					$('#searchList').empty();
+					if(data.totalCnt == 0) {
+						//
+					} else {
+						var totalCnt = data.totalCnt;
+						$.each(data.data, function(idx, obj){
+							obj.rIdx = totalCnt - ((params.page - 1) * params.recordSize + idx);
+						});
+						$('#eventlistTmpl').tmpl(data.data).appendTo('#searchList');	
+					}
+					$('#totla_count').html("총 "+data.totalCnt+"건");
+					renderPagination(params.page, data.totalCnt, params.recordSize)
+				},
+				error : function(request, status, error){
+					alert(error);
+				},
+				complete:function(){
+					// $('#loading').addClass('display-none');
+				}
+		});
+	}
+	
+	function displaySpProc(id, obj){
+		console.log($(obj).is(':checked'));
+		var gbn = $(obj).is(':checked') ? '1' : '0';
+		var params = { id : id, displaySp : gbn}
+		$.ajax({
+			url			: '/csm/baekseo/ajaxDisplaySp'
+			,type 		: 'POST'
+			,dataType 	: "json"
+			,contentType:"application/json"
+			,data 		: JSON.stringify(params)
+			,success	: function (data) {
+				$(obj).val(gbn);
+			}
+			,error 	: function(request, status, error){
+				alert(error);
+			}
+			,complete:function(){
+			}
+		});
+	}
+	
+	
+	function deleteRow(delId,tit) {
+		
+		showConfirm( '삭제하시겠습니까?',
+                () => { 
+                	deleteProc(delId,tit); 
+                },
+                () => {  },
+                '공지관리'
+         )
+	}
+	
+	
+	function deleteProc(id,tit){
+		
+		var params = { id : id}
+		$.ajax({
+			url			: '/csm/baekseo/ajaxDel'
+			,type 		: 'POST'
+			,dataType 	: "json"
+			,contentType:"application/json"
+			,data 		: JSON.stringify(params)
+			,success	: function (data) {
+				console.log(data);
+				showAlert('삭제 되었습니다.');
+				searchList();
+			}
+			,error 	: function(request, status, error){
+				alert(error);
+			}
+			,complete:function(){
+			}
+		});
+		$("#keyword").focus();
+	}
+	
+	
+	
+	
+
+</script>
+
+
+</th:block>
+
+<div class="main-content">
+	
+	<div class="container-fluid">
+		<!-- 로케이션 & 제목 영역 추가 -->
+		<div class="page-header mb-4">
+			<div class="location mb-2">
+				<small class="text-secondary">
+					<i class="fas fa-home me-1"></i>
+					<a href="javascript:;">홈</a>
+					>
+					<a href="javascript:;">서비스 관리</a>
+					>
+					<a href="/svc/baekseo/list">세모통설명서관리</a>
+				</small>
+			</div>
+			<h2 class="page-title fs-4 mb-4">
+				세모통설명서관리
+			</h2>
+		</div>
+		
+		<!-- 검색 구간 -->
+		<div class="search-section">
+			<div class="col-12 mb-2">
+				<div class="form-row">
+					<div class="form-label mb-0">검색조건</div>
+					<div class="form-control-wrap flex-grow-1">
+						<select class="form-select" id="searchKeywordType">
+							<option value="ALL">전체</option>
+							<option value="01">설명서</option>
+							<option value="02">백  서</option>
+						</select>
+					</div>
+					<div class="position-relative col-9">
+						<i
+							class="fas fa-search position-absolute"
+							style="left: 16px; top: 15px; color: #94a3b8;"></i>
+						<input type="text" class="form-control ps-5" id="keyword" placeholder="검색어를 입력하세요">
+					</div>
+				</div>
+			</div>
+			<div class="row align-items-center mb-2">
+				<div class="form-row">
+					<div class="form-label mb-0">검색기간</div>
+					<div class="d-flex align-items-center gap-3">
+						<select class="form-select" style="width: 120px" id="periodType">
+							<option value="CREATE">등록일자</option>
+							<option value="START">시작일자</option>
+							<option value="END">종료일자</option>
+						</select>
+						<div class="d-flex align-items-center gap-2">
+							<input type="date" class="form-control" style="width: 150px" id="searchStartDt">
+							<span class="text-secondary">-</span>
+							<input type="date" class="form-control" style="width: 150px" id="searchEndDt">
+						</div>
+						<div class="d-flex gap-2">
+							<button class="period-button" value="0">오늘</button>
+							<button class="period-button" value="7" id="defaultWeek">1주일</button>
+							<button class="period-button" value="30">1개월</button>
+							<button class="period-button" value="90">3개월</button>
+							<button class="period-button" value="180">6개월</button>
+							<button class="period-button" value="365">1년</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 검색 구간 -->
+
+			<div class="row">
+				<div class="col-12 text-end mt-2">
+					
+					<button class="btn btn-primary btn-sm" onclick="searchList();">
+						<i class="fas fa-search"></i>
+						검색
+					</button>
+					<button class="btn btn-light me-2 btn-sm" onclick="toggleDetailSearch()">
+						<i class="fas fa-redo"></i>
+						초기화
+					</button>
+				</div>
+			</div>
+		</div>
+		
+		
+		
+		
+		<!-- contents 영역 -->
+		<div class="table-section">
+			<div class="d-flex justify-content-between align-items-center mb-4">
+				<div class="d-flex align-items-center gap-3">
+					<div class="stats-badge">
+						<i class="fas fa-calculator me-1"></i>
+						<span id="totla_count">총 450건</span>
+					</div>
+				</div>
+								
+				<div class="header-actions">
+					<div class="custom-dropdown">
+						<button class="btn btn-primary btn-sm btnDrop" onclick="goInsert()">
+							<i class="fas fa-calculator"></i>
+							등록
+						</button>
+					</div>
+				</div>
+			</div>
+			
+			<table class="table custom-table">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>편집</th>
+						<th>구분</th>
+						<th>제목</th>
+						<th>게시여부</th>
+						<th>시작일자</th>
+						<th>종료일자</th>
+						<th>등록자</th>
+						<th>등록일자</th>
+					</tr>
+				</thead>
+				<tbody id="searchList">
+				</tbody>
+			</table>
+			
+			<div class="d-flex justify-content-left mt-4">
+				<ul class="pagination">
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

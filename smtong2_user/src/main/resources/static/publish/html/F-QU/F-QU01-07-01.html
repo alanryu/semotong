@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>간편개통 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+</head>
+
+<body>
+	<!-- 레이아웃이 없는 경우  -->
+	<div class="wrapper only-container">
+		<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-QU-page F-QU01-07-01-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">유심 정보를 적어주세요.</h2>
+						</div>
+						<div class="sec-body">
+							<!-- 유심카드 -->
+							 <div class="usim-image">
+								<img src="../../assets/images/common/img-usim-demo.png" alt="">
+							 </div>
+							<!-- //유심카드 -->
+							<!-- 등록폼 -->
+							<div class="basic-frm">
+								<!-- 일련번호 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmSerial" class="tit">일련번호</label>
+									</div>
+									<div class="frm-content">
+										<!-- 2025-04-28 조찬기 : 일련번호 UI 변경 -->
+										<div class="frm-group type-serial">
+											<div class="ui-inp">
+												<input type="tel" name="" id="frmSerial" value="" placeholder="0000" title="" class="inp" oninput="setRegularNumber(this)"/>
+											</div>
+											<div class="ui-inp">
+												<input type="tel" name="" id="" value="" placeholder="0000" title="" class="inp" oninput="setRegularNumber(this)"/>
+											</div>
+											<div class="ui-inp">
+												<input type="tel" name="" id="" value="" placeholder="0000" title="" class="inp" oninput="setRegularNumber(this)"/>
+											</div>
+											<div class="ui-inp">
+												<input type="tel" name="" id="" value="" placeholder="0000" title="" class="inp" oninput="setRegularNumber(this)"/>
+											</div>
+											<div class="ui-inp">
+												<input type="text" name="" id="" value="" placeholder="000F" title="" class="inp" oninput="setRegularNumber(this)"/>
+											</div>
+										</div>
+									</div>
+									<!-- 2025-02-26 조찬기 : 일련번호 안내 추가 -->
+									<!-- 일련번호 안내 -->
+									<div class="help-msg">
+										<p class="help-msg-tit">
+											<i class="ui-icn icn-16-info-gr" aria-hidden="true"></i>
+											<span>아래의 가이드에 따라 전체 유심번호를 등록해주세요.</span>
+										</p>
+										<ul class="help-msg-list">
+											<li><em>SKT : </em> 유심 우측 하단에 있는 일련번호 끝 14자리</li>
+											<li><em>KT : </em> 유심 우측 하단에 있는 일련번호 끝자리(F)를 포함한 20자리</li>
+											<li><em>LG U : </em> 유심 우측 하단에 있는 모델명(영문, 숫자 포함)과 일련번호 12~15자리</li>
+											<li><em>그 외 : </em> 노출된 일련번호 모두 입력(영문, 숫자 포함)</li>
+										</ul>
+									</div>
+									<!-- //일련번호 안내 -->
+								</div>
+								<!-- // 일련번호 입력 -->
+							</div>
+							<!-- // 등록폼 -->
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" disabled>
+							<span>다음</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 플로팅 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+	</div>
+</body>
+
+</html>

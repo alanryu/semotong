@@ -1,0 +1,67 @@
+# Spring: Default Setting, DB Connection Setting
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local} # 환경 변수가 없으면 기본값(local) 사용
+  application:
+    name: semotong
+  web:
+    resources:
+      add-mappings: false
+  datasource:
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5 # 최소 커넥션 개수 (유지할 커넥션 개수)
+      idle-timeout: 250000 # (250초) MySQL `wait_timeout = 300`보다 짧게 설정하여 사전에 커넥션 해제
+      max-lifetime: 280000 # (280초) MySQL `wait_timeout = 300`보다 짧게 설정하여 재사용 문제 방지
+      keepalive-time: 200000 # (200초) 일정 주기로 커넥션을 유지하기 위해 `SELECT 1` 실행
+      connection-timeout: 30000 # (30초) 커넥션 대기 시간
+      validation-timeout: 5000 # (5초) 커넥션 유효성 검사 타임아웃
+      test-while-idle: true # 아이들 상태에서도 커넥션 검사
+      test-on-borrow: true # 커넥션을 사용할 때마다 유효성 검사
+      leak-detection-threshold: 20000 # (20초) 커넥션 누수 감지						
+  thymeleaf:
+    cache: false
+    check-template-location: true
+    prefix: classpath:/templates/
+    suffix: .html
+    enabled: true
+  mvc:
+    static-path-pattern: "/static/**"
+  session:
+    store-type: redis
+    redis:
+      flush-mode: ON_SAVE
+      repository-type: default
+      namespace: semotong:session
+  devtools:
+    livereload:
+      enabled: true
+# Server: Default Setting
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+    session:
+      cookie:
+        name: JSESSIONID
+      timeout: 36000
+# Mybatis
+mybatis:
+  type-aliases-package: kr.co.ucomp.domain
+  mapper-locations: classpath*:mapper/**/*.xml
+  configuration:
+    cache-enabled: false
+    map-underscore-to-camel-case: true
+    use-generated-keys: true
+    default-executor-type: reuse
+    jdbc-type-for-null: null
+#facebook-meta
+facebook:
+  meta:
+    url: https://graph.facebook.com/v23.0/2132101073966419/events?access_token
+    access-token: EAAHNdZBmBmqsBPAZAFHEUEDIaZC3JINoTC6MoBf0ADkXjG2xth69NyGfUKmFlB7W8DktrZChlR65J4AhNxJUNdsi9hr2ltrIEB83tTtetHjyP4ZB2gREv6ZCxmlNqFq5WNzpxQPySvcxnL6leaAJSlYnHo57SAgiWjJ6tC8OO3hOFVCtFWRv3ZA5X6nwH8gMhVt2wZDZD

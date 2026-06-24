@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/order_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='약관동의'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ 
+ <script>
+	
+	
+	$( document ).ready(function() {
+		
+		setBillMethod("02");
+	});
+	
+	
+	function tabHandler(targetId, element) {
+		
+		$('#btnNext').attr('disabled', 'disabled');
+		
+		document.querySelectorAll("[id$='-pane']").forEach(el => el.classList.remove("active"));
+
+		const targetElement = document.getElementById(targetId);
+		if (targetElement) {
+			targetElement.classList.add("active");
+		}
+
+		// 라디오 버튼 체크 여부 확인 (선택 사항)
+		if (element) {
+			element.checked = true;
+		}
+		
+		
+		if(targetId == "FQU0112-01-pane") {
+			setBillMethod("02");
+		} else {
+			setBillMethod("03");
+		}
+		
+		
+	};
+	
+	
+	function setBillMethod(sp){
+		$('#billCd').val(sp);
+		$('#btnNext').removeAttr("disabled");
+		
+	}
+	
+
+	
+	function isValidEmail(email) {
+	    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	    return emailRegex.test(email);
+	}
+	
+	
+	function goNext() {
+		moveNextOrder('/order/completReqProc');
+	}
+ </script>
+</th:block>
+
+<!-- Container -->
+<main role="main" class="container">
+<th:block th:include="pages/order/incOrderForm :: orderFormFragment"></th:block>
+<!-- content -->
+			<div class="content F-QU-page F-QU01-12-01-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">요금 청구서 수령 방법을 선택해 주세요.</h2>
+							<p class="sec-explain">신청 후에도 고객센터에서 변경할 수 있어요.</p>
+						</div>
+						<div class="sec-body">
+							<!-- 등록폼 -->
+							<div class="basic-frm">
+								<!-- 수령 방법 선택 -->
+								<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label class="tit" for="frmFiled11">수령 방법</label>
+									</div>
+									<div class="frm-content">
+										<ul class="frm-group">
+											<label class="ui-rdo rdo-style2">
+												<input type="radio" name="frmSurvey" id="FQU0112-01" aria-controls="FQU0112-01-pane" checked onchange="tabHandler('FQU0112-01-pane', this)" />
+												<span class="rdo"><span>모바일로 받을래요</span></span>
+											</label>
+											<label class="ui-rdo rdo-style2">
+												<input type="radio" name="frmSurvey" id="FQU0112-02" aria-controls="FQU0112-02-pane" onchange="tabHandler('FQU0112-02-pane', this)" />
+												<span class="rdo"><span>이메일로 받을래요</span></span>
+											</label>
+										</ul>
+									</div>
+								</div>
+								<!-- // 수령 방법 선택 -->
+
+								<div class="tab-content">
+									<!-- 이메일로 받을래요 패널 -->
+									<div class="tab-pane active" id="FQU0112-01-pane" role="tabpanel" aria-labelledby="FQU0112-01" tabindex="0"></div>
+									<!-- //모바일로 받을래요 패널 -->
+									<!-- 이메일로 받을래요 패널 -->
+									<div class="tab-pane" id="FQU0112-02-pane" role="tabpanel" aria-labelledby="FQU0112-02" tabindex="0"></div>
+									<!-- 이메일로 받을래요 패널 -->
+								</div>
+							</div>
+							<!-- // 등록폼 -->
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary"  disabled id="btnNext" onclick="goNext()">
+							<span>다음</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 플로팅 섹션 -->
+			</div>
+			<!-- // content -->
+</main>
+
+	
+</html>

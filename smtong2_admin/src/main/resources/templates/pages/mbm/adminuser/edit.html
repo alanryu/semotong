@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layout/default_layout}"
+  layout:fragment="Content"
+  th:with="menuIdGroup ='01',menuId ='01'"
+>
+  <!-- index.html 고유 CSS 추가 -->
+  <th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+  </th:block>
+  <!-- index.html 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+    <script type="text/javascript">
+      document.addEventListener("DOMContentLoaded", () => {
+        var procMsg = "[[${procMsg}]]";
+
+        if (procMsg != "" || procMsg != "") {
+          if (procMsg == "sucess") {
+            var procSp = "[[${procSp}]]";
+            if (procSp == "c") {
+              showAlert("등록되었습니다.", goList);
+            } else {
+              showAlert("수정되었습니다.", goList);
+            }
+          } else {
+            showAlert(procMsg);
+          }
+        }
+
+        $("#spPasswdConfirm").hide();
+
+        var recordId = "[[${record.id}]]";
+        if (recordId != 0) {
+          $("#userName").prop("disabled", true);
+          $("#adminId").prop("disabled", true);
+        }
+
+        var url = $(location).attr("href");
+        var searchParams = new URL(url).searchParams;
+        var id = searchParams.get("id");
+        if (id != null && id != "") {
+          $(".btn-dup").hide();
+        }
+
+        $("#adminId").keyup(function (event) {
+          if (!(event.keyCode >= 37 && event.keyCode <= 40)) {
+            var inputVal = $(this).val();
+            var check = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+            if (check.test(inputVal)) {
+              $(this).val("");
+            }
+          }
+        });
+
+        var authType = "[[${record.authType}]]";
+
+        setuthTypeInit(authType);
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        if ($("#id").val() != 0) {
+          $("#chkAdminInDup").val("Y");
+        }
+      });
+
+      function checkAdminId() {
+        var adminId = $("#adminId").val();
+        if (adminId.length == 0) {
+          showAlert("아이디를 입력 하세요.");
+          return;
+        }
+        $("#chkAdminInDup").val("N");
+
+        var params = {
+          searchAdminid: $("#adminId").val(),
+        };
+
+        $.ajax({
+          url: "/mbm/adminuser/getUserById",
+          type: "POST",
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(params),
+          success: function (data) {
+            console.log(data);
+            if (data.code == 200) {
+              console.log(data.data);
+              if (data.data == null) {
+                showAlert("등록할 수 있는 아이디입니다.");
+                $("#chkAdminInDup").val("Y");
+              } else {
+                showAlert("이미 등록된 아이디입니다.");
+              }
+            } else {
+              showAlert(data.message);
+            }
+          },
+          error: function (request, status, error) {
+            showAlert(error);
+          },
+          complete: function () {
+            // $('#loading').addClass('display-none');
+          },
+        });
+      }
+
+      function updatePwd() {
+        if ($("#password").val() == "") {
+          showAlert("비밀번호를 입력 해주세요.");
+          return;
+        }
+
+        if ($("#paswordConfirm").val() != $("#password").val()) {
+          showAlert("비밀번호가 일치하지 않습니다.");
+          return;
+        }
+        var validPass = validatePassword($("#password").val());
+        if (validPass != "sucess") {
+          showAlert(validPass);
+          return;
+        }
+
+        showConfirm(
+          "비밀번호를 수정하시겠습니까?",
+          () => {
+            updatePwdProc();
+          },
+          () => {},
+          "비밀번호 수정"
+        );
+      }
+
+      function updatePwdProc() {
+        var params = {
+          password: $("#password").val(),
+          id: $("#id").val(),
+        };
+
+        $.ajax({
+          url: "/mbm/adminuser/updatePwd",
+          type: "POST",
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(params),
+          success: function (data) {
+            console.log(data);
+            if (data.code == 200) {
+              showAlert("비밀번호가 수정되었습니다.");
+              $("#password").val("");
+              $("#paswordConfirm").val("");
+            } else {
+              showAlert(data.message);
+            }
+          },
+          error: function (request, status, error) {
+            showAlert(error);
+          },
+          complete: function () {
+            // $('#loading').addClass('display-none');
+          },
+        });
+      }
+
+      function goList() {
+        window.location.href = "/mbm/adminuser/list";
+      }
+
+      function saveData() {
+        chkAdminInDup = $("#chkAdminInDup").val();
+        if (chkAdminInDup == "N") {
+          showAlert("아이디 중복 체크를 해주세요.");
+          return;
+        }
+
+        if ($("#password").val() != "") {
+          if ($("#paswordConfirm").val() != $("#password").val()) {
+            showAlert("비밀번호가 일치하지 않습니다.");
+            return;
+          }
+
+          var validPass = validatePassword($("#password").val());
+          if (validPass != "sucess") {
+            showAlert(validPass);
+            return;
+          }
+        }
+
+        if ($("#comGroup").val() == "") {
+          showAlert("소속을 확인하세요");
+          $("#comGroup").focus();
+          return;
+        }
+
+        if ($("#phoneNumber").val() == "") {
+          showAlert("전화번호를 확인하세요");
+          $("#phoneNumber").focus();
+          return;
+        }
+
+        if ($("#email").val() == "") {
+          showAlert("이메일을 확인하세요");
+          $("#email").focus();
+          return;
+        } else {
+          var email_regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
+          if (!email_regex.test($("#email").val())) {
+            showAlert("이메일을 확인하세요");
+            return;
+          }
+        }
+
+        var url = $(location).attr("href");
+        var searchParams = new URL(url).searchParams;
+        var id = searchParams.get("id");
+
+        var txt = "등록하시겠습니까?";
+        if (id != null && id != "") {
+          txt = "수정하시겠습니까?";
+        }
+
+        showConfirm(
+          txt,
+          () => {
+            $("#userName").prop("disabled", false);
+            $("#adminId").prop("disabled", false);
+
+            $("#submitForm").submit();
+          },
+          () => {},
+          "계정등록"
+        );
+      }
+
+      function setuthTypeInit(sp) {
+        if (sp == "ADMIN") {
+          $("#allAuthYn").prop("disabled", false);
+        } else {
+          if (sp == "MANAGE") {
+            $("#allAuthYn").prop("disabled", true);
+            $("#adminMemAuthYn").prop("disabled", false);
+            $("#userMngYn").prop("disabled", false);
+            $("#companyMngYn").prop("disabled", false);
+            $("#prodMngYn").prop("disabled", false);
+            $("#reqMngYn").prop("disabled", false);
+            $("#settleMngYn").prop("disabled", false);
+            $("#serviceMngYn").prop("disabled", false);
+          } else if (sp == "INTERNET" || sp == "INTERNET2") {
+            $("#allAuthYn").prop("disabled", true);
+            $("#adminMemAuthYn").prop("disabled", true);
+            $("#userMngYn").prop("disabled", true);
+            $("#companyMngYn").prop("disabled", true);
+            $("#prodMngYn").prop("disabled", true);
+            $("#settleMngYn").prop("disabled", true);
+            $("#serviceMngYn").prop("disabled", true);
+            $("#pointMngYn").prop("disabled", true);
+            $("#salesMngYn").prop("disabled", true);
+            $("#kakaoMsgMngYn").prop("disabled", true);
+
+            // 신청관리 만 체크
+            $("#reqMngYn").prop("disabled", false);
+          } else if (sp == "MKT") {
+            $("#allAuthYn").prop("disabled", true);
+            $("#adminMemAuthYn").prop("disabled", true);
+            $("#userMngYn").prop("disabled", true);
+            $("#companyMngYn").prop("disabled", true);
+            $("#prodMngYn").prop("disabled", true);
+            $("#settleMngYn").prop("disabled", true);
+            $("#pointMngYn").prop("disabled", true);
+            $("#salesMngYn").prop("disabled", true);
+            $("#kakaoMsgMngYn").prop("disabled", true);
+
+            // 신청관리 만 체크
+            $("#reqMngYn").prop("disabled", false);
+            $("#serviceMngYn").prop("disabled", false);
+          } else if (sp == "SKYLIFE") {
+            $("#allAuthYn").prop("disabled", true);
+            $("#adminMemAuthYn").prop("disabled", true);
+            $("#userMngYn").prop("disabled", true);
+            $("#companyMngYn").prop("disabled", true);
+            $("#prodMngYn").prop("disabled", true);
+            $("#settleMngYn").prop("disabled", true);
+            $("#serviceMngYn").prop("disabled", true);
+            $("#pointMngYn").prop("disabled", true);
+            $("#salesMngYn").prop("disabled", true);
+            $("#reqMngYn").prop("disabled", true);
+            $("#salesMngYn").prop("disabled", true);
+
+            $("#reqMngYn").prop("disabled", false);
+          } else {
+            $("#allAuthYn").prop("disabled", true);
+            $("#adminMemAuthYn").prop("disabled", true);
+            $("#userMngYn").prop("disabled", true);
+            $("#companyMngYn").prop("disabled", true);
+            $("#prodMngYn").prop("disabled", true);
+            $("#settleMngYn").prop("disabled", true);
+            $("#serviceMngYn").prop("disabled", true);
+            $("#pointMngYn").prop("disabled", true);
+            $("#salesMngYn").prop("disabled", true);
+            $("#reqMngYn").prop("disabled", true);
+
+            $("#salesMngYn").prop("disabled", false);
+          }
+        }
+      }
+
+      function setuthType(sp) {
+        $("#allAuthYn").prop("checked", false);
+        $("#adminMemAuthYn").prop("checked", false);
+        $("#userMngYn").prop("checked", false);
+        $("#companyMngYn").prop("checked", false);
+        $("#prodMngYn").prop("checked", false);
+        $("#reqMngYn").prop("checked", false);
+        $("#settleMngYn").prop("checked", false);
+        $("#serviceMngYn").prop("checked", false);
+        $("#pointMngYn").prop("checked", false);
+        $("#salesMngYn").prop("checked", false);
+        $("#kakaoMsgMngYn").prop("checked", false);
+
+        if (sp == "ADMIN") {
+          selAuth("ALL");
+          $("#allAuthYn").prop("disabled", false);
+        } else {
+          if (sp == "MANAGE") {
+            $("#allAuthYn").prop("disabled", true);
+            $("#adminMemAuthYn").prop("disabled", false);
+            $("#userMngYn").prop("disabled", false);
+            $("#companyMngYn").prop("disabled", false);
+            $("#prodMngYn").prop("disabled", false);
+            $("#reqMngYn").prop("disabled", false);
+            $("#settleMngYn").prop("disabled", false);
+            $("#serviceMngYn").prop("disabled", false);
+          } else if (sp == "INTERNET" || sp == "INTERNET2" || sp == "SKYLIFE") {
+            $("#allAuthYn").prop("disabled", true);
+            $("#adminMemAuthYn").prop("disabled", true);
+            $("#userMngYn").prop("disabled", true);
+            $("#companyMngYn").prop("disabled", true);
+            $("#prodMngYn").prop("disabled", true);
+            $("#settleMngYn").prop("disabled", true);
+            $("#serviceMngYn").prop("disabled", true);
+            $("#pointMngYn").prop("disabled", true);
+            $("#salesMngYn").prop("disabled", true);
+            $("#kakaoMsgMngYn").prop("disabled", true);
+
+            // 신청관리 만 체크
+            $("#reqMngYn").prop("disabled", false);
+            $("#reqMngYn").prop("checked", true);
+          } else if (sp == "MKT") {
+            $("#allAuthYn").prop("disabled", true);
+            $("#adminMemAuthYn").prop("disabled", true);
+            $("#userMngYn").prop("disabled", true);
+            $("#companyMngYn").prop("disabled", true);
+            $("#prodMngYn").prop("disabled", true);
+            $("#settleMngYn").prop("disabled", true);
+            $("#pointMngYn").prop("disabled", true);
+            $("#salesMngYn").prop("disabled", true);
+            $("#kakaoMsgMngYn").prop("disabled", true);
+
+            // 신청관리 만 체크
+            $("#reqMngYn").prop("disabled", false);
+            $("#serviceMngYn").prop("disabled", false);
+            $("#reqMngYn").prop("checked", true);
+            $("#serviceMngYn").prop("checked", true);
+          } else {
+            $("#allAuthYn").prop("disabled", true);
+            $("#adminMemAuthYn").prop("disabled", true);
+            $("#userMngYn").prop("disabled", true);
+            $("#companyMngYn").prop("disabled", true);
+            $("#prodMngYn").prop("disabled", true);
+            $("#settleMngYn").prop("disabled", true);
+            $("#serviceMngYn").prop("disabled", true);
+            $("#pointMngYn").prop("disabled", true);
+            $("#salesMngYn").prop("disabled", true);
+            $("#reqMngYn").prop("disabled", true);
+
+            $("#salesMngYn").prop("disabled", false);
+            $("#salesMngYn").prop("checked", true);
+          }
+        }
+      }
+
+      function selAuth(id) {
+        if (id == "ALL") {
+          $("#allAuthYn").prop("checked", true);
+          $("#adminMemAuthYn").prop("checked", false);
+          $("#userMngYn").prop("checked", false);
+          $("#companyMngYn").prop("checked", false);
+          $("#prodMngYn").prop("checked", false);
+          $("#reqMngYn").prop("checked", false);
+          $("#settleMngYn").prop("checked", false);
+          $("#serviceMngYn").prop("checked", false);
+        } else {
+          $("#allAuthYn").prop("checked", false);
+        }
+      }
+      function chkPassConfirm() {
+        var password = $("#password").val();
+        var paswordConfirm = $("#paswordConfirm").val();
+        if (paswordConfirm == password) {
+          $("#spPasswdConfirm").hide();
+        } else {
+          $("#spPasswdConfirm").show();
+        }
+      }
+
+      var inputVal = $(this).val();
+      var check = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+      if (check.test(inputVal)) {
+        $(this).val("");
+      }
+    </script>
+  </th:block>
+
+  <div class="main-content">
+    <div class="container-fluid">
+      <div class="location mb-2">
+        <small class="text-secondary">
+          <a href="/mbm/adminuser/list">홈</a> > <a href="/mbm/adminuser/list">계정권한관리</a> >
+          <a href="/mbm/adminuser/list">계정권한목록</a>
+        </small>
+      </div>
+      <h2 class="page-title fs-4 mb-4" th:text="${record == null or record.id == 0} ? '계정 등록' : '계정 수정'"></h2>
+
+      <!-- 등록 폼 섹션 -->
+      <form method="POST" id="submitForm" th:object="${record}" th:action="${record.id == null or record.id == 0} ? '/mbm/adminuser/create' : '/mbm/adminuser/update'">
+        <input type="hidden" th:field="*{id}" />
+        <input type="hidden" id="chkAdminInDup" value="N" />
+        <input type="hidden" id="companyCode" value="999" />
+
+        <div class="search-section detail">
+          <!-- 이름 -->
+          <div class="form-row full-width">
+            <div class="form-label">이름<span class="required">*</span></div>
+            <div class="form-control-wrap">
+              <input type="text" class="form-control" placeholder="관리자 이름을 입력해주세요" th:field="*{userName}" maxlength="10" />
+              <th:block th:if="${#fields.hasErrors('userName')}" class="error"><span th:errors="*{userName}" class="required">Field error</span></th:block>
+            </div>
+          </div>
+
+          <!-- 아이디 -->
+          <div class="form-row full-width">
+            <div class="form-label">아이디<span class="required">*</span></div>
+            <div style="display: flex; gap: 5px">
+              <input type="text" class="form-control" placeholder="관리자 id를 입력해주세요" th:field="*{adminId}" maxlength="20" />
+              <button type="button" class="btn btn-primary btn-sm btn-dup" onclick="checkAdminId();">
+                <span>아이디 중복확인</span>
+              </button>
+              <th:block th:if="${#fields.hasErrors('adminId')}" class="error"><span th:errors="*{adminId}" class="required">Field error</span></th:block>
+            </div>
+          </div>
+
+          <!-- 비밀번호 -->
+          <div class="form-row full-width">
+            <div class="form-label">비밀번호<span class="required">*</span></div>
+            <div class="form-control-wrap">
+              <input type="text" class="form-control" placeholder="비밀번호를 등록해주세요(영문/숫자/특수문자 포함 20자까지 입력 가능)" id="password" name="password" maxlength="20" />
+            </div>
+          </div>
+
+          <div class="form-row full-width">
+            <div class="form-label">비밀번호 확인<span class="required">*</span></div>
+            <div style="display: flex; gap: 5px">
+              <input type="text" class="form-control" placeholder="비밀번호를 확인해주세요" id="paswordConfirm" maxlength="20" oninput="chkPassConfirm()" />
+              <button type="button" class="btn btn-primary btn-sm" onclick="updatePwd();" th:unless="${record.id == null or record.id == 0}">
+                <span>비밀번호 수정</span>
+              </button>
+            </div>
+            <br /><span id="spPasswdConfirm" class="required"> * 비밀번호가 일치하지 않습니다.</span>
+          </div>
+
+          <!-- 계정분류 -->
+          <div class="form-row full-width">
+            <div class="form-label">회원 구분</div>
+            <div class="form-control-wrap">
+              <div class="form-check-group">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="authType01" name="authType" th:checked="${record.authType eq 'ADMIN'}" value="ADMIN" onclick="setuthType('ADMIN');" />
+                  <label class="form-check-label" for="authType01">마스터</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="authType02" name="authType" th:checked="${record.authType eq 'MANAGE'}" value="MANAGE" onclick="setuthType('MANAGE');" />
+                  <label class="form-check-label" for="authType02">운영자</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="authType03" name="authType" th:checked="${record.authType eq 'INTERNET'}" value="INTERNET" onclick="setuthType('INTERNET');" />
+                  <label class="form-check-label" for="authType03">인터넷 상담</label>
+                </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="authType07" name="authType" th:checked="${record.authType eq 'INTERNET2'}" value="INTERNET2" onclick="setuthType('INTERNET2');" />
+                  <label class="form-check-label" for="authType07">인터넷 CS</label>
+                </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="authType04" name="authType" th:checked="${record.authType eq 'SALES'}" value="SALES" onclick="setuthType('SALES');" />
+                  <label class="form-check-label" for="authType04">영업담당자</label>
+                </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="authType05" name="authType" th:checked="${record.authType eq 'MKT'}" value="MKT" onclick="setuthType('MKT');" />
+                  <label class="form-check-label" for="authType05">광고관리자</label>
+                </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="authType06" name="authType" th:checked="${record.authType eq 'SKYLIFE'}" value="SKYLIFE" onclick="setuthType('SKYLIFE');" />
+                  <label class="form-check-label" for="authType06">스카이라이프담당자</label>
+                </div>
+
+                <th:block th:if="${#fields.hasErrors('authType')}" class="error"><span th:errors="*{authType}" class="required">Field error</span></th:block>
+              </div>
+            </div>
+          </div>
+
+          <!-- 소속 -->
+          <div class="form-row full-width">
+            <div class="form-label">소속<span class="required">*</span></div>
+            <div class="form-control-wrap">
+              <input type="text" class="form-control" placeholder="소슥을 입력해주세요(영문/숫자/특수문자 포함 100자까지 입력 가능)" th:field="*{comGroup}" maxlength="20" />
+              <th:block th:if="${#fields.hasErrors('comGroup')}" class="error"><span th:errors="*{comGroup}" class="required">Field error</span></th:block>
+            </div>
+          </div>
+
+          <!-- 전화번호 -->
+          <div class="form-row full-width">
+            <div class="form-label">전화번호</div>
+            <div class="form-control-wrap">
+              <input type="text" class="form-control phonnumClass" placeholder="전화번호를 입력해주세요(숫자/특수문자 포함 50자까지 입력 가능)" th:field="*{phoneNumber}" maxlength="50" />
+            </div>
+          </div>
+
+          <!-- 전화번호 -->
+          <div class="form-row full-width">
+            <div class="form-label">이메일</div>
+            <div class="form-control-wrap">
+              <input type="text" class="form-control" placeholder="이메일을 입력해주세요(영문/숫자/특수문자 포함 50자까지 입력 가능)" th:field="*{email}" maxlength="50" />
+              <th:block th:if="${#fields.hasErrors('email')}" class="error"><span th:errors="*{email}" class="required">Field error</span></th:block>
+            </div>
+          </div>
+
+          <!-- 메뉴권한 -->
+          <div class="form-row full-width">
+            <div class="form-label">메뉴권한<span class="required">*</span></div>
+            <div class="form-control-wrap">
+              <div class="form-check-group">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="allAuthYn" name="allAuthYn" th:checked="${record.allAuthYn eq 'Y'}" value="Y" onclick="selAuth('ALL');" />
+                  <label class="form-check-label" for="allAuthYn">전체</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="adminMemAuthYn" name="adminMemAuthYn" th:checked="${record.adminMemAuthYn eq 'Y'}" value="Y" onclick="selAuth('1');" />
+                  <label class="form-check-label" for="adminMemAuthYn">계정권한 관리</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="userMngYn" name="userMngYn" th:checked="${record.userMngYn eq 'Y'}" value="Y" onclick="selAuth('2');" />
+                  <label class="form-check-label" for="userMngYn">회원 관리</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="companyMngYn" name="companyMngYn" th:checked="${record.companyMngYn eq 'Y'}" value="Y" onclick="selAuth('3');" />
+                  <label class="form-check-label" for="companyMngYn">입점사 관리</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="prodMngYn" name="prodMngYn" th:checked="${record.prodMngYn eq 'Y'}" value="Y" onclick="selAuth('4');" />
+                  <label class="form-check-label" for="prodMngYn">상품 관리</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="reqMngYn" name="reqMngYn" th:checked="${record.reqMngYn eq 'Y'}" value="Y" onclick="selAuth('5');" />
+                  <label class="form-check-label" for="reqMngYn">신청 관리</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="settleMngYn" name="settleMngYn" th:checked="${record.settleMngYn eq 'Y'}" value="Y" onclick="selAuth('6');" />
+                  <label class="form-check-label" for="settleMngYn">실적 관리</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="serviceMngYn" name="serviceMngYn" th:checked="${record.serviceMngYn eq 'Y'}" value="Y" onclick="selAuth('7');" />
+                  <label class="form-check-label" for="serviceMngYn">서비스 관리</label>
+                </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="pointMngYn" name="pointMngYn" th:checked="${record.pointMngYn eq 'Y'}" value="Y" onclick="selAuth('8');" />
+                  <label class="form-check-label" for="pointMngYn">포인트 관리</label>
+                </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="salesMngYn" name="salesMngYn" th:checked="${record.salesMngYn eq 'Y'}" value="Y" onclick="selAuth('9');" />
+                  <label class="form-check-label" for="salesMngYn">영업 관리</label>
+                </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="kakaoMsgMngYn" name="kakaoMsgMngYn" th:checked="${record.kakaoMsgMngYn eq 'Y'}" value="Y" onclick="selAuth('10');" />
+                  <label class="form-check-label" for="kakaoMsgMngYn">카카오 메세지 관리</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 활성여부 -->
+          <div class="form-row full-width">
+            <div class="form-label">활성 여부</div>
+            <div class="form-control-wrap">
+              <div class="form-check-group">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="disable01" name="disable" th:checked="${record.disable eq 'Y' or  (record.id == 0 or  record.id == '')}" value="Y" />
+                  <label class="form-check-label" for="disable01">활동</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="disable02" name="disable" th:checked="${record.disable eq 'N'}" value="N" />
+                  <label class="form-check-label" for="disable02">정지</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      <!-- 버튼 영역 -->
+      <div class="d-flex justify-content-center gap-2 mt-4">
+        <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">닫기</button>
+        <button type="button" class="btn btn-lg btn-dark px-4 btn-sm" onclick="saveData();">저장</button>
+      </div>
+    </div>
+  </div>
+</html>

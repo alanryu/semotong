@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="robots" content="noindex, nofollow">
+    <title>세모통 로그인</title>
+	<link rel="stylesheet" type="text/css" th:href="@{css/bootstrap.min.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{css/design.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{css/login.css}" />
+	<script th:src="@{/js/libs/jquery.min.js}"></script>
+	<script th:src="@{/js/libs/librurys.min.js}"></script>
+	<script th:src="@{/js/libs/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/js/ui/script.js}"></script>
+	<script>
+	
+		document.addEventListener('DOMContentLoaded', () => {
+		
+			const input = document.querySelector('input[type="text"]');
+			input.addEventListener('keydown', function(event) {
+				console.log(event.key);
+				  if (event.key === 'Enter') {
+					  loginCert()
+				  }
+			});
+			  
+			$("#certNo").focus();
+		});
+		
+		function loginCert() {
+			
+			
+			
+		    var otp = document.getElementById('certNo').value;
+		    if(otp =="") {
+		    	alert("인증번호를 입력하세요.");
+		    	return false;
+		    }
+		    var params = {
+		    		certNo : otp
+		    }
+		    
+		    $.ajax({
+		        url: '/otpVerify',
+		        dataType : "json",
+		        type : 'POST',
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+		        success: function(response) {
+		        	console.log(response);
+		            if (response.status === '00') {
+		                // OTP 검증 성공 시, 최종 페이지로 리다이렉트
+		                window.location.href = response.redirectUrl;
+		            } else {
+		                // OTP 검증 실패 시, 오류 메시지 표시
+		                alert(response.message);
+		            }
+		        },
+		        error: function() {
+		            alert("OTP 검증 중 오류가 발생했습니다.");
+		        }
+		    });
+			
+		}
+		
+		
+		
+
+		// 타이머 기능
+		function startTimer(duration, display) {
+		  if (!display) {
+		    console.log('Timer display element not found');
+		    return;
+		  }
+
+		  let timer = duration;
+		  const interval = setInterval(function () {
+		    try {
+		      const minutes = parseInt(timer / 60, 10);
+		      const seconds = parseInt(timer % 60, 10);
+
+		      display.textContent = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+
+		      if (--timer < 0) {
+		        clearInterval(interval);
+		        display.textContent = "0:00";
+		      }
+		    } catch (error) {
+		      console.error('Error updating timer:', error);
+		      clearInterval(interval);
+		    }
+		  }, 1000);
+
+		  return interval; // 필요한 경우 타이머를 중지할 수 있도록 반환
+		}
+		
+		function sendAuthKey() {
+
+			var params = { }
+					  
+				$.ajax({
+				   url : '/sendAuthKey',
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+				   success: function (data) {
+					   console.log(data);
+					   
+				    },
+					error : function(request, status, error){
+			            showAlert(error);
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+				});
+		}
+		
+		
+		
+	</script>
+</head>
+<body>
+    <div class="login-container d-flex align-items-center justify-content-center min-vh-100">
+        <div class="login-card">
+            <!-- 로고 영역 -->
+            <div class="text-center mb-4">
+                <img src="../images/SMT1-3.png" alt="세모통 로고" class="logo-img">
+            </div>
+            
+            <!-- 로그인 타이틀 -->
+            <h1 class="text-center mb-4">인증번호 입력</h1>
+	            <!-- 안내문구 -->
+	            <div class="mb-4">
+	                <p>등록된 휴대폰 번호로 인증번호가 자동 발송됩니다.</p>
+	                <ul class="instruction-text ps-3">
+	                    <li class="mb-1">3분 이내 인증번호를 입력해 주세요.</li>
+	                    <li>1분 이내에 인증문자가 수신되지 않을 경우 재발송 버튼을 눌러 주세요.</li>
+	                </ul>
+	            </div>
+	
+	            <!-- 인증번호 입력 -->
+	            <div class="mb-4">
+	            <div class="floating-input mb-4">
+	                <input type="text" class="form-control" name="certNo" id="certNo" placeholder=" " required maxlength="6">
+	                <label for="certNo">인증번호</label>
+	                <span class="timer">3:00</span>
+	              </div>
+	              <div class="text-end" id="btnResend" onclick="sendAuthKey()">
+	                  <a href="#" class="resend-btn">재발송</a>
+	              </div>
+	          </div>
+	          <!-- 확인 버튼 -->
+	          <button class="btn btn-dark w-100 mb-3" onclick="loginCert()" id="btnCert">
+	              인증 확인
+	          </button>
+
+
+          <!-- 도움말 텍스트 -->
+          <p class="text-center text-secondary small">
+            인증번호가 수신되지 않을 경우 관리자에게 문의해 주세요.
+          </p>
+        </div>
+    </div>
+</html>

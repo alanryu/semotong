@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/order_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='약관동의'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ 
+ <script>
+	
+	
+	$( document ).ready(function() {
+		$("#btnViewModelEsim").hide();
+	   
+	});
+	
+	
+	function selUsimEntrType(sp) {
+		$("#bbtnViewModelEsim").hide();
+		$("#usimPayType").val(sp);
+		// 유심 배송
+		if(sp =="01") {
+			moveNextOrder('/order/usimDelivery');
+			return;
+		}
+		
+		// 유심 구매		
+		if(sp =="02") {
+			moveNextOrder('/order/usimNum');
+			return;
+		}
+		
+		// esim
+		if(sp =="03") {
+			$("#btnViewModelEsim").show();
+		}
+		
+	}
+	
+	
+	function viewEsimModel() {
+		// 모달 바로 볼 수 있도록 호출
+		var FQU0107P01Modal = new bootstrap.Modal(document.getElementById('FQU0107P01Modal'));
+		FQU0107P01Modal.show();
+		return;
+	}
+	
+	
+	
+ </script>
+</th:block>
+
+<!-- Container -->
+<main role="main" class="container">
+<th:block th:include="pages/order/incOrderForm :: orderFormFragment"></th:block>
+<!-- content -->
+			<div class="content F-QU-page F-QU01-07-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">새로운 유심이 준비되었나요?</h2>
+							<p class="sec-explain">사용중인 기존 유심으로는 알뜰요금제로 변경하실 수 없어요. <br>유심을 준비해주세요.</p>
+						</div>
+						<div class="sec-body">
+							<ul class="survey-list">
+								<li class="survey-item">
+									<label class="ui-rdo survey-rdo">
+										<input type="radio" name="frmSurvey" onclick="selUsimEntrType('02');"/>
+										<span class="rdo"><span>네, 있어요.</span><small>요금제를 신청할게요.</small></span>
+									</label>
+								</li>
+								<li class="survey-item">
+									<label class="ui-rdo survey-rdo">
+										<input type="radio" name="frmSurvey" onclick="selUsimEntrType('01');" />
+										<span class="rdo"><span>아니요, 없어요.</span><small>구매 방법을 알려주세요.</small></span>
+									</label>
+								</li>
+							</ul>
+							<div class="help-service">
+								<button type="button" class="ui-btn btn-texted" onclick="selUsimEntrType('03');">
+									<span>배송이 필요없는 eSIM으로 개통할래요.</span>
+								</button>
+								<button type="button" class="ui-btn btn-info" onclick="viewEsimModel()" id="btnViewModelEsim">
+									<i class="ui-icn icn-16-info-gr" aria-hidden="true"></i>
+									<span>eSIM 지원 휴대폰 모델 확인</span>
+									<i class="ui-icn icn-16-more-gr" aria-hidden="true"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+			</div>
+			<!-- // content -->
+</main>
+
+
+
+	<!-- modal default -->
+	<div class="modal modal-basic fade " id="FQU0107P01Modal" tabindex="-1" role="dialog" aria-labelledby="FQU0107P01ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-QU01-07-P01-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FQU0107P01ModalLabel">eSIM 개통이 가능한<br>휴대폰을 알려드려요.</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+
+				</div>
+				<div class="modal-body">
+					<!-- 상담신청 섹션 -->
+					<section class="esim-info-sec">
+						<div class="sec-inner">
+							<ul class="esim-info">
+								<li>- iPhone : iPhone X 시리즈부터</li>
+								<li>- 갤럭시 : S23 시리즈, 플립/폴드 Z4 모델부터</li>
+							</ul>
+						</div>
+					</section>
+					<!-- // 상담신청 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary" onclick="moveNextOrder('/order/esimInfo');">
+						<span>확인했어요</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal default -->
+
+	
+</html>

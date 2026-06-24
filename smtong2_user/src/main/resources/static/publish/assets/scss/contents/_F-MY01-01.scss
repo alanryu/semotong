@@ -1,0 +1,226 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 마이페이지
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 마이페이지 페이지
+.F-MY01-01-page {
+	// 페이지별 섹션 여백 설정
+	--sec-outer-margin: 30rem;
+
+	// 페이시 여백
+	@include bottom-spacer;
+
+	// s: 나의정보 섹션
+	.my-info-sec {
+		margin-top:10rem; /* 4차 수정 : 나의정보 상단여백 조정 */
+
+		// 나의정보
+		.my-info-profile {
+			position: relative;
+			.name {
+				font-weight: 600;
+				font-size: 18rem;
+				color: #000000;
+			}
+			.info {
+				font-weight: 500;
+				font-size: 12rem;
+				line-height: 16rem;
+				color: rgba(99, 102, 106, 1);
+			}
+			.btn-cs { /* 4차 수정 : 나의정보 고객센터 버튼 추가 */
+				position: absolute;
+				right: 0;
+				top: -4rem;
+			}
+		}
+
+		// 요금제
+		.my-info-rateplan {
+			// 이용요금제 있음
+			&-data {
+				margin-top: 16rem;
+				.ratePlanD-card {
+					@include ratePlanD-card;
+				}
+			}
+
+			// 이용요금제 없음
+			&-nodata {
+				margin-top: 16rem;
+				padding: 11rem;
+				text-align: center;
+				border-radius: 2rem;
+				background-color: #EFF0F0;
+				font-size: 12rem;
+				line-height: 14rem;
+				color: #5A5D60;
+				p {
+					display: flex;
+					justify-content: center;
+				}
+				.ui-icn {
+					margin-right: 4rem;
+				}
+			}
+
+			// 내 S캐쉬
+			&-myCash {
+				margin-top: 12rem;
+				@include box-shadow-10;
+				padding: 16rem;
+				.myCash-tit {
+					width: 100%;
+					font-weight: 500;
+					font-size: 12rem;
+					line-height: 16rem;
+					color: #2801B5;
+				}
+				.myCash-con {
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+					margin-top: 12rem;
+					.myCash-val {
+						.ui-btn {
+							font-weight: 700;
+							font-size: 16rem;
+							line-height: 22rem;
+						}
+					}
+				}
+			}
+
+			// 요금제 대시보드
+			&-status {
+				margin-top: 12rem;
+				@include box-shadow-10;
+
+				.status-list {
+					display: flex;
+					.status-item {
+						position: relative;
+						flex:1;
+						padding: 20rem 16rem 12rem 16rem;
+						text-align: center;
+						& + .status-item::before {
+							position: absolute;
+							top: 50%;
+							left: 0;
+							transform: translateY(-50%);
+							@include split-set(16rem, #EFF0F0);
+						}
+						.tit {
+							display: block;
+							font-size: 12rem;
+							line-height: 17rem;
+							font-weight: 500;
+							color: #96989B;
+						}
+						.val {
+							display: block;
+							margin-top: 6rem;
+							font-weight: 600;
+							font-size: 16rem;
+							line-height: 22rem;
+							color: #000000;
+						}
+					}
+				}
+
+				.status-more {
+					position: relative;
+					padding: 8rem 16rem;
+					&::before {
+						content:'';
+						display: block;
+						position: absolute;
+						left: 16rem;
+						right: 16rem;
+						top: 0;
+						height: 1rem;
+						background-color: #eee;
+					}
+					.ui-btn {
+						width: 100%;
+						justify-content: flex-start;
+						padding: 8rem 0;
+						font-size: 12rem;
+						line-height: 16rem;
+						color: #46484B;
+						font-weight: 500;
+						em {
+							color: $color-primary;
+						}
+						.icn-16-emo-hand {
+							margin-right: 4rem;
+						}
+					}
+				}
+			}
+		}
+	}
+	// e: 나의정보 섹션
+
+	// s: 고객지원 섹션
+	.cscenter-sec {
+		margin-top: var(--sec-outer-margin);
+
+		.sec-header {
+			margin-bottom: 10rem;
+			.sec-tit {
+				display: flex;
+				align-items: center;
+				font-weight: 700;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #2A2B2D;
+				.ui-icn {
+					top: -1px;
+					margin-right: 4rem;
+				}
+			}
+		}
+
+		.sec-body {
+			.cs-menu-list {
+				display: flex;
+				flex-direction: column;
+				gap: 8rem;
+				width: 100%;
+				margin-bottom: -8rem;
+				.cs-menu-item {
+					width: 100%;
+					.cs-menu-btn {
+						display: flex;
+						align-items: center;
+						justify-content: space-between;
+						width: 100%;
+						padding: 8rem 0;
+						font-size: 16rem;
+						line-height: 20rem;
+						font-weight: 500;
+						color: rgba(70, 72, 75, 1);
+					}
+				}
+			}
+		}
+	}
+	// e: 고객지원 섹션
+
+	// s: 이벤트 섹션
+	.event-sec {
+		margin-top: var(--sec-outer-margin);
+
+		.event-swiper {
+			@include event-swiper;
+		}
+
+		.event-bnr {
+			@include event-bnr;
+		}
+	}
+	// e: 이벤트 섹션
+}
+// e: 마이페이지 페이지

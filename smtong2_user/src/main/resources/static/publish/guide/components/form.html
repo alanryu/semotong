@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Forms | 세모통 스타일가이드</title>
+	<meta http-equiv="X-UA-Compatible" content="ie=edge chrome=1" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="프로젝트가이드, 세모통 스타일가이드" />
+	<meta name="description" content="프로젝트가이드, 세모통 스타일가이드" />
+	<link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 인크루드 설정용도(개발적용안함) -->
+	<link rel="stylesheet" type="text/css" href="css/guide.css" /><!-- 가이드전용 -->
+</head>
+
+<body>
+	<div class="wrapper sub_page">
+		<!-- Header -->
+		<div data-include="include_header.html"></div>
+		<!-- // Header -->
+
+		<!-- Container -->
+		<div class="container">
+			<main id="content" class="content" role="main">
+				<div class="content-body">
+					<div class="out-sec in-sec">
+						<h1 class="g-h1">Form Elements</h1>
+					</div>
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">기본 구조</h2>
+						</div>
+						<div class="g-section-body">
+							<xmp style="max-height: 400px;">
+<!-- Input -->
+<div class="ui-inp">
+	<input type="text" name="" id="frm아이디" value="" placeholder="Placeholder" title="" class="inp" />
+</div>
+
+<!-- Input on-right -->
+<div class="ui-inp">
+	<input type="text" name="" id="frm아이디" value="" placeholder="Placeholder" title="" class="inp" />
+	<div class="on-right">
+		<button type="button" class="ui-btn"></button>
+	</div>
+</div>
+
+<!-- Textarea -->
+<div class="ui-textarea">
+	<textarea name="" id="frm아이디" cols="50" rows="2" class="textarea"></textarea>
+</div>
+
+<!-- Select -->
+<div class="ui-sel">
+	<!-- 선택전 is-placeholder, (선택후 삭제) -->
+	<button type="button" id="frmType" class="sel is-placeholder" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#selectModal">
+		<span>문의유형 선택</span>
+		<i class="ui-icn icn-20-select-arw" aria-hidden="true"></i>
+	</button>
+</div>
+
+<!-- Checkbox -->
+<label class="ui-chk">
+	<input type="checkbox" name="" id="frm아이디" />
+	<span class="chk"><span>체크박스</span></span>
+</label>
+
+<!-- Radio -->
+<label class="ui-rdo">
+	<input type="radio" name="" id="frm아이디" />
+	<span class="rdo"><span>체크박스</span></span>
+</label>
+
+<!-- Switch -->
+<div class="ui-switch">
+	<input type="checkbox" name="sSwitch1" id="sSwitch11" value="">
+	<label for="sSwitch11"></label>
+</div>
+
+							</xmp>
+						</div>
+					</section>
+					<!-- // Section -->
+
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">Input</h2>
+						</div>
+						<div class="g-section-body">
+							<div class="ui-inp">
+								<input type="text" name="" id="frmInp1" value="" placeholder="Placeholder" title="" class="inp" />
+							</div>
+							<div class="ui-inp">
+								<input type="text" name="" value="" placeholder="Placeholder" title="" class="inp" disabled />
+							</div>
+							<br>
+							<br>
+							<div class="ui-inp">
+								<input type="tel" name="" id="frmTitle" value="" placeholder="전화번호를 입력해 주세요." title="" class="inp" oninput="setRegularNumber(this)"/>
+							</div>
+							<div class="ui-inp">
+								<input type="text" name="" value="" placeholder="검색어를 입력해 주세요." class="inp" />
+								<div class="on-right">
+									<button type="button" class="ui-btn btn-srch">
+										<i class="ui-icn icn-20-srch-bk" aria-label="검색"></i>
+									</button>
+								</div>
+							</div>
+							<!-- <br>
+							<br>
+							<div class="ui-inp">
+								<input type="text" name="" id="frmInp2" value="입력된 글자 (삭제가능)" placeholder="Placeholder" title="" class="inp" />
+								<div class="on-right">
+									<button type="button" class="ui-btn btn-clear" onclick="InputClearHandler('#frmInp2')"><i class="ui-icn">삭제</i></button>
+								</div>
+							</div> -->
+						</div>
+					</section>
+					<!-- // Section -->
+
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">Textarea</h2>
+						</div>
+						<div class="g-section-body">
+							<div class="ui-textarea">
+								<textarea name="" id="frmTextarea" cols="50" rows="2" class="textarea"></textarea>
+								<p class="bytes"><em class="count">0/</em>1,000</p>
+							</div>
+						</div>
+					</section>
+					<!-- // Section -->
+
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">Select</h2>
+						</div>
+						<div class="g-section-body">
+							<div class="ui-sel">
+								<!-- 선택전 is-placeholder, (선택후 삭제) -->
+								<button type="button" id="frmType" class="sel is-placeholder" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#selectModal">
+									<span>문의유형 선택</span>
+									<i class="ui-icn icn-20-select-arw" aria-hidden="true"></i>
+								</button>
+							</div>
+
+							<!--
+								[모달 가이드]
+								모달 효과 : fade (공통) // 1차 수정 : fade-pc 사용안함, fade 공통으로 사용
+								모달 기본 : modal
+								모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+								화면 이름 : 화면아이디-page (modal-select 제외)
+							-->
+							<!-- modal default -->
+							<div class="modal modal-select fade" id="selectModal" tabindex="-1" role="dialog" aria-labelledby="selectModalLabel" aria-hidden="true">
+								<div class="modal-dialog">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h3 class="modal-title" id="selectModalLabel">문의유형 선택</h3>
+											<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+											<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+												<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+											</button>
+										</div>
+										<div class="modal-body">
+											<!-- 콤보박스 섹션 -->
+											<section class="select-sec">
+												<div class="sec-inner">
+													<!-- modal-select 공통 -->
+													<ul class="select-listbox" role="listbox">
+														<!-- setSelectValued 는 퍼블 확인용입니다. -->
+														<!-- 이미 선택목록이 있는 경우 class="is-selected" 추가 -->
+														<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmType', this)">문의유형 1</li>
+														<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmType', this)">문의유형 2</li>
+														<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmType', this)">문의유형 3</li>
+														<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmType', this)">문의유형 4</li>
+													</ul>
+												</div>
+											</section>
+											<!-- // 콤보박스 섹션 -->
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- // modal default -->
+						</div>
+					</section>
+					<!-- // Section -->
+
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">Checkbox</h2>
+						</div>
+						<div class="g-section-body">
+							<label class="ui-chk chk-style1">
+								<input type="checkbox" name="sCheck1" id="sCheck11" checked>
+								<span class="chk"><span>Checked</span></span>
+							</label>
+							<label class="ui-chk chk-style1">
+								<input type="checkbox" name="sCheck1" id="sCheck12">
+								<span class="chk"><span>Default</span></span>
+							</label>
+							<!-- <label class="ui-chk chk-style1">
+								<input type="checkbox" name="sCheck1" id="sCheck13" disabled>
+								<span class="chk"><span>Disabled</span></span>
+							</label> -->
+							<label class="ui-chk chk-style1">
+								<input type="checkbox" name="sCheck1" id="sCheck14">
+								<span class="chk"><span>라벨이<br>두줄인 경우</span></span>
+							</label>
+						</div>
+					</section>
+					<!-- // Section -->
+
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">Radio</h2>
+						</div>
+						<div class="g-section-body">
+							<label class="ui-rdo rdo-style1">
+								<input type="radio" name="sRadio1" id="sRadio11" checked>
+								<span class="rdo"><span>Checked</span></span>
+							</label>
+							<label class="ui-rdo rdo-style1">
+								<input type="radio" name="sRadio1" id="sRadio12">
+								<span class="rdo"><span>Default</span></span>
+							</label>
+							<!-- <label class="ui-rdo rdo-style1">
+								<input type="checkbox" name="sRadio1" id="sRadio13" disabled>
+								<span class="rdo"><span>Disabled</span></span>
+							</label> -->
+							<label class="ui-rdo rdo-style1">
+								<input type="radio" name="sRadio1" id="sRadio14">
+								<span class="rdo"><span>라벨이<br>두줄인 경우</span></span>
+							</label>
+						</div>
+					</section>
+					<!-- // Section -->
+
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">Swich</h2>
+						</div>
+						<div class="g-section-body">
+							<div class="ui-switch">
+								<input type="checkbox" name="sSwitch1" id="sSwitch11" value="">
+								<label for="sSwitch11"></label>
+							</div>
+							<div class="ui-switch">
+								<input type="checkbox" name="sSwitch1" id="sSwitch12" value="" checked>
+								<label for="sSwitch12"></label>
+							</div>
+							<div class="ui-switch">
+								<input type="checkbox" name="sSwitch1" id="sSwitch13" value="" disabled>
+								<label for="sSwitch13"></label>
+							</div>
+							<div class="ui-switch">
+								<input type="checkbox" name="sSwitch1" id="sSwitch14" value="" checked disabled>
+								<label for="sSwitch14"></label>
+							</div>
+							<br>
+							<br>
+							<div class="ui-switch xs">
+								<input type="checkbox" name="sSwitch2" id="sSwitch21" value="">
+								<label for="sSwitch21"></label>
+							</div>
+							<div class="ui-switch xs">
+								<input type="checkbox" name="sSwitch2" id="sSwitch22" value="" checked>
+								<label for="sSwitch22"></label>
+							</div>
+							<div class="ui-switch xs">
+								<input type="checkbox" name="sSwitch2" id="sSwitch23" value="" disabled>
+								<label for="sSwitch23"></label>
+							</div>
+							<div class="ui-switch xs">
+								<input type="checkbox" name="sSwitch2" id="sSwitch24" value="" checked disabled>
+								<label for="sSwitch24"></label>
+							</div>
+						</div>
+					</section>
+					<!-- // Section -->
+				</div>
+			</main>
+		</div>
+		<!-- // Container -->
+
+		<!-- Footer (include_footer.html) -->
+		<div data-include="include_footer.html"></div>
+		<!-- // Footer -->
+	</div>
+</body>
+
+</html>

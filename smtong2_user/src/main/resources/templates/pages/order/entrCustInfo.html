@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/order_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='약관동의'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ 
+ <script id="mvnoListTmpl" type="text/x-jquery-tmpl">
+<li class="select-partner-item" role="option" tabindex="0" data-bs-dismiss="modal"  onclick="selMvnoTelecom('${code}',this)">
+	<div class="select-partner">
+		<img src="/images/partner/${etc2}" alt="" aria-hidden="true">
+		<strong class="name">${codeName}</strong>
+	</div>
+</li>
+</script>
+
+	
+ <script>
+
+	 let mvnoChosen = false;
+ 	document.addEventListener('DOMContentLoaded', function () {
+		var entrType = $("#entrType").val();
+		if(entrType == "01") {
+			$("#preTelecom").hide();
+		}
+
+		//알뜰폰 통신사선택 모달이 닫힐때 preMvnoCd 선택하지 않으면 초기화
+		var modalEl = document.getElementById('FQU0106P02Modal');
+		if (modalEl) {
+			modalEl.addEventListener('hidden.bs.modal', function () {
+				if(!mvnoChosen){
+					$("#preMvnoCd").val("");
+					$('#sptelecomNm').html("통신사를 선택해 주세요.");
+					chkInputValid();
+				}
+
+				mvnoChosen = false; //초기화
+			});
+		}
+			
+	});
+	
+	function chkInputValid() {		
+		var isAllCheck = true;
+		var entrType = $("#entrType").val();
+		
+		$('#btnNext').attr('disabled', 'disabled');
+		
+		var custnameLength = $('#custname').val().length;		
+		var custId01Length = $('#custId01').val().length;		
+		var custId02Length = $('#custId02').val().length;
+		var custTelNoLength = $('#custTelNo').val().length;
+		var txtEmailLength = $('#txtEmail').val().length;
+		
+		
+		if(custnameLength < 2) {
+			isAllCheck = false;
+			return;
+		}
+		if(custId01Length != 6) {
+			isAllCheck = false;
+			return;
+		}
+		if(custId02Length != 7) {
+			isAllCheck = false;
+			return;
+		}
+		if(custTelNoLength < 10) {
+			isAllCheck = false;
+			return;
+		}
+		
+		if(!isValidEmail($('#txtEmail').val())) {
+			return;
+		}
+		if(entrType == "02") {
+			if(checkTeleCom($("#preTelecomCd").val(), $("#preMvnoCd").val())) {
+				return;
+			}
+		}
+
+
+		$('#btnNext').removeAttr("disabled");		
+		
+		
+		
+		
+	}
+
+	function isValidEmail(email) {
+	    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	    return emailRegex.test(email);
+	}
+
+	function checkTeleCom(telCd, mvnoCd) {
+		var retVal = false;
+		if(telCd == null || telCd == ""){
+			retVal = true;
+		}
+		if(mvnoCd == null || mvnoCd == ""){
+			retVal = true;
+		}
+		return retVal;
+	}
+
+	
+	function goSelCertSp() {
+		
+		$("#orderNm").val($('#custname').val());
+		$("#userSsn").val($('#custId01').val() + $('#custId02').val());
+		$("#prePhoneNum").val($('#custTelNo').val().replaceAll("-",""));
+		$("#orderPhone").val($('#custTelNo').val().replaceAll("-",""));
+		$("#orderEmail").val($('#txtEmail').val());
+		
+		
+		var entrType = $("#entrType").val();
+		
+		if(entrType == "01") {
+			moveNextOrder('/order/hopeNum');
+		} else {
+			moveNextOrder('/order/custAdress');
+		}
+		
+	}
+	
+	
+	function selTelecom(sp,element) {
+		var _html = "";
+		
+		
+		$('#selTelecomList li').removeClass('is-selected');
+	    $(element).addClass('is-selected');
+	    
+	    
+		$("#preTelecomCd").val(sp);
+		
+		if(sp == "SKT" || sp == "KT"  || sp == "LGT" ) {
+			if (!$('#sptelecomNm').hasClass('partner-option')) {
+			    $('#sptelecomNm').addClass('partner-option');
+			}
+			_html = '<strong class="partner-name">'+sp+'</strong>';
+			$('#sptelecomNm').html(_html);
+			
+			if( sp == "KT" ) {
+				$("#preMvnoCd").val("KTF");
+			} else {
+				$("#preMvnoCd").val(sp);	
+			}
+			chkInputValid(); // 통신사 체크
+			 
+		} else {
+			getListMvno(sp);
+		}
+		
+	}
+	
+	
+	function getListMvno(telecom) {
+		var _etc1 = telecom.replace("M","");
+		var companyId = $("#companyId").val();
+		var codeGroup = "pre_mvno_cd";
+		
+		// 쉐이크 모바일 따로 적용
+		if(companyId =="22") {
+			codeGroup = "pre_mvno_cd_shake";
+		}
+		
+		
+		var params = {
+				codeGroup :  codeGroup,
+				etc1 : _etc1,
+				userYn: "Y",
+				page : 1,
+				recordSize : 999
+		    }
+		
+		
+		$.ajax({
+			   url : '/cmm/cmmcode/code/list',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+			   beforeSend: function(xhr){
+			       xhr.setRequestHeader(header,token);
+			    },
+				success: function (data) {
+
+					if(data.code == 200) {
+						
+						$('#mvnoList').empty();
+						$('#mvnoListTmpl').tmpl(data.data).appendTo('#mvnoList');
+						$('#FQU0106P02ModalLabel').html(_etc1 + "알뜰폰 통신사");
+						
+						//알뜰폰 통신사
+						var FQU0106P02Modal = new bootstrap.Modal(document.getElementById('FQU0106P02Modal'));
+						FQU0106P02Modal.show();
+						
+					} else {
+						alertModalShow(data.message, "");
+					}
+					
+			    },
+				error : function(request, status, error){
+					alertModalShow(error,"");
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+			});
+	}
+	
+	
+	function selMvnoTelecom(mvnoCd,element) {
+		$('#mvnoList li').removeClass('is-selected');
+	    $(element).addClass('is-selected');
+	    $("#preMvnoCd").val(mvnoCd);
+	    
+	    const partnerName = element.querySelector('.name').textContent;
+	    
+	    if (!$('#sptelecomNm').hasClass('partner-option')) {
+		    $('#sptelecomNm').addClass('partner-option');
+		}
+	    _html = '<strong class="partner-name">'+partnerName+'</strong>';
+	    $('#sptelecomNm').html(_html);
+
+		chkInputValid(); // 통신사 체크
+		mvnoChosen = true; //알뜰폰 통신사 선택완료
+	}
+ </script>
+</th:block>
+
+<!-- Container -->
+<main role="main" class="container">
+<th:block th:include="pages/order/incOrderForm :: orderFormFragment"></th:block>
+<!-- content -->
+			<div class="content F-QU-page F-QU01-01-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">가입자 정보를 <br> 확인해 주세요?</h2>
+							<p class="sec-explain">
+								개인정보는 안전하게 보관해서 개통에만 사용되어요.
+							</p>
+						</div>
+						<div class="sec-body">
+							<div class="basic-frm">
+								<!-- 이름 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="custname" class="tit">이름</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="text" name="custname" id="custname" value="" placeholder="예) 홍길동" title="" class="inp" oninput="chkInputValid();"/>
+										</div>
+									</div>
+								</div>
+								
+								<!-- 주민등록번호 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="custId01" class="tit">주민등록번호</label>
+									</div>
+									<div class="frm-content">
+										<div class="frm-group">
+											<div class="ui-inp">
+												<input type="tel" name="" id="custId01" value="" placeholder="YYMMDD" title="" class="inp" oninput="setRegularNumber(this);chkInputMax(this,'custId02');chkInputValid();" maxlength="6" />
+											</div>
+											<span class="frm-split">-</span>
+											<div class="ui-inp">
+												<input type="password" name="" id="custId02" value="" placeholder="뒷자리(7자리)" title="" class="inp" oninput="setRegularNumber(this);chkInputMax(this,'custTelNo');chkInputValid();" maxlength="7"/>
+											</div>
+										</div>
+									</div>
+								</div>
+								<!-- 전화번호 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="custTelNo" class="tit">휴대폰 번호</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="tel" name="custTelNo" id="custTelNo" value="" placeholder="010-0000-0000" title="" class="inp" oninput="chkInputValid();inputTelNo(this);"/>
+										</div>
+									</div>
+								</div>
+								<!-- // 전화번호 입력 -->
+								
+								<!-- 전화번호 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="custTelNo" class="tit">이메일 입력</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="text" name="txtEmail" id="txtEmail" value="" placeholder="이메일을 등록해주세요." title="" class="inp" oninput="chkInputValid();"/>
+										</div>
+									</div>
+								</div>
+								<!-- // 전화번호 입력 -->
+								
+								<!-- 통신사 선택 -->
+								<div class="frm-field" id="preTelecom">
+									<div class="frm-title">
+										<label class="tit" for="telecom">통신사</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-sel">
+											<!-- 선택전 is-placeholder, (선택후 삭제) -->
+											<button type="button" id="telecom" class="sel is-placeholder" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#FQU0106P01Modal">
+												<span id="sptelecomNm">통신사를 선택해 주세요.</span>
+												<i class="ui-icn icn-20-select-arw" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+								<!-- // 통신사 선택 -->
+																
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" disabled id="btnNext" onclick="goSelCertSp();">
+							<span>다음</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 페이지 섹션 -->
+			</div>
+			<!-- // content -->
+</main>
+
+
+	<!--
+		[모달 가이드]
+		모달 효과 : fade (공통)
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+		// 1차 수정 : fade-pc 사용안함, fade 공통으로 사용
+	-->
+	<!-- 정렬 modal select -->
+	<div class="modal modal-select fade" id="FQU0106P01Modal" tabindex="-1" role="dialog" aria-labelledby="FQU0106P01ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FQU0106P01ModalLabel">통신사</h3>
+					<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 콤보박스 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<!-- modal-select 공통 -->
+							<ul class="select-listbox" role="listbox" id="selTelecomList">
+								<!-- 이미 선택목록이 있는 경우 class="is-selected" 추가 -->
+								<li role="option" tabindex="0" data-bs-dismiss="modal" class="is-selected" onclick="selTelecom('SKT',this)">SKT</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="selTelecom('KT',this)">KT</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="selTelecom('LGT',this)">U+</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="selTelecom('SKTM',this)">SKT 알뜰폰</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="selTelecom('KTM',this)">KT 알뜰폰</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal" onclick="selTelecom('LGTM',this)">U+ 알뜰폰</li>
+							</ul>
+						</div>
+					</section>
+					<!-- // 콤보박스 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 정렬 modal select -->
+
+
+
+<!-- 정렬 modal select -->
+	<div class="modal modal-select fade" id="FQU0106P02Modal" tabindex="-1" role="dialog" aria-labelledby="FQU0106P02ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FQU0106P02ModalLabel">통신사</h3>
+					<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 콤보박스 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<!-- modal-select 공통 -->
+							<ul class="select-partner-list" role="listbox" id="mvnoList">
+
+								
+							</ul>
+						</div>
+					</section>
+					<!-- // 콤보박스 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 정렬 modal select -->
+	
+	
+</html>

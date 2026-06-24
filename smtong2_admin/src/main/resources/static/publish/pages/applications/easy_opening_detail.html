@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>세모통</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            rel="stylesheet">
+        <link href="../../css/design.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="sidebarWrapper">
+            <div class="left-sidebar">
+                <div class="admin-profile">
+                    <div class="profile-letter">A</div>
+                    <div>
+                        <div class="fw-semibold text-dark">관리자 - 아무개님</div>
+                        <small class="text-muted">UPDATE -<br>
+                            2024-12-12 18:02</small>
+                    </div>
+                </div>
+                <ul class="menu-list">
+                    <!-- 계정권한관리 -->
+                    <li class="menu-item">
+                        <a href="../account/account.html" class="menu-link">
+                            <i class="fas fa-user-cog"></i>
+                            <span>계정권한관리</span>
+                        </a>
+                    </li>
+                    <!-- 회원관리 -->
+                    <li class="menu-item">
+                        <a href="../members/members.html" class="menu-link">
+                            <i class="fas fa-users"></i>
+                            <span>회원관리</span>
+                        </a>
+                    </li>
+                    <!-- 입점사관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="#" class="menu-link">
+                            <i class="fas fa-building"></i>
+                            <span>입점사관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                                <a href="../business/list.html" class="submenu-link">사업자 목록</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../business/manage.html" class="submenu-link">입점사 관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 상품관리 -->
+                    <li class="menu-item has-submenu active open">
+                        <a href="#" class="menu-link">
+                            <i class="fas fa-box"></i>
+                            <span>상품관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item active">
+                                <a href="../product/rateplan.html" class="submenu-link">요금제</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../product/scraping.html" class="submenu-link">스크래핑 관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="javascript:;" class="submenu-link">인터넷</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 신청관리 -->
+                    <li class="menu-item">
+                        <a href="../applications/applications.html" class="menu-link">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>신청관리</span>
+                        </a>
+                    </li>
+                    <!-- 정산관리 -->
+                    <li class="menu-item">
+                        <a href="../settlements/settlements.html" class="menu-link">
+                            <i class="fas fa-calculator"></i>
+                            <span>정산관리</span>
+                        </a>
+                    </li>
+                    <!-- 서비스관리 -->
+                    <li class="menu-item">
+                        <a href="../services/services.html" class="menu-link">
+                            <i class="fas fa-cog"></i>
+                            <span>서비스관리</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <button class="toggle-sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="main-content">
+            <div class="container-fluid">
+                <!-- 로케이션 & 제목 영역 추가 -->
+                <div class="page-header mb-4">
+                    <div class="location mb-2">
+                        <small class="text-secondary">
+                            <i class="fas fa-home me-1"></i>
+                            <a href="javascript:;">홈</a>
+                            >
+                            <a href="javascript:;">상품관리</a>
+                            >
+                            <a href="../applications/easy_opening_detail.html">간편개통 신청내역</a>
+                        </small>
+                    </div>
+                    <h2 class="page-title fs-4 mb-4">
+                        간편개통 신청내역 상세
+                    </h2>
+                </div>
+
+                <div class="search-section detail">
+                    <div class="form-row">
+                        <div class="form-label">신청번호</div>
+                        <div class="form-control-wrap">
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="ABCD123456789"
+                                readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">현재 상태</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="접수" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">신청일</div>
+                        <div class="form-control-wrap">
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="2024.12.31-08:21:44"
+                                readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">가입유형</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="신규가입 / 번호이동" readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-label">신청자명</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="홍*동" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">주민등록번호</div>
+                        <div class="form-control-wrap">
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="123456-1234567"
+                                readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">연락처</div>
+                        <div class="form-control-wrap">
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="010-1234-5678"
+                                readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">신분증 정보</div>
+                        <div class="form-control-wrap">
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="주민등록증+발급일자 / 운전면허증+운전면허번호"
+                                readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-label">주소</div>
+                        <div class="form-control-wrap">
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="(06094) 서울특별시 강남구 삼성로119길 37-9"
+                                readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-label">유심</div>
+                        <div class="form-control-wrap">
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="미보유 / 보유 / esim"
+                                readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-label">유심정보</div>
+                        <div class="form-control-wrap">
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="유심 일련번호 / 단말기 정보 노출"
+                                readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label">납부방법</div>
+                        <div class="form-control-wrap">
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="카드 / 계좌이체"
+                                readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">납부정보</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="카드사+카드번호+유효기간 / 은행명+계좌번호" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">요금청구서<br>수령방법</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="모바일 / 이메일" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">이메일</div>
+                        <div class="form-control-wrap">
+                            <a href="mailto:user@email.com">user@email.com</a>
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">MNO</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="U+" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">사업자</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="에이모바일" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">요금제명 1</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="A 5G 갓성비 5GB/100분 (평생)" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">요금제명 2</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="월 11GB + 일 2GB + 3Mbps" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">기본료</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="13,200원" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">할인료</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="7,700원">
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">최종금액</div>
+                        <div class="form-control-wrap">
+                          <input type="text" class="form-control" value="7,700원">
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">할인기간</div>
+                        <div class="form-control-wrap">
+                          <input type="text" class="form-control" value="7개월">
+                        </div>
+                    </div>
+                    <div class="form-row full-width">
+                        <div class="form-label">포인트<br>요금제 여부</div>
+                        <div class="form-control-wrap">
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="Y / N"
+                                readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">추천인 여부</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="Y / N" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="form-row ">
+                        <div class="form-label">추천인 ID</div>
+                        <div class="form-control-wrap">
+                            <input type="text" class="form-control" value="sales011" readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-label">상태별 날짜</div>
+                        <div class="form-control-wrap" style="width:100%;">
+                              접수 : 2024.12.31-08:21:44<br>
+                              유심배송 : 2025.01.04-08:21:44<br>
+                              개통완료 : 2025.01.07-08:21:33
+                        </div>
+                    </div>
+
+
+                    <div class="form-row full-width">
+                      <div class="form-label">개통 취소 사유</div>
+                      <div class="form-control-wrap">
+                        <input type="text" class="form-control" value="" readonly="readonly">
+                      </div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-center gap-2 mt-4 w-100 mb-5">
+                    <button
+                        type="button"
+                        class="btn btn-lg btn-dark px-4 btn-sm"
+                        onclick="history.back()">
+                        목록
+                    </button>
+                </div>
+
+                <script src="../../js/bootstrap.bundle.min.js"></script>
+                <script src="../../js/script.js"></script>
+            </body>
+        </html>

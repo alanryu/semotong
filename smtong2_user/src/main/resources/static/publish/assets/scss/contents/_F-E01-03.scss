@@ -1,0 +1,215 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 이벤트 상세
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 이벤트 상세 페이지
+.F-E01-03-page {
+
+	// 페이시 여백
+	@include bottom-spacer;
+
+	// s: 공지사항 상세 섹션
+	.event-detail-sec {
+		.event-detail {
+
+			border-top: 1px solid #2A2B2D;
+			.detail-header {
+				display: flex;
+				flex-wrap: wrap;
+				padding: 20rem 8rem;
+				border-bottom: 1px solid #EFF0F0;
+				.tit {
+					width: 100%;
+					margin-bottom: 8rem;
+					font-weight: 600;
+					font-size: 16rem;
+					line-height: 22rem;
+					color: #2A2B2D;
+				}
+				.date {
+					margin-right: auto;
+					font-weight: 500;
+					font-size: 14rem;
+					line-height: 20rem;
+					color: #96989B;
+				}
+			}
+			.detail-body {
+				padding: 32rem 0 0 0;
+
+				.data-view {
+					font-weight: 400;
+					font-size: 14rem;
+					line-height: 20rem;
+					color: #46484B;
+					p + p {
+						margin-top: 8rem;
+					}
+				}
+
+			}
+		}
+	}
+	// e: 공지사항 상세 섹션
+
+	// s: 요금제 섹션
+	.ratePlanC-sec {
+		margin-top: 32rem;
+		@include sec-basic;
+
+		.ratePlanC-list {
+			@include ratePlanC-list;
+			padding-top: 0;
+		}
+		.ratePlanC-card {
+			@include ratePlanC-card;
+		}
+	}
+	// e: 요금제 섹션
+
+	// s: 유의사항
+	.note-sec {
+		padding-bottom: 60rem;
+		@include sec-basic;
+
+		.note-acco {
+			margin-top: 30rem;
+			border-top: 1px solid #EFF0F0;
+
+			.collapsing {
+				height: 0;
+				overflow: hidden;
+				transition: height .35s ease;
+			}
+			.collapse:not(.show) {
+				display: none;
+			}
+			.acco-button .ui-icn {
+				transition: transform .35s ease;
+			}
+			.acco-button[aria-expanded='true'] .ui-icn {
+				transform: rotate(180deg);
+			}
+
+			// 아코디언 스타일
+			.acco-header {
+				position: relative;
+				padding: 14rem 0;
+				border-bottom: 1px solid #EFF0F0;
+
+				.acco-button {
+					display: flex;
+					align-items: center;
+					width: 100%;
+					text-align: left;
+					> span {
+						position: relative;
+						display: block;
+						padding-right: 12rem;
+						font-weight: 700;
+						font-size: 18rem;
+						line-height: 24rem;
+						max-height: 72rem;
+						@include ellipsis2;
+					}
+					.ui-icn {
+						margin-left: auto;
+					}
+				}
+			}
+
+			.acco-body {
+				margin-top: 16rem;
+				.acco-data {
+					font-weight: 500;
+					font-size: 14rem;
+					line-height: 20rem;
+					color: #63666A;
+
+					p {
+						margin-top: 20rem;
+
+						&:first-child {
+							margin-top: 0;
+						}
+
+						strong {
+							display: block;
+							font-weight: 500;
+							font-weight: 16rem;
+							line-height: 24rem;
+							color: #000;
+						}
+					}
+
+					ol {
+						display: flex;
+						flex-direction: column;
+						gap: 8rem;
+						font-size: 12rem;
+						line-height: 16rem;
+						margin-top: 8rem;
+						margin-bottom: 8rem;
+						&:first-child {
+							margin-top: 0;
+						}
+						&:last-child {
+							margin-bottom: 0;
+						}
+						li {
+							position: relative;
+							counter-increment: item;
+							padding-left: 12rem;
+							&::before {
+								content: counter(item) ". ";
+								position: absolute;
+								left: 0;
+								top: 0;
+							}
+						}
+					}
+
+					ul {
+						display: flex;
+						flex-direction: column;
+						gap: 8rem;
+						font-size: 12rem;
+						line-height: 16rem;
+						margin-top: 8rem;
+						margin-bottom: 8rem;
+						&:first-child {
+							margin-top: 0;
+						}
+						&:last-child {
+							margin-bottom: 0;
+						}
+						li {
+							position: relative;
+							counter-increment: item;
+							padding-left: 12rem;
+							color: #63666A;
+							&::before {
+								content:'';
+								position: absolute;
+								left: 0;
+								top: 5.5rem;
+								width: 3rem;
+								height: 3rem;
+								background-color: rgba(0, 0, 0, 0.2);
+								border-radius: 50%;
+							}
+						}
+					}
+				}
+			}
+
+			@include media-tablet-xs {
+				margin-left: 0;
+				margin-right: 0;
+			}
+		}
+	}
+	// e: 유의사항
+}
+// e: 이벤트 상세 페이지

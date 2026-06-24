@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='추천 요금제', layoutSubTitleYN='Y'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ <!--    <script th:src="@{/js/page/home.js}"></script>-->
+ <script>
+	
+ var viewPage = 1;
+	$( document ).ready(function() {
+		
+		getPlanList();
+		
+		$("input[type=checkbox][name=frmMonth]").change( function () {
+			var value = $(this).val();              // value
+	        var checked = $(this).prop('checked');
+			if(value == 12 && checked == true) {
+				$("#frmMonth24").prop("checked",false);
+				
+			}
+			if(value == 24 && checked == true) {
+				$("#frmMonth12").prop("checked",false);
+			}
+			 getPlanListReset();
+		});
+		
+		var recomSwiper = new Swiper(".recom-swiper", {
+			threshold: 3,
+			spaceBetween: 10,
+			pagination: {
+				el: ".swiper-pagination",
+			},
+			autoplay: {
+				delay: 2500,
+				disableOnInteraction: false,
+			},
+		});
+		
+	});
+	
+	
+	function getPlanListReset(option) {
+		viewPage = 1;
+		$("#btnPlanListMore").show();
+		
+		if ( option != null && option != undefined ) {
+			/* 체크박스 초기화 */
+			$("input[type=checkbox][name=frmMonth]").prop('checked', false);
+			
+			/* 12개월 합산 가격낮은 순 */
+			if ( $("#planSearchSortSp").find(".is-selected").attr("value") == 'AP12' ) {
+				$("input[type=checkbox][name=frmMonth]:eq(0)").prop('checked', true);
+			/* 24개월 합산 가격낮은 순 */ 
+			} else if ( $("#planSearchSortSp").find(".is-selected").attr("value") == 'AP24' ) {
+				$("input[type=checkbox][name=frmMonth]:eq(1)").prop('checked', true);
+			}
+		}
+		
+		getPlanList();
+	}
+	
+	function getPlanListMore() {
+		viewPage = viewPage +1;
+		getPlanList();
+	}
+	
+	function getPlanList() {
+			
+	  		var page = viewPage;
+	  		var pageSize = 10;
+	  		var sortSp = $("#planSearchSortSp").find(".is-selected").attr("value");
+	  		
+	  		sortSp = sortSp + "Ally";
+	  		var recomType = "[[${recomType}]]";
+	  		var params;
+	  		var searchDataVal = 0;
+	  		// 평생할인 -> 할인기간 : 9999
+	  		// 장기할인 -> 할인기간 : 12 개월 이상
+	  		// 인터넷 결합 -> 인터넷 결합 체크 여부
+	  		
+	  		if(recomType == "4") {
+	  			params = {
+	  					 searchSaleSp : "SALE",
+	  					 searchSalePriceTermTo : "9900",
+	  					 searchOrderType : "RE2Ally",
+	  					 page : page,
+	  					 recordSize : pageSize
+		  			}
+	  		} else  {
+	  			
+	  			var searchData =0;
+	  			
+	  			if(recomType == "1") { 
+	  				//7GB+ : [데이터 = 7GB] 
+	  				searchData = 7*1024;
+	  			}
+	  			if(recomType == "2") {
+	  				//15GB+ : [데이터 = 15GB]
+	  				searchData = 15*1024;
+	  			}
+	  			if(recomType == "3") {
+	  				//15GB+ : [데이터 = 15GB]
+	  				searchData = 71*1024;
+	  			}
+	  			if(recomType == "5") {
+	  				//10GB+ : [데이터 = 10GB]
+	  				searchData = 10*1024;
+	  			}
+	  			if(recomType == "6") {
+	  				//100GB+ : [데이터 = 100GB]
+	  				searchData = 100*1024;
+	  			}
+	  			
+	  			
+	  			if(recomType == "6") {
+	  				params = {
+	  	  					 searchSaleSp : "SALE",
+	  	  					 searchDataTermFrom : searchData,
+	  	  					 searchOrderType : sortSp,
+	  	  					 page : page,
+	  	  					 recordSize : pageSize
+	  		  			}
+	  			} else {
+	  				params = {
+	  	  					 searchSaleSp : "SALE",
+	  	  					 searchData : searchData,
+	  	  					 searchOrderType : sortSp,
+	  	  					 searchQosTermFrom : 1,
+	  	  					 page : page,
+	  	  					 recordSize : pageSize
+	  		  			}	
+	  			}
+	  		}
+	  		
+	  		
+	  		if($("#keywordItm").val() ==1) {
+	  			params.searchCombination = 1;
+	  		}
+	  		if($("#keywordItm").val() ==2) {
+	  			params.searchPromoPeriodTermFrom = 12;
+	  			params.searchPromoPeriodTermTo = 9998;
+	  		}
+	  		
+	  		if($("#keywordItm").val() ==3) {
+	  			params.searchPromoPeriodTermFrom = 9999;
+	  		}
+	  		
+	  		
+			$.ajax({
+			   url : '/pbm/plan/getPlanlist',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+			   beforeSend: function(xhr){
+			       xhr.setRequestHeader(header,token);
+			    },
+				success: function (data) {
+					if(data.code == 200) {
+						var totalCnt = data.totalCnt;
+						var viewListCnt = viewPage * pageSize;
+						if(viewListCnt >= totalCnt) {
+							$("#btnPlanListMore").hide();
+						}
+						if(page == 1) {
+							$('#planList').empty();	
+						}
+						if(data.totalCnt ==0) {
+							$('#nodataPlanListTmpl').tmpl(null).appendTo('#planList');
+						} else {
+							var result = data.data;
+							var displayPrice = 0;
+							if($("#frmMonth12").prop("checked")) {
+								displayPrice = 12;
+							}
+							
+							if($("#frmMonth24").prop("checked")) {
+								displayPrice = 24;
+							}
+							
+							result.forEach(function(itm) {
+								itm.displayPrice = displayPrice;
+							 });
+							$('#planListTmpl').tmpl(data.data).appendTo('#planList');	
+						}
+						if(viewListCnt >= totalCnt) {
+							$("#btnPlanListMore").hide();		
+						}
+						setPopover('ui-popover popover-style1'); //동적 리스트 생성후 툴팁 function 다시로드 
+					} else {
+						alertModalShow(data.message,"");
+					}
+					  
+			    },
+				error : function(request, status, error){
+					alertModalShow(error,"");
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+			});
+		}
+	
+		function setKeywordItm(sp) {
+			
+			$(".keyword-btn").removeClass("is-selected");
+			$(".keyword-btn").eq(sp).addClass("is-selected");			
+			$("#keywordItm").val(sp);
+			getPlanListReset();
+		}
+ </script>
+</th:block>
+
+<!-- Container -->
+<main role="main" class="container">
+	<input type="hidden" id="keywordItm">
+	<!-- content -->
+	<div class="content F-M02-01-T01-page">
+		<!-- 카드형 요금제 섹션 -->
+		<section class="ratePlanB-sec">
+			<div class="sec-inner">
+				<!-- 요금제 공통 타입 B : 선택 요금제 -->
+				<div class="ratePlanB-card">
+					<div class="card-body">
+						<th:block th:if="${recomType == '1'}">
+						<p class="card-img" aria-hidden="true"> <img th:src="@{'/images/common/icn-40-plan-cate-01.png'}" /></p>
+							<p class="card-tit"><strong>월 4,400원 부터 7GB+</strong></p>
+							<p class="card-txt">메신저, 웹서핑, 저화질영상 정도면 충분!</p>
+							<p class="card-tag">
+								<span class="tag">#가볍게</span>
+								<span class="tag">#실속형</span>
+							</p>
+						</th:block>
+						<th:block th:if="${recomType == '2'}">
+							<p class="card-img" aria-hidden="true"> <img th:src="@{'/images/common/icn-40-plan-cate-03.png'}" /></p>
+							<p class="card-tit"><strong>월 10,900원 부터 15GB+</strong></p>
+							<p class="card-txt">웹툰, 음악, 유튜브도 부담없이!</p>
+							<p class="card-tag">
+								<span class="tag">#즐겨보자</span>
+								<span class="tag">#BGM필수</span>
+							</p>
+						</th:block>
+						<th:block th:if="${recomType == '3'}">
+							<p class="card-img" aria-hidden="true"> <img th:src="@{'/images/common/icn-40-plan-cate-04.png'}" /></p>
+							<p class="card-tit"><strong>월 16,900원 부터 71GB+</strong></p>
+							<p class="card-txt">동영상+게임 자유롭게! 사실상 무제한급!</p>
+							<p class="card-tag">
+								<span class="tag">#렉없는 삶</span>
+								<span class="tag">#마음껏</span>
+							</p>
+						</th:block>
+						<th:block th:if="${recomType == '4'}">
+							<p class="card-img" aria-hidden="true"> <img th:src="@{'/images/common/icn-40-plan-cate-06.png'}" /></p>
+							<p class="card-tit"><strong>월 110원 부터 갓성비</strong></p>
+							<p class="card-txt">저렴하게, 똑똑하게!</p>
+							<p class="card-tag">
+								<span class="tag">#알뜰파</span>
+								<span class="tag">#세컨폰</span>
+							</p>
+						</th:block>
+						<th:block th:if="${recomType == '5'}">
+						<p class="card-img" aria-hidden="true"> <img th:src="@{'/images/common/icn-40-plan-cate-02.png'}" /></p>
+							<p class="card-tit"><strong>월 7,000원 부터 10GB+</strong></p>
+							<p class="card-txt">적당한 데이터로 일상에서 무난하게!</p>
+							<p class="card-tag">
+								<span class="tag">#딱좋아</span>
+								<span class="tag">#합리파</span>
+							</p>
+						</th:block>
+						<th:block th:if="${recomType == '6'}">
+						<p class="card-img" aria-hidden="true"> <img th:src="@{'/images/common/icn-40-plan-cate-05.png'}" /></p>
+							<p class="card-tit"><strong>월 19,000원 부터 100GB+</strong></p>
+							<p class="card-txt">데이터 걱정없이 무제한!</p>
+							<p class="card-tag">
+								<span class="tag">#끝판왕</span>
+								<span class="tag">#제한없이</span>
+							</p>
+						</th:block>
+					</div>
+				</div>
+				<!-- // 요금제 공통 타입 B : 선택 요금제 -->
+			</div>
+		</section>
+		<!-- // 카드형 요금제 섹션 -->
+
+		<!-- 키워드 섹션 -->
+		<section class="keyword-sec">
+			<div class="sec-inner">
+				<div class="swiper keyword-swiper">
+					<div class="swiper-wrapper">
+						<div class="swiper-slide">
+							<!-- 선택됨:  is-selected 클래스, aria-selected="true" -->
+							<button type="button" class="keyword-btn is-selected" aria-selected="true" onclick="setKeywordItm(0);"><span>전체</span></button>
+						</div>
+						<div class="swiper-slide">
+							<button type="button" class="keyword-btn" aria-selected="false" onclick="setKeywordItm(1);"><span>인터넷 결합 요금제</span></button>
+						</div>
+						<div class="swiper-slide">
+							<button type="button" class="keyword-btn" aria-selected="false" onclick="setKeywordItm(2);"><span>장기 할인 요금제</span></button>
+						</div>
+						<div class="swiper-slide">
+							<button type="button" class="keyword-btn" aria-selected="false" onclick="setKeywordItm(3);"><span>평생 할인 요금제</span></button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- // 키워드 섹션 -->
+
+		<!-- 상품 리스트 섹션 -->
+		<section class="ratePlanC-sec">
+			<div class="sec-inner">
+				<!-- 요금제 상품그룹 -->
+				<div class="ratePlanC-list-wrap">
+					<!-- 요금제 상품 툴바 -->
+					<div class="ratePlanC-toolbar">
+						<div class="opt">
+							<!-- checkbox.scss에 포함 -->
+							<div class="ui-switch xs">
+								<input type="checkbox" name="frmMonth" id="frmMonth12" value="12" />
+								<label for="frmMonth12"></label>
+							</div>
+							<p>12개월 총액</p>
+							<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto"
+								data-bs-content="할인기간 포함된 12개월 요금 총액이에요.">
+								<i class="ui-icn icn-16-plan-quse-gr" aria-label="툴팁"></i>
+							</button>
+						</div>
+						<div class="opt">
+							<!-- checkbox.scss에 포함 -->
+							<div class="ui-switch xs">
+								<input type="checkbox" name="frmMonth" id="frmMonth24" value="24" />
+								<label for="frmMonth24"></label>
+							</div>
+							<p>24개월 총액</p>
+							<button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto"
+								data-bs-content="할인기간 포함된 24개월 요금 총액이에요.">
+								<i class="ui-icn icn-16-plan-quse-gr" aria-label="툴팁"></i>
+							</button>
+						</div>
+						<div class="sort">
+							<!-- 2차 수정 : 모든화면 추천순제외 -->
+							<button type="button" class="ui-btn" id="frmSort" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#selectSortPlanModal">
+								<i class="ui-icn icn-16-sort-gr" aria-hidden="true"></i>
+								<span>추천 순</span>
+								<i class="ui-icn icn-16-select-arw" aria-hidden="true"></i>
+							</button>
+						</div>
+					</div>
+					<!-- // 요금제 상품 툴바 -->
+
+					<!-- 요금제 공통 타입 C : 요금제 상품 리스트 -->
+					<ul class="ratePlanC-list" id="planList">
+						
+					</ul>
+					<!-- // 요금제 공통 타입 C : 요금제 상품 리스트 -->
+
+					<!-- Case 목록이 많은 경우 더보기 -->
+					<button type="button" class="ui-btn btn-more-list" onclick="getPlanListMore();" id="btnPlanListMore">
+						<i class="ui-icn icn-16-more-list-gr" aria-hidden="true"></i>
+						<span>더보기</span>
+					</button>
+				</div>
+				<!-- // 요금제 상품그룹 -->
+			</div>
+		</section>
+		<!-- // 상품 섹션 -->
+
+		<!-- 상품추천 섹션 -->
+		<section class="recom-bnr-sec">
+			<div class="sec-inner">
+				<div class="sec-header">
+					<h2 class="sec-tit">결합하면 좋은 인터넷 상품 추천드려요!</h2>
+				</div>
+				<div class="sec-body">
+					<div class="swiper recom-swiper">
+						<div class="swiper-wrapper">
+							<div class="swiper-slide" th:each="list : ${bannerList}">
+								<button type="button" class="recom-bnr" th:attr="onclick=|navigateTo('${list.url}');|">
+									<img th:src="@{${list.imageMo}}" th:alt="${list.bannerAlt}" class="only-mo" />
+									<img th:src="@{${list.imagePc}}" th:alt="${list.bannerAlt}" class="only-pc" />
+								</button>
+							</div>
+						</div>
+						<div class="swiper-pagination"></div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- // 상품추천 섹션 -->
+
+		<!-- 자주묻는 질문 섹션 -->
+		<section class="faq-sec">
+			<div class="sec-inner">
+				<div class="sec-header">
+					<h2 class="sec-tit">알뜰폰 요금제 궁금하세요?</h2>
+				</div>
+				<div class="sec-body">
+					<!-- 자주묻는 질문 아코디언 -->
+					<div class="faq-accordion" id="faqAccordion">
+						<div class="acco-item" th:each="list, stat : ${faqList}">
+							<h3 class="acco-header">
+								<button class="acco-button" type="button" data-bs-toggle="collapse" th:attr="aria-controls=|faqAccordion${stat.index}|,data-bs-target=|#faqAccordion${stat.index}|"
+									aria-expanded="false">
+									<span><em>Q.</em>[[${list.inquiry}]]</span>
+									<i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+								</button>
+							</h3>
+							<div th:id="|faqAccordion${stat.index}|" class="acco-collapse collapse" data-bs-parent="#faqAccordion">
+								<div class="acco-body">
+									<div class="acco-answer">
+										<p th:utext="${list.ansContent}"></p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- // 자주묻는 질문 아코디언 -->
+				</div>
+			</div>
+		</section>
+		<!-- // 자주묻는 질문 섹션 -->
+
+		<!-- 알뜽폰 개통 방법 -->
+		<section class="account-sol-sec">
+			<div class="sec-inner">
+				<div class="sec-header">
+					<h2 class="sec-tit">알뜰폰 개통 방법 궁금하시죠?</h2>
+				</div>
+				<div class="sec-body">
+					<div class="ui-tab tab-style3">
+						<ul class="tab-list" role="tablist">
+							<li class="tab-item" role="presentation">
+								<button class="tab-link active" id="tab-11" data-bs-toggle="tab" data-bs-target="#tab-11-pane" type="button" role="tab" aria-controls="tab-11-pane" aria-selected="true">쓰던 번호로 개통</button>
+							</li>
+							<li class="tab-item" role="presentation">
+								<button class="tab-link" id="tab-12" data-bs-toggle="tab" data-bs-target="#tab-12-pane" type="button" role="tab" aria-controls="tab-12-pane" aria-selected="false">새 번호 사용</button>
+							</li>
+						</ul>
+					</div>
+					<div class="tab-content">
+						<div class="tab-pane fade show active" id="tab-11-pane" role="tabpanel" aria-labelledby="tab-11" tabindex="0">
+							<ol class="solution-steps">
+								<li><em class="num">1</em>요금제 조회하고 유심 구매 <br>(오프라인 또는 배송 받기)</li>
+								<li><em class="num">2</em>번호이동으로 가입 신청</li>
+								<li><em class="num">3</em>번호이동 사전인증 진행</li>
+								<li><em class="num">4</em>개통 완료 안내받으면 유심 교체!</li>
+							</ol>
+						</div>
+						<div class="tab-pane fade" id="tab-12-pane" role="tabpanel" aria-labelledby="tab-12" tabindex="0">
+							<ol class="solution-steps">
+								<li><em class="num">1</em>요금제 조회하고 유심 구매 <br>(오프라인 또는 배송 받기)</li>
+								<li><em class="num">2</em>신규가입으로 가입 신청</li>
+								<li><em class="num">3</em>해피콜 받기</li>
+								<li><em class="num">4</em>개통 완료 안내받으면 유심 넣고 바로 사용!</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- // 알뜽폰 개통 방법 -->
+
+	</div>
+	<!-- // content -->
+</main>
+<!-- // Container -->
+
+
+
+</html>

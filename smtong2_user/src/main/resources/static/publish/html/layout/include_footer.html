@@ -1,0 +1,96 @@
+<!-- 푸터 섹션 -->
+<section class="footer-sec">
+	<div class="logo-area">
+		<div class="logo-footer">
+			<img src="../../assets/images/common/img-logo-footer.svg" alt="세모통 로고" />
+		</div>
+	</div>
+
+	<div class="fnb-area">
+		<ul class="fnb-list">
+			<!-- 2차 수정 : 이용가이드 제외
+			<li class="fnb-item">
+				<a href="#" class="ui-btn">이용가이드</a>
+			</li> -->
+			<li class="fnb-item">
+				<a href="#" class="ui-btn">FAQ</a>
+			</li>
+			<li class="fnb-item">
+				<a href="#" class="ui-btn">공지사항</a>
+			</li>
+			<li class="fnb-item">
+				<a href="#" class="ui-btn">이용약관</a>
+			</li>
+			<li class="fnb-item">
+				<a href="#" class="ui-btn">개인정보처리방침</a>
+			</li>
+		</ul>
+	</div>
+
+	<div class="info-area">
+		<div class="info-cont">
+			<strong class="info-tit">(주)유테크온</strong>
+			<p class="info-txt">사업자등록번호 : 429-81-03454</p>
+			<p class="info-txt">통신판매업 신고번호 : 제 2025-서울강남-01704</p><!-- 2025-03-27 조찬기 : 통신판매업 추가 -->
+			<p class="info-txt">대표 : 김계영</p>
+			<p class="info-txt">주소 : 서울특별시 강남구 봉은사로 50길 29, 4층 (역삼동, 휘정빌딩)</p>
+			<p class="info-txt">이메일 : help_smtong@ucomp.co.kr</p><!-- 2025-03-19 조찬기 : 푸터 이메일정보 수정 -->
+		</div>
+		<div class="info-cont">
+			<strong class="info-tit">고객센터</strong>
+			<p class="info-txt">카카오톡 : @세모통</p>
+		</div>
+		<div class="info-cont">
+			<strong class="info-tit">운영시간</strong>
+			<p class="info-txt">월~목 : 10:00 ~ 18:00</p>
+			<p class="info-txt">금 : 10:00 ~ 17:00</p>
+			<p class="info-txt">점심시간 : 12:30 ~ 13:30 (주말, 공휴일 제외)</p>
+		</div>
+		<!-- 2025-04-10 조찬기 : 유테크온 인증마크 추가 -->
+		<div class="info-mark">
+			<a href="https://ictmarket.or.kr:8443/agent/pop_AgentCertIcon.do?AGENT_REQ_ID=AGT0000225007&AGENT_CD=VIN0026"
+				onclick="window.open('https://ictmarket.or.kr:8443/agent/pop_AgentCertIcon.do?AGENT_REQ_ID=AGT0000225007&AGENT_CD=VIN0026','_blank','width=600, height=400, toolbar=no, menubar=no, scrollbars=no, resizable=no' ); return false">
+				<img src="../../assets/images/common/logo_utechon.png" alt="유태크온 대리점">
+			</a>
+		</div>
+	</div>
+</section>
+<!-- // 푸터 섹션 -->
+
+<!-- 플로팅 메뉴 -->
+<!-- 2025-07-02 플롯팅 메뉴 수정
+	floating-menu: is-active 기본값
+	floating-layer: fade show 기본값, 버튼 변경
+-->
+<div class="floating-menu is-active">
+	<!-- 2025-05-20 조찬기 : 요금제 비교하기 추가 -->
+	<!-- 비교할때 is-compared -->
+	<button type="button" class="ui-btn btn-compare-view">
+		<span>비교<br>보기</span>
+	</button>
+
+	<!-- aria-expanded: true/false -->
+	<!-- <button type="button" class="ui-btn btn-menu" id="floatingBtn" aria-expanded="false" aria-haspopup="menu" onclick="floatingMenuHandler('floatingMenuLayer', 'floatingBtn')">
+		<i class="ui-icn icn-30-floating-logo" aria-label="Floating Menu"></i>
+		<i class="ui-icn icn-30-floating-close" aria-label="Floating Menu"></i>
+	</button> -->
+	<!-- 3차 수정 : 푸터 Top버튼 아이콘 적용 -->
+	<button type="button" class="ui-btn btn-top" onclick="window.scrollTo({top:0, left:0, behavior: 'smooth'})">
+		<i class="ui-icn icn-30-floating-top" aria-label="Scroll Top"></i>
+	</button>
+
+
+	<div class="floating-layer fade show" id="floatingMenuLayer">
+		<!-- a태그, button태그 무관합니다. -->
+		<button type="button" class="ui-btn type-cs" aria-label="1:1 문의">
+			<i class="ui-icn icn-54-floating-kakao" aria-hidden="true"></i>
+			<span>1:1 <br>문의</span>
+		</button>
+		<button type="button" class="ui-btn type-bot" aria-label="요금제 추천">
+			<i class="ui-icn icn-54-floating-bot" aria-hidden="true"></i>
+			<span>요금제 <br>추천</span>
+		</button>
+	</div>
+</div>
+<div class="floating-backdrop fade" onclick="floatingMenuHandler('floatingMenuLayer', 'floatingBtn')"></div>
+<!-- // 플로팅 메뉴 -->

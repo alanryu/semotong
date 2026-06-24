@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='07',menuId ='07'">
+	  
+<th:block layout:fragment="css">
+</th:block>
+
+<th:block layout:fragment="script">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script> 
+
+<script id="eventlistTmpl" type="text/x-jquery-tmpl">
+	<tr>
+		<!-- 번호 -->
+		<td>${rIdx}</td>
+		<!-- 구분 -->
+		<td>{{if reviewType == 'SEMOTONG'}}세모통후기{{/if}}{{if reviewType == 'ORDER'}}상품후기{{/if}}</td>
+		<!-- 입점사 -->
+		<td>${companyName}</td>
+		<!-- 상품 -->
+		<td>${planName}</td>
+		<!-- 내용 -->
+		<td>
+			<a href="/csm/review/goUpdatePage/${id}">${contentShort}</a>
+		</td>
+		<!-- 게시 Y/N -->
+		<td>
+			<div class="form-check form-switch mb-3">
+				<input class="form-check-input" type="checkbox" role="switch" value="${displayYn}" {{if displayYn == 'Y'}}checked="true"{{/if}} onclick="displayYnProc('${id}', this)" style="transform: scale(1.5);">
+			</div>
+		</td>
+		<!-- 별점 -->
+		<td>${score}</td>
+		<td>${username}</td>
+		<td>{{html dateToStringDot(createDate)}}</td>
+	</tr>
+</script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		//$("#defaultWeek").trigger("click");
+		$("#keyword").focus();
+		//페이징 기본(필수)  
+		currentPage = 1;
+		searchList();
+	})
+	
+	function goInsert(){
+		window.location.href='/csm/review/goUpdatePage/0';
+	}
+	
+	//list 화면 필수
+	function renderPage(page) {
+		currentPage = page;
+		searchList();
+	}
+	//10개씩 보기
+	function changeCombo(){
+		currentPage = 1;
+		searchList();
+	}
+	
+	function toggleDetailSearch(){
+		$("#periodType")		.val('CREATE')	.prop('selected', true);
+		
+		$("#keyword").val('');
+		//$("#defaultWeek").trigger("click");
+		periodButtonInit();
+		$("#useAll").trigger("click");
+		$("#searchReviewTypeAll").trigger("click");
+		
+		
+		currentPage = 1;
+	}
+	
+	function searchList() {
+		//페이징 기본(필수)
+		var page = currentPage;
+		if(page =="" || page == null) page =1;
+		var _recordSize =  parseInt($("#recordSize").val());
+		
+		if( !_isDateForm($("#searchStartDt").val()) ){
+			alert("올바른 날짜를 넣어주세요");
+			$("#searchStartDt").focus();
+			return;
+		}
+		if( !_isDateForm($("#searchEndDt").val()) ){
+			alert("올바른 날짜를 넣어주세요");
+			$("#searchEndDt").focus();
+			return;
+		}
+		var params = {
+				searchReviewType 		: $("input[name='searchReviewType']:checked").val()	// SEMOTONG, ORDER
+		 		,searchKeyword			: $("#keyword").val()							// 입력 검색어 
+		 		,searchPeriodType		: $("#periodType").val()						// CREATE only
+		 		,searchStartDate		: $("#searchStartDt").val()						//BaseSearchDto
+		 		,searchEndDate			: $("#searchEndDt").val()						//BaseSearchDto
+		 		,searchDisplayYn 		: $("input[name='useType']:checked").val()		// Y, N
+		 		,page					: page
+		 		,recordSize 			: _recordSize
+		}
+		
+		$.ajax({
+				url : '/csm/review/ajaxList'
+				,type : 'POST'
+				,dataType : "json"
+				,contentType:"application/json"
+				,data : JSON.stringify(params)
+				,success: function (data) {
+					
+					var items = data.data
+					$('#searchList').empty();
+					if(data.totalCnt == 0) {
+						//
+					} else {
+						var totalCnt = data.totalCnt;
+						$.each(data.data, function(idx, obj){
+							obj.rIdx = totalCnt - ((params.page - 1) * params.recordSize + idx);
+						});
+						$('#eventlistTmpl').tmpl(data.data).appendTo('#searchList');	
+					}
+					$('#totla_count').html("총 "+data.totalCnt+"건");
+					renderPagination(params.page, data.totalCnt, params.recordSize)
+				},
+				error : function(request, status, error){
+					alert(error);
+				},
+				complete:function(){
+					// $('#loading').addClass('display-none');
+				}
+		});
+	}
+	
+	
+	
+	function displayYnProc(id, obj){
+		var gbn = $(obj).is(':checked') ? 'Y' : 'N';
+		var params = { id : id, displayYn : gbn}
+		$.ajax({
+			url			: '/csm/review/ajaxDisplayYn'
+			,type 		: 'POST'
+			,dataType 	: "json"
+			,contentType:"application/json"
+			,data 		: JSON.stringify(params)
+			,success	: function (data) {
+				$(obj).val(gbn);
+			}
+			,error 	: function(request, status, error){
+				alert(error);
+			}
+			,complete:function(){
+			}
+		});
+	}
+	
+	
+	
+	
+
+	function downloadExcel() {
+		//페이징 기본(필수)
+		//var page = currentPage;
+		//if(page =="" || page == null) page =1;
+		var page = 1;
+		//var _recordSize =  parseInt($("#recordSize").val());
+		var _recordSize =  9999;
+		if( !_isDateForm($("#searchStartDt").val()) ){
+			alert("올바른 날짜를 넣어주세요");
+			$("#searchStartDt").focus();
+			return;
+		}
+		if( !_isDateForm($("#searchEndDt").val()) ){
+			alert("올바른 날짜를 넣어주세요");
+			$("#searchEndDt").focus();
+			return;
+		}
+		var params = {
+				searchReviewType 		: $("input[name='searchReviewType']:checked").val()	// SEMOTONG, PLAN
+		 		,searchKeyword			: $("#keyword").val()							// 입력 검색어 
+		 		,searchPeriodType		: $("#periodType").val()						// CREATE only
+		 		,searchStartDate		: $("#searchStartDt").val()						//BaseSearchDto
+		 		,searchEndDate			: $("#searchEndDt").val()						//BaseSearchDto
+		 		,searchDisplayYn 		: $("input[name='useType']:checked").val()		// Y, N
+		 		,page					: page
+		 		,recordSize 			: _recordSize
+		}
+		
+		var _url = '/csm/review/exceldown';
+		
+		downloadExcelProc(params,_url,"ReviewList");
+		
+	}
+	
+	
+	
+
+</script>
+
+
+</th:block>
+
+<div class="main-content">
+	
+	<div class="container-fluid">
+		<!-- 로케이션 & 제목 영역 추가 -->
+		<div class="page-header mb-4">
+			<div class="location mb-2">
+				<small class="text-secondary">
+					<i class="fas fa-home me-1"></i>
+					<a href="javascript:;">홈</a>
+					>
+					<a href="javascript:;">서비스 관리</a>
+					>
+					<a href="/svc/review/list">후기관리</a>
+				</small>
+			</div>
+			<h2 class="page-title fs-4 mb-4">
+				후기관리
+			</h2>
+		</div>
+		
+		<!-- 검색 구간 -->
+		<div class="search-section">
+			<div class="col-12 mb-2">
+				<div class="form-row">
+					<div class="form-label mb-0">검색어</div>
+					<div class="position-relative col-9">
+						<i
+							class="fas fa-search position-absolute"
+							style="left: 16px; top: 15px; color: #94a3b8;"></i>
+						<input type="text" class="form-control ps-5" id="keyword" placeholder="검색어를 입력하세요">
+					</div>
+				</div>
+			</div>
+			<div class="row align-items-center mb-2">
+				<div class="form-row">
+					<div class="form-label mb-0">검색기간</div>
+					<div class="d-flex align-items-center gap-3">
+						<select class="form-select" style="width: 120px" id="periodType">
+							<option value="CREATE">등록일자</option>
+						</select>
+						<div class="d-flex align-items-center gap-2">
+							<input type="date" class="form-control" style="width: 150px" id="searchStartDt">
+							<span class="text-secondary">-</span>
+							<input type="date" class="form-control" style="width: 150px" id="searchEndDt">
+						</div>
+						<div class="d-flex gap-2">
+							<button class="period-button" value="0">오늘</button>
+							<button class="period-button" value="7" id="defaultWeek">1주일</button>
+							<button class="period-button" value="30">1개월</button>
+							<button class="period-button" value="90">3개월</button>
+							<button class="period-button" value="180">6개월</button>
+							<button class="period-button" value="365">1년</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row align-items-center mb-3">
+				<div class="col-12">
+					<div class="d-flex align-items-center gap-3">
+						<div class="form-label mb-0">게시여부</div>
+						<div class="radio-group">
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="useType" id="useAll" value = "" checked>
+								<label class="form-check-label" for="useAll">전체</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="useType" id="useY" value = "Y">
+								<label class="form-check-label" for="useY">Y</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="useType" id="useN" value = "N">
+								<label class="form-check-label" for="useN">N</label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row align-items-center mb-3">
+				<div class="col-12">
+					<div class="d-flex align-items-center gap-3">
+						<div class="form-label mb-0">구분</div>
+						<div class="radio-group">
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="searchReviewType" id="searchReviewTypeAll" value = "" checked>
+								<label class="form-check-label" for="searchReviewTypeAll">전체</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="searchReviewType" id="searchReviewType01" value = "ORDER">
+								<label class="form-check-label" for="searchReviewType01">상품후기</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="searchReviewType" id="searchReviewType02" value = "SEMOTONG">
+								<label class="form-check-label" for="searchReviewType02">세모통후기</label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>			
+			<!-- 검색 구간 -->
+
+			<div class="row">
+				<div class="col-12 text-end mt-2">
+					
+					<button class="btn btn-primary btn-sm" onclick="searchList();">
+						<i class="fas fa-search"></i>
+						검색
+					</button>
+					<button class="btn btn-light me-2 btn-sm" onclick="toggleDetailSearch()">
+						<i class="fas fa-redo"></i>
+						초기화
+					</button>
+				</div>
+			</div>
+		</div>
+		
+		
+		
+		
+		<!-- contents 영역 -->
+		<div class="table-section">
+			<div class="d-flex justify-content-between align-items-center mb-4">
+				<div class="d-flex align-items-center gap-3">
+					<div class="stats-badge">
+						<i class="fas fa-calculator me-1"></i>
+						<span id="totla_count">총 450건</span>
+					</div>
+					<select class="form-select" style="width: 100px" id="recordSize" onchange="changeCombo()">
+						<option value="10">10개씩</option>
+						<option value="20">20개씩</option>
+						<option value="30">30개씩</option>
+						<option value="40">40개씩</option>
+						<option value="50">50개씩</option>
+					</select>
+				</div>
+				
+				<div class="header-actions">
+					<button class="btn btn-light btn-sm">
+						<i class="fas fa-download"></i>
+						다운로드
+					</button>
+				</div>
+			</div>
+			
+			<table class="table custom-table">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>구분</th>
+						<th>입점사</th>
+						<th>상품</th>
+						<th>내용</th>
+						<th>게시여부</th>
+						<th>별점</th>
+						<th>회원</th>
+						<th>등록일자</th>
+					</tr>
+				</thead>
+				<tbody id="searchList">
+				</tbody>
+			</table>
+			
+			<div class="d-flex justify-content-left mt-4">
+				<ul class="pagination">
+				</ul>
+			</div>
+		</div>
+	</div>
+		
+	
+</div>

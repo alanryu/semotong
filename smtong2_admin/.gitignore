@@ -1,0 +1,105 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+ehthumbs_vista.db
+$RECYCLE.BIN/
+*.lnk
+
+# Build directories
+/target/
+/build/
+.gradle/
+out/
+bin/
+tmp/
+dist/
+deploy/
+
+# Gradle
+.gradletasknamecache
+!gradle/wrapper/gradle-wrapper.jar
+
+# Java compiled
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+*.ctxt
+.mtj.tmp/
+
+# Logs
+*.log
+logs/
+
+# IDEs - IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# IDEs - Eclipse/STS
+.classpath
+.project
+.settings/
+.metadata
+.springBeans
+.sts4-cache
+.factorypath
+.apt_generated
+.apt_generated/
+.recommenders/
+.externalToolBuilders/
+*.launch
+.loadpath
+.buildpath
+
+# IDEs - VSCode
+.vscode/
+
+# IDEs - NetBeans
+/nbproject/private/
+/nbbuild/
+/nbdist/
+/.nb-gradle/
+
+# Claude
+.claude/
+
+# Temp/Backup files
+*.tmp
+*.bak
+*.swp
+*.sw?
+*~
+*~.nib
+.#*
+*#
+*.orig
+
+# Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+.flattened-pom.xml
+
+# Secrets & Local config
+secrets.yml
+local.properties
+
+# Misc
+.cache/
+/test-output/
+node_modules/
+.attach_pid*
+MANIFEST.MF
+/.kotlin/
+
+
+

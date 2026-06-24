@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='04',menuId ='06'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+<!-- list 템플릿 --> 
+
+
+<script id="planListTmpl" type="text/x-jquery-tmpl">
+	<tr>
+	     <td>${id}</td>
+	     <td>{{if dispYn}} 노출 {{else}} 비노출{{/if}}</td>
+	     <td>{{if saleStatus}} 판매중 {{else}} 판매정지{{/if}}</td>
+	     <td>${mno}</td>
+	     <td>${planType}</td>
+	     <td>${hostNm}</td>
+	     <td>
+	         <a href="/pbm/plan/edit?searchId=${id}">{{html getPlanNm(planName, planNameSmt)}}</a>
+	     </td>
+	     <td>{{html getPriceStr(normalPrice)}}</td>
+	     <td>{{html getPriceStr(salePrice)}}</td>
+	     <td>${promotionPeriod}</td>
+	     <td>{{html getDataStr(supDataVal)}}</td>
+	     <td>{{html getQosStr(supQos)}}</td>
+	     <td>${joinCount}</td>
+		 <td><input type="text" name="recomOrder4" id="recomOrder4_${id}" value="${recomOrder4}" data-id="${id}"></td>
+	 </tr>
+</script>
+<script type="text/javascript">
+
+document.addEventListener('DOMContentLoaded', function () {
+	
+	searchListInit();
+	
+	document.getElementById("recordSize").addEventListener("change", function () {
+		currentPage =1;
+		searchList();
+	});
+	
+	
+	
+});
+
+function changeCombo(){
+	currentPage = 1;
+	searchList()
+}
+
+function searchListInit() {
+	currentPage = 1;
+	searchList();
+}
+
+function renderPage(page) {
+	currentPage = page;
+	searchList();
+}
+
+
+
+
+
+function searchList() {
+	
+	var page = currentPage;
+	if(page =="" || page == null) page =1;
+	
+	var _recordSize =  parseInt($("#recordSize").val());
+	
+	var params = {
+		 searchDispYn : "1",
+		 searchSaleSp : "SALE",
+		 searchOrderType : "POP",
+		 page : page,
+		 recordSize : _recordSize
+	}
+	
+	$.ajax({
+			   url : '/pbm/plan/ajaxList',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+			   success: function (data) {
+					$('#searchList').empty();
+					
+					$('#listCount').html("총 " + data.totalCnt +"건" );
+					$('#planListTmpl').tmpl(data.data).appendTo('#searchList');
+					
+				//	renderPagination(page,data.totalCnt,_recordSize);
+			    },
+				error : function(request, status, error){
+		            alert(error);
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		       }
+	});
+}
+	
+function updateOrderInit(){
+	
+	$.ajax({
+	  url: "/pbm/popPlan/ajaxOrderInit",
+	  type: "POST",
+	  async: false,
+	  dataType: "json",
+	  contentType: "application/json",
+	  success: function (data) {
+		console.log(data);
+		updateOrder();
+	  },
+	  error: function (request, status, error) {
+	    showAlert(error);
+	  },
+	  complete: function () {
+	  },
+	});
+}
+
+
+function updateOrder(){
+
+	const inputs = document.querySelectorAll("input[name='recomOrder4']");
+	
+	inputs.forEach((input,index) => {
+       var dataId = input.getAttribute("data-id"); // data-id 값
+       var value = input.value; // input의 value 값
+	   
+	      
+		if(dataId !="" && value !="") {
+
+			var params = {
+			  id: dataId,
+			  recomOrder4: value,
+			};
+			
+			$.ajax({
+			  url: "/pbm/popPlan/ajaxOrder",
+			  type: "POST",
+			  async: false,
+			  dataType: "json",
+			  contentType: "application/json",
+			  data: JSON.stringify(params),
+			  success: function (data) {
+			   	console.log(index);
+				if(index == 19) {
+					showAlert("수정되었습니다.",searchList);
+				}
+			  },
+			  error: function (request, status, error) {
+			    showAlert(error);
+			  },
+			  complete: function () {
+			  },
+			});
+		} else {
+			if(index == 19) {
+				showAlert("수정되었습니다.",searchList);				
+			}
+		}
+       
+   });
+   
+   
+	   
+}	
+	
+function toggleSearchInit(){
+	$("#keyword").val('');
+	
+	$("#searchDispYn01").prop('checked', true); // 노출여부
+	$("#searchSaleSp01").prop('checked', true); // 상태
+	
+	$("#searchOrderListSp01").prop('checked', true); // 추천요금제 리스트구분
+	
+	currentPage = 1;
+}
+
+
+</script>
+</th:block>
+
+        <div class="main-content">
+            <div class="container-fluid">
+                 <!-- 로케이션 & 제목 영역 추가 -->
+                <div class="page-header mb-4">
+                    <div class="location mb-2">
+                        <small class="text-secondary">
+                            <i class="fas fa-home me-1"></i>
+                            <a href="javascript:;">홈</a> > <a href="/pbm/plan/list">상품관리</a> > <a href="/pbm/plan/list">요금제</a>
+                        </small>
+                    </div>
+                    <h2 class="page-title fs-4 mb-4">
+                        인기 요금제 관리
+                    </h2>
+                </div>
+                
+                <div class="search-section">
+                    <div class="row g-3">
+                        <div class="col-12">
+
+                            <!-- 최근 수정일 -->
+                            <div class="col-12">
+                                <!-- 상세검색 영역 -->
+                                <div class="row">
+                                    <div class="col-12 text-end mt-2">
+                                        <button class="btn btn-primary btn-sm me-2" onclick="searchListInit();">
+                                            <i class="fas fa-search"></i>
+                                            검색
+                                        </button>
+                                        <button class="btn btn-light btn-sm" onclick="toggleSearchInit()">
+                                            <i class="fas fa-redo"></i>
+                                            초기화
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="stats-badge">
+                                <i class="fas fa-calculator me-1"></i>
+                                <span id="listCount"></span>
+                            </div>
+                            <select class="form-select" style="width: 100px" id="recordSize" onchange="changeCombo()">
+                                <option value="20">20개씩</option>
+                                <option value="40">40개씩</option>
+                            </select>
+                        </div>
+						<div class="header-actions">
+						    <div class="custom-dropdown">
+						        <button class="btn btn-primary btn-sm me-2" onclick="updateOrderInit();">
+						            <i class="fas fa-calculator"></i>
+						            정렬 저장
+						        </button>
+						    </div>
+						</div>
+                    </div>
+
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+								<th>번호</th>
+								<th>노출여부</th>
+								<th>상태</th>
+								<th>MNO</th>
+								<th>네트워크</th>
+								<th>사업자</th>
+								<th>요금제</th>
+								<th>기본료</th>
+								<th>할인금액</th>
+								<th>할인기간</th>
+								<th>데이터</th>
+								<th>QoS</th>
+								<th>신청건수 </th>
+								<th>정렬 순서</th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchList">
+                           
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-between mt-4 align-items-start">
+                        <ul class="pagination">
+                            
+                        </ul>
+                        <!-- <button class="btn btn-success btn-sm"> -->
+                        <!-- <button class="btn btn-light btn-sm">
+                            <i class="fas fa-download"></i>
+                            엑셀 다운로드
+                        </button> -->
+                        
+                    </div>
+                </div>
+            </div>
+		</div>
+		
+
+</html>

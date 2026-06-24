@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.stl.mapper.SettlementMngMapper">
+	<sql id="listWhere">
+			<!-- 등록자 -->
+			<if test="createUserName != null and createUserName != ''">
+				AND b.user_name like CONCAT('%', #{createUserName}, '%')
+			</if>
+			
+			<!-- 정산구분 -->
+			<if test="stlType != null and stlType != ''">
+				AND stl_type = #{stlType}
+			</if>
+			
+			<!-- 입점사 -->
+			<if test="companyId != null and companyId != ''">
+				AND company_id IN
+		        <foreach item="company" index="index" collection="_parameter.companyId.split(',')" open="(" separator="," close=")">
+		            #{company}
+		        </foreach>
+			</if>
+			
+			<!-- 정산월 기간조회 -->
+			<if test="startYyyymm != null and startYyyymm != ''">
+				AND yyyymm  <![CDATA[>=]]> #{startYyyymm}
+			</if>
+			<if test="endYyyymm != null and endYyyymm != ''">
+				AND yyyymm <![CDATA[<=]]> #{endYyyymm}
+			</if>
+	</sql>
+	<sql id="Base_Column_list">
+		a.id
+		,a.company_id
+		,GET_COMPANY_NM(a.company_id) companyNm
+		,a.yyyymm
+		,a.stl_type
+		,a.mno
+		,a.network
+		,a.plan_name
+		,a.data_plan
+		,a.basic_fee
+		,a.discount_amount
+		,a.discount_period
+		,a.applicant
+		,a.contact_number
+		,a.activation_date
+		,a.create_date
+		,a.create_id
+		,a.modified_date
+		,a.modified_id
+		,b.user_name createNm
+		,c.user_name modifiedNm
+	</sql>
+	
+	<select id="getListSettlementMst" parameterType="kr.co.ucomp.web.stl.dto.SettlementMngSearchDto" resultType="kr.co.ucomp.web.stl.entity.EarningEntity">
+	  	SELECT company_id
+			,yyyymm
+			,stl_type
+			,create_id 
+			,stlCount
+			,GET_ADMIN_USER_NM(create_id) as createNm
+			,GET_COMPANY_NM(company_id) as companyNm
+	  	FROM (
+		    SELECT company_id
+				,yyyymm
+				,stl_type
+				,create_id
+				,count(1) stlCount
+		    FROM
+		        tb_stl_settlement_mng 
+		    WHERE 1=1
+		    <include refid="listWhere" />
+		    GROUP by company_id,yyyymm,stl_type,create_id
+	    ) B
+	    ORDER BY company_id DESC
+	    LIMIT #{offset}, #{recordSize}
+	</select>
+	
+	<select id="getListSettlement" parameterType="kr.co.ucomp.web.stl.dto.SettlementMngSearchDto" resultType="kr.co.ucomp.web.stl.entity.SettlementMngEntity">
+    SELECT
+        <include refid="Base_Column_list" />
+        <!-- u.user_name as createUserName,
+        m.user_name as modifiedUserName -->
+    FROM
+        tb_stl_settlement_mng a
+ 		LEFT OUTER JOIN tb_mbm_admin_user b 
+ 		ON a.create_id = b.id
+		LEFT OUTER JOIN tb_mbm_admin_user c
+ 		ON a.modified_id = c.id
+    WHERE 1=1
+    <include refid="listWhere" />
+    ORDER BY a.id DESC
+    LIMIT #{offset}, #{recordSize}
+</select>
+
+
+	<select id="getListSettlementCount" parameterType="kr.co.ucomp.web.stl.dto.SettlementMngSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+	    FROM
+	        tb_stl_settlement_mng a
+	 		LEFT OUTER JOIN tb_mbm_admin_user b 
+	 		ON a.create_id = b.id
+			LEFT OUTER JOIN tb_mbm_admin_user c
+	 		ON a.modified_id = c.id
+	    WHERE 1=1
+	        <include refid="listWhere" />
+	</select>
+	
+	
+	<select id="getSettlement" parameterType="int" resultType="kr.co.ucomp.web.stl.entity.SettlementMngEntity">
+		SELECT
+	            <include refid="Base_Column_list" />
+	        FROM
+	            tb_stl_settlement_mng a
+	        WHERE id=#{id}
+	</select>
+	
+	<insert id="create"  parameterType="kr.co.ucomp.web.stl.entity.SettlementMngEntity" >
+	
+	INSERT INTO tb_stl_settlement_mng (
+		company_id,
+		yyyymm,
+		stl_type,
+		mno,
+		network,
+		plan_name,
+		data_plan,
+		basic_fee,
+		discount_amount,
+		discount_period,
+		applicant,
+		contact_number,
+		activation_date,
+		create_id,
+		modified_id
+	) VALUES (
+		#{companyId},
+		#{yyyymm},
+		#{stlType},
+		#{mno},
+		#{network},
+		#{planName},
+		#{dataPlan},
+		#{basicFee},
+		#{discountAmount},
+		#{discountPeriod},
+		#{applicant},
+		#{contactNumber},
+		#{activationDate},
+		#{createId},
+		#{modifiedId}
+	);
+	
+	
+	</insert>
+	
+	<update id="update"  parameterType="kr.co.ucomp.web.stl.entity.SettlementMngEntity" >
+	UPDATE tb_stl_settlement_mng SET 
+				company_id=#{companyId},
+				yyyymm=#{yyyymm},
+				stl_type=#{stlType},
+				mno=#{mno}, 
+				network=#{network}, 
+				plan_name=#{planName},
+				data_plan=#{dataPlan},
+				basic_fee=#{basicFee},
+				discount_amount=#{discountAmount},
+				discount_period=#{discountPeriod},
+				applicant=#{applicant},
+				contact_number=#{contactNumber},
+				activation_date=#{activationDate},
+				modified_id=#{modifiedId},
+				modified_date=NOW()
+	WHERE id=#{id};
+	
+	</update>
+	
+	<delete id="delSettlement" parameterType="int">
+		DELETE FROM tb_stl_settlement_mng
+	    WHERE id=#{id}
+	</delete>
+	
+	<delete id="deleteByYearMonthAndCompany" parameterType="kr.co.ucomp.web.stl.dto.SettlementMngUploadDto">
+		DELETE FROM tb_stl_settlement_mng
+		WHERE yyyymm = #{stlTYyyymm} 
+		AND company_id = #{companyId}
+	</delete>
+</mapper>

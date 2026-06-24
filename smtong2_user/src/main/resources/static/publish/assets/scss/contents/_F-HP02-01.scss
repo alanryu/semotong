@@ -1,0 +1,293 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 핸드폰
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 핸드폰 페이지
+.F-HP02-01-page {
+
+	// 페이시 여백
+	@include bottom-spacer;
+
+	@include media-tablet-xs {
+		padding-top: 60rem;
+	}
+
+	// s: 핸드폰 상세정보 섹션
+	.hp-detail-sec {
+		.hp-detail-view {
+			display: flex;
+			justify-content: center;
+			margin-left: calc(#{$mobile-outer-spacer} * -1);
+			margin-right: calc(#{$mobile-outer-spacer} * -1);
+			padding: 45rem 0;
+			background-color: #EFF0F0;
+			img {
+				display: inline;
+				width: 280rem;
+				height: 280rem;
+				mix-blend-mode: darken;
+			}
+		}
+
+		.hp-detail-cont {
+			padding-top: 24rem;
+
+			.sec-telecom {
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: $color-primary;
+			}
+			.sec-tit {
+				margin-top: 6rem;
+				font-weight: 600;
+				font-size: 20rem;
+				line-height: 28rem;
+				color: #000;
+			}
+
+			.sec-tit-sub {
+				margin-top: 28rem;
+				margin-bottom: 10rem;
+				font-weight: 600;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #000;
+				em {
+					color: $color-primary;
+				}
+			}
+
+			// 색상
+			.detail-color {
+				display: flex;
+				gap: 4rem;
+				overflow-x: auto;
+				margin-right: calc(#{$mobile-outer-spacer});
+
+				.rdo-color {
+					position: relative;
+					display: block;
+					flex: none;
+					input {
+						pointer-events: none;
+						position: absolute;
+						left: 0;
+						top: 0;
+						width: 100%;
+						height: 100%;
+						opacity: 0;
+					}
+					.rdo {
+						display: block;
+						border:2px solid transparent;
+						border-radius: 50%;
+						i {
+							display: block;
+							width: 56rem;
+							height: 56rem;
+							border-radius: 50%;
+							border:1px solid #fff;
+						}
+					}
+					input:checked + .rdo {
+						border-color: $color-primary;
+					}
+				}
+			}
+
+			// 부부 개월
+			.detail-radio {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 8rem;
+
+				.installment-rdo {
+					position: relative;
+					display: block;
+
+					input {
+						position: absolute;
+						left: 0;
+						top: 0;
+						z-index: 1;
+						display: block;
+						width: 100%;
+						height: 100%;
+					}
+					.rdo {
+						position: relative;
+						display: flex;
+						align-items: center;
+						z-index: 2;
+						min-height: 56rem;
+						padding: 7rem 15rem;
+						border-radius: 10rem;
+						background-color: #EFF0F0;
+						border:1px solid transparent;
+						cursor: pointer;
+						> span {
+							display: block;
+							position: relative;
+							width: 100%;
+							padding-right: 25rem;
+							font-weight: 500;
+							font-size: 14rem;
+							line-height: 20rem;
+							color: #5A5D60;
+							&::after {
+								content:'';
+								display: block;
+								position: absolute;
+								top: 0;
+								right: 0;
+								width: 20rem;
+								height: 20rem;
+								opacity: 0;
+								background: url('../images/common/icn-20-rdo-sel.svg') no-repeat center center / contain;
+							}
+							strong {
+								display: block;
+								margin-bottom: 4rem;
+								font-weight: 600;
+								font-size: 16rem;
+								line-height: 22rem;
+							}
+						}
+					}
+					input:checked + .rdo {
+						background-color: #EAE6FB;
+						border-color: $color-primary;
+						> span {
+							font-weight: 600;
+							color: $color-primary;
+							&::after {
+								opacity: 1;
+							}
+						}
+					}
+					&.has-tit {
+						.rdo {
+							padding-top: 13rem;
+							padding-bottom: 13rem;
+							> span::after {
+								top: 1rem;
+							}
+						}
+						input:checked + .rdo {
+							> span {
+								font-weight: 500;
+								color: $color-primary;
+							}
+						}
+					}
+				}
+			}
+
+			// 스펙
+			.detail-spec {
+				.spec-table {
+					table-layout: fixed;
+					th, td {
+						padding: 12rem;
+						border:1px solid #EFF0F0;
+						font-weight: 500;
+						font-size: 14rem;
+						line-height: 20rem;
+						color: #5A5D60;
+						vertical-align: middle;
+					}
+					th {
+						width: max(82rem, 20vw);
+						padding: 12rem 10rem;
+						background-color: #F9F9F9;
+						text-align: center;
+					}
+				}
+			}
+
+			// 사은품
+			.detail-gift {
+				padding: 12rem 16rem;
+				border-radius: 10rem;
+				background-color: #EFF0F0;
+				p {
+					display: flex;
+					align-items: center;
+					font-weight: 500;
+					font-size: 14ren;
+					line-height: 20rem;
+					color: #36383A;
+					.ui-icn {
+						margin-right: 4rem;
+					}
+				}
+			}
+		}
+
+		@include media-tablet-xs {
+			.hp-detail-view {
+				margin-left: 0;
+				margin-right: 0;
+				border-radius: 10rem;
+			}
+
+			.hp-detail-cont {
+				.detail-color {
+					margin-right: 0;
+				}
+				.detail-spec {
+					.spec-table {
+						th {
+							width: 150rem;
+						}
+					}
+				}
+			}
+		}
+	}
+	// e: 핸드폰 상세정보 섹션
+
+	// s: 구매신청 플로팅 섹션
+	.hp-floating-sec {
+		position: sticky;
+		bottom: 0;
+		z-index: 90;
+		padding-top: 20rem;
+		padding-bottom: 20rem;
+		margin-top: 30rem;
+		margin-bottom: calc(#{$mobile-bottom-spacer} * -1);
+		border-top: 1px solid #EFF0F0;
+		background-color: #fff;
+		.sec-inner {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.floating-cont {
+			.charge {
+				display: flex;
+				align-items: center;
+				gap: 4rem;
+				font-weight: 700;
+				font-size: 18rem;
+				line-height: 24rem;
+				color: #000;
+			}
+			.info {
+				margin-top: 2rem;
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #828588;
+			}
+		}
+		@include media-tablet-xs {
+			margin-bottom: calc(#{$pc-bottom-spacer} * -1);
+		}
+	}
+	// e: 구매신청 플로팅 섹션
+}
+// e: 핸드폰 페이지

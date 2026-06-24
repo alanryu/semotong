@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='07',menuId ='12'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<!--	<link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script type="text/javascript">
+		document.addEventListener('DOMContentLoaded', () => {
+			
+			var procMsg = "[[${procMsg}]]";
+			if(procMsg!="" || procMsg !="") {
+				if(procMsg == "sucess") {
+					
+					var procSp = "[[${procSp}]]";
+					if(procSp =="C") {
+						showAlert("등록 되었습니다.",goList);	
+					} else {
+						showAlert("수정 되었습니다.",goList);
+					}
+				} else {
+					alert(procMsg);
+				}
+			}
+						
+						
+			const colorInput = document.getElementById('btnColor');
+			var btnColor = "[[${record.btnColor}]]";
+			if(btnColor=="") btnColor = "#0967e1";
+			colorInput.value = btnColor;
+			
+			const currentUrl = window.location.href; // 현재 브라우저 URL 가져오기
+		    const linkElement = document.getElementById('dynamicLink'); // 링크 요소 가져오기
+			var rdpUrl = linkElement.textContent;
+			var totUrl = "";
+		    if (!currentUrl.startsWith('https://admin.smtong.co.kr')) {
+		        // 표시되는 텍스트도 업데이트
+		        totUrl = "https://tb.smtong.co.kr" + rdpUrl;
+		    } else {
+				totUrl = "https://www.smtong.co.kr" + rdpUrl;
+			}
+			
+			linkElement.innerHTML = "<a href = '"+totUrl+"' target='_blank'>" + totUrl + "</a>";
+						
+						 
+		});
+		
+		
+		function saveData(procSp) {
+			
+			if ( $.trim($('#title').val()) == '' ) {
+				showAlert("제목을 입력하세요",$("#title"));
+				return;
+			}
+			
+			if ( $.trim($('#fileText1').val()) == '' ) {
+				showAlert("상단 배너 이미지를 입력하세요");
+				return;
+			}
+			
+			/*
+			if ( $.trim($('#fileText2').val()) == '' ) {
+				showAlert("하단 배너 이미지를 입력하세요");
+				return;
+			}
+			*/
+			
+			if ( $.trim($('#footBarText').val()) == '' ) {
+				showAlert("하단 문구를 입력하세요",$("#footBarText"));
+				return;
+			}
+			
+			
+			if ( $.trim($('#btnCta').val()) == '' ) {
+				showAlert("하단 CTA를 입력하세요",$("#btnCta"));
+				return;
+			}
+			
+						
+			showConfirm( 
+				'저장 하시겠습니까?'
+				, () => {
+					//console.log('확인 클릭');
+					saveProc(procSp);
+				}
+				,() => { }
+				,"랜딩 페이지 정보 저장"
+			)
+		}
+		
+		function saveProc(procSp) { 
+			$("#recordForm").submit();
+		}
+		
+		
+		function goList(){
+			window.location.href="/svc/internetrdp/list";
+		}
+		
+		
+		function delUploadFile(sp,obj) {
+			if(sp=="1") {
+				$("#topBanner").val("");
+			} else if(sp=="2") {
+				$("#footBanner").val("");
+			}
+			console.log($("#fileText"+sp));
+			$("#fileText"+sp).val("");
+			$("#preview"+sp).attr("src","");
+			$("#preview"+sp).hide();
+			$(obj).hide();
+		}
+	</script>
+		
+</th:block>
+
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="location mb-2">
+            <small class="text-secondary">
+				<i class="fas fa-home me-1"></i>
+				<a href="javascript:;">홈</a>
+				>
+				<a href="javascript:;">서비스 관리</a>
+				>
+				<a href="/svc/internetrdp/list">랜딩페이지관리</a>
+            </small>
+        </div>
+         <h2 class="page-title fs-4 mb-4" th:text="${record == null or record.id == 0} ? '랜딩 페이지 등록' : '랜딩 페이지 수정'"></h2>
+
+        <!-- 입력 폼 섹션 -->
+		<form id="recordForm" th:object="${record}" method="POST" action="/svc/internetrdp/insUpdProc" enctype="multipart/form-data">
+			<input type="hidden" th:field="*{id}" >
+			<input type="hidden" th:field="*{rdUrl}" >
+			
+	        <div class="search-section detail">
+					<!-- 질문 -->
+					<div class="form-row full-width">
+					    <div class="form-label">
+					        제목<span class="required">*</span>
+					    </div>
+					    <div class="form-control-wrap">
+					        <input type="text" class="form-control" placeholder="제목을 등록해주세요." th:field="*{title}" required maxlength="500"  style="width:800px">
+							<th:block th:if="${#fields.hasErrors('title')}" class="error"><span th:errors="*{title}" class="required">Field error</span></th:block>
+					    </div>
+					</div>
+		            <!-- 질문 -->
+		            <div class="form-row full-width">
+		                <div class="form-label">
+		                    상단 이미지 등록<span class="required">*</span>
+		                </div>
+						<div class="form-control-wrap" id="req-imagePc">
+				            <div class="file-input-wrap">
+				            	<input type="hidden" th:field="*{topBanner}">
+				                <input type="text" class="form-control" readonly id="fileText1" th:value="${record?.topBanner}">
+				                <input type="file" name="topFile" id="fileInput1" class="file-input" style="display: none;" accept="image/*">
+				                <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput1').click()" style="min-width:70px">찾기</button>
+				            </div>
+				          <!--  <div class="file-info c_red">
+				                이미지 형식의 파일만 업로드 가능합니다. (jpg, png, jpeg) / 권장 사이즈: 720x160
+				            </div>-->
+				            <div class="preview-wrap">
+				            	<img id="preview1" class="preview-image" th:src="@{${record?.topBanner}}" style="display:none;">
+								<button type="button" class="btn btn-secondary" onclick="delUploadFile('1',this);" style="min-width:50px" th:if="${record?.topBanner != null and record?.topBanner != ''}">삭제</button>
+				            </div>
+				        </div>
+		            </div>
+		
+		            <!-- 하단 이미지 -->
+		            <div class="form-row full-width">
+		                <div class="form-label">
+							하단 이미지 등록
+		                </div>
+						<div class="form-control-wrap" id="req-imagePc">
+				            <div class="file-input-wrap">
+				            	<input type="hidden" th:field="*{footBanner}">
+				                <input type="text" class="form-control" readonly id="fileText2" th:value="${record?.footBanner}">
+				                <input type="file" name="footFile" id="fileInput2" class="file-input" style="display: none;" accept="image/*">
+				                <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput2').click()" style="min-width:70px">찾기</button>
+				            </div>
+				            <!--<div class="file-info c_red">
+				                이미지 형식의 파일만 업로드 가능합니다. (jpg, png, jpeg) / 권장 사이즈: 720x160
+				            </div>-->
+							
+				            <div class="preview-wrap">
+				            	<img id="preview2" class="preview-image" th:src="@{${record?.footBanner}}" style="display:none;">
+								<button type="button" class="btn btn-secondary" onclick="delUploadFile('2',this);" style="min-width:50px" th:if="${record?.footBanner != null and record?.footBanner != ''}">삭제</button>
+				            </div>
+						</div>
+					</div>
+					
+					<!-- 하단바 문구 -->
+					<div class="form-row full-width">
+					    <div class="form-label">
+					        하단바 문구<span class="required">*</span>
+					    </div>
+					    <div class="form-control-wrap">
+					        <textarea class="form-control" th:field="*{footBarText}" rows="3" style="min-height:60px;width:800px"></textarea>
+							<th:block th:if="${#fields.hasErrors('footBarText')}" class="error"><span th:errors="*{footBarText}" class="required">Field error</span></th:block>
+					    </div>
+					</div>
+					
+					<!-- 버튼 CTA -->
+					<div class="form-row full-width">
+					    <div class="form-label">
+					        버튼 CTA<span class="required">*</span>
+					    </div>
+					    <div class="form-control-wrap">
+					        <textarea class="form-control" th:field="*{btnCta}" rows="3" style="min-height:60px;width:800px"></textarea>
+							<th:block th:if="${#fields.hasErrors('btnCta')}" class="error"><span th:errors="*{btnCta}" class="required">Field error</span></th:block>
+					    </div>
+					</div>
+									
+					
+					<!-- 버튼 컬러 -->
+					<div class="form-row full-width">
+					    <div class="form-label">
+							버튼 컬러<span class="required">*</span>
+					    </div>
+					    <div class="form-control-wrap">
+							<input type="color" th:field="*{btnColor}" required>
+							<th:block th:if="${#fields.hasErrors('title')}" class="error"><span th:errors="*{btnColor}" class="required">Field error</span></th:block>
+					    </div>
+					</div>						
+		
+		           <!-- 노출 -->
+		            <div class="form-row full-width">
+		                <div class="form-label">
+		                   사용여부
+		                </div>
+						<div class="form-control-wrap">
+		                    <div class="form-check-group">
+		                        <div class="form-check form-switch mb-3">
+		                            <input class="form-check-input" name="useYn" id="useYn" type="checkbox" th:field="*{useYn}" value="Y" >
+		                        </div>
+								<th:block th:if="${#fields.hasErrors('useYn')}" class="error"><span th:errors="*{useYn}" class="required">Field error</span></th:block>
+		                    </div>
+		                </div>
+		            </div>
+					
+					
+					<!-- URL -->
+					<div class="form-row full-width" th:if="${record.id > 0}">
+					    <div class="form-label">
+							URL
+					    </div>
+					    <div class="form-control-wrap">
+							<span th:text="${record.rdUrl}" id="dynamicLink"></span>
+					    </div>
+					</div>	
+					
+					<!-- URL -->
+					<div class="form-row full-width" th:if="${record.id > 0}">
+					    <div class="form-label">
+							등록일
+					    </div>
+					    <div class="form-control-wrap">
+							<span th:text="${record.createDate}"></span>
+					    </div>
+					</div>	
+	            </div>
+            </form>
+        </div>
+        
+        <!-- 버튼 영역 -->
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">
+                닫기
+            </button>
+            <button type="button" class="btn btn-lg btn-dark px-4 btn-sm" onclick="saveData();">
+                저장
+            </button>
+        </div>
+    </div>
+</div>

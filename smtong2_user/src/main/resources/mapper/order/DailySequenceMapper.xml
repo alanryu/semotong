@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.order.mapper.DailySequenceMapper">
+    <!-- 날짜별로 현재 순번 조회 -->
+    <select id="getCurrentSequence" resultType="Integer">
+        SELECT max(seq) FROM tb_pmb_plan_online_orderid WHERE ymd = #{ymd}
+    </select>
+
+    <!-- 날짜별 순번 추가 -->
+    <insert id="insertNewDate">
+        INSERT INTO tb_pmb_plan_online_orderid (ymd, seq) VALUES (#{param.ymd}, #{param.seq})
+    </insert>
+
+    <!-- 날짜별 순번 업데이트 -->
+    <update id="updateSequence">
+        UPDATE tb_pmb_plan_online_orderid SET seq = seq + 1 WHERE ymd = #{param.ymd}
+    </update>
+</mapper>

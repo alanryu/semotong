@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:fragment="Content">
+<head>
+<style>
+
+.hiddenList-0, .hiddenList-1, .hiddenList-2, .hiddenList-3, 
+.hiddenList-4, .hiddenList-5, .hiddenList-6, .hiddenList-7, 
+.hiddenList-8, .hiddenList-9, .hiddenList-10 {
+    display: none;
+}
+
+</style>
+<script>
+	function moreViewList(idx,obj) {
+		
+		const span = obj.querySelector('span'); // 버튼 안의 <span> 요소 선택
+		var btnsp =span.innerText;
+		
+		if (span.innerText === '더보기') {
+	        span.innerText = '닫기'; // 텍스트를 '닫기'로 변경
+			document.querySelectorAll('.hiddenList-'+idx).forEach(element => {
+			    element.style.display = 'block';
+			});
+	    } else {
+	        span.innerText = '더보기'; // 텍스트를 '더보기'로 변경
+			document.querySelectorAll('.hiddenList-'+idx).forEach(element => {
+			    element.style.display = 'none';
+			});
+	    }
+		
+	}
+</script>
+</head>
+<body>
+<!--
+	[모달 가이드]
+	모달 기본 : modal
+	모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+	화면 이름 : 화면아이디-page (modal-select 제외)
+-->
+<!-- modal 대표 추천 요금제 -->
+
+<!-- 모통봇 소개 섹션 -->
+<section class="cb-intro-sec">
+	<div class="sec-inner">
+		<div class="intro-img">
+			<i class="ui-icn icn-62-motong" aria-hidden="true"></i>
+		</div>
+		<div class="intro-con">
+			<p>인기있는 요금제 구성을 <br> 바로 비교해 보세요.</p>
+		</div>
+	</div>
+</section>
+<!-- // 모통봇 소개 섹션 -->
+
+<!-- 상품 리스트 섹션 -->
+<section class="cb-ratePlanE-sec">
+	<div class="sec-inner">
+		<div class="sec-body">
+			<!-- 요금제 공통 타입 E : 요금제 상품 리스트 -->
+			<div class="ratePlanE-list-wrap">
+				<ul class="ratePlanE-list">
+					<li class="ratePlanE-item" th:each="list, status : ${list}">
+						<div class="ratePlanE-card">
+							<div class="card-body">
+								<!-- 2025-02-26 조찬기 : 요금제에 관리자 등록문구 추가 -->
+								<div class="card-tit">
+									<strong>[[${list.groupName}]] [[${list.title}]]</strong>
+								</div>
+								<div class="card-info" th:each="subList, stat : ${list.list}" th:if="${stat.index == 0}">
+									<span class="label"><i class="ui-icn icn-12-tel-gr" aria-hidden="true"></i>[[${subList.supCallVal == 9999 ? '무제한' : subList.supCallVal + '분'}]]</span>
+									<span class="split" aria-hidden="true"></span>
+									<span class="label"><i class="ui-icn icn-12-mail-gr" aria-hidden="true"></i>[[${subList.supSmsVal == 9999 ? '무제한' : subList.supSmsVal + '건'}]]</span>
+									<span class="split" aria-hidden="true"></span>
+									<span class="label"><i class="ui-icn icn-12-antena-gr" aria-hidden="true"></i>[[${subList.planType}]]</span>
+								</div>
+							</div>
+
+							<div class="card-footer">
+								<!-- 서브 카드리스트 -->
+								<ul class="ratePlanC-list">
+									<li class="ratePlanC-item" th:each="subList, stat : ${list.list}"
+									 	th:classappend="${stat.index >= 5} ? 'hiddenList-' + ${status.index} : ''" >
+										<div class="ratePlanC-card outlined"
+											th:classappend="${subList.chatbotPlanRecomYn} ? 'is-recom' : ''">
+											<!-- Case 세모통 추천 -->
+											<div class="card-badge" th:if="${subList.chatbotPlanRecomYn}">
+												<p><img src="/images/common/badge-card-recom.svg" alt="세모통 추천" /></p>
+											</div>
+											<div class="card-body">
+												<div class="card-util">
+													<div class="card-util-label">
+														<span class="label skt" th:if="${subList.mno eq 'SKT'}">SKT</span>
+														<span class="label kt" th:if="${subList.mno eq 'KT'}">KT</span>
+														<span class="label lgu" th:if="${subList.mno eq 'LGU'}">U+</span>
+														<span class="label main" th:if="${stat.index == 0}">대표</span>
+														<span class="label price" th:if="${subList.chatbotPlanLowPriceYn}">최저가보장</span>
+														<span class="label benefit" th:if="${subList.chatbotPlanMaxBenefitYn}">최대혜택</span>
+													</div>
+												</div>
+												<div class="card-charge">
+													<div class="brand">
+														<img th:src="@{${subList.planLogoImg}}" th:alt="${subList.hostNm}" />
+													</div>
+													<div class="charge">
+														<p class="charge-tit" th:text="|${#numbers.formatInteger(subList.salePrice, 0, 'COMMA')}원|"></p>
+														<th:block th:if="${subList.secondPrice != null and subList.secondPrice != ''}">
+															<p class="charge-point"><em class="tit">실제 체감가</em> [[${subList.secondPrice}]]</p>
+														</th:block>
+														
+														<th:block th:unless="${subList?.promotionPeriodVal == '0' or subList?.promotionPeriodVal == '9999'}">
+															<p class="charge-txt" th:unless="${subList.promotionPeriod.isEmpty()}">
+															[[${subList.promotionPeriod}]] 이후
+															<th:block th:if="${subList.afterPrice > 999}">[[${#numbers.formatInteger(subList.afterPrice,0,'COMMA')}]]원</th:block>
+															<th:block th:unless="${subList.afterPrice > 999}">[[${subList.afterPrice}]]원</th:block>
+															</p>
+														</th:block>
+													</div>
+												</div>
+												<!-- 카드 클릭영역  -->
+												
+												<button type="button" class="card-button" th:attr="onClick=|goPlanDetail('${subList.id}','${subList.hostNm}')|">
+													<span class="blind">요금제 자세히 보기</span>
+												</button>
+											</div>
+											<div class="card-footer"  th:if="${subList.planBenefitCnt > 0}">
+												<!-- Case 사은품확인 -->
+												<div class="card-status">
+													<div class="status-gift" th:attr="id=|cardListExtend${status.index}${stat.index}|">
+														<p class="status-gift-tit"  th:each="bfList, stat : ${subList.benefitList}" th:if="${stat.index == 0}">
+															<img th:src="@{${bfList.icon}}"  alt="" aria-hidden="true" class="img" />
+															<span class="count" th:if="${subList.planBenefitCnt > 1}">+[[${subList.planBenefitCnt -1}]]</span>
+															<span class="tit" th:text="${bfList.benefitTitle}">네이버포인트 매월 5천원 제공</span>
+														</p>
+															
+														<th:block th:if="${subList.planBenefitCnt > 1}">
+														
+														<button type="button" class="ui-btn" aria-expanded="false" th:onclick="|cardExpand2('#cardListExtend${status.index}${stat.index}', this)|">
+															<i class="ui-icn icn-16-plan-expand-gr" aria-label="자세히보기"></i>
+														</button>
+														<div class="status-gift-expanded">
+															<ul class="status-gift-list">
+																<li  th:each="bfList, stat : ${subList.benefitList}">
+																	<img th:src="@{${bfList.icon}}"  alt="" aria-hidden="true" class="img" />
+																	[[${bfList.benefitTitle}]]
+																</li>
+															</ul>
+														</div>
+														
+														</th:block>
+													</div>
+												</div>
+											</div>
+										</div>
+									</li>
+									
+								</ul>
+								<!-- //서브 카드리스트 -->
+
+								<div class="card-list-more" th:if="${list.planCnt > 5}">
+									<!-- 5차 수정 : 전체보기/닫기 토글 -->
+									<button type="button" class="ui-btn btn-sub xl" th:onclick="|moreViewList('${status.index}',this)|">
+										<span>더보기</span>
+									</button>
+								</div>
+							</div>
+						</div>
+						<!-- // 요금제 공통 타입 E : 요금제 상품 상세 -->
+					</li>
+				</ul>
+
+				<!-- Case 목록이 많은 경우 더보기 -->
+				<button type="button" class="ui-btn btn-more-list" id="more-list-main" data-type="mvno">
+					<span>다른 요금제를 안내해 드릴까요?</span>
+					<i class="ui-icn icn-16-more-02-gr" aria-hidden="true"></i>
+				</button>
+			</div>
+			<!-- // 요금제 공통 타입 C : 요금제 상품 리스트 -->
+		</div>
+	</div>
+</section>
+<!-- // 상품 리스트 섹션 -->
+</body>
+</html>

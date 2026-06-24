@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.pmb.mapper.PlanSalesMngMapper">
+	
+	<sql id="listWhere">
+		<where>
+			<if test="searchComUserId != null and searchComUserId != ''">
+				AND com_user_id = #{searchComUserId}
+			</if>
+			
+			<!-- 등록일 조회-->
+	    	<if test='searchStartDt != null and searchStartDt !=""'>
+				AND create_date  <![CDATA[>=]]> #{searchStartDt}
+			</if>		
+	    	<if test='searchEndDt != null and searchEndDt !=""'>
+				AND create_date <![CDATA[<=]]> #{searchEndDt}
+			</if>
+			
+			<!-- 제목 조회 -->
+	   		<if test='keyword != null and keyword !=""'>
+				AND title LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+			
+			<!-- 사용여부 조회 -->
+	   		<if test='useYn != null and useYn !=""'>
+				AND use_yn = #{useYn}
+			</if>
+		</where>
+	</sql>
+
+	<sql id="Base_Column_list">
+		id
+		,com_user_id
+		,GET_ADMIN_USER_NM(com_user_id) as com_user_nm
+		,GET_ADMIN_USER_ID(com_user_id) as admin_id
+		,title
+		,image_pc
+		,image_mo
+		,use_yn
+		,url
+		,create_date
+		,create_id
+		,modified_date
+		,modified_id
+	</sql>
+	
+	<select id="getCount" parameterType="kr.co.ucomp.web.pmb.dto.PlanSalesSearchDto" resultType="Long">
+		SELECT
+			count(1)
+		FROM tb_pmb_plan_sales
+	    <include refid="listWhere" />
+	</select>
+	
+	<select id="list" parameterType="kr.co.ucomp.web.pmb.dto.PlanSalesSearchDto" resultType="kr.co.ucomp.web.pmb.entity.SalesPlanEntity">
+		 SELECT
+            <include refid="Base_Column_list" />
+        FROM tb_pmb_plan_sales
+        <include refid="listWhere" />
+        ORDER BY create_date DESC
+        LIMIT #{offset}, #{recordSize}
+	</select>
+	
+	<select id="listWithoutLimit" parameterType="kr.co.ucomp.web.pmb.dto.PlanSalesSearchDto" resultType="kr.co.ucomp.web.pmb.entity.SalesPlanEntity">
+		 SELECT
+            <include refid="Base_Column_list" />
+        FROM tb_pmb_plan_sales
+        <include refid="listWhere" />
+        ORDER BY create_date DESC
+	</select>
+	
+	<select id="getDetail" parameterType="Long" resultType="kr.co.ucomp.web.pmb.entity.SalesPlanEntity">
+		SELECT
+	            <include refid="Base_Column_list" />
+	        FROM tb_pmb_plan_sales
+	        WHERE id=#{id}
+	</select>
+	
+	<insert id="create" parameterType="kr.co.ucomp.web.pmb.entity.SalesPlanEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+		INSERT INTO tb_pmb_plan_sales (
+			  com_user_id
+			, title
+			, image_pc
+			, use_yn
+			, idx
+			, url
+			, create_date
+			, create_id
+		) VALUES (
+			  #{comUserId}
+			, #{title}
+			, #{imagePc}
+			, #{useYn}
+			, #{idx}
+			, #{url}
+			, NOW()
+			, #{createId}
+		)
+	</insert>
+	
+	<update id="update" parameterType="kr.co.ucomp.web.pmb.entity.SalesPlanEntity">
+		UPDATE 
+			tb_pmb_plan_sales
+		SET
+			  title = #{title}
+			, image_pc = #{imagePc}
+			, use_yn = #{useYn}
+			, modified_date = NOW()
+			, modified_id = #{modifiedId}
+		WHERE
+			id = #{id}
+	</update>
+	
+	<insert id="createByPlanList" parameterType="kr.co.ucomp.web.pmb.entity.SalesPlanListEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+		INSERT INTO tb_pmb_plan_sales_plan_list (
+			  sales_id
+			, plan_id
+			, order_no
+		) VALUES (
+			  #{salesId}
+			, #{planId}
+			, #{orderNo}
+		)
+	</insert>
+	
+	<select id="salePlanList" parameterType="kr.co.ucomp.web.pmb.entity.SalesPlanListEntity" resultType="kr.co.ucomp.web.pmb.entity.SalesPlanListEntity">
+		SELECT
+            a.id
+			,a.sales_id
+			,a.plan_id
+			,b.uuid
+			,b.plan_name
+        FROM
+            tb_pmb_plan_sales_plan_list a
+        LEFT JOIN 
+        	tb_pmb_plan_list b
+        ON a.plan_id = b.id
+        WHERE 1=1
+        	AND a.sales_id = #{salesId} 
+        order by order_no
+	</select>
+	
+	<delete id="planDelete" parameterType="Long">
+		DELETE FROM 
+			tb_pmb_plan_sales_plan_list
+		WHERE id = #{id}
+	</delete>
+</mapper>

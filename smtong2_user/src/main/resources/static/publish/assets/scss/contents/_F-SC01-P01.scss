@@ -1,0 +1,116 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : S캐쉬 보유현황
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: S캐쉬 보유현황
+.F-SC01-P01-page {
+	// s: 내 S캐쉬
+	.sCash-sec {
+		.sCash-box {
+			margin-top: 12rem;
+			@include box-shadow-10;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 16rem;
+
+			.sCash-tit {
+				font-weight: 500;
+				font-size: 12rem;
+				line-height: 16rem;
+				color: #2801B5;
+			}
+			.sCash-val {
+				font-weight: 700;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #63666A;
+			}
+		}
+		.sCash-info {
+			margin-top: 10rem;
+			text-align: right;
+			font-size: 10rem;
+			line-height: 14rem;
+			color: #BFBFBF;
+		}
+
+		.sCash-list-wrap {
+			margin-top: 16rem;
+			.sCash-list {
+				.sCash-item + .sCash-item {
+					margin-top: 4rem;
+				}
+			}
+		}
+
+		.sCash-wrap {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 8rem 0;
+			gap: 10rem;
+
+			.sCash-val,
+			.sCash-label {
+				flex:none;
+				flex:none;
+			}
+
+			.sCash-con {
+				flex: 1 1 auto;
+				overflow: hidden;
+			}
+
+			.label {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				width: 34rem;
+				height: 34rem;
+				font-weight: 500;
+				font-size: 12rem;
+				line-height: 16rem;
+				color: #fff;
+				border-radius: 50%;
+				&.plus {
+					background-color: #7C5FE5;
+				}
+				&.minus {
+					background-color: #E55F61;
+				}
+			}
+
+			.title {
+				width: 100%;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				font-weight: 700;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #000;
+			}
+
+			.date {
+				margin-top: 2rem;
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #5A5D60;
+			}
+
+			.val {
+				min-width: 106rem;
+				font-weight: 500;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #63666A;
+				text-align: right;
+			}
+		}
+	}
+	// e: 내 S캐쉬
+}
+// e: S캐쉬 보유현황

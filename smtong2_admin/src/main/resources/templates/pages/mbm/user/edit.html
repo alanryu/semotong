@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='02',menuId ='01'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<style type="text/css">
+	.custom-modal-size {
+	  max-width: 650px; /* 원하는 너비 */
+	  width: 90%; /* 화면 크기에 따라 적응 */
+	}
+	
+	.custom-modal-content {
+	  max-height: 80%; /* 화면 높이에 따라 제한 */
+	}
+	</style>
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+
+<script id="chgStatHistListTmpl" type="text/x-jquery-tmpl">
+<tr>
+	<td class="bnf-select__td">${etc1}</td>
+	<td class="bnf-select__td">${memo}</td>
+	<td class="bnf-select__td">${createNm}</td>
+	<td class="bnf-select__td">${createDate}</td>
+</tr>
+</script>
+
+<th:block layout:fragment="script">
+	<script type="text/javascript">
+		
+		function updateState() { 
+			 var disableResn = $("#disableResn").val();
+			 var nowState = "[[${record.memberStat}]]";
+			 var disablesState = $("input[name=memberStat]:checked").val();
+			 if(nowState ==disablesState ) {
+				showAlert("변경할 상태가 현재상태와 동일 합니다.");
+				return;
+			 }
+			 
+			if(disableResn =="") {
+				showAlert("상태변경 사유를 입력하세요");
+				return;
+			}
+			
+			if(disablesState =="") {
+				showAlert("변경 상태를 선택 하세요");
+				return;
+			}
+			
+			
+			showConfirm( "회원상태를 변경 하시겠습니까?",
+					() => { updateStateProc() },
+					() => { },
+					'회원상태 변경'
+			 )
+		}
+		
+		function updateStateProc() {
+			 var disableResn = $("#disableResn").val();
+			 var nowState = "[[${record.memberStat}]]";
+			 var disablesState = $("input[name=memberStat]:checked").val();
+			 
+			var params = {
+					id : $("#userId").val(),
+					memberStat :disablesState,
+					memberStatNow : nowState,
+					disableResn :  disableResn,
+					orderNo : 1
+			}
+			$.ajax({
+				   url : '/mbm/users/updateState',
+				   type : 'POST',
+				   async : false,
+				   dataType : "json",
+				   contentType:"application/json",
+				   data : JSON.stringify(params),
+					success: function (data) {
+						if(data.code ==200) {
+							showAlert("회원 상태를 변경 하였습니다.",refreshView);
+							
+						} else {
+							showAlert(data.code);
+						}
+					},
+					error : function(request, status, error){
+						alert(error);
+					},
+					complete:function(){
+					   // $('#loading').addClass('display-none');
+					}
+			});
+		}
+			
+		function refreshView() {
+			location.href="/mbm/users/edit?searchId=[[${record.id}]]";
+		}
+		
+		
+		
+		function goList(){
+			window.location.href="/mbm/users/list";
+		}
+		
+		
+		function viewChangeHist() {
+			
+			var params = {
+					userId : $("#userId").val(),
+					memoType :"tb_mbm_user-member_stat"
+			}
+			
+			$.ajax({
+				   url : '/mbm/admin-memo/list',
+				   type : 'POST',
+				   async : false,
+				   dataType : "json",
+				   contentType:"application/json",
+				   data : JSON.stringify(params),
+					success: function (data) {
+						if(data.code == "200") {
+							if(data.totalCnt >0) {
+								$('#chgStatHistList').empty();
+								$('#chgStatHistListTmpl').tmpl(data.data).appendTo('#chgStatHistList');
+								const modalEl = document.getElementById('applyDetailModal');
+								const modal = new bootstrap.Modal(modalEl);
+								modal.show();	
+							} else {
+								showAlert("변경 내역이 없습니다.");
+							}
+							
+						} else {
+							showAlert(data.message);
+						}
+					},
+					error : function(request, status, error){
+						alert(error);
+					},
+					complete:function(){
+					   // $('#loading').addClass('display-none');
+					}
+			});
+			
+			
+			  
+		}
+	</script>
+		
+</th:block>
+
+<div class="main-content">
+	<div class="container-fluid">
+		<div class="location mb-2">
+			<small class="text-secondary">
+				<i class="fas fa-home me-1"></i>
+				<a href="#">홈</a> > <a href="/mbm/users/list">회원관리</a> > <a href="/mbm/users/list">회원목록</a>
+			</small>
+		</div>
+		<h2 class="page-title fs-4 mb-4">
+			회원정보
+		</h2>
+
+	   		<input type="hidden" th:value="${record.id}" id="userId">
+			<div class="search-section detail">
+				<!-- 이름 -->
+				<div class="form-row full-width">
+					<div class="form-label">
+						이름
+					</div>
+					<div class="form-control-wrap" th:text="${record.username}"> </div>
+				</div>
+	  			<!-- 가입일 -->
+				<div class="form-row full-width">
+					<div class="form-label">
+						가입일
+					</div>
+					<div class="form-control-wrap" th:text="${#temporals.format(record.createDate, 'yyyy-MM-dd HH:mm:ss')}"> </div>
+					
+				</div>
+				
+				<!-- 연령대 -->
+				<div class="form-row full-width">
+					<div class="form-label">
+						연령대
+					</div>
+					<div class="form-control-wrap" th:text="${record.ageGroup}"> </div>
+				</div>
+			   
+				<!-- 생일 -->
+				<div class="form-row full-width">
+					<div class="form-label">
+						생일
+					</div>
+					<div class="form-control-wrap" th:text="${record.birthDay}"> </div>
+				</div>
+				
+				<!-- 출생년도 -->
+				<div class="form-row full-width">
+					<div class="form-label">
+						출생년도
+					</div>
+					<div class="form-control-wrap" th:text="${record.birthYear}"> </div>
+				</div>
+				
+				<!-- 카카오계정 -->
+				<div class="form-row full-width">
+					<div class="form-label">
+						카카오계정
+					</div>
+					<div class="form-control-wrap" th:text="${record.email}"> </div>
+				</div>
+				<!-- 회원구분 -->
+				<div class="form-row full-width">
+					<div class="form-label">
+					   회원구분
+					</div>
+					<div class="form-control-wrap" th:if="${record.memberStat =='ACTIVE'}"> 활성</div>
+					<div class="form-control-wrap" th:if="${record.memberStat =='STOP'}"> 중지</div>
+					<div class="form-control-wrap" th:if="${record.memberStat =='DROP'}"> 탈퇴</div>
+				</div>
+				
+				
+				<div class="form-row">
+					 <div class="form-label">개인정보활용<br>동의여부</div>
+					 <div class="form-control-wrap" th:text="${record.piAgreeYn == '1' ? '동의' : '미동의'}"> </div>
+				 </div>
+				 <div class="form-row">
+					 <div class="form-label">개인정보활용<br>동의일시</div>
+					 <div class="form-control-wrap">
+						 [[${#temporals.format(record.piAgreeDttm, 'yyyy-MM-dd HH:mm:ss')}]]
+					 </div>
+				 </div>
+				 
+				 <div class="form-row">
+					 <div class="form-label">이용약관<br>동의여부</div>
+					 <div class="form-control-wrap" th:text="${record.polAgreeYn == '1' ? '동의' : '미동의'}">  </div>
+				 </div>
+				 <div class="form-row">
+					 <div class="form-label">이용약관<br>동의일시</div>
+					 <div class="form-control-wrap">
+						 [[${#temporals.format(record.polAgreeDttm, 'yyyy-MM-dd HH:mm:ss')}]]
+					 </div>
+				 </div>
+				 
+				 
+				 <div class="form-row">
+					 <div class="form-label">SMS 수신<br>동의여부</div>
+					 <div class="form-control-wrap" th:text="${record.smsAgreeYn == '1' ? '동의' : '미동의'}">
+						 [[${record.smsAgreeYn}]]
+					 </div>
+				 </div>
+				 <div class="form-row">
+					 <div class="form-label">이메일 수신<br>동의여부</div>
+					 <div class="form-control-wrap" th:text="${record.emailAgreeYn == '1' ? '동의' : '미동의'}">
+						 [[${record.emailAgreeYn}]]
+					 </div>
+				 </div>
+				
+				<div class="form-row full-width">
+					<div class="form-label">
+						카카오채널<br/>추가여부
+					</div>
+					<div class="form-control-wrap" th:text="${record.channelYn == 1 ? 'Y' : 'N'}"> </div>		
+				</div>
+				
+				<!-- 2025.03.12 sancho -->
+				<div class="form-row full-width">
+					<div class="form-label">
+						보유포인트
+					</div>								
+					<div class="form-control-wrap" 	th:text="${userAccInfo.balance == 0 ? '0' : #numbers.formatInteger(userAccInfo.balance, 0, 'COMMA')}"    > </div>
+					<a href="javascript:;" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pointHistoryModal">
+						<span class="log-status__text">포인트내역</span>
+					</a>
+		
+				</div>
+				
+				
+				<div class="form-row full-width">
+					<div class="form-label">
+					   회원구분<span class="required">*</span>
+					</div>
+					<div class="form-control-wrap">
+						<div class="form-check-group" th:if="${record.memberStat eq 'DROP'}">
+							<div class="form-check">
+								<input class="form-check-input" type="radio" th:checked="${record.memberStat eq 'DROP'}" name="memberStat" id="memberStat3" value="DROP" >
+								<label class="form-check-label" for="memberStat3">탈퇴</label>
+							</div>
+						</div>
+						<div class="form-check-group" th:unless="${record.memberStat eq 'DROP'}">
+							<div class="form-check">
+								<input class="form-check-input" type="radio" th:checked="${record.memberStat eq 'ACTIVE'}" name="memberStat" id="memberStat1" value="ACTIVE" >
+								<label class="form-check-label" for="memberStat1">활동</label>
+							</div>
+							<div class="form-check">
+								<input class="form-check-input" type="radio" th:checked="${record.memberStat eq 'STOP'}" name="memberStat" id="memberStat2" value="STOP" >
+								<label class="form-check-label" for="memberStat2">중지</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+ 				<th:block   th:unless="${#strings.isEmpty(record.disableResn)}">
+					 <div class="form-row">
+						 <div class="form-label">상태값 변경 사유</div>
+						 <div class="form-control-wrap"  style="width: 55%;overflow: hidden;word-wrap: break-word;" th:text="${record.disableResn}">  </div>
+						 <button  type="button" class="btn btn-primary btn-sm" onclick="viewChangeHist();"><span>변경내역</span></button>
+					 </div>
+					 <div class="form-row">
+						 <div class="form-label" th:text="${record.disableMngNm}"> </div>
+						 <div class="form-control-wrap" th:text="${record.disableDttm}">  </div>
+					 </div>
+			 	 </th:block>
+				<div class="form-row full-width" >
+					<div class="form-label">
+						<th:block  th:if="${#strings.isEmpty(record.disableResn)}">
+					   	상태값 변경 사유
+					   </th:block>
+					</div>				
+					 <div style="display: flex; gap: 5px;">
+						<input type="text" class="form-control" placeholder="상태값 변경 사유 입력" id="disableResn" maxlength="100">
+					 	<button  type="button" class="btn btn-primary btn-sm" onclick="updateState();"><span>상태값 변경</span></button>
+				 	</div>
+				</div>
+		</div>
+		
+		<!-- 버튼 영역 -->
+		<div class="d-flex justify-content-center gap-2 mt-4">
+			<button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">
+				닫기
+			</button>
+		</div>
+	</div>
+	
+	
+	
+<!-- 신청내역 상세보기 -->
+		<div class="modal fade" id="applyDetailModal" tabindex="-1" aria-labelledby="applyDetailModalLabel" aria-hidden="true">
+		  <div class="modal-dialog modal-dialog-centered custom-modal-size">
+			  <div class="modal-content custom-modal-content">
+				  <div class="modal-header border-0 pb-0 mb-4">
+					  <h5 class="modal-title fs-6 fw-bold" id="scrapingModalLabel">회원상태 변경내역</h5>
+					  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				  </div>
+				  <div class="bnf-select__table__outer otherH mb-3">
+					<table class="bnf-select__table">
+					  <colgroup>
+						<col style="width: 20%">
+						<col style="width: auto">
+						<col style="width: 10%">
+						<col style="width: 25%">
+					  </colgroup>
+					  <thead>
+					  <tr>
+					  	<th class="bnf-select__th">상태</th>
+					  	<th class="bnf-select__th">변경사유</th>
+					  	<th class="bnf-select__th">관리자</th>
+					  	<th class="bnf-select__th">변경일시</th>
+					  </tr>
+					  </thead>
+			   		  <tbody id="chgStatHistList">
+			   		  	
+			   		  </tbody>
+					</table>
+				  </div>
+				  <div class="modal-footer border-0 pt-0">
+					  <button type="button" class="btn btn-secondary px-4 btn-sm" data-bs-dismiss="modal" aria-label="Close">닫기</button>
+				  </div>
+			  </div>
+		  </div>
+	  </div>
+	  
+	 <!-- 포인트 내역 상세 팝업 -->
+	 <div class="modal fade" id="pointHistoryModal" tabindex="-1" aria-labelledby="pointHistoryModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header border-0 pb-0">
+						<h5 class="modal-title fs-6 fw-bold" id="pointHistoryModalLabel">포인트 내역</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<!-- 포인트 요약 섹션 -->
+						<div class="point-summary mb-4">
+							<div class="d-flex justify-content-between align-items-center">
+								<div>
+									<div>적립 합계</div>
+									<div class="text-primary"><b>[[${hTotInfo.inBoundSum == 0 ? '0' : #numbers.formatInteger(hTotInfo.inBoundSum, 0, 'COMMA')}]]</b></div>
+								</div>
+								<div>
+									<div>차감 합계</div>
+									<div class="text-danger"><b>[[${hTotInfo.dedSum == 0 ? '0' : #numbers.formatInteger(hTotInfo.dedSum, 0, 'COMMA')}]]</b></div>
+								</div>
+								<div>
+									<div>사용 합계</div>
+									<div class="text-danger"><b>[[${hTotInfo.outBoundSum == 0 ? '0' : #numbers.formatInteger(hTotInfo.outBoundSum, 0, 'COMMA')}]]</b></div>
+								</div>
+								<div>
+									<div>잔액</div>
+									<div><b>[[${userAccInfo.balance == 0 ? '0' : #numbers.formatInteger(userAccInfo.balance, 0, 'COMMA')}]]</b></div>
+								</div>
+							</div>
+						</div>
+
+						<!-- 포인트 내역 테이블 -->
+						<div class="point-history">
+							<table class="table">
+								<thead>
+									<tr>
+										<th>일시</th>
+										<th>유형</th>
+										<th>적립/차감액</th>
+										<th>사유</th>
+										<th>사용</th>
+										
+										<!-- <th>총 캐쉬</th> -->
+									</tr>
+								</thead>
+								<tbody>
+								
+								
+									<th:block  th:each="scashItm:${hitoryList}">
+											
+									<tr>
+									
+										<td>
+											 <th:block th:if="${ scashItm.actAmt != null }">
+											</th:block>
+											<th:block th:unless="${ scashItm.actAmt != null }">
+											[[${#temporals.format(scashItm.createDate, 'yyyy.MM.dd')}]]
+											</th:block>
+										
+										</td>
+										
+										<!-- 유형 적립/차감 -->
+										<th:block th:if="${ scashItm.actAmt != null }">
+											<td></td>
+										</th:block>
+										<th:block th:unless="${ scashItm.actAmt != null }">
+											<th:block th:if="${#strings.equals(scashItm.crPointType, 'DED')}">
+												<td class="text-danger" 	>차감</td>
+											</th:block>
+											<th:block th:unless="${#strings.equals(scashItm.crPointType, 'DED')}">
+												<td							th:if="${#strings.equals(scashItm.drCr, 'DR')}">사용</td>
+												<td	class="text-primary"	th:unless="${#strings.equals(scashItm.drCr, 'DR')}">적립</td>
+											</th:block>
+										</th:block>
+										<!-- 유형 적립/차감 -->
+										
+										<!-- class="text-danger"  -->
+										<!-- class="text-primary"  -->
+										
+										<td class="text-danger" 	th:if="${#strings.equals(scashItm.crPointType, 'DED')}">-[[${#numbers.formatInteger(scashItm.displayAmount, 0, 'COMMA')}]]</td>
+										
+										<td class="text-primary" 	th:unless="${#strings.equals(scashItm.crPointType, 'DED')}">
+											<span class="c_blue" th:if="${#strings.equals(scashItm.drCr, 'CR')}">[[${#numbers.formatInteger(scashItm.displayAmount, 0, 'COMMA')}]]</span>
+											<span class="c_red" th:unless="${#strings.equals(scashItm.drCr, 'CR')}">[[${#numbers.formatInteger(scashItm.displayAmount, 0, 'COMMA')}]]</span>
+										</td>
+										
+										<td>
+											<th:block th:if="${ scashItm.actAmt != null }">
+												<th:block th:if="${ scashItm.drPointType != null && #strings.equals(scashItm.drPointType, 'CAN')}">
+													<span class="c_blue">+[[${scashItm.actAmt}]]</span>
+												</th:block>
+												<th:block th:unless="${ scashItm.drPointType != null && #strings.equals(scashItm.drPointType, 'CAN')}">
+													<span class="c_red">-[[${scashItm.actAmt}]]</span>
+												</th:block>
+											</th:block>
+											<th:block th:unless="${ scashItm.actAmt != null }">
+												[[${scashItm.crPointTypeName}]]
+											</th:block>
+											
+											
+										</td>
+										<td>
+											[[${scashItm.detailDrPointTypeName}]]
+										</td>
+										
+									</tr>
+									<!-- 
+									<tr>
+										<td class="text-primary">적립</td>
+										<td class="text-primary">+5,000</td>
+										<td>친구추천</td>
+										<td>24.09.11</td>
+										<td><b>9,000캐쉬</b></td>
+									</tr>
+									<tr>
+										<td class="text-danger">사용</td>
+										<td class="text-danger">-3,000</td>
+										<td>캐쉬백</td>
+										<td>24.06.10</td>
+										<td><b>4,000캐쉬</b></td>
+									</tr>
+									<tr>
+										<td class="text-danger">사용</td>
+										<td class="text-danger">-3,000</td>
+										<td>네이버포인트 전환</td>
+										<td>24.02.09</td>
+										<td><b>7,000캐쉬</b></td>
+									</tr>
+									<tr>
+										<td class="text-primary">적립</td>
+										<td class="text-primary">+10,000</td>
+										<td>요금제 가입</td>
+										<td>24.01.02</td>
+										<td><b>10,000캐쉬</b></td>
+									</tr>
+									 -->
+									</th:block>
+									
+								</tbody>
+							</table>
+						</div>
+
+					</div>
+					<div class="modal-footer border-0 pt-0">
+						<button type="button" class="btn btn-secondary px-4 m-auto" data-bs-dismiss="modal">닫기</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		  
+</div>

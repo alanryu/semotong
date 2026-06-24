@@ -1,0 +1,184 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 요금제 상세 정보
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// 요금제 상세 공통
+@import './F-P02-01';
+
+// s: 요금제 상세 정보 페이지
+.F-P02-01-T01-page {
+	// s: 요금제 상세 정보 섹션
+	.ratePlan-detail-sec {
+		// 요금제 상세 카드
+		.ratePlan-detail-card {
+			border: 1px solid #EFF0F0;
+			@include box-shadow-16;
+			padding: 16rem;
+
+			.card-header {
+				padding-top: 4rem;
+				.card-tit {
+					font-weight: 700;
+					font-size: 20rem;
+					line-height: 28rem;
+					color: #36383A;
+					@include ellipsis1;
+				}
+			}
+			.card-body {
+				margin-top: 14rem;
+				.card-info {
+					display: grid;
+					grid-template-columns: 1fr 1fr 1fr 1fr;
+					gap: 12rem;
+					padding: 16rem 12rem;
+					border-radius: 4rem;
+					background-color: #F4F5F8;
+					text-align: center;
+					.tit {
+						display: block;
+						font-weight: 600;
+						font-size: 14rem;
+						line-height: 20rem;
+						color: #63666A;
+					}
+					.txt {
+						display: block;
+						margin-top: 2rem;
+						font-weight: 700;
+						font-size: 16rem;
+						line-height: 16rem;
+						color: #36383A;
+					}
+					+ .card-info {
+						margin-top: 10rem;
+					}
+				}
+			}
+		}
+
+		// 요금제 상세 아코디언
+		.ratePlan-detail-acco {
+			margin: 0 calc(#{$mobile-outer-spacer} * -1);
+			margin-top: 30rem;
+			border-top: 1px solid #EFF0F0;
+
+			.collapsing {
+				height: 0;
+				overflow: hidden;
+				transition: height .35s ease;
+			}
+			.collapse:not(.show) {
+				display: none;
+			}
+			.acco-button .ui-icn {
+				transition: transform .35s ease;
+			}
+			.acco-button[aria-expanded='true'] .ui-icn {
+				transform: rotate(180deg);
+			}
+
+			// 아코디언 스타일
+			.acco-item {
+				padding: 14rem $mobile-outer-spacer;
+				border-bottom: 1px solid #EFF0F0;
+			}
+			.acco-header {
+				position: relative;
+
+				.acco-button {
+					display: flex;
+					align-items: center;
+					width: 100%;
+					text-align: left;
+					> span {
+						position: relative;
+						display: block;
+						padding-right: 12rem;
+						font-weight: 500;
+						font-size: 14rem;
+						line-height: 20rem;
+						max-height: 40rem;
+						@include ellipsis2;
+					}
+					.ui-icn {
+						margin-left: auto;
+					}
+				}
+			}
+
+			.acco-body {
+				margin-top: 16rem;
+				.acco-answer { /* 8차 수정 : 요금제 상세 정보 수정(여기부터) */
+					display: flex;
+					flex-direction: column;
+					gap: 8rem;
+					font-weight: 500;
+					font-size: 14rem;
+					line-height: 20rem;
+					color: #46484B;
+
+					h3 {
+						font-weight: 700;
+						color: #2A2B2D;
+					}
+					div {
+						margin-top: 16rem;
+						margin-bottom: 4rem;
+						&:first-child {
+							margin-top: 0;
+						}
+						&:last-child {
+							margin-bottom: 0;
+						}
+					}
+					ol {
+						font-size: 14rem;
+						line-height: 22rem;
+						margin-top: 8rem;
+						margin-bottom: 8rem;
+						&:first-child {
+							margin-top: 0;
+						}
+						&:last-child {
+							margin-bottom: 0;
+						}
+						li {
+							position: relative;
+							counter-increment: item;
+							margin-top: 8rem;
+							padding-left: 12rem;
+							padding-bottom: 8rem;
+							border-bottom: 1px solid #ddd;
+							font-weight: 400;
+							&::before {
+								content: counter(item) ". ";
+								position: absolute;
+								left: 0;
+								top: 0;
+							}
+							&:last-child {
+								border-bottom: 0;
+								padding-bottom: 0;
+								margin-bottom: 0;
+							}
+						}
+					}
+					small { /* 8차 수정 : 요금제 상세 정보 수정(여기까지) */
+						font-weight: 500;
+						font-size: 12rem;
+						line-height: 16rem;
+					}
+				}
+			}
+
+			@include media-tablet-xs {
+				margin-left: 0;
+				margin-right: 0;
+			}
+		}
+	}
+	// e: 요금제 상세 정보 섹션
+}
+// e: 요금제 상세 페이지

@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='07',menuId ='09'">
+	  
+<th:block layout:fragment="css">
+<style>
+.modal-dialog.custom-size {
+  max-width: 800px; /* 원하는 크기로 설정 */
+  width: 90%; /* 반응형 크기 조정 */
+}
+</style>
+</th:block>
+
+<th:block layout:fragment="script">
+<script type="text/javascript">
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // 목록 이동 버튼 클릭 이벤트 처리
+    const moveDownBtn = document.querySelector('.centerMovingButton .btn-outline-secondary:first-child');
+    const moveUpBtn = document.querySelector('.centerMovingButton .btn-outline-secondary:last-child');
+    
+    // 요금제 선택 테이블 (첫 번째 registered-plans 클래스 요소)
+    const plansContainers = document.querySelectorAll('.registered-plans');
+    
+    if (plansContainers.length >= 2) {
+        const selectTableContainer = plansContainers[0];
+        const targetTableContainer = plansContainers[1];
+        
+        const selectTable = selectTableContainer.querySelector('table');
+        const targetTable = targetTableContainer.querySelector('table tbody');
+        
+        // 모두 선택 체크박스 기능 추가
+        const checkAllBox = document.getElementById('checkall');
+        if (checkAllBox) {
+            checkAllBox.addEventListener('change', function() {
+                const isChecked = this.checked;
+                const allCheckboxes = targetTableContainer.querySelectorAll('tbody input[name="chkSelPlan"]');
+                
+                allCheckboxes.forEach(function(checkbox) {
+                    checkbox.checked = isChecked;
+                });
+            });
+            
+            // 개별 체크박스 상태에 따라 전체 선택 체크박스 상태 변경
+            targetTableContainer.addEventListener('change', function(e) {
+                if (e.target.type === 'checkbox' && e.target !== checkAllBox) {
+                    const allCheckboxes = targetTableContainer.querySelectorAll('tbody input[name="chkSelPlan"]');
+                    const allChecked = Array.from(allCheckboxes).every(checkbox => checkbox.checked);
+                    
+                    checkAllBox.checked = allChecked;
+                    checkAllBox.indeterminate = !allChecked && Array.from(allCheckboxes).some(checkbox => checkbox.checked);
+                }
+            });
+        }
+        
+        // 모든 요소가 존재하는지 확인
+        if (moveDownBtn && moveUpBtn && selectTable && targetTable) {
+            
+            // 아래로 이동 버튼 (▼) 클릭 시
+            moveDownBtn.addEventListener('click', function() {
+                
+                // 요금제 선택 테이블에서 체크된 행 가져오기
+                const selectRows = selectTable.querySelectorAll('tbody tr');
+                
+                // 현재 등록된 요금제 수 확인
+                const currentRegisteredCount = targetTable.querySelectorAll('tr').length;
+                
+                // 체크된 행 수 확인
+                let checkedCount = 0;
+                selectRows.forEach(function(row) {
+                    const checkbox = row.querySelector('input[type="checkbox"]');
+                    if (checkbox && checkbox.checked) {
+                        const planName = row.cells[4].innerText;
+                        const existingPlans = targetTable.querySelectorAll('tr');
+                        let isDuplicate = false;
+                        
+                        existingPlans.forEach(function(existingRow) {
+                            if (existingRow.cells[4].innerText === planName) {
+                                isDuplicate = true;
+                            }
+                        });
+                        
+                        if (!isDuplicate) {
+                            checkedCount++;
+                        }
+                    }
+                });
+                
+                // 등록 가능한 최대 요금제 수 체크
+                const maxPlans = 10;
+                if (currentRegisteredCount + checkedCount > maxPlans) {
+                    showAlert(`요금제는 최대 ${maxPlans}개까지 등록 가능합니다. 현재 ${currentRegisteredCount}개가 등록되어 있습니다.`);
+                    return;
+                }
+                
+                // 체크된 행들을 등록 요금제 테이블로 이동
+                selectRows.forEach(function(row) {
+                    const selCheckbox = row.querySelector('input[name="chkSelPlan"]');
+                    if (selCheckbox && selCheckbox.checked) {
+                        
+                        // 이미 등록된 요금제인지 확인 (요금제명 기준)
+                        const selPlanName = row.cells[4].innerText;
+                        const selPlanId = selCheckbox ? selCheckbox.value : ""; // 값 추출
+                        
+                        
+                        const existingPlans = targetTable.querySelectorAll('tr');
+                        let isDuplicate = false;
+                        
+                        existingPlans.forEach(function(existingRow) {
+                        	
+                        	const existingCheckbox = existingRow.querySelector('input[name="chkSelPlan"]');
+                        	const existingValue = existingCheckbox ? existingCheckbox.value : ""; // 값 추출
+                        	
+                        	 
+                            if (existingValue === selPlanId) {
+                                isDuplicate = true;
+                            }
+                        });
+                        
+                        // 중복이 아닌 경우에만 추가
+                        if (!isDuplicate) {
+                            console.log('새 항목을 추가합니다:', selPlanName);
+                            
+                            // 새 행 생성
+                            const newRow = document.createElement('tr');
+                            
+                            // 원본 행의 내용 복사 (최근수정일 제외)
+                            for (let i = 0; i < 13; i++) {
+                                const newCell = document.createElement('td');
+                                newCell.innerHTML = row.cells[i].innerHTML;
+                                newRow.appendChild(newCell);
+                            }
+                            
+                            // 라벨 설정 셀 추가
+                            const labelCell = document.createElement('td');
+                            labelCell.innerHTML = `
+                                <div class="d-flex flex-column">
+                                    <div class="form-check mb-1 txt-left">
+                                        <input class="form-check-input" type="checkbox" id="chk_recommend_${Date.now()}" name="chk_recommend">
+                                        <label class="form-check-label" for="chk_recommend_${Date.now()}">세모통추천</label>
+                                    </div>
+                                    <div class="form-check mb-1 txt-left">
+                                        <input class="form-check-input" type="checkbox" id="chk_lowprice_${Date.now()}" name="chk_lowprice">
+                                        <label class="form-check-label" for="chk_lowprice_${Date.now()}">최저가 보장</label>
+                                    </div>
+                                    <div class="form-check txt-left">
+                                        <input class="form-check-input" type="checkbox" id="chk_benefits_${Date.now()}" name="chk_benefits">
+                                        <label class="form-check-label" for="chk_benefits_${Date.now()}">최다혜택</label>
+                                    </div>
+                                </div>
+                            `;
+                            newRow.appendChild(labelCell);
+                            
+                            // 순서 버튼 추가
+                            const orderCell = document.createElement('td');
+                            orderCell.innerHTML = `
+                                <div class="d-flex justify-content-center">
+                                    <button class="btn btn-sm btn-outline-secondary me-1">▲</button>
+                                    <button class="btn btn-sm btn-outline-secondary">▼</button>
+                                </div>
+                            `;
+                            newRow.appendChild(orderCell);
+
+                            
+                            // 등록 요금제 테이블에 추가
+                            targetTable.appendChild(newRow);
+                            
+                            // 전체 선택 체크박스 상태 업데이트
+                            if (checkAllBox) {
+                                const allCheckboxes = targetTableContainer.querySelectorAll('tbody input[name="chkSelPlan"]');
+                                const allChecked = Array.from(allCheckboxes).every(checkbox => checkbox.checked);
+                                
+                                checkAllBox.checked = allChecked;
+                                checkAllBox.indeterminate = !allChecked && Array.from(allCheckboxes).some(checkbox => checkbox.checked);
+                            }
+                        } else {
+                            console.log('중복된 항목입니다:', selPlanName);
+                        }
+                    }
+                });
+            });
+            
+            // 위로 이동 버튼 (▲) 클릭 시
+            moveUpBtn.addEventListener('click', function() {
+                
+                // 등록 요금제 테이블에서 체크된 행 삭제
+                const targetRows = targetTable.querySelectorAll('tr');
+                
+                targetRows.forEach(function(row) {
+                    const checkbox = row.querySelector('input[type="checkbox"]');
+                    if (checkbox && checkbox.checked) {
+                        // 삭제할 행의 요금제명 가져오기
+                        const planName = row.cells[4].innerText;
+                        
+                        // 요금제 선택 테이블에서 해당 요금제 찾아서 체크박스 해제
+                        const selectRows = selectTable.querySelectorAll('tbody tr');
+                        selectRows.forEach(function(selectRow) {
+                            const selectPlanName = selectRow.cells[4].innerText;
+                            if (selectPlanName === planName) {
+                                const selectCheckbox = selectRow.querySelector('input[type="checkbox"]');
+                                if (selectCheckbox) {
+                                    selectCheckbox.checked = false;
+                                }
+                            }
+                        });
+                        
+                        // 행 삭제
+                        row.remove();
+                    }
+                });
+                
+                // 모든 행이 삭제된 경우 체크박스 상태 업데이트
+                if (checkAllBox) {
+                    const remainingCheckboxes = targetTableContainer.querySelectorAll('tbody input[name="chkSelPlan"]');
+                    checkAllBox.checked = remainingCheckboxes.length > 0 && Array.from(remainingCheckboxes).every(checkbox => checkbox.checked);
+                    checkAllBox.indeterminate = remainingCheckboxes.length > 0 && !checkAllBox.checked && Array.from(remainingCheckboxes).some(checkbox => checkbox.checked);
+                }
+            });
+            
+            // 등록 요금제 테이블 내의 순서 버튼 처리 (이벤트 위임)
+            targetTableContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('btn-outline-secondary')) {
+                    const button = e.target;
+                    const row = button.closest('tr');
+                    
+                    // 위로 이동 버튼 (▲)
+                    if (button.textContent === '▲') {
+                        const prevRow = row.previousElementSibling;
+                        if (prevRow) {
+                            row.parentNode.insertBefore(row, prevRow);
+                        }
+                    }
+                    // 아래로 이동 버튼 (▼)
+                    else if (button.textContent === '▼') {
+                        const nextRow = row.nextElementSibling;
+                        if (nextRow) {
+                            row.parentNode.insertBefore(nextRow, row);
+                        }
+                    }
+                }
+            });
+            
+            // 등록 버튼 클릭 이벤트 처리
+            const registerBtn = document.getElementById('registerBtn');
+            if (registerBtn) {
+                registerBtn.addEventListener('click', function() {
+                    // 유효성 검사: 등록 요금제 테이블에 행이 1개 이상 있는지 확인
+                    const registeredRows = targetTable.querySelectorAll('tr');
+                    const registeredCount = registeredRows.length;
+                    
+                    // 등록 가능한 최대 요금제 수는 10개
+                    const maxPlans = 10;
+                    
+                    if (registeredCount === 0) {
+                        // 요금제가 등록되지 않은 경우
+                        showAlert('요금제를 등록해주세요.');
+                        return;
+                    } else if (registeredCount > maxPlans) {
+                        // 최대 개수 초과 시 (일반적으로 UI에서 방지하지만 추가 검증)
+                        showAlert(`요금제는 최대 ${maxPlans}개까지 등록 가능합니다. 현재 ${registeredCount}개가 선택되었습니다.`);
+                        return;
+                    }
+                    
+                    
+                    showConfirm( '등록하시겠습니까?',
+        					() => { 
+        						insUpdProc();
+        					},
+        					() => { },
+        					'챗봇 요금제 관리'
+        			 )
+                });
+            }
+        } else {
+            console.error('일부 요소를 찾을 수 없습니다:', {
+                moveDownBtn: !!moveDownBtn,
+                moveUpBtn: !!moveUpBtn,
+                selectTable: !!selectTable,
+                targetTable: !!targetTable
+            });
+        }
+    } else {
+    }
+    
+    
+    
+    initSelect("");
+    searchPlanReq();
+});
+
+
+
+function selCondSelect(sp) {
+	
+	
+	var	params = {
+			searchSaleSp : "SALE"
+	}
+	
+	var setSelect = "";
+	
+	if(sp =="") {
+		params.searchCondCol = "mno";
+		setSelect = "condMno";
+	}
+	
+	var _mno = $("#condMno").val();
+	var _mnoparam = "";
+	if(_mno =="SKT") {
+		_mnoparam = "SKT,SK";
+	} else if(_mno =="KT") {
+		_mnoparam = "KT,kt";
+	} else if(_mno =="LGU") {
+		_mnoparam = "LGU,LGT";
+	}
+	
+	if(sp =="mno") {
+
+		params.searchMno = _mnoparam;
+		params.searchCondCol = "sup_data_val";
+		setSelect = "condData";
+	}
+	
+	
+	if(sp =="data") {
+		params.searchMno = _mnoparam;
+		params.searchData = $("#condData").val();
+		params.searchCondCol = "sup_qos"		
+		setSelect = "condQos";
+	}
+	
+	if(sp =="qos") {
+		params.searchMno = _mnoparam;
+		params.searchData = $("#condData").val();
+		params.searchQos = $("#condQos").val();
+		params.searchCondCol = "sup_call_val";
+		setSelect = "condCall";
+	}
+	
+	if(sp =="call") {
+		params.searchMno = _mnoparam;
+		params.searchData = $("#condData").val();
+		params.searchQos = $("#condQos").val();
+		params.searchCall = $("#condCall").val();
+		params.searchCondCol = "sup_sms_val";
+		setSelect = "condSms";
+	}
+	
+	
+	initSelect(sp);
+	
+	const selectElement = document.getElementById(setSelect);
+	
+	$.ajax({
+			url : '/svc/chatbotGroup/schCond'
+			,type : 'POST'
+			,dataType : "json"
+			,contentType:"application/json"
+			,data : JSON.stringify(params)
+			,success: function (data) {
+				
+				var result = data.data;
+				var option = $("<option value=''> 전체</option>"); 
+                $(selectElement).append(option);
+				result.data.forEach(value => {
+	                if (value !== null && value !== '0') { // null 값은 무시
+	                    var option = $("<option value='"+value+"'>"+getDataStrConv(value,setSelect)+"</option>"); 
+	                    $(selectElement).append(option);
+	                }
+	            });
+				
+			},
+			error : function(request, status, error){
+				showAlert(error);
+			},
+			complete:function(){
+				// $('#loading').addClass('display-none');
+			}
+	});
+}
+	
+function initSelect(sp) {
+	var option = "";
+	
+	if(sp =="mno") {
+		$("#condData").empty();
+		$("#condQos").empty();
+		$("#condCall").empty();
+		$("#condSms").empty();
+		
+		option = $("<option value=''>데이터 용량 선택</option>");                
+		$('#condData').append(option);
+		option = $("<option value=''>QOS 선택</option>");                
+		$('#condQos').append(option);
+		option = $("<option value=''>전화 제공량 선택</option>");                
+		$('#condCall').append(option);
+		option = $("<option value=''>문자 제공량 선택</option>");                
+		$('#condSms').append(option);
+	} else if(sp =="data") {
+		$("#condQos").empty();
+		$("#condCall").empty();
+		$("#condSms").empty();
+		option = $("<option value=''>QOS 선택</option>");                
+		$('#condQos').append(option);
+		option = $("<option value=''>전화 제공량 선택</option>");                
+		$('#condCall').append(option);
+		option = $("<option value=''>문자 제공량 선택</option>");                
+		$('#condSms').append(option);
+	} else if(sp =="qos") {
+		$("#condCall").empty();
+		$("#condSms").empty();
+		option = $("<option value=''>전화 제공량 선택</option>");                
+		$('#condCall').append(option);
+		option = $("<option value=''>문자 제공량 선택</option>");                
+		$('#condSms').append(option);
+	} else if(sp =="call") {
+		$("#condSms").empty();
+		option = $("<option value=''>문자 제공량 선택</option>");                
+		$('#condSms').append(option);
+	} else if(sp =="") {
+		$("#condData").empty();
+		$("#condQos").empty();
+		$("#condCall").empty();
+		$("#condSms").empty();
+		
+		option = $("<option value=''>데이터 용량 선택</option>");                
+		$('#condData').append(option);
+		option = $("<option value=''>QOS 선택</option>");                
+		$('#condQos').append(option);
+		option = $("<option value=''>전화 제공량 선택</option>");                
+		$('#condCall').append(option);
+		option = $("<option value=''>문자 제공량 선택</option>");                
+		$('#condSms').append(option);
+	} 
+	
+}
+
+
+
+function getDataStrConv(val,sp){
+	var res = "";
+	
+	if(sp=="condData") {
+		if(val >= 1024) {
+			if(val ==10238976) {
+				res = "무제한";
+			} else {
+				
+				const result = val / 1024;
+				const decimalPart = result % 1;
+				
+				if (decimalPart === 0) {
+					res = Math.floor(result); // 정수 반환
+			    } else {
+			    	res= result.toFixed(1); // 소수점 한 자리로 표시
+			    }
+				res = res + "GB";
+			}
+		} else {
+			res = val + "MB";
+		}		
+	} else if(sp=="condQos") {
+		if(val >= 1024) {
+			res = (val / 1024) + "MBps";
+		} else {
+			res = val + "KBps";
+		}
+	} else if(sp=="condCall") {
+		if(val == 9999) {
+			res = "무제한";
+		} else {
+			res = val + "분";
+		}
+		
+	} else if(sp=="condSms") {
+		if(val == 9999) {
+			res = "무제한";
+		} else {
+			res = val + "건";
+		}
+	} else {
+		res = val;
+	}
+	
+	
+	return res;
+}
+	
+	
+
+function searchPlan() {
+	
+	
+	var	params = {
+		searchSaleSp : "SALE",
+		 page : 1,
+		 recordSize : 99999
+	}
+	
+	
+	var _mno = $("#condMno").val();
+	var _mnoparam = "";
+	if(_mno =="SKT") {
+		_mnoparam = "SKT,SK";
+	} else if(_mno =="KT") {
+		_mnoparam = "KT,kt";
+	} else if(_mno =="LGU") {
+		_mnoparam = "LGU,LGT";
+	}
+	
+	
+	params.searchMno = _mnoparam;
+	params.searchData = $("#condData").val();
+	params.searchQos = $("#condQos").val();
+	params.searchCall = $("#condCall").val();
+	params.searchSms = $("#condSms").val();
+	params.keyword = $("#strSearchWrod").val();
+	
+	
+	
+	$.ajax({
+		   url : '/pbm/plan/ajaxList',
+	       type : 'POST',
+	       dataType : "json",
+	       contentType:"application/json",
+		   data : JSON.stringify(params),
+			success: function (data) {
+				$('#searchList').empty();
+				$('#planListTmpl').tmpl(data.data).appendTo('#searchList');
+				
+				setSelectedPlanChk();
+				
+		    },
+			error : function(request, status, error){
+				showAlert(error);
+	        },
+	        complete:function(){
+	           // $('#loading').addClass('display-none');
+	        }
+		});
+}
+	
+
+function insUpdProc() {
+	
+	
+	const rows = document.querySelectorAll('#trReqList tr');
+
+	var subData ="";
+	var subQos ="";
+	var _mno = "";
+	
+	
+	var alertTxt = '등록되었습니다';
+	var paramSearchId = "[[${searchId}]]";
+	if ( paramSearchId !="" ) {
+		alertTxt = '수정되었습니다.';
+	}
+	
+	
+	// 데이터 추출
+	const chatbotGroupPlans  = Array.from(rows).map((row, index) => {
+	    // 특정 체크박스 값 추출
+	    const chkSelPlan = row.querySelector('input[type="checkbox"][name="chkSelPlan"]');
+	    const chkRecommend = row.querySelector('input[type="checkbox"][name="chk_recommend"]');
+	    const chkLowprice = row.querySelector('input[type="checkbox"][name="chk_lowprice"]');
+	    const chkBenefits = row.querySelector('input[type="checkbox"][name="chk_benefits"]');
+	    
+	    if(subData=="")  subData = row.querySelector('input[type="hidden"][name="txtSupData"]').value;
+	    if(subQos=="")  subQos = row.querySelector('input[type="hidden"][name="txtSupQos"]').value;
+	    if(_mno=="")  _mno = row.querySelector('input[type="hidden"][name="txtMno"]').value;
+	    
+	    return {
+	    	plan: chkSelPlan ? chkSelPlan.value : null, // id="chkSelPlan" 값
+	    	recomYn: chkRecommend ? chkRecommend.checked : false, // name="chk_recommend" 선택 여부
+	    	lowPriceYn:  chkLowprice ? chkLowprice.checked : false, // name="chk_lowprice" 선택 여부
+	    	maxBenefitYn: chkBenefits ? chkBenefits.checked : false, // name="chk_benefits" 선택 여부
+	    	orderSeq : index +1
+	    };
+	});
+	
+	
+	const chatbotGroupEntity = {
+		    id: paramSearchId, // 예제 값
+		    mvno: _mno,
+		    supData: subData,
+		    subQos: subQos,
+		    groupMemo:  $("#chatbotGroupMemo").val(),
+		    regCnt: chatbotGroupPlans.length,
+		    title: $("#chatbotGroupTitle").val()
+		};
+	
+	
+	// 최종 JSON 구조
+	const finalJson = {
+	    chatbotGroupEntity,
+	    chatbotGroupPlans
+	};
+	
+	
+	console.log(JSON.stringify(finalJson, null, 2));
+	
+
+	$.ajax({
+	    url: '/svc/chatbotGroup/insupdProc', // 변경된 URL
+	    type: 'POST',
+	    dataType: 'json', // 기대하는 응답 타입
+	    contentType: 'application/json', // 보낼 데이터 타입
+	    data: JSON.stringify(finalJson, null, 2), // 데이터 직렬화
+	    success: function (response) {
+			
+
+			
+	    	showAlert(alertTxt,goList);
+
+	    },
+	    error: function (request, status, error) {
+	        console.error('Error:', error);
+	        showAlert('Failed to save plans: ' + error);
+	    }
+	});
+	
+	
+}
+
+
+function goList() {
+	window.location.href="/svc/chatbotGroup/list";
+}
+
+
+
+
+
+function searchPlanReq() {
+	
+	var paramSearchId = "[[${searchId}]]"
+	
+	
+	var	params = {
+		searchChatbotGroupId : paramSearchId
+	}
+	
+	
+	
+	$.ajax({
+		   url : '/svc/chatbot/planList',
+	       type : 'POST',
+	       dataType : "json",
+	       contentType:"application/json",
+		   data : JSON.stringify(params),
+			success: function (data) {
+				$('#trReqList').empty();
+				$('#reqPlanListTmpl').tmpl(data.data).appendTo('#trReqList');
+				
+	
+				
+		    },
+			error : function(request, status, error){
+				showAlert(error);
+	        },
+	        complete:function(){
+	           // $('#loading').addClass('display-none');
+	        }
+		});
+}
+	
+	
+	function btGoList() {
+		
+		
+		showConfirm( '입력한 내용이 저장되지 않습니다. 목록으로 돌아가시겠습니까?',
+				() => { 
+					goList();
+				},
+				() => { },
+				'챗봇 요금제 관리'
+		 )
+		 
+	}
+	
+	
+	
+	
+	function setSelectedPlanChk() {
+		
+		const trReqListCheckboxes = document.querySelectorAll('#trReqList input[name="chkSelPlan"]');
+		const searchListCheckboxes = document.querySelectorAll('#searchList input[name="chkSelPlan"]');
+		  
+		  
+		 trReqListCheckboxes.forEach((trCheckbox) => {
+			 chkVal = trCheckbox.value;
+			 searchListCheckboxes.forEach((searchCheckbox) => {
+				 console.log("chkVal>>>>>>>>>>>" + chkVal);
+				 
+				 slchkVal = searchCheckbox.value;
+				 
+				 console.log("slchkVal>>>>>>>>>>>" + slchkVal);
+				 if(slchkVal==chkVal) {
+					 searchCheckbox.checked = true;
+				 }
+			 });
+			 
+			 
+		 });
+	}
+</script>
+
+<script id=planListTmpl type="text/x-jquery-tmpl">
+	<tr>
+	    <td>
+			<input type="checkbox" id="chkSelPlan${id}" name="chkSelPlan" value="${id}">
+			<input type="hidden" id="txtSupData${id}" name="txtSupData" value="${supDataVal}">
+			<input type="hidden" id="txtSupQos${id}" name="txtSupQos" value="${supQos}">
+			<input type="hidden" id="txtMno${id}" name="txtMno" value="${mno}">
+		</td>
+	    <td>${mno}</td>
+	    <td>${planType}</td>
+	    <td>${hostNm}</td>
+	    <td><a href="#" style="color: #007bff;">{{html getPlanNm(planName, planNameSmt)}}</a></td>
+	    <td>{{html getPriceStr(normalPrice)}}</td>
+	    <td>{{html getPriceStr(salePrice)}}</td>
+	    <td>${promotionPeriod}</td>
+	    <td>{{html getDataStr(supDataVal)}}</td>
+	    <td>{{html getQosStr(supQos)}}</td>
+	    <td>{{html getCallStr(supCallVal)}}</td>
+	    <td>{{html getSmsStr(supSmsVal)}}</td>
+	    <td>${planBenefitCnt}</td>
+	    <td>{{html getDateStr(modifiedDate)}}</td>
+	</tr> 
+</script>
+
+
+<script id=reqPlanListTmpl type="text/x-jquery-tmpl">
+	<tr>
+	    <td>
+			<input type="checkbox" id="chkSelPlan${id}" name="chkSelPlan" value="${id}">
+			<input type="hidden" id="txtSupData${id}" name="txtSupData" value="${supDataVal}">
+			<input type="hidden" id="txtSupQos${id}" name="txtSupQos" value="${supQos}">
+			<input type="hidden" id="txtMno${id}" name="txtMno" value="${mno}">
+		</td>
+	    <td>${mno}</td>
+	    <td>${planType}</td>
+	    <td>${hostNm}</td>
+	    <td><a href="#" style="color: #007bff;">{{html getPlanNm(planName, planNameSmt)}}</a></td>
+	    <td>{{html getPriceStr(normalPrice)}}</td>
+	    <td>{{html getPriceStr(salePrice)}}</td>
+	    <td>${promotionPeriod}</td>
+	    <td>{{html getDataStr(supDataVal)}}</td>
+	    <td>{{html getQosStr(supQos)}}</td>
+	    <td>{{html getCallStr(supCallVal)}}</td>
+	    <td>{{html getSmsStr(supSmsVal)}}</td>
+	    <td>${planBenefitCnt}</td>
+		<td>
+			<div class="d-flex flex-column">
+				<div class="form-check mb-1 txt-left">
+					{{if chatbotPlanRecomYn}}
+						<input class="form-check-input" type="checkbox" id="chk_recommend_${id}" name="chk_recommend" checked>
+					{{else}}
+						<input class="form-check-input" type="checkbox" id="chk_recommend_${id}" name="chk_recommend">
+					{{/if}}
+					<label class="form-check-label" for="chk_recommend_${id}">세모통추천</label>
+				</div>
+				<div class="form-check mb-1 txt-left">
+					{{if chatbotPlanLowPriceYn}}
+						<input class="form-check-input" type="checkbox" id="chk_lowprice_${id}" name="chk_lowprice" checked>
+					{{else}}
+						<input class="form-check-input" type="checkbox" id="chk_lowprice_${id}" name="chk_lowprice">
+					{{/if}}					
+					<label class="form-check-label" for="chk_lowprice_${id}">최저가 보장</label>
+				</div>
+				<div class="form-check txt-left">
+					{{if chatbotPlanMaxBenefitYn}} 
+						<input class="form-check-input" type="checkbox" id="chk_benefits_${id}" name="chk_benefits" checked>
+					{{else}}
+						<input class="form-check-input" type="checkbox" id="chk_benefits_${id}" name="chk_benefits">
+					{{/if}}
+					
+					<label class="form-check-label" for="chk_benefits_${id}">최다혜택</label>
+				</div>
+			</div>
+		</td>
+		<td>
+			<div class="d-flex justify-content-center">
+				<button class="btn btn-sm btn-outline-secondary me-1">▲</button>
+				<button class="btn btn-sm btn-outline-secondary">▼</button>
+			</div>
+		</td>
+	</tr> 
+</script>
+
+
+
+
+</th:block>
+
+
+
+
+<div class="main-content">
+         <div class="container-fluid">
+             <div class="page-header d-flex justify-content-between align-items-start">
+                 <div>
+                     <div class="location mb-2">
+                         <small class="text-secondary">
+                             <i class="fas fa-home me-1"></i>
+                             <a href="javascript:;">홈</a>
+                             >
+                             <a href="javascript:;">서비스 관리</a>
+                             >
+                             <a href="javascript:;">챗봇요금제관리</a>
+                         </small>
+                     </div>
+                     <h2 class="page-title fs-4 mb-4" th:text="${searchId == null or searchId ==''} ? '챗봇요금제 등록' : '챗봇요금제 수정'"></h2>
+                 </div>
+             </div>
+
+             <div class="table-section p-4">
+                 <!-- 필터 드롭다운 영역 -->
+                 <div class="d-flex mb-3">
+                     <div class="me-2">
+                         <select class="form-select pe-5" style="height:40px" onchange="selCondSelect('mno');" id="condMno">
+                             <option selected>통신망 선택</option>
+                             <option value="">전체</option>
+                             <option value="SKT">SKT</option>
+                             <option value="KT">KT</option>
+                             <option value="LGU">U+</option>
+                         </select>
+                     </div>
+                     <div class="me-2">
+                         <select class="form-select  pe-5"  style="height:40px" onchange="selCondSelect('data');" id="condData">
+                             <option selected>데이터 용량 선택</option>
+                             <option>1GB</option>
+                             <option>5GB</option>
+                             <option>10GB</option>
+                             <option>20GB</option>
+                             <option>무제한</option>
+                         </select>
+                     </div>
+                     <div class="me-2">
+                         <select class="form-select  pe-5"  style="height:40px" onchange="selCondSelect('qos');" id="condQos">
+                             <option selected>QoS 선택</option>
+                             <option>일반</option>
+                             <option>프리미엄</option>
+                         </select>
+                     </div>
+                     <div class="me-2">
+                         <select class="form-select  pe-5"  style="height:40px" onchange="selCondSelect('call');" id="condCall">
+                             <option selected>전화 제공량 선택</option>
+                             <option>기본제공</option>
+                             <option>무제한</option>
+                         </select>
+                     </div>
+                     <div class="me-2">
+                         <select class="form-select  pe-5"  style="height:40px" onchange="selCondSelect('sms');" id="condSms">
+                             <option selected>문자 제공량 선택</option>
+                             <option>기본제공</option>
+                             <option>무제한</option>
+                         </select>
+                     </div>
+                     <div class="search-input d-flex gap-2 flex-grow-1">
+                         <input type="text" class="form-control" placeholder="요금제명을 입력해주세요." id="strSearchWrod">
+                         <button class="btn btn-dark" onclick="searchPlan()"><span>검색</span></button>
+                     </div>
+                 </div>
+
+                 <!-- 요금제 선택 영역 -->
+                 <div class="registered-plans mb-4">
+                     <div class="d-flex justify-content-between align-items-center mb-2">
+                         <h5 class="mb-0">요금제 선택</h5>
+                         
+                     </div>
+                     <div class="table-responsive">
+                         <table class="table custom-table table-bordered">
+                             <colgroup>
+                                 <col style="width: 40px;">
+                                 <col style="width: 80px;">
+                                 <col style="width: 80px;">
+                                 <col style="width: 80px;">
+                                 <col style="width: 140px;">
+                                 <col style="width: 80px;">
+                                 <col style="width: 80px;">
+                                 <col style="width: 80px;">
+                                 <col style="width: 80px;">
+                                 <col style="width: 60px;">
+                                 <col style="width: 60px;">
+                                 <col style="width: 60px;">
+                                 <col style="width: 100px;">
+                                 <col style="width: 100px;">
+                             </colgroup>
+                             <thead>
+                                 <tr>
+                                     <th>선택</th>
+                                     <th>통신망</th>
+                                     <th>네트워크</th>
+                                     <th>사업자</th>
+                                     <th>요금제명</th>
+                                     <th>기본료</th>
+                                     <th>할인금액</th>
+                                     <th>할인기간</th>
+                                     <th>데이터</th>
+                                     <th>QoS</th>
+                                     <th>전화</th>
+                                     <th>문자</th>
+                                     <th>혜택</th>
+                                     <th>최근수정일</th>
+                                 </tr>
+                             </thead>
+                             <tbody id="searchList">
+                                <!-- 
+                                 <tr>
+                                     <td><input type="checkbox" checked></td>
+                                     <td>U+</td>
+                                     <td>LTE</td>
+                                     <td>새븐모바일</td>
+                                     <td><a href="#" style="color: #007bff;">온가족 매일 무제한 5GB+</a></td>
+                                     <td>48,400원</td>
+                                     <td>28,400원</td>
+                                     <td>평생</td>
+                                     <td>5GB</td>
+                                     <td>1Mbps</td>
+                                     <td>0분</td>
+                                     <td>0건</td>
+                                     <td>5</td>
+                                     <td>2025-04-14 19:27:46</td>
+                                 </tr> 
+                                 -->
+                                
+                             </tbody>
+                         </table>
+                     </div>
+                 </div>
+
+                 <div class="d-flex centerMovingButton">
+                     <button class="btn btn-sm btn-outline-secondary me-2">▼</button>
+                     <button class="btn btn-sm btn-outline-secondary">▲</button>
+                 </div>
+
+                 <!-- 등록 요금제 영역 -->
+                 <div class="registered-plans mb-4">
+                     <div class="d-flex justify-content-between align-items-center mb-2">
+                         <h5 class="mb-0">등록 요금제</h5>
+                     </div>
+                     <div class="table-responsive">
+                         <table class="table custom-table table-bordered">
+                             <colgroup>
+                                 <col style="width: 40px;">
+                                 <col style="width: 80px;">
+                                 <col style="width: 80px;">
+                                 <col style="width: 80px;">
+                                 <col style="width: 140px;">
+                                 <col style="width: 80px;">
+                                 <col style="width: 80px;">
+                                 <col style="width: 80px;">
+                                 <col style="width: 80px;">
+                                 <col style="width: 60px;">
+                                 <col style="width: 60px;">
+                                 <col style="width: 60px;">
+                                 <col style="width: 100px;">
+                                 <col style="width: 140px;">
+                                 <col style="width: 60px;">
+                             </colgroup>
+                             <thead>
+                                 <tr>
+                                     <th><input type="checkbox" id="checkall"></th>
+                                     <th>통신망</th>
+                                     <th>네트워크</th>
+                                     <th>사업자</th>
+                                     <th>요금제명</th>
+                                     <th>기본료</th>
+                                     <th>할인금액</th>
+                                     <th>할인기간</th>
+                                     <th>데이터</th>
+                                     <th>QoS</th>
+                                     <th>전화</th>
+                                     <th>문자</th>
+                                     <th>혜택</th>
+                                     <th>라벨 설정</th>
+                                     <th>순서</th>
+                                 </tr>
+                             </thead>
+                             <tbody id="trReqList">
+                                 
+                             </tbody>
+                         </table>
+                     </div>
+                 </div>
+
+                 <!-- 타이틀 / 메모 -->
+                 <div class="form-section mt-4 mb-3">
+                     <table class="table table-bordered">
+                         <colgroup>
+                             <col style="width: 150px;">
+                             <col style="width: auto;">
+                         </colgroup>
+                         <tbody>
+                             <tr>
+                                 <th class="bg-dark text-white text-center align-middle">타이틀</th>
+                                 <td>
+                                     <input type="text" class="form-control" placeholder="타이틀을 입력해주세요" id="chatbotGroupTitle" th:value="${record.title}">
+                                 </td>
+                             </tr>
+                             <tr>
+                                 <th class="bg-dark text-white text-center align-middle">메모</th>
+                                 <td>
+                                     <input type="text" class="form-control" placeholder="메모를 입력해주세요" id="chatbotGroupMemo" th:value="${record.groupMemo}">
+                                 </td>
+                             </tr>
+                         </tbody>
+                     </table>
+                 </div>
+
+             </div>
+             <!-- 버튼 영역 -->
+             <div class="d-flex justify-content-center gap-3 mt-5">
+                 <button type="button" class="btn btn-lg btn-secondary px-5"
+                     onclick="btGoList();"
+                 >
+                     목록
+                 </button>
+                 <button type="button" class="btn btn-lg btn-dark px-5" id="registerBtn">
+                     등록
+                 </button>
+             </div>
+         </div>
+
+</div>

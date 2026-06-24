@@ -1,0 +1,82 @@
+python3 ./src/encrypt_decrypt.py encrypt "암호화할단어"
+python3 ./src/encrypt_decrypt.py decrypt  "8ts8xjLoZHOGuUxoNDCyxj-OQFaMvLnGNo43nSxBqGI="
+
+
+source venv/bin/activate
+
+
+실행명령
+python3 ./src/scrapingApp.py
+
+종료명령
+ps -ef | grep scrapingApp.py
+kill <PID>
+
+독립실행중인 앱 종료
+./shutdown.sh
+
+독립실행 하는 앱 시작 
+./startup.sh 
+
+실행중인 로그 보기 (실시간)
+tail -f scrapingLog.log
+
+스크래핑 시작
+curl -X POST http://localhost:5001/start -H "Content-Type: application/json" -d '{"wait_time": 60}'
+
+스크래핑 시작 (윈도우)
+curl -X POST http://localhost:5001/start -H "Content-Type: application/json" -d "{\"wait_time\": 20}"
+
+스크래핑 종료
+curl -X POST http://localhost:5001/shutdown
+
+스크래핑 상태
+curl -X GET http://localhost:5001/status
+
+빌드
+PYTHONPATH=src pyinstaller --onefile --clean --name scrapingApp src/scrapingApp.py
+
+
+1. 테스트 데이터 삽입 :  엉뚱한 uuid?
+ 
+INSERT INTO tb_pmb_plan_data2 (
+    uuid, mno, telecom, url, plan_type, plan_name, data, voice_call, message, 
+    normal_price, sale_price, benefit, qos, business_name, after_price, 
+    combination, freebies, promotion_period, etc, sale_status, create_date, modified_date, company_id
+) VALUES (
+    'Amobile00000', 'KT', '에이모바일', 'https://www.amobile.co.kr/plan/66992', 
+    'LTE', '[테스트] A 올라잇 15GB+/300분', 15360, '', '0건', 
+    42900, 19030, '', 3072, '(주)에넥스텔레콤', 37400, 
+    '', '', '7개월', '', 1, '2024-12-20 07:37:39', '2024-12-20 07:37:39', 1
+);
+
+
+DELETE FROM tb_pmb_plan_data2;
+ALTER TABLE tb_pmb_plan_data2 AUTO_INCREMENT = 1;
+
+DELETE FROM tb_pmb_scraping_logs2;
+ALTER TABLE tb_pmb_scraping_logs2 AUTO_INCREMENT = 1;
+ucomp01 / smtongdaebak^^
+
+INSERT INTO tb_pmb_plan_data (
+    uuid, mno, telecom, 
+    url, 
+    plan_type, plan_name, 
+    data, voice_call, message, qos, buga_call,
+    normal_price, sale_price, after_price,
+    benefit,  business_name,  
+    combination, freebies, promotion_period, etc, sale_status, company_id,
+    plan_code, daily_data, 
+    m12_price, m24_price, hidden_yn
+) VALUES (
+    'SPTIZ_100023', 'KT', '스피츠모바일', 
+    'https://sptizmobile.com/view/plan/phone_plan.aspx?AGCD=0cc0a702becfab50f81c524bfd0e980a&GDCD=100023', 
+    'LTE', '미 프리 7G+1M/세모통', 
+    7168, '무제한', '무제한', 1024, '300분',
+    24200, 0,  24200, 
+    '',  '스피츠모바일 주식회사',
+    'False', '', '4개월', '', 1, 33,
+    '100023', 0,
+    178200, 415800, 1 
+);
+

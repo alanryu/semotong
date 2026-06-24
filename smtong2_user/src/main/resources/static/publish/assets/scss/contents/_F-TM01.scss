@@ -1,0 +1,18 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 이용약관
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 이용약관
+.terms-content {
+	// 페이시 여백
+	padding-top: 16rem;
+	@include bottom-spacer;
+	@include terms-content;
+	max-width: 1200rem;
+}
+
+.modal-body .terms-content {
+	padding-top: 0;
+}
+// e: 이용약관

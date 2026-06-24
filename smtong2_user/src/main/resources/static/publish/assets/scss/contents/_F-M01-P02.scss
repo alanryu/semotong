@@ -1,0 +1,52 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 이벤트 모달
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 이벤트 레이어
+.F-M01-P02-page {
+	background-color: transparent;
+	padding-bottom: 0;
+
+	@include media-tablet-xs {
+		border-radius: 20rem !important;
+		overflow: hidden;
+		max-width: 360rem !important;
+	}
+
+	// s: 상품리스트 섹션
+	.event-layer-sec{
+		padding: 0;
+		.event-layer-bnr {
+			position: relative;
+			.swiper-pagination {
+				position: absolute;
+				top: 16rem;
+				left: auto;
+				right: 16rem;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 2rem;
+				width: 38rem;
+				height: 20rem;
+				background-color: rgba(0,0,0,0.8);
+				border-radius: 20rem;
+				font-size: 12rem;
+				line-height: 16rem;
+				font-weight: 500;
+				color: #fff;
+			}
+		}
+		.event-layer-close {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 12rem 20rem;
+			background-color: #fff;
+			padding-bottom: calc(12rem + (env(safe-area-inset-bottom, 0)/1.7));
+		}
+	}
+	// e: 상품리스트 섹션
+}
+// e: 이벤트 레이어

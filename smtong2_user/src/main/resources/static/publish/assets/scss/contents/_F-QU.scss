@@ -1,0 +1,65 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 개인정보 제3자 동의
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 개인정보 제3자 동의 페이지
+.F-QU-page {
+	padding-top: 56rem;
+	padding-bottom: calc(32rem + $safe-area-bottom);
+
+	section .sec-inner {
+		max-width: 560rem;
+	}
+
+	// s: 간편개통 섹션
+	.simple-open-sec {
+		@include sec-basic;
+		flex: 1 1 auto;
+		padding-bottom: 20rem;
+		.sec-header {
+			margin-bottom: 40rem;
+			.sec-tit {
+				line-height: 28rem;
+			}
+			.sec-explain {
+				letter-spacing: -0.5rem;
+			}
+		}
+
+		.sec-body {
+			.tab-style1 {
+				top: 0;
+				margin-top: -20rem;
+				padding-left: 0;
+				padding-right: 0;
+			}
+		}
+	}
+	// e: 간편개통 섹션
+
+	// s: 설문형 목록
+	.survey-list {
+		@include survey-list;
+	}
+	// e: 설문형 목록
+
+	// s: 플로팅 섹션
+	.floating-sec {
+		@include floating-sec;
+	}
+	// e: 플로팅 섹션
+
+	// s: 등록폼
+	.basic-frm {
+		@include basic-frm;
+	}
+	// e: 등록폼
+
+	// s: 완료 섹션
+	.complete-sec {
+		@include complete-sec;
+	}
+	// e: 완료 섹션
+}
+// e: 개인정보 제3자 동의 페이지

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layout/default_layout}"
+  layout:fragment="Content"
+  th:with="menuIdGroup ='07',menuId ='12'"
+>
+  <!-- index.html 고유 CSS 추가 -->
+  <th:block layout:fragment="css">
+    <!--	<link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+  </th:block>
+  <!-- index.html 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+    <script id="searchListTmpl" type="text/x-jquery-tmpl">
+      <tr style="cursor: pointer;">
+      	<td>${id}</td>
+      	<td>{{html getReqStateNm(reqState)}}</td>
+      	<td>${internetPlanMnoNew}</td>
+      	<td><a href="javascript:void(0)" onclick="goDetail('${id}')">${internetPlanNm}</a></td>
+      	<td>{{html maskName(inputName)}}</td>
+      	<td>{{html maskPhoneNumber(inputNumber)}}</td>
+      	<td>{{html getDateStr(createDate)}}</td>
+      	<td>{{html getDateStr(modifiedDate)}}</td>
+      </tr>
+    </script>
+
+    <script type="text/javascript">
+      function goDetail(id) {
+        var siteSp = "[[${siteSp}]]";
+        window.location.href = "/pmb/internetreq/editNew?searchId=" + id;
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        searchList();
+
+        const currentUrl = window.location.href; // 현재 브라우저 URL 가져오기
+        const linkElement = document.getElementById("dynamicLink"); // 링크 요소 가져오기
+
+        if (!currentUrl.startsWith("https://admin.smtong.co.kr")) {
+          // 링크 URL 변경
+          const originalHref = linkElement.getAttribute("href");
+          const updatedHref = originalHref.replace("https://www.smtong.co.kr", "https://tb.smtong.co.kr");
+          linkElement.setAttribute("href", updatedHref);
+
+          // 표시되는 텍스트도 업데이트
+          linkElement.textContent = updatedHref;
+        }
+      });
+
+      function changeCombo() {
+        currentPage = 1;
+        searchList();
+      }
+
+      function getReqStateNm(sp) {
+        var ret = "";
+        if (sp == "REQ") {
+          ret = "상담신청";
+        }
+        if (sp == "CANCEL") {
+          ret = "고객취소";
+        }
+        if (sp == "COMPLET") {
+          ret = "개통완료";
+        }
+        return ret;
+      }
+
+      function renderPage(page) {
+        currentPage = page;
+        searchList();
+      }
+
+      function searchList() {
+        var page = currentPage;
+        if (page == null || page == "") page = 1;
+        var pageSize = $("#pageSizse").val();
+
+        var params = {
+          searchType: $("#searchType").val(),
+          keyword: $("#keyword").val(),
+          searchStartDt: $("#searchStartDt").val(),
+          searchEndDt: $("#searchEndDt").val(),
+          searcState: getCheckedCompanies("searcState"),
+          searchSiteSp: "01",
+          searchIncomSp: "02",
+          searchRdpMngId: "[[${searchId}]]",
+          page: page,
+          recordSize: pageSize,
+        };
+
+        $.ajax({
+          url: "/pmb/internetreq/ajaxList",
+          type: "POST",
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(params),
+          success: function (data) {
+            $("#searchList").empty();
+            console.log(data);
+            $("#totla_count").html("총 " + data.totalCnt + "건");
+            if (data.totalCnt > 0) {
+              $("#searchListTmpl").tmpl(data.data).appendTo("#searchList");
+            }
+
+            renderPagination(page, data.totalCnt, pageSize);
+          },
+          error: function (request, status, error) {
+            showAlert(error);
+          },
+          complete: function () {
+            // $('#loading').addClass('display-none');
+          },
+        });
+      }
+
+      function selMno(id) {
+        if (id == "") {
+          $("input[id^='searchMno']").prop("checked", false);
+          $("#searchMnoALL").prop("checked", true);
+        } else {
+          $("#searchMnoALL").prop("checked", false);
+        }
+      }
+
+      function selState(id) {
+        if (id == "") {
+          $("input[id^='searcState']").prop("checked", false);
+          $("#searcState01").prop("checked", true);
+        } else {
+          $("#searcState01").prop("checked", false);
+        }
+      }
+
+      function toggleSearchInit() {
+        $("#keyword").val("");
+        selState("");
+        selMno("");
+
+        $('.period-button[value="180"]').trigger("click");
+        currentPage = 1;
+      }
+
+      //02.03 - sancho
+      function downloadExcel() {
+        //페이징 기본(필수)
+        var page = 1;
+        if (page == "" || page == null) page = 1;
+        //var _recordSize =  parseInt($("#recordSize").val());
+        var _recordSize = 999;
+
+        var params = {
+          searchType: $("#searchType").val(),
+          keyword: $("#keyword").val(),
+          searchStartDt: $("#searchStartDt").val(),
+          searchEndDt: $("#searchEndDt").val(),
+          page: page,
+          recordSize: _recordSize,
+        };
+
+        var _url = "/pmb/internetreq/exceldown";
+
+        downloadExcelProc(params, _url, "InternetRequestList");
+      }
+    </script>
+  </th:block>
+
+  <div class="main-content">
+    <div class="container-fluid">
+      <!-- 로케이션 & 제목 영역 추가 -->
+      <div class="page-header mb-4">
+        <div class="location mb-2">
+          <small class="text-secondary">
+            <i class="fas fa-home me-1"></i>
+            <a href="javascript:;">홈</a>
+            >
+            <a href="javascript:;">서비스 관리</a>
+            >
+            <a href="/svc/internetrdp/list">랜딩페이지관리</a>
+          </small>
+        </div>
+        <h2 class="page-title fs-4 mb-4">신청내역</h2>
+      </div>
+
+      <div class="salesmanInfo mb-4">
+        <div class="card border shadow-sm">
+          <div class="card-body p-0">
+            <!-- 랜딩 페이지 정보 컨텐츠 -->
+            <div class="p-4">
+              <div class="row align-items-center">
+                <div class="col-md-8">
+                  <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                      <i class="fas fa-link text-primary"></i>
+                    </div>
+                    <div>
+                      <div class="text-secondary small">접속 URL</div>
+
+                      <a th:href="|https://www.smtong.co.kr/internet/landing/${searchId}|" class="text-primary fw-semibold text-decoration-none" target="_blank" id="dynamicLink">
+                        https://www.smtong.co.kr/internet/landing/[[${searchId}]]
+                        <i class="fas fa-external-link-alt ms-2 small"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="search-section">
+        <!-- 검색어 -->
+        <div class="col-12 mb-2">
+          <div class="form-row full-width">
+            <div class="form-label mb-0">검색어</div>
+            <div class="position-relative col-9">
+              <i class="fas fa-search position-absolute" style="left: 16px; top: 15.5px; color: #94a3b8"></i>
+              <input type="text" class="form-control ps-5" placeholder="검색어를 입력하세요" id="keyword" name="keyword" />
+            </div>
+          </div>
+        </div>
+        <div class="row align-items-center mb-3">
+          <div class="col-12">
+            <div class="d-flex align-items-center gap-3">
+              <div class="form-label mb-0">상태</div>
+              <div class="radio-group">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" name="searcState" id="searcState01" value="" checked onclick="selState('')" />
+                  <label class="form-check-label" for="searcState01">전체</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" name="searcState" id="searcState02" value="REQ" onclick="selState('REQ')" />
+                  <label class="form-check-label" for="searcState02">상담신청</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" name="searcState" id="searcState03" value="CANCEL" onclick="selState('CANCEL')" />
+                  <label class="form-check-label" for="searcState03">고객취소</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" name="searcState" id="searcState04" value="COMPLET" onclick="selState('COMPLET')" />
+                  <label class="form-check-label" for="searcState04">개통완료</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row align-items-center mb-2">
+          <div class="form-row full-width">
+            <div class="d-flex align-items-center gap-3">
+              <div class="form-label mb-0">신청일</div>
+              <div class="d-flex align-items-center gap-2">
+                <input type="date" class="form-control" style="width: 150px" id="searchStartDt" />
+                <span class="text-secondary">-</span>
+                <input type="date" class="form-control" style="width: 150px" id="searchEndDt" />
+              </div>
+              <div class="d-flex gap-2">
+                <button class="period-button" value="0">오늘</button>
+                <button class="period-button" value="7">1주일</button>
+                <button class="period-button" value="30">1개월</button>
+                <button class="period-button" value="90">3개월</button>
+                <button class="period-button" value="180">6개월</button>
+                <button class="period-button" value="365">1년</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12 text-end mt-2">
+            <button class="btn btn-light me-2 btn-sm" onclick="toggleSearchInit()">
+              <i class="fas fa-redo"></i>
+              초기화
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="searchList();">
+              <i class="fas fa-search"></i>
+              검색
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="d-flex align-items-center gap-3">
+            <div class="stats-badge">
+              <i class="fas fa-calculator me-1"></i>
+              <span id="totla_count">총 450건</span>
+            </div>
+            <select class="form-select" style="width: 100px" id="pageSizse" onchange="changeCombo()">
+              <option value="10">10개씩</option>
+              <option value="20">20개씩</option>
+              <option value="30">30개씩</option>
+              <option value="40">40개씩</option>
+              <option value="50">50개씩</option>
+            </select>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-light btn-sm">
+              <i class="fas fa-download"></i>
+              다운로드
+            </button>
+            <!-- <button class="btn btn-primary btn-sm" onclick="location.href='/mbm/companyuser/edit?id='">
+							<i class="fas fa-plus"></i>
+							신규등록
+						</button> -->
+          </div>
+        </div>
+
+        <table class="table custom-table">
+          <thead>
+            <tr>
+              <th>번호</th>
+              <th>상태</th>
+              <th>MNO</th>
+              <th>신청상품</th>
+              <th>신청자</th>
+              <th>전화번호</th>
+              <th>신청일시</th>
+              <th>완료일시</th>
+            </tr>
+          </thead>
+          <tbody id="searchList"></tbody>
+        </table>
+
+        <div class="d-flex justify-content-left mt-4">
+          <ul class="pagination"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="gift-manager__modal" id="detailViewModal" style="display: none">
+      <div class="gift-manager__modal-content">
+        <div class="gift-manager__modal-header">
+          <div class="gift-manager__modal-title">신청내역 상세보기</div>
+          <span class="gift-select__close">&times;</span>
+        </div>
+        <div class="custom-table-outer">
+          <table class="table custom-table">
+            <tr>
+              <th>유입구분</th>
+              <td id="dvtreqSp"></td>
+            </tr>
+            <tr>
+              <th>랜딩URL</th>
+              <td id="dvtlinkUrl"></td>
+            </tr>
+            <tr>
+              <th>신청자</th>
+              <td id="dvtreqNm"></td>
+            </tr>
+            <tr>
+              <th>연락처</th>
+              <td id="dvtreqPhonNum"></td>
+            </tr>
+            <tr>
+              <th>MNO</th>
+              <td id="dvtplanMno"></td>
+            </tr>
+            <tr>
+              <th>사업자</th>
+              <td id="dvtplanCompanyNm"></td>
+            </tr>
+            <tr>
+              <th>요금제명</th>
+              <td id="dvtreqProdNm"></td>
+            </tr>
+            <tr>
+              <th>기본요금</th>
+              <td id="dvtnormalPrice"></td>
+            </tr>
+            <tr>
+              <th>할인요금</th>
+              <td id="dvtsalePrice"></td>
+            </tr>
+            <tr>
+              <th>할인기간</th>
+              <td id="dvtpromotionPeriod"></td>
+            </tr>
+          </table>
+        </div>
+        <div class="gift-select__footer">
+          <button class="gift-select__btn gift-select__btn--apply gift-select-close4">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</html>

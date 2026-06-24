@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  tomcat:
+    image: tomcat:10.1-jdk21
+    container_name: smtong-tomcat
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # JVM 옵션
+      JAVA_OPTS: >-
+        -Xms512m
+        -Xmx1024m
+        -Dspring.profiles.active=dev
+        -Dfile.encoding=UTF-8
+        -Duser.timezone=Asia/Seoul
+      # Jasypt 암호화 키 (필수)
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+    volumes:
+      # WAR 파일 배포 경로
+      - ./build/libs/ROOT.war:/usr/local/tomcat/webapps/ROOT.war:ro
+      # 로그 저장
+      - ./logs/tomcat:/usr/local/tomcat/logs
+      # 파일 업로드 경로 (필요시)
+      # - ./upload:/smtong_project/upload_img
+    depends_on:
+      - mysql
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+

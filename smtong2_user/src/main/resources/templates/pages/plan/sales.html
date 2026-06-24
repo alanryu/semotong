@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lagn="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<title>알뜰폰 요금제 비교 | 최저가 추천 및 번호이동 | 세모통</title>
+
+	<meta name="keywords" content="알뜰폰, 알뜰폰 요금제, 최저가 요금제, 인터넷 결합, 번호이동, USIM, 통신비 절약, MVNO, 세모통" />
+	<meta name="description" content="통신호갱 없는 세상, 세모통에서 알뜰폰 요금제를 비교하고 최저가 추천을 받아보세요. USIM 신규가입 및 번호 이동을 쉽고 빠르게 할 수 있습니다!" />
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+	<!-- Open Graph (SNS 공유 최적화) -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="알뜰폰 요금제 비교 | 최저가 추천 및 번호이동 | 세모통" />
+	<meta property="og:description" content="알뜰폰 최저가 요금제를 찾고 계신가요? 세모통에서 간편하게 비교하고 USIM 신규가입, 번호이동까지 한 번에 해결하세요!" />
+	<meta property="og:image" th:content="${baseUrl} + '/images/common/semotong-og-image.jpg'" />
+	<meta property="og:url" th:content="${baseUrl}" />
+	<meta property="og:site_name" content="세모통" />
+
+	<link rel="stylesheet" type="text/css" th:href="@{/css/semotong.css}" />
+
+	<script th:src="@{/js/libs/jquery.min.js}"></script>
+	<script th:src="@{/js/libs/librurys.min.js}"></script>
+	<script th:src="@{/js/libs/jquery.tmpl.min.js}"></script>
+	<script th:src="@{/js/ui/ui.common.js}"></script>
+	<script th:src="@{/js/ui/commonUtil.js}"></script>
+	<script type="text/javascript">
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+
+		$(document).ready(function(){
+			getPlanList();
+		})
+
+		function getPlanList() {
+
+			var page = 1;
+
+			var params = {
+				 page : page,
+				 recordSize : 10,
+				 searchSalesId : $("#txtsalseId").val()
+			}
+
+			$.ajax({
+			   // url : '/sales/getPlanlist',
+			   url : '/b2b/getPlanlist',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+			   async : false,
+			   beforeSend: function(xhr){
+			       xhr.setRequestHeader(header,token);
+			    },
+				success: function (data) {
+
+				if(data.data && data.data.length > 0) {
+					data.data.forEach(function(item) {
+							item.displayPrice = 0;
+					});
+				}
+
+					console.log(data);
+
+					$('#planListTmpl').tmpl(data.data).appendTo('#planList');
+
+					/* 더보기 버튼 숨김 여부 */
+					console.log((params.page * params.recordSize));
+					console.log(data.totalCnt);
+
+					if(data.totalCnt < 1){
+						return;
+					}
+
+					data.displayPrice = 12;
+
+					if ( (params.page * params.recordSize) >= data.totalCnt ) {
+						$('.btn-more-list').hide();
+					} else {
+						$('.btn-more-list').show();
+					}
+			    },
+				error : function(request, status, error){
+
+		        },
+		        complete:function(){
+		        }
+			});
+		}
+
+		function goPlanSalesDetail(id) {
+
+			var path = window.location.pathname;
+		    var segments = path.split("/");
+		    var searchSalesId = $("#txtsalseId").val();
+			// navigateTo("/sales/" + segments[2] + "/" + segments[3] + "/planDetail?planid=" + id + "&recomSalesId="+searchSalesId);
+			navigateTo("/b2b/" + segments[2] + "/planDetail?planid=" + id + "&recomSalesId="+searchSalesId);
+		}
+	</script>
+	<!-- 요금제 카드 텝플릿 -->
+	<script id="planListTmpl" type="text/x-jquery-tmpl">
+		<li class="ratePlanC-item">
+			<!--  요금제 공통 타입 C : 요금제 상품 리스트 카드 -->
+			<div class="ratePlanC-card">
+				<div class="card-body">
+					<div class="card-util">
+						<div class="card-util-label">
+							{{if mno == 'SKT' }}
+								<span class="label skt">SKT망</span>
+							{{/if}}
+							{{if mno == 'KT' }}
+								<span class="label kt">KT망</span>
+							{{/if}}
+							{{if mno == 'LGU' }}
+								<span class="label lgu">U+망</span>
+							{{/if}}
+							{{if imageBadgeSpecial == 1 }}
+								<span class="label semotong">세모통 Only</span>
+							{{/if}}
+							{{if imageBadgeItComb == 1 }}
+								<span class="label merge">인터넷 결합</span>
+							{{/if}}
+							{{if imageBadgeSimpleOpen == 1 }}
+								<span class="label open">간편개통</span>
+							{{/if}}
+							{{if imageBadgeLowest == 1 }}
+								<span class="label lowest">최저가보상</span>
+							{{/if}}
+						</div>
+						<div class="card-util-btn">
+							{{if planLoginUserZzimCnt > 0 }}
+								<button type="button" class="ui-btn is-selected" aria-selected="true" data-planId=${id} onclick="clickZzim('${id}', this)">
+							{{else}}
+								<button type="button" class="ui-btn" aria-selected="true" data-planId=${id} onclick="clickZzim('${id}', this)">
+							{{/if}}
+								<i class="ui-icn icn-20-plan-like-gr" aria-label="좋아요"></i>
+							</button>
+							<button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#shareModal" onclick="kakaoInit('${id}','${planNameSmt}','${salePrice}','${afterPrice}');">
+								<i class="ui-icn icn-20-plan-share-gr" aria-label="공유하기"></i>
+							</button>
+						</div>
+					</div>
+					<div class="card-stit">
+						<p>{{html getPlanNm(planName,planNameSmt)}}</p>
+					</div>
+					<div class="card-tit">
+						<!--<strong>[${mno}] {{html getPlanNm(planName,planNameSmt)}}</strong>-->
+						<strong>
+							{{if planNameSmtSub == null || planNameSmtSub == ''}}
+								{{if supDataVal == 10238976}}
+								무제한
+								{{else}}
+								월 {{html getDataStr(supDataVal)}}
+								{{/if}}
+								{{if dailyData > 0}}
+								+ 매일 {{html getDataStr(dailyData)}}
+								{{/if}}
+								{{if supQos > 0}}
+								+ {{html getQosStr(supQos)}}
+								{{/if}}
+							{{else}}
+								${planNameSmtSub}
+							{{/if}}
+						</strong>
+					</div>
+					{{if supQos > 0}}
+						<div class="card-name">
+
+							{{if supQos >= 5120}}
+								남은 데이터 없이도 쾌적하게 사용할 수 있어요.(5Mbps)
+							{{else}}
+								{{if supQos < 5120 &&  supQos >= 3072 }}
+									남은 데이터 없이도 720p 화질로 볼 수 있어요.(3Mbps)
+								{{else}}
+									{{if supQos < 1000}}
+										남은 데이터 없이도 카톡 대화는 할 수 있어요.(400/700Kbps)
+									{{else}}
+										남은 데이터 없이도 음악 감상이 가능해요.(1Mbps)
+									{{/if}}
+								{{/if}}
+							{{/if}}
+						</div>
+					{{/if}}
+
+					<div class="card-info">
+						<span class="label"><i class="ui-icn icn-12-tel-gr" aria-hidden="true"></i>{{html getCallStr(supCallVal)}}</span>
+						<span class="split" aria-hidden="true"></span>
+						<span class="label"><i class="ui-icn icn-12-mail-gr" aria-hidden="true"></i>{{html getSmsStr(supSmsVal)}}</span>
+						<span class="split" aria-hidden="true"></span>
+						<span class="label"><i class="ui-icn icn-12-antena-gr" aria-hidden="true"></i>${planType}</span>
+					</div>
+					<div class="card-charge">
+						<div class="brand">
+							<img src="${planLogoImg}" alt="{hostNm} 로고" />
+							{{if reviewAvg != 0}}
+							<span class="brand-rating"><i class="ui-icn icn-14-plan-star-pr" aria-label="평점"></i>{{html getReviewAvg(reviewAvg)}}</span>
+							{{/if}}
+						</div>
+						<div class="charge">
+							{{if displayPrice == 12 }}
+								<p class="charge-tit">{{html getPriceStr(m12Price)}}</p>
+							{{else displayPrice == '24' }}
+								<p class="charge-tit">{{html getPriceStr(m24Price)}}</p>
+							{{else}}
+								<p class="charge-tit">{{html getPriceStr(salePrice)}}</p>
+								{{if secondPrice != null && secondPrice != ''}}
+									<p class="charge-point"><em class="tit">실제 체감가</em>${secondPrice}</p>
+								{{/if}}
+								{{if promotionPeriodVal == 9999}}
+									<p class="charge-txt">${promotionPeriod} </p>
+								{{else promotionPeriodVal > 0 && afterPrice >0}}
+									<p class="charge-txt">{{html getDiscountStr(promotionPeriod, afterPrice)}}</p>
+								{{/if}}
+							{{/if}}
+						</div>
+					</div>
+					<!-- 카드 클릭영역  -->
+					<button type="button" class="card-button" onclick="javascript:goPlanSalesDetail('${id}');">
+						<span class="blind">요금제 자세히 보기</span>
+					</button>
+				</div>
+				{{if planBenefitCnt > 0 }}
+				<div class="card-footer">
+					<!-- 혜택 -->
+					<div class="card-status">
+						<div class="status-gift" id="cardExpand${listSp}${id}">
+							{{each benefitList}}
+								{{if $index === 0}}
+								<p class="status-gift-tit">
+									<img src="${icon}" alt="" aria-hidden="true" class="img" />
+									{{if planBenefitCnt > 1 }}
+										<span class="count">+${planBenefitCnt -1}</span>
+									{{/if}}
+									<span class="tit">${benefitTitle}</span>
+								</p>
+								{{/if}}
+							{{/each}}
+							{{if planBenefitCnt > 1 }}
+								<button type="button" class="ui-btn" aria-expanded="false" onclick="cardExpand2('#cardExpand${listSp}${id}', this)">
+									<i class="ui-icn icn-16-plan-expand-gr" aria-label="자세히보기"></i>
+								</button>
+
+								<div class="status-gift-expanded">
+									<ul class="status-gift-list">
+										{{each benefitList}}
+											<li>
+												<img src="${icon}" alt="" aria-hidden="true" class="img" />
+												${benefitTitle}
+											</li>
+										{{/each}}
+									</ul>
+								</div>
+							{{/if}}
+						</div>
+					</div>
+					<!-- Case 선택한상태정보 -->
+				</div>
+				{{/if}}
+			</div>
+			<!--  // 요금제 공통 타입 C : 요금제 상품 리스트 카드 -->
+		</li>
+	</script>
+</head>
+<body>
+	<!-- 레이아웃이 없는 경우  -->
+	<div class="wrapper only-container">
+		<!-- Container -->
+		<main role="main" class="container">
+			<input type="hidden" id="txtsalseId" th:value="${entity.id}"/>
+			<!-- content -->
+			<div class="content F-SL01-page">
+				<!-- 이벤트 혜택 섹션 -->
+				<section class="event-benefit-sec" th:if="${entity.imagePc != null && entity.imagePc != ''}">
+					<div class="sec-inner">
+						<div class="event-benefit">
+							<img th:src="@{${entity.imagePc}}" alt="" />
+						</div>
+					</div>
+				</section>
+				<!-- // 이벤트 혜택 섹션 -->
+
+				<!-- 상품 섹션 -->
+				<section class="ratePlanC-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">추천 요금제</h2>
+						</div>
+						<div class="sec-body">
+							<!-- 요금제 공통 타입 C : 요금제 상품 리스트 -->
+							<ul class="ratePlanC-list">
+								<li class="ratePlanC-item">
+									<!--  요금제 공통 타입 C : 요금제 상품 리스트 카드 -->
+									<ul class="ratePlanC-list" id="planList">
+
+									</ul>
+									<!--  // 요금제 공통 타입 C : 요금제 상품 리스트 카드 -->
+								</li>
+							</ul>
+							<!-- // 요금제 공통 타입 C : 요금제 상품 리스트 -->
+							<button type="button" class="ui-btn btn-more-list">
+								<i class="ui-icn icn-16-more-list-gr" aria-hidden="true"></i>
+								<span>더보기</span>
+							</button>
+						</div>
+						<!-- 요금제 상품그룹 -->
+					</div>
+				</section>
+				<!-- // 상품 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+	</div>
+
+	<!-- 공유하기 Modal Alert -->
+	<div class="modal modal-alert fade" id="shareModal" tabindex="-1" role="alertdialog" aria-labelledby="shareModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="shareModalLabel">공유하기</h3>
+				</div>
+				<div class="modal-body">
+					<section class="share-sec">
+						<button type="button" class="ui-btn">
+							<i class="ui-icn icn-80-kakao" aria-hidden="true"></i>
+							<span>카카오톡</span>
+						</button>
+						<button type="button" class="ui-btn">
+							<i class="ui-icn icn-80-copy" aria-hidden="true"></i>
+							<span>URL 복사</span>
+						</button>
+					</section>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-modal normal" data-bs-dismiss="modal">
+						<span>닫기</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 공유하기 Modal Alert -->
+
+	<!-- QOS Modal Alert -->
+	<div class="modal modal-basic fade" id="QosModal" tabindex="-1" role="dialog" aria-labelledby="QosModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="QosModalLabel">QoS(데이터 소진 시 속도) </h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<section class="qos-sec">
+						<table class="qos-table">
+							<caption>
+								<strong>QoS(데이터 소진 시 속도) 표</strong>
+								<p>속도, 인터넷, 유튜브 재생 속도 로 구성됨</p>
+							</caption>
+							<colgroup>
+								<col style="width: 80rem;" />
+								<col style="width: auto;" />
+								<col style="width: 80rem;" />
+							</colgroup>
+							<thead>
+								<tr>
+									<th scope="col">전송 속도</th>
+									<th scope="col">인터넷</th>
+									<th scope="col">재생 속도</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>1Mbps</td>
+									<td>텍스트와 용량이 작은 <br>이미지 페이지 이용 가능</td>
+									<td>480p</td>
+								</tr>
+								<tr>
+									<td>3Mbps</td>
+									<td>용량이 큰 이미지 파일 등 <br>큰 불편함 없이 이용 가능</td>
+									<td>720p</td>
+								</tr>
+								<tr>
+									<td>5Mbps</td>
+									<td>대부분 쾌적하게 이용 가능</td>
+									<td>100p</td>
+								</tr>
+							</tbody>
+						</table>
+					</section>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // QOS Modal Alert -->
+</body>
+</html>

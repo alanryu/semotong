@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='07',menuId = ${ #strings.equals(param.type, '05') ? '0102' : ( #strings.equals(param.type, '06') ? '0103' : '0101') }">
+	  
+<th:block layout:fragment="css">
+</th:block>
+
+<th:block layout:fragment="script">
+	<script type="text/javascript">
+		$(document).ready(function(){
+			
+			$(document).keypress(function(e) { 
+				if (e.keyCode == 13) e.preventDefault(); 
+			});
+			
+			/* 등록/수정 판단 */
+			if ( $(location).attr('href').indexOf('insert') != -1 ) {
+				var url = $(location).attr('href');
+				var searchParams = new URL(url).searchParams;
+				var type = searchParams.get('type');
+				
+				
+				dateDisable('ALWAYS');
+				
+				$('.btn-proc').html('등록');
+			}
+			
+			/* 수정일 경우 유형 수정불가 */
+			if ( $(location).attr('href').indexOf('update') != -1 ) {
+				$('input[name=type]').prop('disabled', true);
+				dateDisable($('input[name=status]:checked').val());
+				$('.btn-proc').html('수정');
+				
+				/* 이미지 파일 이름 set */
+				$('#fileText1').val($('#orgImagePc').val());
+				$('#fileText2').val($('#orgImageMo').val());
+			}
+			
+			
+			
+			/* 게시기간 변경 */
+			$('input[name=status]').on('change', function(){
+				var stat = $('input[name=status]:checked').val();
+				dateDisable(stat);
+			});
+			
+			/* 등록 확인 버튼 */
+			$('#confirm').on('click', function(){
+				window.history.back();
+			});
+			
+
+			
+			
+			/* 항목명 */
+			$(document).on('keyup', 'input[name=bannerName]', function(e){
+				var length = $(this).val().length;
+				
+				if ( length > 30 ) {
+					var val = $(this).val().substring(0,30);
+					$(this).val( val );
+				}
+			});
+
+			
+			
+			const colorInput = document.getElementById('bgColor');
+			var bgColor = "[[${entity?.bgColor}]]";
+			if(bgColor=="") bgColor = "#0967e1";
+			colorInput.value = bgColor;
+		
+		})
+		
+		/* 등록/수정 */
+		function insupdProc() {
+			
+			var isValid = validationCheck();
+			
+			/* 모든 조건을 충족시키면 넘긴다. */
+			if ( isValid ) {
+				$('input[name=type]').prop('disabled', false);
+				
+				var formData = new FormData($('#form')[0]);
+				
+				
+				
+				$.ajax({
+					url 		: '/svc/mainbanner/insupdProc',
+					type 		: 'post',
+					enctype 	: 'multipart/form-data',
+					data 		: formData,
+					async 		: false,
+					contentType : false,
+					processData : false,
+					success 	: function (data) {
+						var alertTxt = '등록되었습니다';
+						if ( $(location).attr('href').indexOf('update') != -1 ) {
+							alertTxt = '수정되었습니다.';
+						}
+						
+						showAlert(alertTxt);
+					},
+					error 		: function(request, status, error){
+						alert(error);
+					},
+					complete 	: function(){
+					}
+				});
+				
+				$('input[name=type]').prop('disabled', true);
+			}
+		}
+		
+		/* 게시기간 disable */
+		function dateDisable(stat) {
+			if ( stat == 'ALWAYS') {
+				$('#std, #etd, #stdHm, #etdHm').prop('disabled', true);
+			} else {
+				$('#std, #etd, #stdHm, #etdHm').prop('disabled', false);
+			}
+		}
+		
+		/* validation 체크 */
+		function validationCheck() {
+			
+			var validIdx = 0
+			
+			/* 게시기간 */
+			if ( $('input[name=status]:checked').val() == 'ALWAYS' ) {
+				$('#req-status').find('.required').remove();
+			} else if ( $('input[name=status]:checked').val() == 'TERM' ) {
+				if ( $('#std').val() == '' || $('#stdHm').val() == '' ||
+					$('#etd').val() == '' || $('#etdHm').val() == '' ) {
+					$('#req-status').find('.required').remove();
+					$('#req-status').append('<span class="required">게시기간을 입력해주세요.</span>');
+					validIdx++;
+				} else {
+					$('#req-status').find('.required').remove();
+				}
+			}
+			
+			/* 항목명 */
+			if ( $.trim($('input[name=bannerName]').val()) == '' ) {
+				$('#req-bannerName').find('.required').remove();
+				$('#req-bannerName').append('<span class="required">항목명을 입력해주세요.</span>');
+				validIdx++;
+			} else {
+				$('#req-bannerName').find('.required').remove();
+			}
+			
+			/* PC 배너 */
+			if ( $('#fileText1').val() == '' ) {
+				$('#req-imagePc').find('.required').remove();
+				$('#req-imagePc').append('<span class="required">PC배너를 등록해주세요.</span>');
+				validIdx++;
+			} else {
+				$('#req-imagePc').find('.required').remove();
+			}
+			
+			/* 모바일 배너 */
+			if ( $('#fileText2').val() == '' ) {
+				$('#req-imageMo').find('.required').remove();
+				$('#req-imageMo').append('<span class="required">모바일배너를 등록해주세요.</span>');
+				validIdx++;
+			} else {
+				$('#req-imageMo').find('.required').remove();
+			}
+			
+			
+			/* 배경색 컬러 텍스트 */
+			if ( $.trim($('input[name=bgColor]').val()) == '' ) {
+				$('#req-bgColor').find('.required').remove();
+				$('#req-bgColor').append('<span class="required">배경색을 입력해주세요.</span>');
+				validIdx++;
+			} else {
+				$('#req-bgColor').find('.required').remove();
+			}
+			
+			/* 대체 텍스트 */
+			if ( $.trim($('input[name=bannerAlt]').val()) == '' ) {
+				$('#req-bannerAlt').find('.required').remove();
+				$('#req-bannerAlt').append('<span class="required">대체 텍스트값을 입력해주세요.</span>');
+				validIdx++;
+			} else {
+				$('#req-bannerAlt').find('.required').remove();
+			}
+			
+			var flag = true;
+			if ( validIdx > 0 ) {
+				flag = false;
+			}
+			return flag;
+		}
+		
+	
+	
+		/* 취소 버튼 */
+		function formClose() {
+			showConfirm('입력한 내용이 저장되지 않습니다.<br/> 목록으로 돌아가시겠습니까?',
+					() => { window.history.back() },
+					() => {},
+					''
+			)
+		}
+		
+		
+		function openViewPlanDetail(planId) {
+			window.open("/pbm/plan/view?searchId="+planId);
+			
+		}
+	</script>
+</th:block>
+<div class="main-content">
+	<div class="container-fluid">
+		<!-- 로케이션 & 제목 영역 추가 -->
+	    <div class="page-header mb-4">
+	        <div class="location mb-2">
+	            <small class="text-secondary">
+	                <i class="fas fa-home me-1"></i>
+	                <a href="/mbm/adminuser/list">홈</a> > <a href="#none;">서비스관리</a> > <a href="#none;">메인 배너관리</a>
+	            </small>
+	        </div>
+	        <h2 class="page-title fs-4 mb-4">메인빅배너 <span class="btn-proc">수정</span></h2>
+	    </div>
+	</div>
+	
+	<form name="form" id="form">
+	<input type="hidden" name="id" id="id" th:value="${entity?.id}"/>
+	<input type="hidden" name="type" value="07"/>
+	<div class="search-section detail">
+		
+		<div class="form-row full-width">
+		    <div class="form-label mb-0">항목명<span class="required">*</span></div>
+		    <div class="form-control-wrap" id="req-bannerName">
+		        <input type="text" class="form-control" id="bannerName" name="bannerName" placeholder="항목명을 입력해주세요." th:value="${entity?.bannerName}">
+		    </div>
+		</div>
+				
+	    <div class="form-row full-width">
+	        <div class="form-label mb-0">게시기간<span class="required">*</span></div>
+	        <div class="form-control-wrap d-flex align-items-center gap-2" id="req-status">
+	            <div class="form-check">
+	                <input class="form-check-input" type="radio" name="status" th:checked="${entity?.status eq 'ALWAYS' || entity == null}" value="ALWAYS" checked>
+	                <label class="form-check-label" for="dateset1">디폴트(상시게시)</label>
+	            </div>
+	            <div class="form-check">
+	                <input class="form-check-input" type="radio" name="status" th:checked="${entity?.status eq 'TERM'}" value="TERM">
+	                <label class="form-check-label" for="dateset2">기간설정</label>
+	            </div>
+	            <div class="d-flex align-items-center gap-2">
+	                <input type="date" class="form-control" name="std" id="std" th:value="${#temporals.format(entity?.startDate, 'yyyy-MM-dd')}">
+	                <input type="time" class="form-control" name="stdHm" id="stdHm" th:value="${#temporals.format(entity?.startDate, 'HH:mm')}">
+	                <span class="text-secondary">-</span>
+	                <input type="date" class="form-control" name="etd" id="etd" th:value="${#temporals.format(entity?.endDate, 'yyyy-MM-dd')}">
+	                <input type="time" class="form-control" name="etdHm" id="etdHm" th:value="${#temporals.format(entity?.endDate, 'HH:mm')}">
+	            </div>
+	        </div>
+	    </div>
+	    
+	    <div class="form-row full-width">
+	        <div class="form-label mb-0">PC 배너<span class="required">*</span></div>
+	        <div class="form-control-wrap" id="req-imagePc">
+	            <div class="file-input-wrap">
+	            	<input type="hidden" id="orgImagePc" th:value="${entity?.orgImagePc}">
+	                <input type="text" class="form-control" readonly id="fileText1">
+	                <input type="file" name="imagePc" id="fileInput1" class="file-input" style="display: none;" accept="image/*">
+	                <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput1').click()" style="min-width:70px">찾기</button>
+	            </div>
+	            <div class="file-info c_red">
+	                이미지 형식의 파일만 업로드 가능합니다. (jpg, png, jpeg) / 권장 사이즈: 720x160
+	            </div>
+	            <div class="preview-wrap">
+	            	<img id="preview1" class="preview-image" th:src="@{${entity?.imagePc}}" style="display:none;">
+	
+	            </div>
+	        </div>
+	    </div>
+	
+	
+	    <div class="form-row full-width">
+	        <div class="form-label mb-0">모바일 배너<span class="required">*</span></div>
+	        <div class="form-control-wrap" id="req-imageMo">
+	            <div class="file-input-wrap">
+	            	<input type="hidden" id="orgImageMo" th:value="${entity?.orgImageMo}">
+	                <input type="text" class="form-control" readonly id="fileText2" th:value="${entity?.orgImageMo}">
+	                <input type="file" name="imageMo" id="fileInput2" class="file-input" style="display: none;" accept="image/*">
+	                <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput2').click()" style="min-width:70px">찾기</button>
+	            </div>
+	            <div class="file-info c_red">
+	                이미지 첨부의 파일만 업로드 가능합니다. (jpg, png, jpeg) / 권장 사이즈: 328x140
+	            </div>
+	            <div class="preview-wrap">
+	            	<img id="preview2" class="preview-image" th:src="@{${entity?.imageMo}}" style="display:none;">
+
+	            </div>
+	        </div>
+	    </div>
+		
+		<!-- 버튼 컬러 -->
+		<div class="form-row full-width">
+		    <div class="form-label">
+				배경색 설정<span class="required">*</span>
+		    </div>
+		    <div class="form-control-wrap" id="req-bgColor">
+				<input type="color" id="bgColor" name="bgColor" required>
+		    </div>
+		</div>	
+		
+		<!-- 로고 컬러 -->
+		 <div class="form-row full-width">
+		     <div class="form-label">
+		        로고 컬러
+		     </div>
+			<div class="form-control-wrap">
+		         <div class="form-check-group">
+	
+					<div class="form-check">
+		                <input class="form-check-input" type="radio" id="logoColor01" name="logoColor" th:checked="${entity?.logoColor eq 'W' || entity == null}" value="W" checked >
+		                <label class="form-check-label" for="logoColor01">화이트</label>
+		            </div>
+		            <div class="form-check">
+		                <input class="form-check-input" type="radio" id="logoColor02" name="logoColor" th:checked="${entity?.logoColor eq 'B'}" value="B">
+		                <label class="form-check-label" for="logoColor02">블랙</label>
+		            </div>
+		         </div>
+		     </div>
+		 </div>
+	 		
+	    <div class="form-row full-width">
+	        <div class="form-label">
+	            대체 텍스트<span class="required">*</span>
+	        </div>
+	        <div class="form-control-wrap" id="req-bannerAlt">
+	            <input type="text" class="form-control" name="bannerAlt" placeholder="대체 텍스트(alt값)를 입력해주세요." th:value="${entity?.bannerAlt}">
+	        </div>
+	    </div>
+	    <div class="form-row full-width">
+	        <div class="form-label">
+	            랜딩URL
+	        </div>
+	        <div class="form-control-wrap">
+	            <input type="text" class="form-control" name="url" placeholder="URL을 입력해주세요." th:value="${entity?.url}">
+	        </div>
+	    </div>
+	</div>
+	</form>
+	
+	<!-- 버튼 영역 -->
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="formClose()">
+            취소
+        </button>
+        <button type="button" class="btn btn-lg btn-dark px-4 btn-sm btn-proc" onclick="insupdProc()">
+            등록
+        </button>
+    </div>
+  
+</div>

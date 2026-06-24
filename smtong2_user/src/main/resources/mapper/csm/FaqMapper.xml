@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.csm.faq.mapper.FaqMapper">
+
+	<sql id="listWhere">
+		<where>
+			<if test='displayYn != null and displayYn !=""'>
+				AND display_yn = #{displayYn}
+			</if>
+			
+			<if test='categoryId != null and categoryId !=""'>
+				AND faq_category = #{categoryId}
+			</if>
+					
+	   		<if test='keyword != null and keyword !=""'>
+				AND inquiry LIKE CONCAT('%', #{keyword}, '%')
+			</if>		
+		</where>
+	</sql>
+	
+	<sql id="Base_Column_list">
+		id
+		,GET_CODE_NAME('faq_cate', faq_category) faqCategoryNm
+		,faq_category
+		,inquiry
+		,ans_content
+		,display_yn
+		,create_date
+		,create_id
+		,modified_date
+		,modified_id
+
+	</sql>
+	
+	<select id="getListFaq" parameterType="kr.co.ucomp.web.csm.faq.dto.FaqSearchDto" resultType="kr.co.ucomp.web.csm.faq.entity.FaqEntity">
+		  SELECT
+	            <include refid="Base_Column_list" />
+	        FROM
+	            tb_csm_faq_list
+	        <include refid="listWhere" />
+	        <if test="notCategory != null and notCategory != ''">
+	        	AND faq_category != #{notCategory}
+	        </if>
+	        ORDER BY faq_category ASC,order_no DESC
+	        <!-- LIMIT #{offset}, #{recordSize} -->
+
+	</select>
+
+	<select id="getListFaqCount" parameterType="kr.co.ucomp.web.csm.faq.dto.FaqSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+	        FROM
+	            tb_csm_faq_list
+	        <include refid="listWhere" />
+	</select>
+	
+	
+	<select id="getFaq" parameterType="int" resultType="kr.co.ucomp.web.csm.faq.entity.FaqEntity">
+		SELECT
+	            <include refid="Base_Column_list" />
+	        FROM
+	            tb_csm_faq_list
+	        WHERE id=#{id}
+	</select>
+	
+	<insert id="create"  parameterType="kr.co.ucomp.web.csm.faq.entity.FaqEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+	
+	INSERT INTO tb_csm_faq_list (faq_category,inquiry,ans_content,display_yn,create_id,modified_id) 
+	VALUES(	#{faqCategory},
+			#{inquiry},
+			#{ansContent},
+			'Y',
+			#{createId},
+			#{modifiedId}
+	);
+	
+	
+	</insert>
+	
+	<update id="update"  parameterType="kr.co.ucomp.web.csm.faq.entity.FaqEntity" >
+	UPDATE tb_csm_faq_list SET titkr.co.ucomp.web.csm.faq.faq.	content=#{ansContent}, 
+				qna_category=#{faqCategory}, 
+				disable=#{displayYn}, 
+				modified_id=#{modifiedId},
+				modified_date=NOW()
+	WHERE id=#{id};
+	
+	</update>
+	
+	<delete id="delFaq" parameterType="Long">
+		DELETE FROM tb_csm_faq_list
+	    WHERE id=#{id}
+	</delete>
+</mapper>

@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	 xmlns:th="http://www.thymeleaf.org"
+	 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	 layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='04',menuId ='02'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<style type="text/css">
+	#loading_spinner{
+		display: none;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		z-index: 99;
+	}
+	.cv_spinner{
+		height: 100%;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		align-content: stretch;
+		justify-content: center;
+		align-items: baseline;
+		position: relative;
+	}
+	.spinner {
+	  width: 100px;
+	  height: 100px;
+	  border: 15px #ddd solid;
+	  border-top: 15px #2e93e6 solid;
+	  border-radius: 50%;
+	  animation: sp-anime 0.8s infinite linear;
+	}
+	@keyframes sp-anime {
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+	</style> 
+	
+</th:block>
+
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script> 
+
+<script id="loglistTmpl" type="text/x-jquery-tmpl">
+	<tr>
+		<td>{{html dateToStringDot(logTime)}}</td>
+		<td>${cycleId}</td>
+		<td>
+			{{if logType == 'start'}}				<span class="log-status__item log-status__item--start">	<i class="fa-solid fa-play log-status__icon"></i>					<span class="log-status__text">${logTypeName}</span></span>
+			{{else logType == 'end'}}				<span class="log-status__item log-status__item--end">	<i class="fa-solid fa-stop log-status__icon"></i>					<span class="log-status__text">${logTypeName}</span></span>
+			{{else logType == 'error'}}				<span class="log-status__item log-status__item--error">	<i class="fa-solid fa-triangle-exclamation log-status__icon"></i>	<span class="log-status__text">${logTypeName}</span></span>
+			{{else logType == 'info'}}				<span class="log-status__item log-status__item--stop">	<i class="fa-solid "></i>											<span class="log-status__text">${logTypeName}</span></span>
+			{{else logType == 'add_data'}}			<span class="log-status__item log-status__item--add">	<i class="fa-solid fa-plus log-status__icon"></i>					<span class="log-status__text">${logTypeName}</span></span>
+			{{else logType == 'update_data'}}		<span class="log-status__item log-status__item--update"><i class="fa-solid fa-arrows-rotate log-status__icon"></i>			<span class="log-status__text">${logTypeName}</span></span>
+			{{else logType == 'update_sale_status'}}<span class="log-status__item log-status__item--stop">  <i class="fa-solid ffa-ban log-status__icon"></i>					<span class="log-status__text">${logTypeName}</span></span>
+			{{/if}}
+		</td>
+		<td>${functionName}</td>
+		<td>
+			{{if logType   == 'start'}}	${message}
+			{{else logType == 'end'}}	${message}
+			{{else logType == 'error'}}	${message}
+			{{else logType == 'info'}}	${message}
+			{{else logType == 'add_data'}}		<!-- 단건 -->
+			<a href="javascript:;" class="log-status__item log-status__item--add"  		data-bs-toggle="modal" data-bs-target="#scrapingAddModal" 	onclick="popMessage('${logType}', '${message}')">
+				<span class="log-status__text">자세히보기</span>
+			</a>
+			{{else logType == 'update_data'}}	<!-- 단건 -->
+			<a href="javascript:;" class="log-status__item log-status__item--update"	data-bs-toggle="modal" data-bs-target="#scrapingChangeModal" onclick="popMessage('${logType}', '${message}')">
+				<span class="log-status__text">자세히보기</span>
+			</a>
+			{{else logType == 'update_sale_status'}}	<!-- uuid list -->
+			<a href="javascript:;" class="log-status__item log-status__item--stop" 		data-bs-toggle="modal" data-bs-target="#scrapingStopModal" 	onclick="popMessage('${logType}', '${message}')">
+				<span class="log-status__text">자세히보기</span>
+			</a>
+			{{/if}}
+		</td>
+	</tr>
+</script>
+
+<script type="text/javascript">
+
+	const planListColumnInfo = null;
+	
+	$(document).ready(function(){
+		
+		//getPlanListColumnInfo();		//스키마 얻어 오는거... 이거 않되네... ㅜ.ㅜ
+		
+		//페이징 기본(필수)
+		currentPage = 1;
+		searchList();
+		
+		scrapingAPIStatus();
+		
+	})
+	
+	function pageReload(){
+		window.location.href='/pmb/scraping/list';
+	}
+	
+	function scrapingAPIShutdown(){
+		//searchLogType
+		$("#selectTimeId").focus();
+		var params = {
+				serverUri: $("#scrapingUri").val()
+		}
+		$.ajax({
+				 url : '/pmb/scraping/scrapingShutdown'
+				,type : 'POST'
+				,dataType : "json"
+				,contentType:"application/json"
+				,data : JSON.stringify(params)
+				,success: function (data) {
+					console.log(data);				//OK
+					if(data.data != null){
+						showAlert(data.data.message, pageReload);
+					}
+				}
+				,beforeSend:function(){
+					//로딩 중
+					$('#loading_spinner').show();
+				}
+				,error : function(request, status, error){
+					//alert(error);
+				}
+				,complete:function(){
+					//로딩 종료
+					$('#loading_spinner').hide();
+				}
+		});
+		
+	}
+	
+	function scrapingStartFuncBef(){
+		
+		$('#scrapingModal').modal('hide');
+		$("#selectTimeId").focus();
+		
+		showAlert('스크래핑을 실행합니다', scrapingStartFunc );
+	}
+
+	// 중복 방지 ???
+	var dupCheck = true;
+
+	function scrapingStartFunc(){
+		
+		$("#selectTimeId").focus();
+		
+		// 중복 실행 방지
+		if (dupCheck) {
+				
+			var params = {
+					wait_time : $("#selectTimeId").val()
+					,serverUri: $("#scrapingUri").val()
+			}
+			$.ajax({
+				 url : '/pmb/scraping/scrapingStart'
+				,type : 'POST'
+				,dataType : "json"
+				,contentType:"application/json"
+				,data : JSON.stringify(params)
+				,async: false
+				,success: function (data) {
+					//console.log(data);				//OK
+					if(data.data != null){
+						showAlert(data.data.message, pageReload);
+					}
+				}
+				,beforeSend:function(){
+					//로딩 중
+					$('#loading_spinner').show();
+				}
+				,error : function(request, status, error){
+					//alert(error);
+					var data = request.responseJSON;
+					var message = data.message;
+					const messageObj = JSON.parse(message);
+					var sss = message.status;
+					//console.log('-in error messageObj:' + messageObj.status);
+					//scrapingStartFuncAft(messageObj.status);
+					//alert(messageObj.status);
+				}
+				,complete:function(){
+					//로딩 종료
+					$('#loading_spinner').hide();
+					dupCheck = false;
+				}
+			});
+		}
+	}
+	function scrapingStartFuncAft(scrapingStatus){
+		showAlert(scrapingStatus);
+	}
+	
+	
+	
+	function scrapingAPIStatus() {
+		//alert(1);
+		var params = {
+				serverUri: $("#scrapingUri").val()
+		}
+		$.ajax({
+			 url : '/pmb/scraping/scrapingStatus'
+			,type : 'POST'
+			,dataType : "json"
+			,contentType:"application/json"
+			,data : JSON.stringify(params)
+			,success: function (data) {
+				//console.log(data);				//OK
+				//{ "status": "started", "cycle_id": 1, "message": "..."}
+				//{ "status": "running", "cycle_id": 1, "wait_time": 20 }
+				//{ "status": "stopped", "cycle_id": 1, "message": "..."}
+				/*
+				프로그램 상태를 확인 할 수 없습니다.		// X		// X		없음
+				프로그램 실행 중입니다						// O		// X		엔진 실행	started
+				스크래핑 엔진이 실행 중 입니다.				// O		// O		엔진 종료	running
+				프로그램 엔진이 종료되었습니다.				// O		// X		엔진 실행	stopped
+				*/
+				$("#scrapingTextDisp").text("프로그램 상태를 확인 할 수 없습니다.");
+				$("#scrapingBtnRun").css("display","none");
+				$("#scrapingBtnTer").css("display","none");
+				
+				if(data != null && data.code == 200){
+					
+					$("#scrapingBtnRun").css("display","");
+					
+					var st = data.data.status;
+					if( st == 'started' ){
+						$("#scrapingTextDisp").text("프로그램 실행 중입니다.");
+						$("#scrapingBtnRun").css("display","none");					//실행 중 일 때 또 실행하면, already run 막아두자
+					}else if( st == 'running' ){
+						$("#scrapingTextDisp").text("스크래핑 엔진이 실행 중 입니다.");
+						$("#scrapingBtnRun").css("display","none");					//실행 중 일 때 또 실행하면, already run 막아두자
+						$("#scrapingBtnTer").css("display","");
+					}else if( st == 'stopped' ){
+						$("#scrapingTextDisp").text("스크래핑 엔진이 종료되었습니다.");
+					}
+				}
+			}
+			,error : function(request, status, error){
+				//alert(error);
+			}
+			,complete:function(){
+				// $('#loading').addClass('display-none');
+			}
+		});
+	}
+	
+	
+	// ---------------------------------- Log 조회 관련 ---------------------------------- //
+	function renderPage(page) {
+		currentPage = page;
+		searchList();
+	}
+	
+	function changeCombo(){
+		currentPage = 1;
+		searchList()
+	}
+	
+	function searchList() {
+		//페이징 기본(필수)
+		var page = currentPage;
+		if(page =="" || page == null) page =1;
+		var _recordSize =  10;
+		var pageSize = $("#pageSizse").val();
+		var lt = $("#searchLogType").val();
+		
+		var params = {
+				 searchLogType			: lt
+				,page					: page
+		 		,recordSize 			: pageSize
+		}
+		
+		$.ajax({
+			 url : '/pmb/scraping/ajaxList'
+			,type : 'POST'
+			,dataType : "json"
+			,contentType:"application/json"
+			,data : JSON.stringify(params)
+			,success: function (data) {
+				
+				var items = data.data
+				$('#searchList').empty();
+				if(data.totalCnt == 0) {
+					//
+				} else {
+					var totalCnt = data.totalCnt;
+					$.each(data.data, function(idx, obj){
+						obj.rIdx = totalCnt - ((params.page - 1) * params.recordSize + idx);
+					});
+					$('#loglistTmpl').tmpl(data.data).appendTo('#searchList');
+				}
+				renderPagination(page, data.totalCnt, pageSize)
+			}
+			,error : function(request, status, error){
+			}
+			,complete:function(){
+			}
+		});
+	}
+	// ---------------------------------- Log 조회 관련 ---------------------------------- //
+	
+	// ----------------------------------------------------------------------------------------------------------------------------- modal 세팅 -------------------------------- //
+	function popMessage(a, b) {
+		//a 는 logType,  b= message
+		//tb_pmb_plan_data
+		const colObj = {
+
+				 uuid			:"UUID (해당테이블에서의 고유값)"
+				 ,telecom		:"제공업체"
+				 ,mno			:"SKT, KT, U+ 등의 통신사"
+				 ,plan_type		:"요금제 타입 (5G or LTE)"
+				 ,plan_name		:"요금제 명"
+				 ,normal_price	:"요금제 기본료 (할인 전 금액)"
+				 ,sale_price	:"요금제 할인액 (할인 이후 금액)"
+				 ,after_price	:"요금제 최종 금액"
+				 ,promotion_period		:"프로모션 기간"
+				 ,data			:"요금제 데이터 양 (mb단위임)"
+				 ,qos			:"QoS (통신 서비스의 품질, Kbps)"
+				 ,voice_call	:"요금제 전화 양"
+				 ,buga_call		:"부가통화"
+				 ,message		:"요금제 메세지 양"
+				 ,combination	:"결합"
+				 ,benefit		:"구매 혜택"
+				 ,freebies		:"사은품"
+				 ,url			:"요금제 신청 url"
+				 ,business_name	:"사업자명"
+				 ,etc			:"기타 정보"
+				 ,sale_status	:"판매 상태"
+				 ,create_date	:"생성 날짜"
+				 ,modified_date	:"요금제 데이터 최근 수정 날짜"
+				 ,company_id	:"협력사 ID"
+				 ,plan_code		:"개통용 요금제코드"
+
+		};
+		
+		const obj = JSON.parse(b);		//OK
+		
+		if(a == 'add_data'){
+			//$(add_data).show; //const obj = JSON.parse(json);
+			const obj = JSON.parse(b);
+			$('#addTd').text(obj.uuid);
+			$('#addGoBtn').val(obj.uuid);
+			
+		}else if(a == 'update_data'){
+			// 데이타 수정
+			var _uuid = obj.uuid;
+			
+			$("#changePuuid").text('UUID: ' + _uuid);
+			
+			console.log(obj);
+			
+			var _changes = obj.changes;
+			var _column	= _changes[0].column;
+			var _old 	= _changes[0].old;
+			var _new 	= _changes[0].new;
+			if(_old == '0'){
+				_old = 'N';
+			}else if(_old == '1'){
+				_old = 'Y';
+			}
+			if(_new == '0'){
+				_new = 'N';
+			}else if(_new == '1'){
+				_new = 'Y';
+			}
+			//console.log(_uuid + '/' +_column + '/' +_old + '/' +_new )
+			$("#changeTdCol").text(colObj[_column]);
+			$("#changeTdOld").text(_old);
+			$("#changeTdAft").text(_new);
+			$('#changeGoBtn').val(obj.uuid);
+			
+		}else if(a == 'update_sale_status'){
+			// 판매상태 변셩 
+			//getIdsByUuid(b.updated_uuids);
+			const obj = JSON.parse(b);
+			const uuids = obj.updated_uuids;
+			
+			var addText = "";
+			uuids.forEach(function(uuid) {
+				addText += '<a href="javascript:goDetail(\''+uuid+'\');" >' + uuid +'</a>' + '   ';
+			});
+			
+			$("#listTd").html(addText);
+		}
+
+	}
+	
+	function goDetail(val){
+		var resultId = '';
+		var params = {
+				searchUuid			: val
+		}
+		$.ajax({
+				url : '/pmb/scraping/ajaxGetPlanId'
+				,type : 'POST'
+				,dataType : "json"
+				,contentType:"application/json"
+				,data : JSON.stringify(params)
+				,success: function (data) {
+					resultId = data.id;
+					window.location.href='/pbm/plan/edit?searchId=' + resultId;
+				},
+				error : function(request, status, error){
+					//alert(error);
+				},
+				complete:function(){
+					// $('#loading').addClass('display-none');
+				}
+		});
+		
+	}
+	
+	
+	
+	
+	// --------------------------------------------- excel ---------------------------------------- //
+	function downloadExcel() {
+		
+		//페이징 기본(필수)
+		var page = 1;
+		if(page =="" || page == null) page =1;
+		var _recordSize =  9999;
+		
+		var lt = $("#searchLogType").val();
+		
+		var params = {
+				 searchLogType			: lt
+				,page					: page
+		 		,recordSize 			: _recordSize
+		}
+		
+		var _url = '/pmb/scraping/exceldown';
+		
+		downloadExcelProc(params,_url,"ScrapingList");
+	}
+	
+	
+	
+	// --------------------------------------------- 않씀 ---------------------------------------- //
+	/*
+	//getPlanListColumnInfo();
+	function getPlanListColumnInfo(){
+		$.ajax({
+				url : '/pmb/scraping/ajaxGetColumnInfo'
+		});
+	}
+	
+
+	function getIdsByUuid(val){
+		$.ajax({
+				url : '/pmb/scraping/ajaxGetPlanIds'
+		});
+	}
+	*/
+	// --------------------------------------------- 않씀 ---------------------------------------- //
+	
+</script>
+
+</th:block>
+
+<div class="main-content">
+	
+	<!-- JQuery 로딩중 -->
+	<div id="loading_spinner">
+		<div class="cv_spinner">
+			<span class="spinner"></span>
+		</div>
+	</div>
+	
+	<div class="container-fluid">
+		
+		<!-- 로케이션 & 제목 영역 추가 -->
+		<div class="page-header mb-4">
+			<div class="location mb-2">
+				<small class="text-secondary">
+					<i class="fas fa-home me-1"></i>
+					<a href="javascript:;">홈</a>
+					  >
+					<a href="javascript:;">상품관리</a>
+					  >
+					<a href="/pmb/scraping/list">스크래핑 관리</a>
+				</small>
+			</div>
+			<h2 class="page-title fs-4 mb-4">
+				스크래핑 관리
+			</h2>
+			<h3 class="page-title fs-5 mb-1">
+			  요금제 스크래핑 프로그램
+			</h3>
+			<div class="scraping__status mb-4">
+				<span>현재상태: </span></span> <b id="scrapingTextDisp">프로그램 상태를 확인할 수 없습니다.</b>
+				<div class="btn-group" role="group">
+					<button type="button" class="btn btn-primary btn-custom btn-sm"	id="scrapingBtnRun" data-bs-toggle="modal" data-bs-target="#scrapingModal">
+						<i class="fa-solid fa-play"></i>
+						스크래핑 엔진 실행
+					</button>
+					<button type="button" class="btn btn-danger btn-custom btn-sm"	id="scrapingBtnTer" onclick="
+						  showConfirm(
+							'스크래핑 엔진을 종료하시겠습니까?',
+							() => {
+								// 확인 시 실행할 로직
+								//console.log('엔진종료 클릭');
+								scrapingAPIShutdown();
+							},
+							() => {
+								// 취소 시 실행할 로직
+								//console.log('취소 클릭');
+							}
+						);
+						
+					">
+						<i class="fa-solid fa-stop"></i>
+						스크래핑 엔진 종료
+					</button>
+				</div>
+			</div>
+			
+			
+			<input type="hidden" id="scrapingUri" th:value="${scrapingUri}" >
+			
+			<!--  //table-section  -->
+			<div class="table-section">
+				
+				<!-- 테이블 상단 -->
+				<div class="d-flex justify-content-between align-items-center mb-4">
+					<div class="d-flex align-items-center gap-3">
+						<h6 class="mt-2">수집로그</h6>
+						<select class="form-select" style="width: 140px" id="searchLogType" onchange="changeCombo()">
+							<option value= "ALL">			로그 타입 전체</option>
+							<option value= "start">			시작</option>
+							<option value= "end">			정지</option>
+							<option value= "info">			정상로그</option>
+							<option value= "error">			에러로그</option>
+							<option value= "add_data">		데이터추가</option>
+							<option value= "update_data">	데이터수정</option>
+							<option value= "update_sale_status">	판매상태수정</option>
+							
+							<!-- <option value= "10">			판매정지</option> -->
+						</select>
+					</div>
+					<div class="header-actions">
+						<select class="form-select" style="width: 100px" id="pageSizse" onchange="changeCombo()">
+							<option value= "10">10개씩</option>
+							<option value= "20">20개씩</option>
+							<option value= "30">30개씩</option>
+							<option value= "40">40개씩</option>
+							<option value= "50">50개씩</option>
+						</select>
+						
+						<div class="header-actions">
+							<button class="btn btn-light btn-sm">
+								<i class="fas fa-download"></i>
+								다운로드
+							</button>
+						</div>
+						
+					</div>
+				</div>
+
+
+				<!-- 테이블 조회 내역 -->
+				<table class="table custom-table">
+					<thead>
+						<tr>
+							<th>일시</th>
+							<th>싸이클 번호</th>
+							<th>로그 타입</th>
+							<th>사이트명</th>
+							<th>메시지</th>
+						</tr>
+					</thead>
+					<tbody id="searchList">
+					</tbody>
+				</table>
+				<div class="d-flex justify-content-between mt-4">
+					<ul class="pagination">
+					</ul>
+				</div>
+				<!-- //테이블 조회 내역 -->
+				
+				
+				
+				
+				
+				
+				
+				
+					
+			</div>
+			<!--  //table-section  -->
+			
+		
+		
+		</div>
+		<!-- //로케이션 & 제목 영역 추가 -->
+	
+	
+	
+	</div>
+	<!--  //container-fluid -->
+	
+	
+	
+	<!-- 엔진 실행 팝업 -->																									<!-- 엔진 실행 팝업 --><!-- 엔진 실행 팝업 --><!-- 엔진 실행 팝업 --><!-- 엔진 실행 팝업 -->
+	<div class="modal fade" id="scrapingModal" tabindex="-1" aria-labelledby="scrapingModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header border-0 pb-0 mb-4">
+					<h5 class="modal-title fs-6 fw-bold" id="scrapingModalLabel">스크래핑 엔진 실행</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body pt-2 pb-4">
+					<div class="form-row-modal">
+						<div class="form-label-modal">재실행주기</div>
+						<div class="form-control-wrap-modal">
+							<select class="form-select" id="selectTimeId">
+								<option value="10" selected	>10분</option>
+								<option value="20"			>20분</option>
+								<option value="30"			>30분</option>
+								<option value="60"			>1시간</option>
+								<option value="180"			>3시간</option>
+								<option value="360"			>6시간</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer border-0 pt-0">
+					<button type="button" class="btn btn-secondary px-4 btn-sm" data-bs-dismiss="modal" aria-label="Close">취소</button>
+					<!-- <button type="button" class="btn btn-dark px-4 btm-sm"  data-bs-dismiss="modal" aria-label="Close" onclick="scrapingStartFuncBef()">실행</button> -->
+					<button type="button" class="btn btn-dark px-4 btm-sm" onclick="scrapingStartFuncBef()">실행</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
+	
+	<!-- 메세지 3종 -->																													<!-- 메세지 3종 --><!-- 메세지 3종 --><!-- 메세지 3종 --><!-- 메세지 3종 -->
+	<!-- 데이터 추가 팝업 -->
+		  <div class="modal fade" id="scrapingAddModal" tabindex="-1" aria-labelledby="scrapingAddModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header border-0 pb-0 mb-4">
+						<h5 class="modal-title fs-6 fw-bold" id="scrapingModalLabel">스크래핑 엔진 실행</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="bnf-select__table__outer otherH mb-3">
+					  <table class="bnf-select__table">
+						<colgroup>
+						  <col style="width: 20%">
+						  <col style="width: 80%">
+						</colgroup>
+						<tr>
+							<td class="bnf-select__th">
+								로그타입
+							</td>
+							<td class="bnf-select__td">데이터추가</td>
+						</tr>
+						<tr>
+							<td class="bnf-select__th">
+								UUID
+							</td>
+							<td class="bnf-select__td" id="addTd">Amobile67092</td>
+						</tr>
+					  </table>
+					</div>
+					<div class="modal-footer border-0 pt-0">
+						<button type="button" class="btn btn-secondary px-4 btn-sm" data-bs-dismiss="modal" aria-label="Close">닫기</button>
+						<button type="button" class="btn btn-dark px-4 btm-sm" onclick="goDetail(this.value)" id="addGoBtn">
+						  <i class="fas fa-calculator"></i>
+						  <span>해당 요금제 페이지 열기</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- 데이터 변경 팝업 -->
+		<div class="modal fade" id="scrapingChangeModal" tabindex="-1" aria-labelledby="scrapingChangeModalLabel" aria-hidden="true">
+		  <div class="modal-dialog modal-dialog-centered">
+			  <div class="modal-content">
+				  <div class="modal-header border-0 pb-0 mb-4">
+					  <h5 class="modal-title fs-6 fw-bold" id="scrapingModalLabel">메시지 상세보기</h5>
+					  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				  </div>
+				  <p class="mx-lg-4" id="changePuuid">UUID: Amobile67085</p>
+				  <div class="bnf-select__table__outer otherH mb-3">
+					<table class="bnf-select__table">
+					  <colgroup>
+						<col style="width: 20%">
+						<col style="width: 40%">
+						<col style="width: 40%">
+					  <tr>
+						<td class="bnf-select__th">컬럼</td>
+						<td class="bnf-select__th">기존 값</td>
+						<td class="bnf-select__th">변경 값</td>
+					  </tr>
+					  <tr>
+						<td class="bnf-select__td" id="changeTdCol">혜택</td>
+						<td class="bnf-select__td" id="changeTdOld">* 7개월간 월 3,900원 청구|* * 권장사항 : 개통후 90일이내 데이터 100MB or 음성 15분 사용 권장</td>
+						<td class="bnf-select__td" id="changeTdAft">* 7개월간 월 3,900원 청구|* * 권장사항 : 개통후 90일이내 데이터 100MB or 음성 15분 사용 권장|* 12월16일 접수완료 및 개통완료건 까지만 해당 프로모션 적용</td>
+					  </tr>
+					</table>
+				  </div>
+				  <div class="modal-footer border-0 pt-0">
+					  <button type="button" class="btn btn-secondary px-4 btn-sm" data-bs-dismiss="modal" aria-label="Close">닫기</button>
+					  <button type="button" class="btn btn-dark px-4 btm-sm" onclick="goDetail(this.value)" id="changeGoBtn">
+						<i class="fas fa-calculator"></i>
+						<span>해당 요금제 페이지 열기</span>
+					  </button>
+				  </div>
+			  </div>
+		  </div>
+		</div>
+		
+		<!-- 판매정지 팝업 -->
+		<div class="modal fade" id="scrapingStopModal" tabindex="-1" aria-labelledby="scrapingStopModalLabel" aria-hidden="true">
+		  <div class="modal-dialog modal-dialog-centered">
+			  <div class="modal-content">
+				  <div class="modal-header border-0 pb-0 mb-4">
+					  <h5 class="modal-title fs-6 fw-bold" id="scrapingModalLabel">메시지 상세보기</h5>
+					  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				  </div>
+				  <p class="mx-lg-4">UUID: Amobile67085</p>
+				  <div class="bnf-select__table__outer otherH mb-3">
+					<table class="bnf-select__table">
+					  <colgroup>
+						<col style="width: 20%">
+						<col style="width: 80%">
+					  </colgroup>
+					  <tr>
+						  <td class="bnf-select__th">
+							  로그타입
+						  </td>
+						  <td class="bnf-select__td">판매정지</td>
+					  </tr>
+					  <tr>
+						  <td class="bnf-select__th">
+							  UUID
+						  </td>
+						  <td class="bnf-select__td" id="listTd">
+							"Amobile67051", "Amobile67068", "Amobile67071", "Amobile67072", "Amobile67073", "Amobile67074", "Amobile67075", "Amobile67087", "Amobile67089", "Amobile67090", "Amobile67092"
+						  </td>
+					  </tr>
+					</table>
+				  </div>
+				  <div class="modal-footer border-0 pt-0">
+				  
+					  <button type="button" class="btn btn-secondary px-4 btn-sm" data-bs-dismiss="modal" aria-label="Close">확인</button>
+					  <!-- 
+					  <button type="button" class="btn btn-dark px-4 btm-sm" onclick="closeAction('scrapingStopModal')">
+						<span>확인</span>
+					  </button>
+					   -->
+				  </div>
+			  </div>
+		  </div>
+		</div>
+	
+			
+	
+</div>

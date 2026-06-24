@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<script src="assets/js/guide.include.js"></script>
+<script>include.meta()</script>
+<script>include.head()</script>
+</head>
+<body>
+<div class="g-wrapper" class="g-convention-wrap">
+	<script>include.header()</script>
+	<div class="g-container">
+		<script>include.aside()</script>
+
+		<!-- Content -->
+		<article class="g-content" class="">
+			<div class="g-content-header">
+				<h1 class="g-h1">기본환경</h1>
+				<small class="g-explain-h1">Publishing Conventions</small>
+			</div>
+			<div class="g-content-body">
+				<!-- section1 -->
+				<section id="section1" class="g-section">
+					<div class="g-section-header">
+						<h2 class="g-h2">프로젝트 환경</h2>
+					</div>
+					<div class="g-section-body">
+						<div class="g-tbl-type1">
+							<table>
+								<caption>환경정의</caption>
+								<colgroup>
+									<col style="width:20%">
+									<col>
+								</colgroup>
+								<tbody>
+									<tr>
+										<th scope="row" class="align-l">문서 및 버전</th>
+										<td>HTML5, CSS3</td>
+									</tr>
+									<tr>
+										<th scope="row" class="align-l">인코딩</th>
+										<td>UTF-8</td>
+									</tr>
+									<tr>
+										<th scope="row" class="align-l">웹 유형</th>
+										<td>반응형 웹</td>
+										<!-- PC Web | Mobile Web | Responsive Web | Mobile Hybrid Web -->
+									</tr>
+									<tr>
+										<th scope="row" class="align-l">PC 웹 호환성</th>
+										<td>
+											<div class="g-browser-icons">
+												<img src="assets/img/ico_ie9.png" alt="">
+												<img src="assets/img/ico_crom.png" alt="">
+												<img src="assets/img/ico_firefox.png" alt="">
+												<img src="assets/img/ico_sapari.jpg" alt="">
+												<!-- <img src="../../img/ico_opera.png" alt=""> -->
+											</div>
+											<style type="text/css">
+												.g-browser-icons img {width:30px; height:30px;}
+											</style>
+										</td>
+									</tr>
+									<tr>
+										<th scope="row" class="align-l">Mobile 웹 호환성</th>
+										<td>
+											<div class="g-browser-icons">
+												안드로이드 6.x 이상, IOS 12.x 이상, 사파리, 크롬, IE11 이상
+											</div>
+											<style type="text/css">
+												.g-browser-icons img {width:30px; height:30px;}
+											</style>
+										</td>
+									</tr>
+									<!-- <tr>
+										<th scope="row" class="align-l">웹 접근성</th>
+										<td>기본준수(A레벨)</td>
+									</tr> -->
+									<tr>
+										<th scope="row" class="align-l">해상도 정책</th>
+										<td>
+                                            - 모바일 xs : 320 ~ 479  (기본 해상도)<br>
+                                            - 모바일 xl : 480 ~ 767  (가로모드 포함)<br>
+                                            - 가로모드 : W 960 이하, H 480 이하<br>
+                                            - 테블릿 xs : 768 ~ 1023  (가로모드 제외)<br>
+                                            <br>
+											* 모바일 가로모드는 태블릿 구간의 너비이지만 모바일에 포함되도록 한다.<br>
+											* 분기점(320, 480, 768, 1024)은 해당 구간의 최소값으로 한다.
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</section>
+				<!-- // Section1 -->
+
+				<!-- section2 -->
+				<section id="section2" class="g-section">
+					<div class="g-section-header">
+						<h2 class="g-h2">파일/폴더 규칙</h2>
+					</div>
+					<div class="g-section-body">
+						<div class="g-tbl-type1">
+							<table>
+								<caption>파일구조</caption>
+								<colgroup>
+									<col style="width:20%">
+									<col style="width:20%">
+									<col style="width:30%">
+									<col>
+								</colgroup>
+								<thead>
+									<tr>
+										<th>분류 폴더</th>
+										<th>서브 폴더</th>
+										<th>파일 이름</th>
+										<th>파일 설명</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>fonts</td>
+										<td>PretendardVariable</td>
+										<td>Pretendard*.*</td>
+										<td>
+											웹폰트 - Pretendard
+										</td>
+									</tr>
+									<tr>
+										<td>fonts</td>
+										<td>NotoSans</td>
+										<td>NotoSans*.*</td>
+										<td>
+											웹폰트 - NotoSans
+										</td>
+									</tr>
+									<tr>
+										<td>css</td>
+										<td></td>
+										<td>
+											animate.css<br>
+											librarys.min.css<br>
+											common.css<br>
+											components.css<br>
+											content.css<br>
+											main.css
+										</td>
+										<td>
+											스타일 - 에니메이트<br>
+											스타일 - 라이브러리<br>
+											스타일 - 전역 공통 : 초기화, 유틸리티, 레이아웃<br>
+											스타일 - 엘리먼트 공통 : 폼, 버튼, 표, 탭, 팝업 등<br>
+											스타일 - 컨텐츠<br>
+											스타일 - 메인
+										</td>
+									</tr>
+									<tr>
+										<td>scss</td>
+										<td>common</td>
+										<td>
+											_base.scss<br>
+											_utilities.scss<br>
+											_librarys.min.scss<br>
+											_layout.scss
+										</td>
+										<td>
+											스타일 - 웹폰트, 태그초기화<br>
+											스타일 - 유틸리티<br>
+											스타일 - 라이브러리 전체<br>
+											스타일 - 레이아웃
+										</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td>components</td>
+										<td>
+											_button.scss<br>
+											_form.scss<br>
+											_tab.scss<br>
+											... 등등
+										</td>
+										<td>
+											스타일 - 버튼<br>
+											스타일 - 서식<br>
+											스타일 - 탭<br>
+											스타일 - 기타 등등
+										</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td>contents</td>
+										<td>
+											_main.scss<br>
+											_대메뉴1.scss<br>
+											_대메뉴2.scss<br>
+											... 등등
+										</td>
+										<td>
+											스타일 - 메인<br>
+											스타일 - 대메뉴1<br>
+											스타일 - 대메뉴2<br>
+											스타일 - 기타 등등
+										</td>
+									</tr>
+									<tr>
+										<td>js</td>
+										<td>libs</td>
+										<td>
+											jquery.min.js<br>
+											librurys.min.js
+										</td>
+										<td>
+											스크립트 - 제이쿼리 코어<br>
+											스크립트 - 라이브러리 전체
+										</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td>ui</td>
+										<td>
+											ui.common.js<br>
+											ui.publish.js
+										</td>
+										<td>
+											스크립트 - Front UI<br>
+											스크립트 - Only Publishing
+										</td>
+									</tr>
+									<tr>
+										<td>img</td>
+										<td>
+											common<br>
+											content<br>
+											main<br>
+											temp
+										</td>
+										<td></td>
+										<td>
+											이미지 - 공통<br>
+											이미지 - 서브<br>
+											이미지 - 메인<br>
+											이미지 - 샘플<br>
+										</td>
+									</tr>
+									<tr>
+										<td>html</td>
+										<td>
+											_layout<br>
+											[menus]
+										</td>
+										<td></td>
+										<td>
+											공통페이지<br>
+											메뉴페이지
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</section>
+				<!-- // Section2 -->
+			</div>
+		</article>
+		<!-- //Content -->
+	</div>
+	<script>include.footer()</script>
+</div>
+</body>
+</html>

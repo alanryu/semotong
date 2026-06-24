@@ -1,0 +1,3093 @@
+@charset 'utf-8';
+//-------------------------------------------------------------------
+//	@@ Variables
+//-------------------------------------------------------------------
+// IOS Safe Area Bottom 대응 (웹에서 상단은 필요 없음, 띠의 상하여백 동일한 비율 1.7)
+$safe-area-bottom: (env(safe-area-inset-bottom, 0)/1.7);
+
+// 웹폰트
+$font-primary: 'Pretendard', 'sans-serif';
+
+// 본문영역 사이즈 (최대 여백포함 768 기준)
+$pc-outer-spacer: 24rem;
+$pc-inner-content: 720px;
+$pc-bottom-spacer: 48rem;
+$mobile-outer-spacer: 24rem;
+$mobile-inner-content: 320px;
+$mobile-bottom-spacer: 32rem;
+
+// 공통요소 사이즈
+$pc-height-header: 80rem;
+$mobile-height-header: 60rem;
+$height-footer: 76rem;
+
+// 컬러 강조
+$color-primary: #542FDD; // 첫번째
+$color-secondary: #2FBE98; // 두번째
+$color-point: #E43558; // 기타
+
+// 컬러 상태
+$color-success: green; // 성공 임시값
+$color-fail: #EA2A2A; // 실패
+$color-complete: skyblue; // 완료 임시값
+$color-error: #EA2A2A; // 에러
+$color-warning: orange; // 경고 임시값
+$color-caution: orange; // 주의 임시값
+$color-danger: orange; // 위험 임시값
+
+// 컬러 아이템
+// $color-item-best: #7762FF; // 베스트
+// $color-item-recom: #E5446D; // 추천
+$color-item-skt: #3617CE;
+$color-item-kt: #EC1B23;
+$color-item-lgu: #D0006F;
+$color-item-main: #2091AA;
+$color-item-price: #EFBD28;
+$color-item-benefit: #0084FF;
+$color-item-semotong: $color-primary;
+$color-item-merge: #EFBD28;
+$color-item-open: #0084FF;
+$color-item-lowest: #1fbc5e;
+
+// 그림자
+$box-shadow-10: 0rem 4rem 10rem 0 rgba(0,0,0,0.08);
+$box-shadow-16: 0rem 3rem 16rem 0 rgba(0,0,0,0.08);
+
+
+//-------------------------------------------------------------------
+//	@@ Mixins System
+//-------------------------------------------------------------------
+/* 피시전용 hover 스타일 대용 */
+@mixin pc-hover {
+	@media (hover: hover) and (pointer: fine) {
+		@content;
+	}
+}
+
+/* 모바일전용 hover 스타일 대응 */
+@mixin mobile-hover {
+	@media (hover: none) and (pointer: coarse) {
+		@content;
+	}
+}
+//-------------------------------------------------------------------
+//	@@ Mixins Layout
+//-------------------------------------------------------------------
+// 섹션 안쪽 여백
+@mixin in-spacer {
+	padding-left: $mobile-outer-spacer;
+	padding-right: $mobile-outer-spacer;
+	@include media-tablet-xs {
+		padding-left: $pc-outer-spacer;
+		padding-right: $pc-outer-spacer;
+	}
+}
+
+// 하단 여백
+@mixin bottom-spacer {
+	padding-bottom: $mobile-bottom-spacer;
+	@include media-tablet-xs {
+		padding-bottom: $pc-bottom-spacer;
+	}
+}
+
+// 모달 하단여백
+@mixin modal-spacer {
+	.modal-body { /* 2차 수정 : 모달 여백 수정 */
+		// padding-bottom: 16rem;
+		margin-bottom: 24rem;
+	}
+	.modal-footer { /* 2차 수정 : 모달 여백 수정 */
+		padding-top: 16rem;
+		padding-bottom: 24rem;
+	}
+}
+
+// 바깥 섹션
+@mixin out-sec {
+	min-width: $mobile-inner-content;
+	@include in-spacer;
+	transition: padding 0.2s ease;
+}
+
+// 안쪽 섹션
+@mixin in-sec {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	max-width: $pc-inner-content;
+}
+
+// 높이 채우기 레이아웃
+@mixin flex-fill-height {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	flex-basis: auto;
+}
+
+//-------------------------------------------------------------------
+//	@@ Mixins Common
+//-------------------------------------------------------------------
+// 섹션
+@mixin sec-basic {
+	.sec-header {
+		position: relative;
+		margin-bottom: 16rem;
+
+		.sec-label {
+			display: inline-block;
+			margin-bottom: 8rem;
+			padding: 4rem 8rem;
+			font-weight: 500;
+			font-size: 14rem;
+			line-height: 18rem;
+			background-color: #EAE6FB;
+			border-radius: 2rem;
+			color: $color-primary;
+		}
+		.sec-tit {
+			display: flex;
+			align-items: center;
+			font-weight: 700;
+			font-size: 20rem;
+			line-height: 24rem;
+			color: #2A2B2D;
+			.ui-icn {
+				margin-right: 4rem;
+			}
+			+ .sec-explain {
+				margin-top: 4rem;
+			}
+			@include media-mobile-xl {
+				br {
+					display: none;
+				}
+			}
+
+		}
+		.sec-explain {
+			font-weight: 600;
+			font-size: 14rem;
+			color: #63666A;
+		}
+		.btn-more {
+			position: absolute;
+			right: 0;
+			top: 0;
+			&.static {
+				position: static;
+			}
+		}
+	}
+}
+
+@mixin tab-sec-basic {
+	margin-bottom: 60rem;
+
+	.sec-header {
+		margin-bottom: 14rem;
+		.sec-tit {
+			font-weight: 700;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: #2A2B2D;
+		}
+	}
+}
+
+@mixin floating-sec {
+	position: sticky;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+	flex:none;
+	padding-top: 20rem;
+	padding-bottom: 32rem;
+	margin-bottom: -32rem; // 공간은 차지하지만 간격은 영향주지 않는다.
+	background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0rem, rgba(255, 255, 255, 1) 20rem);
+
+	.btn-action + .btn-action {
+		margin-top: 14rem;
+	}
+}
+
+// 구분선
+@mixin split-set($height, $color){
+	content:'';
+	display: block;
+	width: 1px;
+	height: $height;
+	background-color: $color;
+}
+
+@mixin ellipsis1 {
+	overflow: hidden;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+@mixin ellipsis2 {
+	overflow: hidden;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+
+@mixin ellipsis3 {
+	overflow: hidden;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+}
+
+// 그림자
+@mixin box-shadow-16 {
+	box-shadow: $box-shadow-16;
+	border-radius: 2rem;
+}
+
+@mixin box-shadow-10 {
+	box-shadow: $box-shadow-10;
+	border-radius: 2rem;
+}
+
+//-------------------------------------------------------------------
+//    Mixins Content
+//-------------------------------------------------------------------
+// 요금제 카테고리 목록
+@mixin ratePlanA-list {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 10rem;
+
+	@include media-tablet-xs {
+		display: flex;
+		gap: 0;
+		.ratePlanA-item {
+			width: 172rem;
+			flex: none;
+		}
+	}
+}
+// 요금제 카테고리 버튼
+@mixin ratePlanA-swiper {
+	.ratePlanA-button-prev,
+	.ratePlanA-button-next {
+		display: none;
+		position: absolute;
+		top: 50%;
+		right: 0;
+		z-index: 10;
+		transform: translate(50%, -50%);
+		width: 28rem;
+		height: 28rem;
+	}
+	.ratePlanA-button-prev {
+		right: auto;
+		left: 0;
+		transform: translate(-50%, -50%) rotate(180deg);
+	}
+	.swiper-button-disabled {
+		display: none;
+	}
+	@include media-tablet-xs {
+		.ratePlanA-button-prev,
+		.ratePlanA-button-next {
+			display: block;
+		}
+		.swiper-button-disabled {
+			display: none;
+		}
+	}
+}
+
+// 요금제 카테고리 카드
+@mixin ratePlanA-card {
+	position: relative;
+	padding: 20rem;
+	background-color: #fff;
+	box-sizing: border-box;
+	border-radius: 8rem;
+
+	.card-thumb {
+		position: absolute;
+		right: 12rem;
+		top: calc(50% - 24rem);
+		img {
+			width: 48rem;
+			height: 48rem;
+		}
+	}
+	.card-body {
+		text-align: left;
+
+		.card-tit {
+			font-weight: 700;
+			font-size: 20rem;
+			line-height: 28rem;
+			color: #000;
+		}
+
+		.card-charge {
+			font-weight: 600;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: $color-primary;
+		}
+
+		.card-explain {
+			margin-top: 4rem;
+			font-weight: 600;
+			font-size: 12rem;
+			line-height: 16rem;
+			color: #828588;
+			white-space: pre-line;
+			br {
+				display: none;
+			}
+		}
+	}
+
+	@include media-tablet-xs {
+		height: 180rem;
+		.card-thumb {
+			position: absolute;
+			right: 12rem;
+			top: auto;
+			bottom: 12rem;
+			img {
+				width: 40rem;
+				height: 40rem;
+			}
+		}
+		.card-body {
+			.card-explain {
+				margin-top: 8rem;
+				br {
+					all: unset;
+				}
+			}
+		}
+	}
+}
+
+// 선택 요금제 카드
+@mixin ratePlanB-card {
+	position: relative;
+	padding: 20rem 16rem;
+	background-color: #F2F5FB;
+	.card-img {
+		position: absolute;
+		right: 16rem;
+		top: 20rem;
+		width: 40rem;
+		height: 40rem;
+		img {
+			width: 100%;
+			height: 100%;
+		}
+	}
+	.card-tit {
+		position: relative;
+		font-weight: 700;
+		font-size: 18rem;
+		line-height: 24rem;
+		color: #000000;
+	}
+	.card-charge {
+		margin-top: 2rem;
+		font-weight: 600;
+		font-size: 16rem;
+		line-height: 22rem;
+		color: $color-primary;
+	}
+	.card-guide {
+		margin-top: 16rem;
+		padding: 16rem;
+		background-color: #fff;
+		border-radius: 8rem;
+		.tit {
+			margin-bottom: 8rem;
+			font-weight: 700;
+			font-size: 16rem;
+			line-height: 22rem;
+			color: #36383A;
+
+			strong {
+				display: flex;
+				align-items: center;
+			}
+
+			.ui-icn {
+				margin-right: 4rem;
+			}
+		}
+		.list {
+			li {
+				position: relative;
+				padding-left: 16rem;
+				font-weight: 500;
+				font-size: 13rem;
+				line-height: 20rem;
+				color: #63666A;
+				&::before {
+					content: '';
+					display: block;
+					position: absolute;
+					left: 5rem;
+					top: 8rem;
+					width: 3rem;
+					height: 3rem;
+					background-color: #63666A;
+					border-radius: 50%;
+				}
+			}
+		}
+	}
+}
+
+// 요금제 상품 목록
+@mixin ratePlanC-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16rem;
+	padding-top: 16rem;
+
+	.ratePlanC-item {
+		width: 100%;
+	}
+}
+
+// 요금제 상품 목록 카드
+@mixin ratePlanC-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	padding: 15rem;
+	@include box-shadow-16;
+	border-radius: 4rem;
+	border:1px solid transparent;
+
+	.card-body {
+		position: relative;
+		.card-button {
+			position: absolute;
+			left: -16rem;
+			right: -16rem;
+			top: -16rem;
+			bottom: -16rem;
+			z-index: 1;
+		}
+	}
+	.card-footer {
+		margin-top: 16rem;
+	}
+	.card-util {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 12rem;
+		&-label {
+			display: flex;
+			flex: none;
+			gap: 2rem;
+			font-size: 10rem;
+			line-height: 12rem;
+			.label {
+				display: inline-block;
+				padding: 3rem 5rem 5rem;
+				border-radius: 2rem;
+				color: #fff;
+				&.skt {
+					background-color: $color-item-skt;
+				}
+				&.kt {
+					background-color: $color-item-kt;
+				}
+				&.lgu {
+					background-color: $color-item-lgu;
+				}
+				&.main {
+					background-color: $color-item-main;
+				}
+				&.price {
+					background-color: $color-item-price;
+				}
+				&.benefit {
+					background-color: $color-item-benefit;
+				}
+				&.semotong {
+					background-color: $color-item-semotong;
+				}
+				&.merge {
+					background-color: $color-item-merge;
+				}
+				&.open {
+					background-color: $color-item-open;
+				}
+				&.lowest {
+					background-color: $color-item-lowest;
+				}
+			}
+		}
+		&-btn {
+			position: relative;
+			z-index: 10;
+			display: flex;
+			align-items: center;
+			gap: 12rem;
+			margin-left: auto;
+		}
+	}
+	.card-stit {
+		margin-bottom: 3rem;
+		font-weight: 500;
+		font-size: 10rem;
+		line-height: 14rem;
+		color: #96989B;
+	}
+	.card-tit {
+		font-weight: 700;
+		font-size: 20rem;
+		color: #000;
+		.ui-btn {
+			z-index: 10;
+			top: 1rem;
+			margin-left: 4rem;
+		}
+	}
+	.card-name {
+		margin-top: 4rem;
+		font-size: 12rem;
+		color: #777;
+	}
+	.card-info {
+		display: flex;
+		align-items: center;
+		gap: 6rem;
+		margin-top: 8rem;
+		margin-bottom: 20rem;
+		padding: 2rem 0;
+
+		.split {
+			display: inline-block;
+			width: 3rem;
+			height: 3rem;
+			border-radius: 50%;
+			background-color: #CFD0D1;
+		}
+
+		.label {
+			display: inline-flex;
+			align-items: center;
+			color: #494949;
+			font-weight: 500;
+			font-size: 12rem;
+			line-height: 12rem;
+			.ui-icn {
+				margin-right: 4rem;
+			}
+		}
+	}
+	.card-charge {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+
+		.brand {
+			display: flex;
+			align-items: center;
+			height: 20rem;
+			gap: 4rem;
+			margin-top: 1rem;
+			img {
+				height: 100%;
+			}
+			.brand-rating {
+				display: inline-flex;
+				align-items: center;
+				padding: 2rem 8rem 2rem 4rem;
+				border:1px solid #CDC2F5;
+				border-radius: 15rem;
+				color: $color-primary;
+				font-weight: 500;
+				font-size: 12rem;
+				line-height: 14rem;
+			}
+		}
+		.charge { /* 4차 수정 : 요금제 공통 할인금액 조건부 노출 대응 */
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+			align-items: flex-end;
+			position: relative;
+			text-align: right;
+
+			.charge-tit { /* 4차 수정 : 요금제 공통 할인금액 조건부 노출 대응 */
+				margin-bottom: 2rem;
+				font-weight: 700;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #000;
+			}
+			.charge-txt { /* 4차 수정 : 요금제 공통 할인금액 조건부 노출 대응 */
+				margin-top: 0rem;
+				font-weight: 500;
+				font-size: 12rem;
+				line-height: 16rem;
+				color: #828588;
+			}
+			.charge-point {
+				display: flex;
+				align-items: center;
+				margin-bottom: 2rem;
+				font-weight: 700;
+				font-size: 18rem;
+				line-height: 24rem;
+				color: $color-point;
+				.tit {
+					font-size: 12rem;
+					line-height: 24rem;
+					margin-right: 4rem;
+				}
+			}
+		}
+	}
+	.card-status {
+		padding: 11rem 16rem;
+		background-color: #F4F5F8;
+		border-radius: 4rem;
+		.status-gift {
+			position: relative;
+			display: flex;
+			align-items: center;
+			--icn-size: 20rem;
+
+			.img {
+				width: var(--icn-size);
+				height: var(--icn-size);
+			}
+
+			.ui-btn {
+				margin-left: auto;
+				position: absolute;
+				right: 0;
+				top: 2rem;
+				z-index: 10;
+			}
+
+			.status-gift-tit {
+				display: flex;
+				align-items: center;
+				flex: 1 1 auto;
+				overflow: hidden;
+				padding-right: var(--icn-size);
+				.count {
+					flex: none;
+					display: inline-flex;
+					justify-content: center;
+					align-items: center;
+					width: var(--icn-size);
+					height: var(--icn-size);
+					outline: 2rem solid #F4F5F8;
+					margin-left: -6rem;
+					padding-bottom: 1rem;
+					padding-right: 1rem;
+					background-color: #B7B9BA;
+					border-radius: 50%;
+					color: #fff;
+					font-size: 10rem;
+					line-height: var(--icn-size);
+					font-weight: 400;
+				}
+				.tit {
+					display: block;
+					flex: 1 1 auto;
+					overflow: hidden;
+					margin-left: 6rem;
+					font-weight: 600;
+					font-size: 12rem;
+					line-height: var(--icn-size);
+					color: #63666A;
+					@include ellipsis1;
+				}
+			}
+			.status-gift-list {
+				display: flex;
+				flex-direction: column;
+				gap: 8rem;
+
+				li {
+					position: relative;
+					width: 100%;
+					padding-left: calc(var(--icn-size) + 6rem);
+					font-weight: 500;
+					font-size: 12rem;
+					line-height: 20rem;
+					color: #63666A;
+
+					.img {
+						position: absolute;
+						left: 0;
+						top: 0;
+					}
+				}
+			}
+
+			// 인터렉션
+			.status-gift-expanded {
+				display: none;
+				width: 100%;
+			}
+			&.is-expanded {
+				.ui-btn .ui-icn {
+					transform: rotate(180deg);
+				}
+				.status-gift-tit {
+					display: none;
+				}
+				.status-gift-expanded {
+					display: block;
+				}
+			}
+		}
+		.status-choice {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+
+			.choice {
+				display: flex;
+				align-items: center;
+
+				.ui-icn:first-child {
+					margin-right: 4rem;
+				}
+				.txt {
+					font-weight: 600;
+					font-size: 12rem;
+					line-height: 16rem;
+					color: #36383A;
+					em {
+						color: $color-primary;
+					}
+				}
+				.split {
+					@include split-set(10rem, #CFD0D1);
+					margin: 0 8rem;
+				}
+
+			}
+
+			.ui-btn {
+				margin-left: auto; /* 4차 수정 : 요금제 카드 공통 오류문의 margin 추가 */
+				align-items: center;
+				font-weight: 600;
+				font-size: 12rem;
+				line-height: 14rem;
+				color: #828588;
+				> span { /* 4차 수정 : 요금제 카드 공통 오류문의 margin 추가 */
+					margin-left: 4rem;
+				}
+			}
+
+		}
+	}
+	.card-status + .card-compare-mo {
+		margin-top: 12rem;
+	}
+	.card-compare-pc {
+		.btn-compare {
+			width: auto;
+			height: 20rem;
+			padding: 0 7rem;
+			gap: 2rem;
+			border-radius: 4rem;
+			border: 1px solid transparent;
+			font-size: 12rem;
+			line-height: 16rem;
+			font-weight: 600;
+			color: #5A5D60;
+			vertical-align: top;
+
+			.icn-selection {
+				display: none;
+			}
+			.count {
+				display: none;
+				align-items: center;
+				justify-content: center;
+				width: 12rem;
+				height: 12rem;
+				padding: 0 1px 1px 0;
+				font-weight: 500;
+				font-size: 10rem;
+				line-height: 12rem;
+				border-radius: 50%;
+				background-color: $color-primary;
+				color: #fff;
+			}
+			&.outlined {
+				border-color: #CFD0D1;
+				background-color: #fff;
+				&:active {
+					background-color: #fff;
+				}
+			}
+			&.is-selected {
+				color: $color-primary;
+
+				.icn-default {
+					display: none;
+				}
+				.icn-selection {
+					display: inline-flex;
+				}
+				.count {
+					display: inline-flex;
+				}
+
+				&.outlined {
+					border-color: $color-primary;
+				}
+			}
+		}
+	}
+	.card-compare-mo {
+		.btn-compare {
+			width: 100%;
+			height: 38rem;
+			gap: 2rem;
+			border-radius: 4rem;
+			border: 1px solid transparent;
+			font-size: 12rem;
+			line-height: 16rem;
+			font-weight: 600;
+			color: #5A5D60;
+
+			.icn-selection {
+				display: none;
+			}
+			.count {
+				display: none;
+				align-items: center;
+				justify-content: center;
+				width: 16rem;
+				height: 16rem;
+				padding: 0 1px 1px 0;
+				font-weight: 500;
+				font-size: 10rem;
+				line-height: 12rem;
+				border-radius: 50%;
+				background-color: $color-primary;
+				color: #fff;
+			}
+			&.outlined {
+				border-color: #CFD0D1;
+				background-color: #fff;
+				&:active {
+					background-color: #fff;
+				}
+			}
+			&.is-selected {
+				color: $color-primary;
+
+				.icn-default {
+					display: none;
+				}
+				.icn-selection {
+					display: inline-flex;
+				}
+				.count {
+					display: inline-flex;
+				}
+
+				&.outlined {
+					border-color: $color-primary;
+				}
+			}
+		}
+	}
+	.card-buyinfo {
+		margin-top: 32rem;
+		.buyinfo-con {
+			text-align: center;
+			dt {
+				font-weight: 700;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #000;
+				&:last-child { /* 8차 수정 : 내용 숨김에 대한 여백 조정 */
+					margin-bottom: 20rem;
+				}
+			}
+			dd {
+				margin-top: 6rem;
+				font-weight: 600;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #36383A;
+			}
+		}
+	}
+
+	// 상위 3개 베스트 요금제
+	&.plan-best {
+		border-color: $color-primary;
+		padding-top: 45rem;
+		.card-best {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			background: linear-gradient(90deg, #6039EE 0%, #3A1EA2 100%);
+			padding: 6rem 11rem;
+			p {
+				display: flex;
+				gap: 4rem;
+				color: #fff;
+				font-weight: 500;
+				font-size: 12re,;
+				line-height: 18rem;
+			}
+		}
+	}
+
+	&.outlined {
+		box-shadow: none;
+		border-color: #EFF0F0;
+
+		&.is-recom {
+			border-color: $color-primary;
+			.card-badge {
+				position: absolute;
+				right: 10rem;
+				top: 0;
+			}
+		}
+	}
+
+	+ .ratePlan-info {
+		margin-top: 12rem;
+		text-align: right;
+		.btn-texted {
+			font-size: 12rem;
+			line-height: 18rem;
+			color: #828588;
+		}
+	}
+
+}
+
+// 요금제 상품 상세 목록
+@mixin ratePlanD-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16rem;
+	padding-top: 16rem;
+
+	.ratePlanD-item {
+		width: 100%;
+	}
+}
+
+// 요금제 상품 상세 카드
+@mixin ratePlanD-card {
+	position: relative;
+	padding: 0 16rem;
+	@include box-shadow-10;
+	.card-button {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		z-index: 1;
+	}
+	.card-body {
+		padding: 16rem 0 12rem 0;
+	}
+	.card-footer {
+		padding: 8rem 0 12rem 0;
+		border-top: 1px solid #EFF0F0;
+	}
+	.card-opening {
+		display: inline-flex;
+		position: absolute;
+		top: 0;
+		right: 16rem;
+		height: 24rem;
+		align-items: center;
+		justify-content: center;
+		padding: 0 6rem;
+		font-weight: 500;
+		font-size: 12rem;
+		font-style: 16rem;
+		color: #5FCDB0;
+		border-radius: 0 0 2rem 2rem;
+		background-color: #E6F7F2;
+	}
+	.card-state {
+		margin-bottom: 4rem;
+		font-weight: 500;
+		font-size: 12rem;
+		&.is-current {
+			color: #2801B5;
+		}
+	}
+	.card-label {
+		display: flex;
+		align-items: center;
+		margin-bottom: 2rem;
+		gap: 6rem;
+		.split {
+			display: inline-block;
+			width: 3rem;
+			height: 3rem;
+			border-radius: 50%;
+			background-color: #CDC2F5;
+		}
+		.label {
+			display: inline-flex;
+			align-items: center;
+			font-weight: 600;
+			font-size: 12rem;
+			line-height: 16rem;
+			color: $color-primary;
+			.ui-icn {
+				margin-right: 2rem;
+			}
+		}
+	}
+
+	.card-tit {
+		display: flex;
+		font-weight: 600;
+		font-size: 20rem;
+		color: #000;
+		.ui-btn {
+			z-index: 10;
+			top: 2rem;
+			margin-left: 4rem;
+		}
+	}
+	.card-name {
+		margin-top: 4rem;
+		font-size: 12rem;
+		color: #777;
+	}
+	.card-info {
+		display: flex;
+		align-items: center;
+		gap: 6rem;
+		margin-top: 8rem;
+		padding: 2rem 0;
+
+		.split {
+			display: inline-block;
+			width: 3rem;
+			height: 3rem;
+			border-radius: 50%;
+			background-color: #CFD0D1;
+		}
+
+		.label {
+			display: inline-flex;
+			align-items: center;
+			color: #494949;
+			font-weight: 500;
+			font-size: 12rem;
+			line-height: 12rem;
+			.ui-icn {
+				margin-right: 4rem;
+			}
+		}
+
+		.date {
+			margin-left: auto;
+			color: #494949;
+			font-weight: 500;
+			font-size: 12rem;
+			line-height: 12rem;
+		}
+
+		.label-state {
+			display: inline-block;
+			margin-left: 4rem;
+			padding: 3rem 6rem;
+			border-radius: 3rem;
+			background-color: $color-primary;
+			color: #494949;
+			font-weight: 400;
+			font-size: 12rem;
+			line-height: 12rem;
+			color: #fff;
+		}
+	}
+	.card-charge {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		.brand {
+			height: 28rem;
+			img {
+				height: 100%;
+			}
+		}
+		.charge {
+			position: relative;
+			top: 2rem;
+			text-align: right;
+
+			.charge-tit {
+				font-weight: 700;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #1B0179;
+			}
+			.charge-txt {
+				margin-top: 0rem;
+				font-weight: 500;
+				font-size: 12rem;
+				line-height: 16rem;
+				color: #828588;
+			}
+			.charge-point {
+				display: flex;
+				align-items: center;
+				margin-bottom: 2rem;
+				font-weight: 700;
+				font-size: 18rem;
+				line-height: 24rem;
+				color: $color-point;
+				.tit {
+					font-size: 12rem;
+					line-height: 24rem;
+					margin-right: 4rem;
+				}
+			}
+		}
+	}
+}
+
+// 요금제 상품 상세 목록
+@mixin ratePlanE-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16rem;
+	padding-top: 16rem;
+
+	.ratePlanE-item {
+		width: 100%;
+	}
+}
+
+// 요금제 상품 상세 카드
+@mixin ratePlanE-card {
+	position: relative;
+	padding: 15rem;
+	@include box-shadow-10;
+	border: 1px solid #EFF0F0;
+
+	.card-button {
+		position: absolute;
+		left: -16rem;
+		right: -16rem;
+		top: 0;
+		bottom: 0;
+		z-index: 1;
+	}
+	.card-body {
+		position: relative;
+
+		.card-tit {
+			font-weight: 600;
+			font-size: 18rem;
+			line-height: 24rem;
+			color: #000;
+			.ui-icn {
+				position: relative;
+				top: -2rem;
+			}
+		}
+		.card-info {
+			display: flex;
+			align-items: center;
+			gap: 6rem;
+			margin-top: 4rem;
+			padding: 2rem 0;
+
+			.split {
+				display: inline-block;
+				width: 3rem;
+				height: 3rem;
+				border-radius: 50%;
+				background-color: #CFD0D1;
+			}
+
+			.label {
+				display: inline-flex;
+				align-items: center;
+				color: #494949;
+				font-weight: 500;
+				font-size: 12rem;
+				line-height: 12rem;
+				.ui-icn {
+					margin-right: 4rem;
+				}
+			}
+		}
+	}
+
+
+	.ratePlanC-list {
+		gap: 8rem;
+		margin-top: 20rem;
+		padding-top: 0;
+	}
+}
+
+// 추천 요금제 목록
+@mixin recom-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10rem;
+	.recom-item {
+		width: 100%;
+	}
+}
+
+// 추천 요금제 배너
+@mixin recom-bnr {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	padding: 17rem 16rem;
+	border-radius: 2rem;
+	background-color: #F2F5FB;
+	.recom-con {
+		flex:1 1 auto;
+		display: flex;
+		flex-direction: column;
+		margin-right: auto;
+		margin-left: 17rem;
+		text-align: left;
+		.tit {
+			display: block;
+			width: 100%;
+			font-weight: 700;
+			font-size: 16rem;
+			line-height: 19rem;
+			color: #2A2B2D;
+		}
+		.txt {
+			display: block;
+			width: 100%;
+			margin-top: 4rem;
+			font-weight: 500;
+			font-size: 14rem;
+			line-height: 17rem;
+			color: #63666A;
+		}
+	}
+}
+
+// 특별한 이벤트 목록
+@mixin special-event-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12rem;
+
+	.special-event-item {
+		display: flex; /* 7차 수정 : 불필요한 여백 제거하기 */
+		width: 100%;
+	}
+}
+
+// 특별한 이벤트 배너
+@mixin special-event-bnr {
+	width: 100%;
+
+	img {
+		width: 100%;
+		border-radius: 2rem;
+		vertical-align: top;
+	}
+}
+
+// 이벤트 스와이프
+@mixin event-swiper {
+	.swiper-pagination {
+		position: static;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-top: 8rem;
+		gap: 4rem;
+		&-bullet {
+			width: 6rem;
+			height: 6rem;
+			margin: 0;
+			border-radius: 3rem;
+			background-color: #EFF0F0;
+			opacity: 1;
+			transition: all 0.2s ease;
+			&-active {
+				width: 12rem;
+				background-color: $color-primary;
+			}
+		}
+	}
+}
+
+// 이벤트 목록
+@mixin event-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12rem;
+
+	li {
+		display: flex; /* 7차 수정 : 불필요한 여백 잡아줌 */
+		width: 100%;
+	}
+}
+
+// 이벤트 배너
+@mixin event-bnr {
+	display: flex;
+	width: 100%;
+
+	img {
+		width: 100%;
+		border-radius: 2rem;
+		vertical-align: top;
+	}
+}
+
+// 리뷰 목록(리뷰 관리)
+@mixin review-list {
+	display: flex;
+	flex-direction: column;
+	gap: 16rem;
+	padding-top: 16rem;
+
+	.review-item {
+		width: 100%;
+	}
+}
+
+@mixin review-card {
+	padding: 0 16rem;
+	@include box-shadow-16;
+
+	.card-body {
+		position: relative;
+		display: flex;
+		flex-wrap: wrap;
+		padding:16rem 0 0 0;
+
+		.card-label {
+			display: inline-flex;
+			margin-right: auto;
+			background-color: #EFF0F0;
+			margin-bottom: 10rem;
+			padding: 4rem 8rem;
+			border-radius: 4rem;
+			font-weight: 500;
+			font-size: 12rem;
+			line-height: 16rem;
+			color: #63666A;
+			&.is-written { /* 1차 수정 : is-written 로 변경 */
+				background-color: #EAE6FB;
+				color: $color-primary;
+			}
+		}
+		.card-remove {
+			margin-left: auto;
+			position: absolute;
+			top: 16rem;
+			right: 0;
+		}
+		.card-cont {
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			width: 100%;
+			height: 68rem;
+			margin-bottom: 6rem;
+			padding-bottom: 16rem;
+			padding-left: calc(52rem + 12rem);
+			border-bottom: 1px solid #EFF0F0;
+			.card-brand {
+				position: absolute;
+				left: 0;
+				top: 0;
+				flex: none;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 52rem;
+				height: 52rem;
+				border-radius: 50%;
+				background-color: #F4F2FD;
+				img {
+					width: 44rem;
+					height: auto;
+				}
+			}
+			.card-title {
+				display: block;
+				width: 100%;
+				font-weight: 700;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #000;
+				@include ellipsis1;
+			}
+			.card-date {
+				margin-top: 2rem;
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #5A5D60;
+			}
+		}
+	}
+	.card-footer {
+		padding: 10rem 0 24rem;
+
+		// 작성완료
+		.card-written {
+			display: flex;
+			flex-wrap: wrap;
+
+			.written-sat {
+				display: inline-flex;
+				align-items: center;
+				margin-right: auto;
+				.ui-icn {
+					margin-right: 7rem;
+				}
+				.val {
+					font-weight: 700;
+					font-size: 22rem;
+					line-height: 30rem;
+				}
+			}
+
+			.written-mod {
+				margin-left: auto;
+				padding: 3rem 9rem;
+				border:1px solid #CFD0D1;
+				border-radius: 4rem;
+				font-weight: 600;
+				font-size: 12rem;
+				line-height: 17rem;
+				color: #828588;
+			}
+
+			.written-cont {
+				margin-top: 10rem;
+				width: 100%;
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #46484B;
+				white-space: pre-line;
+			}
+		}
+
+		// 작성대기
+		.card-wait {
+			.wait-rating {
+				.rating-tit {
+					font-weight: 500;
+					font-size: 14rem;
+					line-height: 20rem;
+					color: $color-primary;
+					text-align: center;
+				}
+				.rating-star {
+					display: flex;
+					justify-content: center;
+					gap: 6rem;
+					margin: 6rem auto 0;
+				}
+			}
+			.wait-frm {
+				margin-top: 24rem;
+				.ui-textarea {
+					height: 115rem;
+				}
+			}
+			.wait-action {
+				margin-top: 16rem;
+			}
+		}
+	}
+}
+
+// 리뷰 목록(전체공통)
+@mixin review-list-02 {
+	.review-item {
+		border-bottom: 1px solid #EFF0F0;
+	}
+	@include media-tablet-xs {
+		margin-left: 0;
+		margin-right: 0;
+	}
+}
+
+// 리뷰 카드(전체공통)
+@mixin review-card-02 {
+	display: flex;
+	flex-wrap: wrap;
+	padding: 14rem 0;
+
+	.review-telecom {
+		display: flex;
+		align-items: center;
+		height: 16rem;
+		margin-right: 12rem;
+		img {
+			height: 100%;
+		}
+	}
+	.review-name {
+		margin-right: 10rem;
+		font-weight: 700;
+		font-size: 14rem;
+		line-height: 16rem;
+	}
+
+	.review-sat {
+		display: inline-flex;
+		gap: 4rem;
+		align-items: center;
+		.val {
+			font-weight: 500;
+			font-size: 14rem;
+			line-height: 16rem;
+			color: #46484B;
+		}
+	}
+
+	.review-con {
+		width: 100%; /* 2025-02-03 조찬기 : 리뷰 내용 내려가게 수정 */
+		margin-top: 8rem;
+		font-weight: 500;
+		font-size: 14rem;
+		line-height: 20rem;
+		max-height: 60rem;
+		@include ellipsis3;
+	}
+
+	@include media-tablet-xs {
+		padding-left: 0;
+		padding-right: 0;
+	}
+}
+
+// 추천내역 목록
+@mixin recom-history-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12rem;
+	padding-top: 16rem;
+
+	.recom-history-item {
+		width: 100%;
+		@include media-tablet-xs {
+			width: calc(50% - 6rem);
+		}
+	}
+}
+
+// 추천내역 카드
+@mixin recom-history-card {
+	padding: 20rem 16rem;
+	@include box-shadow-16;
+
+	.card-body {
+		display: flex;
+		flex-wrap: wrap;
+		.card-name {
+			flex:1 1 auto;
+			max-width: calc(100% - 140rem);
+			font-weight: 700;
+			font-size: 18rem;
+			line-height: 24rem;
+
+			.num {
+				color: $color-primary;
+			}
+			.name {
+				color: #000;
+			}
+		}
+		.card-date {
+			display: inline-flex;
+			justify-content: flex-end;
+			align-items: center;
+			margin-left: auto;
+			max-width: 140rem;
+			padding-top: 4rem;
+			text-align: right;
+			.txt {
+				margin-right: 4rem;
+				font-weight: 500;
+				font-size: 12rem;
+				line-height: 16rem;
+				color: #828588;
+			}
+			.date {
+				font-weight: 600;
+				font-size: 14rem;
+				line-height: 20rem;
+			}
+		}
+
+		.card-title {
+			display: flex;
+			justify-content: space-between;
+			width: 100%;
+			margin-top: 12rem;
+			padding: 12rem 16rem;
+			border-radius: 2rem;
+			background-color: #EFF0F0;
+			.type {
+				flex: none;
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #63666A;
+			}
+			.title {
+				font-weight: 600;
+				list-style: 14rem;
+				line-height: 20rem;
+				color: #2A2B2D;
+			}
+		}
+	}
+}
+
+// noData 섹션
+@mixin nodata-sec {
+	@include flex-fill-height;
+	.sec-inner {
+		@include flex-fill-height;
+	}
+}
+
+// noData
+@mixin nodata {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	flex-basis: auto;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	max-width: 328rem;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 60rem 16rem;
+
+	.ui-icn {
+		margin-bottom: 8rem;
+	}
+	.nodata-tit {
+		font-weight: 700;
+		font-size: 16rem;
+		line-height: 24rem;
+		color: #36383A;
+	}
+	.nodata-txt {
+		font-weight: 500;
+		font-size: 14rem;
+		line-height: 20rem;
+		color: #5A5D60;
+	}
+	.nodata-tit + .nodata-txt {
+		margin-top: 4rem;
+	}
+}
+
+// 등록 폼
+@mixin basic-frm {
+	display: flex;
+	flex-direction: column;
+	gap: 20rem;
+
+	.frm-field-group {
+		display: flex;
+		flex-direction: column;
+		gap: 20rem;
+	}
+
+	.frm-field {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+
+		.frm-title {
+			margin-bottom: 10rem;
+			.tit {
+				font-weight: 600;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #000;
+			}
+		}
+
+		.frm-group {
+			display: flex;
+			align-items: center;
+			gap: 8rem;
+			.btn-sub {
+				margin: 0;
+				height: 52rem;
+				width: auto;
+				min-width: 100rem;
+			}
+			+ .frm-group {
+				margin-top: 10rem;
+			}
+			.frm-split {
+				color: #D9D9D9;
+			}
+
+			// 운전면허번호
+			&.type-car {
+				.ui-inp .inp {
+					text-align: center;
+				}
+				.ui-inp:nth-child(3) {
+					flex:none;
+					width:25%;
+				}
+			}
+
+			// 일련번호
+			&.type-serial {
+				.ui-inp .inp {
+					padding-left: 8rem;
+					padding-right: 8rem;
+					text-align: center;
+					@include media-mobile-xl {
+						padding-left: 17rem;
+						padding-right: 17rem;
+					}
+				}
+			}
+		}
+	}
+
+	.frm-alert {
+		display: none;
+		margin-top: 6rem;
+		font-weight: 500;
+		font-size: 14rem;
+		line-height: 20rem;
+		&.is-show {
+			display: block;
+		}
+		&.is-errored {
+			color: $color-error;
+		}
+	}
+}
+
+// 문의 답변
+@mixin inq-accordion {
+	margin: -20rem 0;
+
+	// 아코디언 필수
+	.collapsing {
+		height: 0;
+		overflow: hidden;
+		transition: height .35s ease;
+	}
+	.collapse:not(.show) {
+		display: none;
+	}
+	.acco-button .ui-icn { /* 2024-12-20 조찬기 : acco-button 으로 변경 */
+		transition: transform .35s ease;
+	}
+	.acco-button[aria-expanded='true'] .ui-icn { /* 2024-12-20 조찬기 : acco-button 으로 변경 */
+		transform: rotate(180deg);
+	}
+
+	// 아코디언 스타일
+	.acco-item {
+		padding: 20rem 0;
+		border-top: 1px solid #EFF0F0;
+	}
+	.acco-header {
+		display: flex;
+		flex-wrap: wrap;
+		position: relative;
+		.acco-tit {
+			max-width: calc(100% - 66rem);
+			margin-right: auto;
+			font-weight: 600;
+			font-size: 16rem;
+			line-height: 22rem;
+			color: #2A2B2D;
+			@include ellipsis1;
+		}
+		.acco-date {
+			flex: none;
+			margin-left: auto;
+			padding-top: 2rem;
+			font-weight: 500;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: #96989B;
+		}
+		.acco-con {
+			width: 100%;
+			margin-top: 10rem;
+			font-weight: 500;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: #5A5D60;
+			white-space: pre-wrap;
+		}
+		.acco-info {
+			display: flex;
+			align-items: center;
+			gap: 8rem;
+			margin-top: 16rem;
+			font-weight: 600;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: #96989B;
+			.split {
+				@include split-set(10rem, #CFD0D1);
+			}
+			.state {
+				&.is-received,
+				&.is-answered {
+					color: $color-primary;
+				}
+			}
+		}
+		.acco-button {
+			position: absolute;
+			right: 0;
+			bottom: 0;
+			width: 100%;
+			height: 100%;
+			display: flex;
+			align-items: flex-end;
+			justify-content: flex-end;
+		}
+	}
+
+	.acco-body {
+		margin-top: 16rem;
+		.acco-answer {
+			background-color: #F4F4F4;
+			padding: 16rem;
+			font-weight: 500;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: #2A2B2D;
+		}
+	}
+}
+
+// 모통봇 소개 섹션
+@mixin cb-intro-sec {
+	padding-top: 20rem;
+	.sec-inner {
+		display: flex;
+		flex-direction: column;
+		gap: 12rem;
+	}
+	.intro-img {
+		width: 62rem;
+		img {
+			width: 100%;
+		}
+	}
+	.intro-con {
+		flex: 1 1 auto;
+		p {
+			font-weight: 600;
+			font-size: 20rem;
+			line-height: 28rem;
+			color: #000;
+			em {
+				color: $color-primary;
+			}
+		}
+	}
+
+	@include media-tablet-xs {
+		.sec-inner {
+			flex-direction: row;
+			align-items: center;
+		}
+		.intro-con {
+			margin-top: 0;
+		}
+	}
+}
+
+@mixin  cb-selection-sec {
+	margin-top: 60rem;
+	.selection-tit {
+		margin-top: -20rem;
+		margin-bottom: 12rem;
+		font-weight: 600;
+		font-size: 20rem;
+		line-height: 28rem;
+		color: #000;
+	}
+
+	.selection-frm {
+		display: flex;
+		gap: 12rem;
+
+		.selection-rdo {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			padding: 36rem 18rem;
+			width:calc(50% - 6rem);
+			border: 1px solid #EFF0F0;
+			border-radius: 2rem;
+			cursor: pointer;
+
+			img {
+				width: 86rem;
+			}
+
+			.ui-rdo {
+				margin-top: 18rem;
+				.rdo::before,
+				.rdo::after,
+				input {
+					display: none;
+				}
+				.rdo {
+					text-align: center;
+					span {
+						display: block;
+						padding-left: 0;
+						font-size: 14rem;
+						line-height: 20rem;
+						word-break: keep-all;
+						color: #5A5D60;
+						text-align: center;
+						em {
+							display: block;
+							margin-bottom: 4rem;
+							font-weight: 700;
+						}
+					}
+				}
+			}
+			&.is-selected {
+				border-color: $color-primary;
+				background-color: #EAE6FB;
+				.ui-rdo .rdo span {
+					color: $color-primary;
+				}
+			}
+		}
+	}
+}
+
+// 설문 셀렉션
+@mixin survey-list {
+	.survey-item + .survey-item {
+		margin-top: 12rem;
+	}
+	.survey-rdo {
+		@extend .rdo-style2;
+		.rdo > span {
+			text-align: left;
+		}
+	}
+}
+
+// 가이드박스
+@mixin noti-box {
+	border-radius: 2rem;
+	.noti-box-tit {
+		margin-bottom: 12rem;
+		font-weight: 700;
+		font-size: 14rem;
+		line-height: 20rem;
+	}
+	.noti-box-list {
+		li {
+			position: relative;
+			padding-left: 18rem;
+			font-weight: 500;
+			font-size: 12rem;
+			line-height: 16rem;
+			color: #63666A;
+			word-break: keep-all;
+			&::before {
+				content:'';
+				display: block;
+				position: absolute;
+				left: 6rem;
+				top: 6rem;
+				width: 3rem;
+				height: 3rem;
+				border-radius: 50%;
+				background-color: #63666A;
+			}
+			& + li {
+				margin-top: 6rem;
+			}
+		}
+	}
+
+	// Expand
+	.noti-box-header {
+		position: relative;
+		padding: 20rem 16rem;
+		padding-right: 20rem;
+		margin-top: 10rem;
+		background-color: #f4f4f4;
+
+		.noti-box-title {
+			font-weight: 700;
+			font-size: 16rem;
+			line-height: 22rem;
+			color: #000;
+		}
+		.noti-box-expand {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			display: flex;
+			justify-content: flex-end;
+			align-items: center;
+			.ui-icn {
+				right: 16rem;
+			}
+			&[aria-expanded="true"] {
+				.ui-icn {
+					position: absolute;
+					transform: rotate(180deg);
+				}
+			}
+		}
+	}
+	.noti-box-body {
+		overflow: hidden;
+		background-color: #f4f4f4;
+		.noti-box-con {
+			padding: 0 16rem 20rem 16rem;
+		}
+	}
+}
+
+// s: 유심구매 안내 섹션
+@mixin usimBuy-intro-sec {
+	padding-top: 10rem;
+
+	.intro-box {
+		display: flex;
+		align-items: center;
+		gap: 8rem;
+		padding: 16rem;
+		/* padding-left: 0; 7차 수정 : 유심 구매 안내 수정 */
+		border-radius: 10rem;
+		background-color: #F4F5F8;
+		.intro-img {
+			flex: none;
+			width: 80rem;
+			height: 80rem;
+			img {
+				width: 100%;
+				height: 100%;
+			}
+		}
+		.intro-con {
+			flex:1 1 auto;
+			.tit {
+				width: 100%;
+				font-weight: 700;
+				font-size: 14rem;
+				line-height: 20rem;
+				letter-spacing: -1px;
+				color: #2A2B2D;
+				em {
+					color: $color-primary;
+				}
+				@include media-mobile-xl {
+					letter-spacing: 0;
+				}
+			}
+			.txt {
+				margin-top: 10rem;
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #5A5D60;
+			}
+		}
+	}
+}
+// e: 유심구매 안내 섹션
+
+
+// s: 어디서 구매하나요 섹션
+@mixin usimBuy-store-sec {
+	margin-top: 30rem;
+	@include sec-basic;
+
+	.usim-img {
+		width: 100%;
+		height: 212rem;
+		text-align: center;
+		img {
+			max-width: 100%;
+			height: 100%;
+			vertical-align: top;
+		}
+	}
+
+	.usim-msg {
+		p {
+			font-weight: 700;
+			font-size: 18rem;
+			line-height: 24rem;
+			text-align: center;
+		}
+	}
+
+	// 구매 스토어
+	.usim-store-list {
+		margin-top: 12rem;
+		.usim-store-item + .usim-store-item {
+			margin-top: 10rem;
+		}
+	}
+
+	.usim-store-card {
+		padding: 16rem;
+		border-radius: 10rem;
+		background-color: #F4F5F8;
+		.card-title {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			.title {
+				font-weight: 600;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #2A2B2D;
+				word-break: keep-all;
+			}
+			.btn-sub {
+				width: 80rem;
+				margin-left: auto;
+			}
+		}
+		.card-info {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			margin-top: 10rem;
+			font-weight: 500;
+			font-size: 12rem;
+			line-height: 16rem;
+			color: #63666A;
+			.info-txt {
+				width: 100%;
+			}
+			.split {
+				margin: 0 6rem;
+				@include split-set(10rem, #CFD0D1);
+			}
+			.ui-btn {
+				margin-left: 2rem;
+			}
+		}
+		@include media-tablet-xs {
+			.card-title {
+				.title {
+					br {
+						display: none;
+					}
+				}
+			}
+		}
+	}
+}
+// e: 어디서 구매하나요 섹션
+
+// s: 인터넷 결합 설문 목록
+@mixin choice-list {
+	display: grid;
+	width: 100%;
+	grid-template-columns: 1fr;
+	gap: 12rem;
+
+	@include media-tablet-xs {
+		grid-template-columns: 1fr 1fr 1fr !important;
+	}
+}
+@mixin choice-swiper {
+	> li {
+		width: 160rem;
+		height: 150rem;
+	}
+}
+// e: 인터넷 결합 설문 목록
+
+// s: 인터넷 결합 설문 라디오
+@mixin choice-rdo {
+	position: relative;
+	display: flex;
+	flex-wrap: wrap;
+	height: 100%;
+	background-color: #F4F5F8;
+	border-radius: 4rem;
+	padding: 16rem 20rem;
+	border: 1px solid transparent;
+	box-sizing: border-box;
+	cursor: pointer;
+
+	/* 1차 수정 : IOS 호환성 대응 */
+	input {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		opacity: 0;
+		pointer-events: none;
+	}
+	.choice-con {
+		position: relative;
+		z-index: 10;
+		display: block;
+		width: 100%;
+		.tit {
+			display: block;
+			margin-bottom: 4rem;
+			font-weight: 600;
+			font-size: 16rem;
+			line-height: 22rem;
+			color: #2A2B2D;
+		}
+		.txt {
+			display: block;
+			font-weight: 500;
+			font-size: 12rem;
+			line-height: 16rem;
+			color: #63666A;
+		}
+	}
+
+	input:checked + .choice-con .ui-icn {
+		&::before {
+			transform: translateY(110%);
+		}
+
+		&::after {
+			transform: translateY(0%);
+		}
+	}
+
+	&.is-selected {
+		background-color: #EAE6FB;
+		border-color: $color-primary;
+	}
+}
+// e: 인터넷 결합 설문 라디오
+
+// s: 자주묻는 질문
+@mixin faq-accordion {
+	// margin: 0 calc(#{$mobile-outer-spacer} * -1);
+	margin-top: -14rem;
+
+	.collapsing {
+		height: 0;
+		overflow: hidden;
+		transition: height .35s ease;
+	}
+	.collapse:not(.show) {
+		display: none;
+	}
+	.acco-button .ui-icn {
+		transition: transform .35s ease;
+	}
+	.acco-button[aria-expanded='true'] .ui-icn {
+		transform: rotate(180deg);
+	}
+
+	// 아코디언 스타일
+	.acco-item {
+		padding: 14rem 0;
+		border-bottom: 1px solid #EFF0F0;
+	}
+	.acco-header {
+		position: relative;
+
+		.acco-button {
+			display: flex;
+			align-items: center;
+			width: 100%;
+			text-align: left;
+			padding-right: 24rem;
+			> .part { /* 8차 수정 : FAQ 요금제 소개 한줄 처리 */
+				display: inline-block;
+				min-width: 60rem;
+				font-size: 14rem;
+				line-height: 20rem;
+				flex: none;
+			}
+			> span {
+				position: relative;
+				display: block;
+				padding-left: 16rem;
+				font-weight: 600;
+				font-size: 14rem;
+				line-height: 20rem;
+				max-height: 40rem;
+				@include ellipsis2;
+				em {
+					position: absolute;
+					left: 0;
+					top: 0;
+					color: #542FDD;
+				}
+			}
+			.ui-icn {
+				position: absolute;
+				right: 0;
+				top: calc(50% - 8rem);
+			}
+		}
+	}
+
+	.acco-body {
+		margin-top: 16rem;
+		.acco-answer {
+			font-weight: 500;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: #46484B;
+
+			ol {
+				display: flex;
+				flex-direction: column;
+				gap: 4rem;
+				font-size: 12rem;
+				line-height: 16rem;
+				margin-top: 8rem;
+				margin-bottom: 8rem;
+				&:first-child {
+					margin-top: 0;
+				}
+				&:last-child {
+					margin-bottom: 0;
+				}
+				li {
+					position: relative;
+					counter-increment: item;
+					padding-left: 12rem;
+					&::before {
+						content: counter(item) ". ";
+						position: absolute;
+						left: 0;
+						top: 0;
+					}
+				}
+			}
+		}
+	}
+	@include media-tablet-xs {
+		margin: 0;
+	}
+}
+// e: 자주묻는 질문
+
+// s: 알뜰폰 개통 방법
+@mixin account-sol-sec {
+	margin-top: 30rem;
+
+	.sec-tit {
+		font-weight: 600;
+		font-size: 16rem;
+		line-height: 22rem;
+		color: #000;
+		text-align: center;
+	}
+	.ui-tab {
+		display: flex;
+		justify-content: center;
+		margin-top: 16rem;
+		.tab-list {
+			width: 268rem;
+		}
+	}
+	.tab-content {
+		height: auto;
+		overflow: hidden;
+		margin-top: 16rem;
+		padding-bottom: 0;
+	}
+	.solution-steps {
+		padding: 20rem;
+		border-radius: 4rem;
+		background-color: #F4F5F8;
+		li {
+			position: relative;
+			display: flex;
+			padding-bottom: 26rem;
+			font-weight: 500;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: #46484B;
+			&::after {
+				content:'';
+				position: absolute;
+				left: 11rem;
+				top: 28rem;
+				bottom: 4rem;
+				display: block;
+				width: 2rem;
+				background: url('../images/common/line-18-step.svg') repeat-y center center;
+			}
+			&:last-child {
+				padding-bottom: 0;
+				&::after {
+					display: none;
+				}
+			}
+			.num {
+				flex: none;
+				position: relative;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 24rem;
+				height: 24rem;
+				margin-right: 10rem;
+				border-radius: 50%;
+				background-color: #CDC2F5;
+				font-weight: 700;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #542FDD;
+			}
+			.inline-block {
+				display: inline-block;
+			}
+			strong {
+				font-weight: 700;
+			}
+		}
+	}
+}
+// e: 알뜰폰 개통 방법
+
+// s: 약관
+@mixin terms-content {
+	color: #2A2B2D;
+	margin-top: 24rem;
+	word-break: keep-all;
+	&:first-child {
+		margin-top: 0;
+	}
+	.terms-title {
+		display: flex;
+		flex-wrap: wrap;
+		margin-bottom: 16rem;
+
+		h2 {
+			font-weight: 700;
+			font-size: 20rem;
+			line-height: 28rem;
+			color: #000;
+		}
+		.ui-sel {
+			margin-top: 8rem;
+		}
+		@include media-tablet-xs {
+			align-items: center;
+			.ui-sel {
+				width: 200rem;
+				margin-top: 0rem;
+				margin-left: auto;
+			}
+		}
+	}
+
+
+	h3 {
+		margin-top: 30rem;
+		margin-bottom: 4rem;
+		font-weight: 600;
+		font-size: 16rem;
+		line-height: 24rem;
+		color: #000;
+
+		&.terms-title-sub {
+			margin-top: 40rem;
+			font-size: 18rem;
+			font-weight: 700;
+			+ h3 {
+				margin-top: 10rem;
+			}
+		}
+	}
+	h4 {
+		margin-top: 10rem;
+		margin-bottom: 4rem;
+		font-weight: 600;
+		font-size: 14rem;
+		line-height: 22rem;
+		color: #000;
+	}
+	p.info {
+		color: #666;
+	}
+	p.center {
+		text-align: center;
+	}
+	a {
+		text-decoration: underline;
+		text-underline-position: under;
+	}
+	> ul {
+		margin-top: 2rem;
+		margin-bottom: 4rem;
+		&.indent-hypen {
+			padding-left: 12rem;
+		}
+		li {
+			position: relative;
+			padding-left: 12rem;
+			&::before {
+				content: '';
+				position: absolute;
+				top: 7rem;
+				left: 0;
+				display: block;
+				width: 3px;
+				height: 3px;
+				border-radius: 50%;
+				background-color: #999;
+				background-color: #999;
+			}
+		}
+	}
+	> ol {
+		> li {
+			position: relative;
+			counter-increment: item;
+			padding-left: 12rem;
+			& + li {
+				margin-top: 8rem;
+			}
+			&::before {
+				content: counter(item) ". ";
+				position: absolute;
+				left: 0;
+				top: 0;
+			}
+		}
+
+		ul {
+			> li {
+				position: relative;
+				padding-left: 12rem;
+				color: #46484B;
+				&::before {
+					content: '-';
+					position: absolute;
+					left: 0;
+					top: 0;
+				}
+			}
+		}
+
+
+	}
+	.terms-num1 {
+		> li {
+			text-indent: -15rem;
+			padding-left: 15rem;
+			&::before {
+				display: none;
+			}
+
+			ol.terms-num2 {
+				padding-top: 6rem;
+			}
+		}
+	}
+
+	.terms-num2 {
+		> li {
+			text-indent: -15rem;
+			padding-left: 15rem;
+			&::before {
+				display: none;
+			}
+			+ li {
+				margin-top: 6rem;
+			}
+
+			ol.terms-kor1 {
+				padding-top: 2rem;
+			}
+		}
+	}
+
+	.terms-kor1 {
+		> li {
+			text-indent: -18rem;
+			padding-left: 18rem;
+			color: #666;
+			&::before {
+				display: none;
+			}
+			strong.block {
+				display: block;
+				margin-top: 6rem;
+				color: #000;
+			}
+			+ li {
+				margin-top: 2rem;
+			}
+			&:first-child {
+				strong.block {
+					margin-top: 0;
+				}
+			}
+		}
+	}
+	.terms-hypen {
+		> li {
+			text-indent: -10rem;
+			padding-left: 10rem;
+			color: #666;
+			&::before {
+				display: none;
+			}
+			+ li {
+				margin-top: 2rem;
+			}
+		}
+	}
+	dl {
+		dt {
+			margin-bottom: 4rem;
+			font-weight: 600;
+		}
+		dt ~ dt {
+			margin-top: 8rem;
+		}
+	}
+	.terms-tbl-scroll {
+		width: 100%;
+		overflow-x: auto;
+		overscroll-behavior:auto;
+		margin-top: 10rem;
+		.terms-tbl {
+			min-width: 720rem;
+		}
+	}
+	.terms-tbl {
+		table-layout: fixed;
+		border-top: 1px solid #46484B;
+		th, td {
+			padding: 8rem 10rem;
+		}
+		th {
+			padding: 8rem 0;
+			font-weight: 600;
+			text-align: center;
+			background-color: #f1f3f5;
+		}
+		td {
+			border-bottom: 1px solid #f1f3f5;
+			> ul {
+				padding-left: 0;
+			}
+		}
+	}
+	p + .terms-tbl-scroll,
+	p + .terms-tbl,
+	p + ol,
+	ol + p,
+	dl + p,
+	p + dl {
+		margin-top: 16rem;
+	}
+}
+// e: 약관
+
+// s: 상세 데이터
+@mixin data-view {
+	p {
+		font-weight: 500;
+		font-size: 14rem;
+		line-height: 22rem;
+	}
+	img {
+		display: block;
+		margin: 20rem auto;
+	}
+	@include media-tablet-xs {
+		p {
+			font-size: 16rem;
+			line-height: 24rem;
+		}
+	}
+}
+
+// s: 스텝
+@mixin basic-steps {
+	li {
+		display: flex;
+		align-items: center;
+		padding: 10rem 0;
+		font-weight: 500;
+		font-size: 14rem;
+		line-height: 20rem;
+		color: #46484B;
+		.num {
+			position: relative;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 24rem;
+			height: 24rem;
+			margin-right: 10rem;
+			border-radius: 50%;
+			background-color: #EAE6FB;
+			font-weight: 700;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: #542FDD;
+		}
+		.tit {
+			font-weight: 500;
+			font-size: 16rem;
+			line-height: 22rem;
+			color: #000;
+			strong {
+				font-weight: 700;
+			}
+		}
+		.txt {
+			margin-top: 2rem;
+			font-weight: 500;
+			font-size: 14rem;
+			line-height: 20rem;
+			color: #63666A;
+		}
+	}
+}
+// e: 스텝
+
+// s: 완료
+@mixin complete-sec {
+	@include flex-fill-height;
+
+	.sec-inner {
+		@include flex-fill-height;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+
+		.complete-wrap {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+
+			strong {
+				display: block;
+				margin-top: 20rem;
+				text-align: center;
+				font-weight: 700;
+				font-size: 20rem;
+				line-height: 28rem;
+				color: #000;
+			}
+			.msg-fail {
+				margin-top: 15rem;
+				text-align: center;
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #E55F61;
+			}
+			.msg-complete {
+				margin-top: 15rem;
+				text-align: center;
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #46484B;
+				em {
+					font-weight: 700;
+					color: $color-primary;
+				}
+			}
+		}
+	}
+}
+// e: 완료
+
+// s: 시스템에러
+@mixin error-sec {
+	@include flex-fill-height;
+
+	.sec-inner {
+		@include flex-fill-height;
+	}
+}
+// e: 시스템에러
+
+// 리스트 공통
+@mixin bul-basic {
+	margin-top: 2rem;
+	margin-bottom: 4rem;
+
+	li {
+		position: relative;
+		padding-left: 16rem;
+		font-size: 12rem;
+		line-height: 20rem;
+		color: #63666A;
+		&::before {
+			content: '';
+			position: absolute;
+			top: 8rem;
+			left: 4rem;
+			display: block;
+			width: 3px;
+			height: 3px;
+			border-radius: 50%;
+			background-color: #999;
+			background-color: #999;
+		}
+	}
+}
+
+// 혜택카드 목록
+@mixin benefit-card-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12rem;
+
+	.benefit-card-item {
+		width: 100%;
+	}
+}
+
+// 혜택카드
+@mixin benefit-card {
+	position: relative;
+	padding: 24rem 20rem;
+	@include box-shadow-16;
+	border-radius: 4rem;
+	border:1px solid #EFF0F0;
+
+	.benefit-header {
+		display: flex;
+		align-items: center;
+		gap: 10rem;
+
+		.benefit-title {
+			flex: 1 1 auto;
+			.stit-gr {
+				margin-bottom: 8rem;
+				font-weight: 600;
+				font-size: 12rem;
+				line-height: 14rem;
+				color: #656565;
+			}
+			.stit-bk {
+				margin-bottom: 8rem;
+				font-weight: 600;
+				font-size: 12rem;
+				line-height: 14rem;
+				color: #000;
+			}
+			.title-20 {
+				font-weight: 700;
+				font-size: 20rem;
+				line-height: 28rem;
+				color: #000;
+			}
+			.title-16 {
+				font-weight: 700;
+				font-size: 16rem;
+				line-height: 22rem;
+				color: #000;
+			}
+			em {
+				color: $color-primary;
+			}
+		}
+
+		.benefit-img {
+			display: flex;
+			justify-content: flex-end;
+			flex: none;
+			width: 100rem;
+			height: 72rem;
+			img {
+				height: 100%;
+			}
+		}
+	}
+
+	.benefit-body {
+		margin-top: 12rem;
+		padding-top: 8rem;
+		border-top: 1px solid #EFF0F0;
+
+		.desc {
+			font-weight: 400;
+			font-size: 11rem;
+			line-height: 15rem;
+			color: #828588;
+		}
+	}
+
+	&.only-semotong {
+		border-color: $color-primary;
+		.benefit-badge {
+			position: absolute;
+			top: 0;
+			right: 10rem;
+			display: flex;
+		}
+	}
+
+	&.primary {
+		background-color: #EAE6FB;
+	}
+
+	// Benefit Content Types
+	.benefit-cont {
+		&.type-a {
+			.tit {
+				margin-bottom: 8rem;
+				font-weight: 700;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #000;
+			}
+			.bul-check {
+				display: flex;
+				flex-direction: column;
+				gap: 4rem;
+
+				li {
+					position: relative;
+					width: 100%;
+					padding-left: 20rem;
+					font-weight: 400;
+					font-size: 14rem;
+					line-height: 20rem;
+					letter-spacing: -0.2rem;
+					color: #000;
+
+					&::before {
+						content:'';
+						display: block;
+						position: absolute;
+						left: 0;
+						top: 2rem;
+						width: 16rem;
+						height: 16rem;
+						background: url('../images/common/icn-16-bul-check.svg') no-repeat 0 0 / 100%;
+					}
+				}
+			}
+			.msg-box {
+				margin-top: 12rem;
+				padding: 16rem;
+				background-color: #EAE6FB;
+				border-radius: 4rem;
+				text-align: center;
+
+				.msg-para {
+					font-weight: 400;
+					font-size: 14rem;
+					line-height: 20rem;
+					color: #000;
+					strong {
+						font-weight: 700;
+						color: $color-primary;
+					}
+					.msg-inline {
+						display: block;
+						@include media-mobile-xl {
+							display: inline-block;
+						}
+					}
+					.msg-block {
+						display: block;
+					}
+				}
+			}
+		}
+		&.type-b {
+			.msg-box {
+				position: relative;
+				margin-top: 12rem;
+				padding: 16rem;
+				background-color: #fff;
+				border-radius: 4rem;
+				text-align: center;
+
+				&::before {
+					content:'';
+					position: absolute;
+					left: 50%;
+					bottom: 100%;
+					display: block;
+					width: 40rem;
+					height: 40rem;
+					background: url('../images/common/icn-24-benefit-plus.svg') no-repeat 0 0 / 100%;
+					transform: translate(-50%, 15rem);
+				}
+
+				.msg-para {
+					font-weight: 400;
+					font-size: 14rem;
+					line-height: 20rem;
+					color: #000;
+				}
+				.msg-info {
+					font-weight: 400;
+					font-size: 12rem;
+					line-height: 16rem;
+					color: #828588;
+				}
+			}
+		}
+	}
+}

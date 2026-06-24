@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='세모통 백서', layoutSubTitleYN='N', layoutFooterYn='Y', menuId='01' ">
+	  
+  <!-- index.html 고유 CSS 추가 -->
+  <th:block layout:fragment="css">
+  </th:block>
+  <!-- index.html 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+   <script>
+  	
+  	
+  	$( document ).ready(function() {
+		
+  	});
+  	
+  
+   </script>
+  </th:block>
+  
+	<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-ER-page F-ER01-page">
+				<!-- 간편개통 섹션 -->
+				<section class="error-sec">
+					<div class="sec-inner">
+						<div class="nodata">
+							<i class="ui-icn icn-110-nodata-cry" aria-hidden="true"></i>
+							<p class="nodata-tit"><strong>앗, 오류가 발생했어요.</strong></p>
+							<p class="nodata-txt">빠르게 조치할게요.</p>
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" onclick="window.location.href='/'">
+							<span>홈으로 가기</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 플로팅 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+  
+  
+</html>

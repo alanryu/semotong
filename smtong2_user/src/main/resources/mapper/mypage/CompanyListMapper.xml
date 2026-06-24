@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.company.mapper.CompanyListMapper">
+	<sql id="listWhere">
+		<where>
+            <!-- 기간 조회-->
+            <if test='searchStartDt != null and searchStartDt !=""'>
+                AND create_date  <![CDATA[>=]]> #{searchStartDt}
+            </if>
+            <if test='searchEndDt != null and searchEndDt !=""'>
+                AND create_date <![CDATA[<=]]> #{searchEndDt}
+            </if>
+			<!-- 키워드 검색 -->
+			<if test="searchType != null and searchType != ''">
+				<choose>
+					<when test="searchType == 'NAME' and keyword != null and keyword !=''">
+						<!-- 입점사 -->
+						AND name LIKE CONCAT('%', #{keyword}, '%')
+					</when>
+					<!-- 회사명 -->
+					<when test="searchType == 'COMPANY' and keyword != null and keyword !=''">
+						AND company_nm LIKE CONCAT('%', #{keyword}, '%')
+					</when>
+				</choose>
+			</if>
+			
+			<if test="useYn != null and useYn != ''">
+				AND use_yn = ${useYn}
+			</if>
+			
+			<choose>
+				<when test="type == 'mvno'">
+					AND company_mng_code NOT IN ('KT', 'SKT', 'LGU')
+				</when>
+				<when test="type == 'mno'">
+					AND company_mng_code IN ('KT', 'SKT', 'LGU')
+				</when>
+			</choose>
+		</where>
+	</sql>
+	<sql id="Base_Column_list">
+		id
+		,name
+		,company_nm
+		,company_code
+		,company_mno
+		,work_time
+		,customer_cenetr
+		,company_adress
+		,logo_img
+		,order_no
+		,homepage_url
+		,use_yn
+		,create_date
+		,create_id
+		,modified_date
+		,modified_id
+		,GET_ADMIN_USER_NM(create_id) as createNm
+		,GET_ADMIN_USER_NM(modified_id) as modifiedNm				
+	</sql>
+	
+	<select id="getListCompanyList" parameterType="kr.co.ucomp.web.company.dto.CompanyListSearchDto" resultType="kr.co.ucomp.web.company.entity.CompanyListEntity">
+		  SELECT
+	            <include refid="Base_Column_list" />
+	        FROM
+	            tb_mbm_company_list
+	        <include refid="listWhere" />
+	        ORDER BY name
+	        LIMIT #{offset}, #{recordSize}
+
+	</select>
+	
+
+	<select id="getListCompanyListCount" parameterType="kr.co.ucomp.web.company.dto.CompanyListSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+	        FROM
+				tb_mbm_company_list
+	        <include refid="listWhere" />
+	</select>
+	
+	
+	<select id="getCompany" parameterType="int" resultType="kr.co.ucomp.web.company.entity.CompanyListEntity">
+		SELECT
+	            <include refid="Base_Column_list" />
+	        FROM
+	            tb_mbm_company_list
+	        WHERE id=#{id}
+	</select>
+	
+	
+	<select id="getReviewCompanyList" parameterType="map" resultType="kr.co.ucomp.web.company.entity.CompanyListEntity">
+		SELECT * FROM (
+		SELECT 
+				id
+				,name
+				,company_nm
+				,company_code
+				,company_mno
+				,(SELECT COUNT(1) FROM tb_csm_semotong_review WHERE create_id = #{userId} AND company_id = a.id) compReviewCnt
+		FROM tb_mbm_company_list a
+		WHERE use_yn = '1'
+		) b WHERE compReviewCnt = 0
+	</select>
+</mapper>

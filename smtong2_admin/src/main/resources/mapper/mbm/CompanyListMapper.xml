@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.mbm.mapper.CompanyListMapper">
+	<sql id="listWhere">
+		<where>
+            <!-- 기간 조회-->
+            <if test='searchStartDt != null and searchStartDt !=""'>
+                AND create_date  <![CDATA[>=]]> #{searchStartDt}
+            </if>
+            <if test='searchEndDt != null and searchEndDt !=""'>
+                AND create_date <![CDATA[<=]]> #{searchEndDt}
+            </if>
+            
+            <if test='searchUseYn != null and searchUseYn !=""'>
+                AND use_yn = #{searchUseYn}
+            </if>
+            
+			<!-- 키워드 검색 -->
+			<if test="searchType != null and searchType != ''">
+				<choose>
+					<when test="searchType == 'NAME' and keyword != null and keyword !=''">
+						<!-- 입점사 -->
+						AND name LIKE CONCAT('%', #{keyword}, '%')
+					</when>
+					<!-- 회사명 -->
+					<when test="searchType == 'COMPANY' and keyword != null and keyword !=''">
+						AND company_nm LIKE CONCAT('%', #{keyword}, '%')
+					</when>
+				</choose>
+			</if>
+			
+			<if test="searchType == null or searchType == ''">
+				<if test='keyword != null and keyword !=""'>
+	                AND ( name LIKE CONCAT('%', #{keyword}, '%') OR  company_nm LIKE CONCAT('%', #{keyword}, '%') )
+	                	
+	            </if>
+			</if>
+			
+			<if test="allyPartnetYn != null and !allyPartnetYn.equals('')">
+				<choose>
+					<when test="allyPartnetYn == 1">
+						AND allyPartnetYn = #{allyPartnetYn}
+					</when>
+					<otherwise>
+						AND ( allyPartnetYn = #{allyPartnetYn} OR allyPartnetYn is null )
+					</otherwise>
+				</choose>
+			</if>
+			
+			<if test="simpleOpenYn != null and !simpleOpenYn.equals('')">
+				<choose>
+					<when test="simpleOpenYn == 1">
+						AND simple_open_yn = #{simpleOpenYn}
+					</when>
+					<otherwise>
+						AND ( simple_open_yn = #{simpleOpenYn} OR simple_open_yn is null )
+					</otherwise>
+				</choose>
+			</if>
+			
+			<if test="searchCompanyCode != null and searchCompanyCode != ''">
+				AND id = #{searchCompanyCode}
+			</if>
+		</where>
+	</sql>
+	<sql id="Base_Column_list">
+		id
+		,name
+		,company_nm
+		,company_code
+		,company_mng_code
+		,company_mno
+		,work_time
+		,customer_cenetr
+		,company_adress
+		,logo_img
+		,order_no
+		,homepage_url
+		,use_yn
+		,allyPartnetYn
+		,simple_open_yn
+		,create_date
+		,create_id
+		,modified_date
+		,modified_id
+		,GET_ADMIN_USER_NM(create_id) as createNm
+		,GET_ADMIN_USER_NM(modified_id) as modifiedNm			
+	</sql>
+	
+	<select id="getListCompanyList" parameterType="kr.co.ucomp.web.mbm.dto.CompanyListSearchDto" resultType="kr.co.ucomp.web.mbm.entity.CompanyListEntity">
+		  SELECT
+	            <include refid="Base_Column_list" />
+	        FROM
+	            tb_mbm_company_list
+	        <include refid="listWhere" />
+	        <choose>
+				<when test="searchOrderType == 'name'">  
+	        		ORDER BY name DESC , id desc
+	        	</when>
+	        <otherwise> 
+					ORDER BY create_date DESC , id desc
+				</otherwise>
+			</choose>
+	        LIMIT #{offset}, #{recordSize}
+
+	</select>
+
+	<select id="getListCompanyListCount" parameterType="kr.co.ucomp.web.mbm.dto.CompanyListSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+	        FROM
+				tb_mbm_company_list
+	        <include refid="listWhere" />
+	</select>
+	
+	
+	<select id="getCompanyList" parameterType="int" resultType="kr.co.ucomp.web.mbm.entity.CompanyListEntity">
+		SELECT
+	            <include refid="Base_Column_list" />
+	        FROM
+	            tb_mbm_company_list
+	        WHERE id=#{id}
+	</select>
+	
+	<select id="getListCompanyListWithoutLimit" parameterType="kr.co.ucomp.web.mbm.dto.CompanyListSearchDto" resultType="kr.co.ucomp.web.mbm.entity.CompanyListEntity">
+		SELECT
+            <include refid="Base_Column_list" />
+        FROM
+            tb_mbm_company_list
+        	<include refid="listWhere" />
+        ORDER BY name
+	</select>
+	
+	<insert id="create"  parameterType="kr.co.ucomp.web.mbm.entity.CompanyListEntity"  useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+	
+	INSERT INTO tb_mbm_company_list (name, company_nm, company_code, company_mno, work_time, 
+                             customer_cenetr, company_adress, logo_img, order_no, use_yn, homepage_url, create_id,modified_id, allyPartnetYn, simple_open_yn )
+	VALUES(#{name}, 
+			#{companyNm}, 
+			#{companyCode}, 
+			#{companyMno}, 
+			#{workTime}, 
+            #{customerCenetr}, 
+            #{companyAdress}, 
+            #{logoImg}, 
+            #{orderNo}, 
+            #{useYn},
+            #{homepageUrl},
+            #{createId}, 
+			#{modifiedId},
+			#{allyPartnetYn},
+			#{simpleOpenYn}
+	);
+	
+	
+	</insert>
+	
+	<update id="update"  parameterType="kr.co.ucomp.web.mbm.entity.CompanyListEntity" >
+	UPDATE tb_mbm_company_list SET name = #{name}, 
+			company_nm = #{companyNm}, 
+			company_code = #{companyCode}, 
+            company_mno = #{companyMno}, 
+            work_time = #{workTime}, 
+            customer_cenetr = #{customerCenetr}, 
+            company_adress = #{companyAdress}, 
+            logo_img = #{logoImg}, 
+            order_no = #{orderNo}, 
+            use_yn = #{useYn}, 
+            homepage_url = #{homepageUrl},
+            allyPartnetYn = #{allyPartnetYn},
+            simple_open_yn = #{simpleOpenYn},
+            modified_date = NOW(), 
+            modified_id = #{modifiedId}
+	WHERE id=#{id}
+	
+	</update>
+	
+	<delete id="delCompanyList" parameterType="int">
+		DELETE FROM tb_mbm_company_list
+	    WHERE id=#{id}
+	</delete>
+</mapper>

@@ -1,0 +1,72 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 이벤트 종료
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 이벤트 종료 페이지
+.F-E02-01-page {
+
+	// 페이시 여백
+	@include bottom-spacer;
+
+	// s: 공지사항 목록 섹션
+	.eventEnd-sec {
+		.eventEnd-list-wrap {
+			.eventEnd-list {
+				border-top: 1px solid #2A2B2D;
+
+				.eventEnd-item {
+					border-bottom: 1px solid #EFF0F0;
+				}
+
+				.eventEnd-post {
+					position: relative;
+					display: flex;
+					align-items: center;
+					gap: 16rem;
+					padding: 16rem;
+					padding-left: 12rem;
+					padding-right: 12rem;
+
+					.eventEnd-cont {
+						display: block;
+						flex:1 1 auto;
+						.tit {
+							display: block;
+							font-weight: 600;
+							font-size: 16rem;
+							line-height: 24rem;
+							color: #2A2B2D;
+							@include ellipsis3;
+						}
+						.date {
+							display: block;
+							margin-top: 4rem;
+							font-weight: 500;
+							font-size: 14rem;
+							line-height: 22rem;
+							color: #96989B;
+						}
+					}
+
+					.ui-icn {
+						flex: none;
+					}
+
+					&:hover {
+						.eventEnd-cont {
+							.tit {
+								color: $color-primary;
+								text-decoration: underline;
+								text-underline-position: under;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	// e: 공지사항 목록 섹션
+
+}
+// e: 이벤트 종료 페이지

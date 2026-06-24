@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layout/default_layout}"
+  layout:fragment="Content"
+  th:with="menuIdGroup ='07',menuId ='12'"
+>
+  <!-- index.html 고유 CSS 추가 -->
+  <th:block layout:fragment="css">
+    <!--	<link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+  </th:block>
+  <!-- index.html 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+    <script id="searchListTmpl" type="text/x-jquery-tmpl">
+      <tr style="cursor: pointer;">
+      	<td>${id}</td>
+      	<td>${title}</td>
+      	<td><a href="javascript:void(0)" onclick="goDetail('${id}')">${rdUrl}</a></td>
+      	<td>
+      		<div class="form-check form-switch mb-3">
+      			{{if useYn == 'Y' }}
+      		    	<input class="form-check-input form-check-switch" type="checkbox" role="switch" id="flexSwitchCheckLarge" style="transform: scale(1.5);" value="${id}" checked>
+      			{{else}}
+      				<input class="form-check-input form-check-switch" type="checkbox" role="switch" id="flexSwitchCheckLarge" style="transform: scale(1.5);" value="${id}">
+      			{{/if}}
+      		</div>
+      	</td>
+      	<td>{{html getDateStr(createDate)}}</td>
+      	<td>
+      		<a href="#none;" class="btn btn-primary btn-sm" onclick="location.href='/svc/internetrdp/reqList?searchId=' + ${id}">
+                    	<i class="fas fa-list"></i>
+                        신청내역 보기
+                    </a>
+      	</td>
+      </tr>
+    </script>
+
+    <script type="text/javascript">
+      function goDetail(id) {
+        window.location.href = "/svc/internetrdp/edit?searchId=" + id;
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        searchList();
+      });
+
+      function changeCombo() {
+        currentPage = 1;
+        searchList();
+      }
+
+      function renderPage(page) {
+        currentPage = page;
+        searchList();
+      }
+
+      function searchList() {
+        var page = currentPage;
+        if (page == null || page == "") page = 1;
+        var pageSize = $("#pageSizse").val();
+
+        var params = {
+          keyword: $("#keyword").val(),
+          searchStartDt: $("#searchStartDt").val(),
+          searchEndDt: $("#searchEndDt").val(),
+          searchUseYn: $('input[name="searchUseYn"]:checked').val(),
+          page: page,
+          recordSize: pageSize,
+        };
+
+        $.ajax({
+          url: "/svc/internetrdp/ajaxList",
+          type: "POST",
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(params),
+          success: function (data) {
+            $("#searchList").empty();
+            $("#totla_count").html("총 " + data.totalCnt + "건");
+            if (data.totalCnt > 0) {
+              $("#searchListTmpl").tmpl(data.data).appendTo("#searchList");
+              handleSwichCheckboxSelect();
+            }
+
+            renderPagination(page, data.totalCnt, pageSize);
+          },
+          error: function (request, status, error) {
+            showAlert(error);
+          },
+          complete: function () {
+            // $('#loading').addClass('display-none');
+          },
+        });
+      }
+
+      function toggleSearchInit() {
+        $("#keyword").val("");
+        $('.period-button[value="180"]').trigger("click");
+        $("#searchUseYn01").prop("checked", true); // 사용여부
+        currentPage = 1;
+      }
+
+      function handleSwichCheckboxSelect() {
+        const bodyCheckboxes = document.querySelectorAll("tbody .form-check-switch");
+
+        bodyCheckboxes.forEach((check) => {
+          check.addEventListener("change", function () {
+            var mngId = $(this).val();
+            var useYn = "";
+            if ($(this).prop("checked")) {
+              var useYn = "Y";
+            } else {
+              var useYn = "N";
+            }
+            updateDisplay(mngId, useYn);
+          });
+        });
+      }
+
+      function updateDisplay(mngId, useYn) {
+        var params = {
+          id: parseInt(mngId),
+          useYn: useYn,
+        };
+
+        $.ajax({
+          url: "/svc/internetrdp/ajaxUpdate",
+          type: "POST",
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(params),
+          success: function (data) {},
+          error: function (request, status, error) {
+            alert(error);
+          },
+          complete: function () {
+            // $('#loading').addClass('display-none');
+          },
+        });
+      }
+
+      //02.03 - sancho
+      function downloadExcel() {
+        //페이징 기본(필수)
+        var page = 1;
+        if (page == "" || page == null) page = 1;
+        var _recordSize = 65000;
+
+        var params = {
+          keyword: $("#keyword").val(),
+          searchStartDt: $("#searchStartDt").val(),
+          searchEndDt: $("#searchEndDt").val(),
+          searchUseYn: $('input[name="searchUseYn"]:checked').val(),
+          page: page,
+          recordSize: pageSize,
+        };
+
+        var _url = "/svc/internetrdp/exceldown";
+
+        downloadExcelProc(params, _url, "InternetRequestList");
+      }
+    </script>
+  </th:block>
+
+  <div class="main-content">
+    <div class="container-fluid">
+      <!-- 로케이션 & 제목 영역 추가 -->
+      <div class="page-header mb-4">
+        <div class="location mb-2">
+          <small class="text-secondary">
+            <i class="fas fa-home me-1"></i>
+            <a href="javascript:;">홈</a>
+            >
+            <a href="javascript:;">서비스 관리</a>
+            >
+            <a href="/svc/internetrdp/list">랜딩페이지관리</a>
+          </small>
+        </div>
+        <h2 class="page-title fs-4 mb-4">랜딩페이지관리</h2>
+      </div>
+
+      <div class="search-section">
+        <!-- 검색어 -->
+        <div class="col-12 mb-2">
+          <div class="form-row full-width">
+            <div class="form-label mb-0">검색어</div>
+            <div class="position-relative col-9">
+              <i class="fas fa-search position-absolute" style="left: 16px; top: 15.5px; color: #94a3b8"></i>
+              <input type="text" class="form-control ps-5" placeholder="검색어를 입력하세요" id="keyword" name="keyword" />
+            </div>
+          </div>
+        </div>
+        <div class="row align-items-center mb-3">
+          <div class="col-12">
+            <div class="d-flex align-items-center gap-3">
+              <div class="form-label mb-0">사용여부</div>
+              <div class="radio-group">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="searchUseYn" id="searchUseYn01" value="" />
+                  <label class="form-check-label" for="searchUseYn01">전체</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="searchUseYn" id="searchUseYn02" value="Y" />
+                  <label class="form-check-label" for="searchUseYn02">노출</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="searchUseYn" id="searchUseYn03" value="N" />
+                  <label class="form-check-label" for="searchUseYn03">비노출</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row align-items-center mb-2">
+          <div class="form-row full-width">
+            <div class="d-flex align-items-center gap-3">
+              <div class="form-label mb-0">등록일</div>
+              <div class="d-flex align-items-center gap-2">
+                <input type="date" class="form-control" style="width: 150px" id="searchStartDt" />
+                <span class="text-secondary">-</span>
+                <input type="date" class="form-control" style="width: 150px" id="searchEndDt" />
+              </div>
+              <div class="d-flex gap-2">
+                <button class="period-button" value="0">오늘</button>
+                <button class="period-button" value="7">1주일</button>
+                <button class="period-button" value="30">1개월</button>
+                <button class="period-button" value="90">3개월</button>
+                <button class="period-button" value="180">6개월</button>
+                <button class="period-button" value="365">1년</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12 text-end mt-2">
+            <button class="btn btn-light me-2 btn-sm" onclick="toggleSearchInit()">
+              <i class="fas fa-redo"></i>
+              초기화
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="searchList();">
+              <i class="fas fa-search"></i>
+              검색
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="d-flex align-items-center gap-3">
+            <div class="stats-badge">
+              <i class="fas fa-calculator me-1"></i>
+              <span id="totla_count">총 450건</span>
+            </div>
+            <select class="form-select" style="width: 100px" id="pageSizse" onchange="changeCombo()">
+              <option value="10">10개씩</option>
+              <option value="20">20개씩</option>
+              <option value="30">30개씩</option>
+              <option value="40">40개씩</option>
+              <option value="50">50개씩</option>
+            </select>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-light btn-sm">
+              <i class="fas fa-download"></i>
+              다운로드
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="goDetail('0')">
+              <i class="fas fa-plus"></i>
+              등록
+            </button>
+          </div>
+        </div>
+
+        <table class="table custom-table">
+          <thead>
+            <tr>
+              <th>번호</th>
+              <th>제목</th>
+              <th>url</th>
+              <th>사용여부</th>
+              <th>등록일</th>
+              <th>신청내역</th>
+            </tr>
+          </thead>
+          <tbody id="searchList"></tbody>
+        </table>
+
+        <div class="d-flex justify-content-left mt-4">
+          <ul class="pagination"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</html>

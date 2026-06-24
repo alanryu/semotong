@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='내 계정', layoutSubTitleYN='N', layoutFooterYn='Y', menuId='05'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script>
+		
+		document.addEventListener("DOMContentLoaded", () => {
+			// 이벤트 스와이프
+		    var eventSwiper = new Swiper(".event-swiper", {
+				threshold: 3,
+				spaceBetween: 10,
+				pagination: {
+					el: ".swiper-pagination",
+				},
+				autoplay: {
+					delay: 2500,
+					disableOnInteraction: false,
+				},
+			});
+			
+		    var _loginErrCode = "[[${loginErrCode}]]";
+		    var _loginErr = "[[${loginErr}]]";
+			if(_loginErrCode !="") {
+				if(_loginErrCode == "99" ) {
+					alertModalShow(_loginErr,"로그인 오류");	
+				}
+				
+				if(_loginErrCode == "91" ) {
+					alertModalShow("불편을 드려 죄송합니다.<br> <span class='txt-primary'> 이름</span> 정보가 확인되지 않아 세모통 가입이 불가합니다.<br><br> 카카오 계정 관리에서 프로필 업데이트 후 <br>다시 시도해 주세요.","로그인 오류","",360);	
+				}
+				
+				if(_loginErrCode == "92" ) {
+					alertModalShow("불편을 드려 죄송합니다.<br><span class='txt-primary'> 전화번호</span> 정보가 확인되지 않아 세모통 가입이 불가합니다.<br> 카카오 계정 관리에서 프로필 업데이트 후 <br>다시 시도해 주세요.","로그인 오류","",360);	
+				}
+				
+			}
+			
+			
+		})
+		
+		
+		function kakaoLogin() {
+			navigateTo('/users/kakaologin');
+		}
+		
+		function goNextSetting(){
+			//login 후 이동 할 페이지 설정.
+			// href="/csm/onetoone/onetoone"
+			//function setCookie(name, value, exp) {
+			// setCookie('nextPage', '/csm/onetoone/onetoone', 1);
+			// navigateTo('/users/kakaologin');
+			window.open('https://pf.kakao.com/_EwxoVn');
+		}
+		
+		function kakaoChat() {
+			window.open('https://pf.kakao.com/_EwxoVn/chat');
+		}
+		
+	</script>
+</th:block>
+<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-MY02-01-page">
+				<!-- 나의정보 섹션 -->
+				<section class="my-info-sec">
+					<div class="sec-inner">
+						<!-- 나의정보 -->
+						<div class="my-info-profile">
+							<!-- 3차 수정 : 인사말 변경 -->
+							<p class="name"><strong>안녕하세요, 고객님!</strong></p>
+							<p class="explain">
+								간편 로그인으로 세모통의<br> 다양한 서비스를 이용하실 수 있어요.
+							</p>
+							<button type="button" class="ui-btn btn-kakao" onclick="kakaoLogin();">
+								<i class="ui-icn icn-18-kakao-bk" aria-hidden="true"></i>
+								<span>카카오 로그인</span>
+							</button>
+							<button type="button" class="ui-btn btn-cs" onclick="kakaoChat()">
+								<i class="ui-icn icn-32-headset-bk" aria-label="고객센터"></i>
+							</button>
+						</div>
+						<!-- // 나의정보 -->
+					</div>
+				</section>
+				<!-- // 나의정보 섹션 -->
+
+				<!-- 고객지원 섹션 -->
+				<section class="cscenter-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit"><i class="ui-icn icn-20-headset-bk"></i>고객지원</h2>
+						</div>
+						<div class="sec-body">
+							<ul class="cs-menu-list">
+								<li class="cs-menu-item">
+									<a href="/cms/notice/noticeList" class="cs-menu-btn">
+										<span>공지사항</span>
+										<i class="ui-icn icn-16-more-gr" aria-hidden="true"></i>
+									</a>
+								</li>
+								
+								<li class="cs-menu-item" onclick="goNextSetting()">
+									<a class="cs-menu-btn">
+										<span>1:1 문의</span>
+										<i class="ui-icn icn-16-more-gr" aria-hidden="true"></i>
+									</a>
+								</li>
+								
+								<li class="cs-menu-item">
+									<a href="/cms/faq/faqlist" class="cs-menu-btn">
+										<span>자주묻는 질문</span>
+										<i class="ui-icn icn-16-more-gr" aria-hidden="true"></i>
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<!-- // 고객지원 섹션 -->
+
+				<!-- 이벤트 섹션 -->
+				<section class="event-sec">
+					<div class="sec-inner">
+						<div class="swiper event-swiper">
+							<div class="swiper-wrapper">
+								<div class="swiper-slide" th:each="list : ${bannerList}">
+									<button type="button" class="event-bnr" th:attr="onclick=|navigateTo('${list.url}');|">
+										<img th:src="@{${list.imageMo}}" th:alt="${list.bannerAlt}" class="only-mo" />
+										<img th:src="@{${list.imagePc}}" th:alt="${list.bannerAlt}" class="only-pc" />
+									</button>
+								</div>
+							</div>
+							<div class="swiper-pagination"></div>
+						</div>
+					</div>
+				</section>
+				<!-- // 배너 섹션 -->
+ 			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->

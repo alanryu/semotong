@@ -1,0 +1,59 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 찜한 요금제
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 찜한 요금제 페이지
+.F-MY01-04-page {
+
+	// 페이시 여백
+	@include bottom-spacer;
+
+	// s: 상품리스트 섹션
+	.ratePlanC-sec {
+		@include sec-basic;
+		.sec-header {
+			margin-bottom: 0;
+		}
+
+		// 요금제 상품 리스트 공통
+		.ratePlanC-list {
+			@include ratePlanC-list;
+
+			// 요금제 상품 리스트 카드 공통
+			.ratePlanC-card {
+				@include ratePlanC-card;
+			}
+		}
+
+		// nodata 공통
+		.nodata {
+			@include nodata;
+
+			// 페이지별 대응
+			margin: 20vh 0;
+			@include media-tablet-xs {
+				margin: 120px 0;
+			}
+		}
+	}
+	// e: 상품리스트 섹션
+
+	// s: 노데이터 섹션
+	.nodata-sec {
+		@include nodata-sec;
+		height: 298rem;
+
+		.nodata {
+			@include nodata;
+		}
+	}
+	// e: 노데이터 섹션
+
+	// s: 플로팅 섹션
+	.floating-sec {
+		@include floating-sec;
+	}
+	// e: 플로팅 섹션
+}
+// e: 찜한 요금제 페이지

@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='', layoutSubTitleYN='N', layoutFooterYn='Y', layoutNavYn='Y', mainWrapper='Y', menuId=${type} == 'mvno' ? '02' : '06'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+
+	<script>
+		
+		// DOMContentLoaded
+		$( document ).ready(function() {
+			
+			const modalElement = document.getElementById('FP0101P01Modal');
+
+			// 모달이 호출된 후 Callback
+			modalElement.addEventListener('shown.bs.modal', () => {
+				// Set Spyscroll (ui.common.js)
+				setSpyScroll();
+				
+				// Set Range Multiple
+				setRange();
+
+				// Set Tab Swipe
+				setTabSwipe();
+
+				// Set SpyScoll 탭스와이프 연동
+				setSpyScrollActiveLink();
+			});
+			
+			/* 필터 결과 보기 버튼 */
+			$('#viewResult').on('click', function(){
+				$('#pageIdx').val('1');
+				viewResult();
+			});
+			
+			getLastViewPlanList();
+			
+			/* 검색필터 클릭 이벤트 */
+			$(document).on('change', 'input[type=checkbox], input[type=radio], input[type=range]', function(){
+				viewResult('count');
+			});
+			
+			
+			/* 요금제 검색 enter */
+			$("#popSearchKeyword").on("keyup", function (key) {
+			  if (key.keyCode == 13) {
+			    searchByKeyword();
+			  }
+			});
+			
+			
+			const buttons = document.querySelectorAll(".ratePlan-chip");
+		    buttons.forEach((button) => {
+		        const codeGroup = button.getAttribute("data-code-group");
+	            button.addEventListener("click", function () {
+			       searchByTag(codeGroup);
+	            });
+		    });
+			
+			
+		});
+		
+		/* 뒤로가기 여부 판단 후 검색 */
+		window.onpageshow = function(event) {
+			
+			/* 뒤로가기로 진입 */
+			if ( event.persisted || (window.performance && window.performance.navigation.type == 2)) {
+				
+				/* 정렬 세팅 */
+				if ( sessionStorage.getItem("searchOrder") != undefined && sessionStorage.getItem("searchOrder") != null ) {
+					
+					var element;
+					if ( sessionStorage.getItem("searchOrder") == 'SP' ) {
+						element = document.getElementById('spOrder');
+					} else if ( sessionStorage.getItem("searchOrder") == 'AP12' ) {
+						element = document.getElementById('apOrder12');
+					} else if ( sessionStorage.getItem("searchOrder") == 'AP24' ) {
+						element = document.getElementById('apOrder24');
+					} else if ( sessionStorage.getItem("searchOrder") == 'DATA' ) {
+						element = document.getElementById('dataOrder');
+					} else if ( sessionStorage.getItem("searchOrder") == 'RE' ) {
+						element = document.getElementById('reOrder');
+					}
+					setSelectValued('#frmSort', element);
+				}
+				
+				/* 검색했던 페이지 수만큼 다시 검색 */
+				if ( parseInt(sessionStorage.getItem('pageIdx')) > 1 ) {
+					for ( var idx = 0; idx < parseInt(sessionStorage.getItem('pageIdx')); idx++ ) {
+						viewResult();
+					}
+				} else {
+					viewResult();
+				}
+			/* 새로 진입 */
+			} else {
+				
+				/* 초기 필터 세팅 */
+				/* $('input[name=searchData][value=5]').prop('checked', true);
+				$('input[name=searchQos][value=0]').prop('checked', true); */
+				
+				viewResult();
+			}
+			sessionStorage.clear();
+		}
+		
+		function getPlanList(params) {
+			
+			$.ajax({
+			   url : '/pbm/plan/getPlanlist',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+			   async : false,
+			   beforeSend: function(xhr){
+			       xhr.setRequestHeader(header,token);
+			    },
+				success: function (data) {
+					
+					if(params.page == 1) {
+						$('#planList').empty();	
+					}
+					if(data.totalCnt ==0) {
+						$('#nodataPlanListTmpl').tmpl(null).appendTo('#planList');
+					} else {
+						$.each(data.data, function(idx, obj){
+							obj.displayPrice = 0;
+							obj.listSp = "1";
+							/* 12개월 합산 금액 */
+							if ( params.searchOrderType == 'AP12' ) {
+								obj.displayPrice = 12;
+							/* 24개월 합산 금액 */
+							} else if ( params.searchOrderType == 'AP24' ) {
+								obj.displayPrice = 24;
+							}
+						});
+						$('#planListTmpl').tmpl(data.data).appendTo('#planList');	
+						//setLikeButton(); // 스크롤 상태 설정
+						setPopover('ui-popover popover-style1'); //동적 리스트 생성후 툴팁 function 다시로드 
+					}
+					
+					/* 총 검색갯수 */
+					$('#totalCnt').html(addCommas(data.totalCnt) + '개');
+					$('#filter-total-cnt').html(addCommas(data.totalCnt));
+					
+					/* 더보기 버튼 숨김 여부 */
+					if ( (params.page * params.recordSize) >= data.totalCnt ) {
+						$('.btn-more-list').hide();
+					} else {
+						$('.btn-more-list').show();
+					}
+					
+					/* 페이지 세팅 */
+					$('#pageIdx').val(params.page + 1);
+					
+					/* 필터 검색 표시 */
+					showFilterProc(params);
+					
+					$('.btn-close').trigger('click');
+			    },
+				error : function(request, status, error){
+					alertModalShow(error,"");
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+			});
+		}
+		
+		
+		
+		function getLastViewPlanList() {
+	  		
+			var params = {
+			     keyword : "",
+			     searchType : "2",
+			     recordSize : "3"
+			    }
+					  
+				$.ajax({
+				   url : '/pbm/plan/getPlanlist',
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+				   beforeSend: function(xhr){
+				       xhr.setRequestHeader(header,token);
+				    },
+					success: function (data) {
+						$('#lastViewplanList').empty();
+						
+						if ( data.totalCnt > 0 ) {
+							$('.recent-ratePlanC-sec').show();
+							$.each(data.data, function(idx, obj){
+								obj.displayPrice = 0;
+								obj.listSp = "2";
+							})
+							$('#planListTmpl').tmpl(data.data).appendTo('#lastViewplanList');
+						} else {
+							$('.recent-ratePlanC-sec').hide();
+						}
+				    },
+					error : function(request, status, error){
+						alertModalShow(error,"");
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+				});
+		}
+		
+		/* 정렬조건 변경시 1페이지 부터 */
+		function selectOrder() {
+			$('#pageIdx').val('1');
+			viewResult();
+		}
+		
+		/* 필터 결과보기 버튼 */
+		function viewResult(section) {
+			
+			/* 정렬 */
+			var searchOrderType = $('#order-type').children('li.is-selected').data('type');
+			/* 페이지 */
+			var page = parseInt($('#pageIdx').val());
+			
+			/* 검색 파라미터 */
+			var params = {
+			     keyword : "",
+				 searchSaleSp : "SALE",
+				 searchOrderType : searchOrderType,
+				 page : page,
+				 recordSize : 10
+			}
+			
+			//mvno,mno 구분
+			params.searchSection = '[[${type}]]';
+			
+			//데이터
+			var sdata = $('input[name=searchData]:checked').val();
+			
+			//가격 from ~ to
+			var priceTermFrom = $('#range1').val();
+			var priceTermTo = $('#range2').val();
+			
+			//소진시 속도
+			var qos = $('input[name=searchQos]:checked').val() == undefined ? '' : $('input[name=searchQos]:checked').val();
+			
+			//할인기간
+			var promoPeriod = $('input[name=searchPromoPeriod]:checked').val();
+			
+			//통화
+			var call = $('input[name=searchCall]:checked').val() == undefined ? '' : $('input[name=searchCall]:checked').val();
+			
+			//문자
+			var sms = $('input[name=searchSms]:checked').val() == undefined ? '' : $('input[name=searchSms]:checked').val()
+			
+			//통신망
+			var mnoArr = new Array();
+			$('input[name=searchMno]:checked').each(function(){
+				mnoArr.push($(this).val());
+			});
+			var mno = mnoArr.join(',');
+			
+			//통신기술
+			var planTypeArr = new Array();
+			$('input[name=searchNetrok]:checked').each(function(){
+				planTypeArr.push($(this).val());
+			});
+			var planType = planTypeArr.join(',');
+			
+			//인터넷 결합
+			var combination = $('input[name=searchCombination]:checked').val() == undefined ? '' : $('input[name=searchCombination]:checked').val();
+			
+			//통신사
+			var companyArr = new Array();
+			$('input[name=host]:checked').each(function(){
+				companyArr.push($(this).val());
+			});
+			var company = companyArr.join(',');
+			
+			/* 데이터 검색값 세팅 */
+			if (sdata > 0 ) {
+				/* ~7GB */
+				if ( sdata == 1 ) {
+					params.searchDataTermFrom = 0;
+					params.searchDataTermTo = 1024 * 7;
+				/* 7~15GB */
+				} else if ( sdata == 2 ) {
+					params.searchDataTermFrom = 1024 * 7;
+					params.searchDataTermTo = 1024 * 15;
+				/* 15~71GB */
+				} else if ( sdata == 3 ) {
+					params.searchDataTermFrom = 1024 * 15;
+					params.searchDataTermTo = 1024 * 71;
+				/* 71GB~ */
+				} else if ( sdata == 4 ) {
+					params.searchDataTermFrom = 1024 * 71;
+				/* 7GB~ */
+				} else if ( sdata == 5 ) {
+					params.searchDataTermFrom = 1024 * 7;
+				}
+			}
+			
+			/* 가격 검색값 세팅 */
+			params.searchSalePriceTermFrom = priceTermFrom;
+			params.searchSalePriceTermTo = priceTermTo;
+			
+			/* 소진시 속도 검색값 세팅 */
+			if ( qos != '' ) {
+				
+				if ( qos == '0' ) {
+					params.searchQosTermFrom = 1;
+				} else {
+					params.searchQos = qos;
+				}
+			}
+			
+			/* 할인기간 검색값 세팅 */
+			if ( promoPeriod != '0' ) {
+				
+				/* 6개월 미만 */
+				if ( promoPeriod == '1' ) {
+					params.searchPromoPeriodTermTo = 6;
+				/* 6개월 이상 ~ 12개월 미만 */
+				} else if ( promoPeriod == '2' ) {
+					params.searchPromoPeriodTermFrom = 6;
+					params.searchPromoPeriodTermTo = 12;
+				/* 12개월 이상 ~ 24개월 미만 */
+				} else if ( promoPeriod == '3' ) {
+					params.searchPromoPeriodTermFrom = 12;
+					params.searchPromoPeriodTermTo = 24;
+				/* 24개월 이상 */
+				} else if ( promoPeriod == '4' ) {
+					params.searchPromoPeriodTermFrom = 24;
+					params.searchPromoPeriodTermTo = 9998;
+				/* 평생 */
+				} else if ( promoPeriod == '5' ) {
+					params.searchPromoPeriod = 9999;
+				}
+			}
+			
+			/* 통화 */
+			if ( call != '0' ) {
+				
+				if ( call == '1' ) {
+					params.searchCallTermTo = 60;
+				} else if ( call == '2' ) {
+					params.searchCallTermFrom = 60;
+					params.searchCallTermTo = 180;
+				} else if ( call == '3' ) {
+					params.searchCallTermFrom = 180;
+					params.searchCallTermTo = 300;
+				} else if ( call == '4' ) {
+					params.searchCallTermFrom = 300;
+					params.searchCallTermTo = 9998;
+				} else if ( call == '9999' ) {
+					params.searchCall = 9999;
+				}
+			}
+			
+			/* 문자 */
+			if ( sms != '0' ) {
+				
+				if ( sms == '1' ) {
+					params.searchSmsTermTo = 50;
+				} else if ( sms == '2' ) {
+					params.searchSmsTermFrom = 50;
+					params.searchSmsTermTo = 100;
+				} else if ( sms == '3' ) {
+					params.searchSmsTermFrom = 100;
+					params.searchSmsTermTo = 300;
+				} else if ( sms == '4' ) {
+					params.searchSmsTermFrom = 300;
+					params.searchSmsTermTo = 500;
+				} else if ( sms == '5' ) {
+					params.searchSmsTermFrom = 500;
+					params.searchSmsTermTo = 9998;
+				} else if ( sms == '9999' ) {
+					params.searchSms = 9999;
+				}
+			}
+			
+			/* 통신망 */
+			params.searchMno = mno;
+			
+			/* 통신기술 */
+			params.searchNetrok = planType;
+			
+			/* 인터넷 결합 */
+			params.searchCombination = combination;
+			
+			/* 통신사 */
+			params.searchCompanyList = company;
+			
+			params.keyword = $("#searchKeyword").val();
+			
+			params.searchPlanTag = $("#searchTagVal").val();
+			
+			
+			if ( section == null || section == undefined ) {
+				getPlanList(params);
+			} else {
+				planCount(params);
+			}
+		}
+		
+		/* 필터 검색 표시 */
+		function showFilterProc(params) {
+			
+			/* 데이터 */
+			$('input[name=searchData]:checked').val() != '0' ? $('#viewDataFilter').show() : $('#viewDataFilter').hide();
+			/* 가격 */
+			if ( params.searchSalePriceTermFrom == 0 && params.searchSalePriceTermTo == 200000 ) {
+				$('#viewPriceFilter').hide();
+			} else {
+				$('#viewPriceFilter').show();
+			}
+			/* 소진시 속도 */
+			$('input[name=searchQos]:checked').val() != '' ? $('#viewQosFilter').show() : $('#viewQosFilter').hide();
+			/* 할인기간 */
+			$('input[name=searchPromoPeriod]:checked').val() != '0' ? $('#viewPromoPeriodFilter').show() : $('#viewPromoPeriodFilter').hide();
+			/* 통화 */
+			$('input[name=searchCall]:checked').val() != '0' ? $('#viewCallFilter').show() : $('#viewCallFilter').hide();
+			/* 문자 */
+			$('input[name=searchSms]:checked').val() != '0' ? $('#viewSmsFilter').show() : $('#viewSmsFilter').hide();
+			/* 통신정보 */
+			if ( params.searchMno == '' && params.searchNetrok == '' ) {
+				$('#viewNetInfoFilter').hide();
+			} else {
+				$('#viewNetInfoFilter').show();
+			}
+			
+			/* 통신사 */
+			if ( params.searchCompanyList == '' ) {
+				$('#viewcompanyFilter').hide();
+			} else {
+				$('#viewcompanyFilter').show();
+			}
+			/* 인터넷 결합 */
+			params.searchCombination != '' ? $('#viewCombinationFilter').show() : $('#viewCombinationFilter').hide();
+			
+			var splFlg = false;
+			$('.filter-list').each(function(){
+				if ( !$(this).is(':hidden') ) {
+					splFlg = true;
+				}
+			});
+			
+			
+			
+			if ( splFlg ) {
+				$('.split').show();
+				$('.filter-btn').addClass('is-setting');
+			} else {
+				$('.split').hide();
+				$('.filter-btn').removeClass('is-setting');
+			}
+		}
+		
+		/* 필터 초기화 */
+		function resetFilter(){
+			
+			//데이터
+			$('input[name=searchData]').eq(0).prop('checked', true);
+			
+			//가격 from ~ to
+			$('#range1').val(0);
+			$('#range2').val(200000);
+			rangeValues.textContent = '전체';
+			$('#range1').css('background','linear-gradient(to right, rgb(207, 208, 209) 0%, rgb(84, 47, 221) 5.71429%, rgb(84, 47, 221) 100%, rgb(207, 208, 209) 100%)');
+			
+			//소진시 속도
+			$('input[name=searchQos]').eq(0).prop('checked', true);
+			
+			//할인기간
+			$('input[name=searchPromoPeriod]').eq(0).prop('checked', true);
+			
+			//통화
+			$('input[name=searchCall]').eq(0).prop('checked', true);
+			
+			//문자
+			$('input[name=searchSms]').eq(0).prop('checked', true);
+			
+			//통신망
+			$('input[name=searchMno]').prop('checked', false);
+			
+			//통신기술
+			$('input[name=searchNetrok]').prop('checked', false);
+			
+			//인터넷 결합
+			$('input[name=searchCombination]').prop('checked', false);
+			
+			//통신사
+			$('input[name=host]').prop('checked', false);
+			
+			viewResult('count');
+		}
+
+		
+		/* 검색 결과 갯수 */
+		function planCount(params) {
+			
+			$.ajax({
+			   url : '/pbm/plan/getPlanlistCount',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+			   async : false,
+			   beforeSend: function(xhr){
+			       xhr.setRequestHeader(header,token);
+			    },
+				success: function (data) {
+					$('#filter-total-cnt').html(addCommas(data.totalCnt));
+			    },
+				error : function(request, status, error){
+					alertModalShow(error,"");
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+			});
+		}
+		
+		function popSearchKeywordModal() {
+			var searchModal = new bootstrap.Modal(document.getElementById('searchModal'));
+			searchModal.show();
+			$("#popSearchKeyword").focus();
+			$("#ulSearchTextList").empty();
+			var cklist = listCookies("searchText");
+			if (Array.isArray(cklist) && cklist.length > 0) {
+				for (let i = 0; i < cklist.length; i++) {
+			        addKeywordToList("ulSearchTextList",cklist[i].value) ;
+			    }
+				$("#dvLastSearch").show();
+			} else {
+				$("#dvLastSearch").hide();
+			}
+			
+			
+
+			
+		}
+		
+		function searchByKeyword() {
+			var cklist = listCookies("searchText");
+			var isExYn = "N";
+			var searchKeyWord = $("#popSearchKeyword").val();
+			
+			if(searchKeyWord.trim().length> 0) {
+				for (let i = 0; i < cklist.length; i++) {
+					if(cklist[i].value ==$("#popSearchKeyword").val() ) {
+						isExYn = "Y";
+					}
+				}
+
+
+				if(isExYn =="N") {
+					addSearchTerm($("#popSearchKeyword").val());
+				}
+				
+			}
+			
+			
+			$("#searchKeyword").val($("#popSearchKeyword").val());
+			$("#popSearchKeyworClose").click();
+			$('#pageIdx').val('1');
+			viewResult();
+		}
+		
+		
+		// 검색어 처리 관련 ------------------------------------------
+		function removeLastKeyword(el) {
+			var liElement = el.closest('li');
+			var ckname = liElement.getAttribute('data-ck');
+			var cklist = listCookies("searchText");
+			
+			for (let i = 0; i < cklist.length; i++) {
+				if(cklist[i].value ==ckname ) {
+					deleteCookie(cklist[i].name);
+				}
+		    }
+			liElement.remove();
+		}
+
+		function removeLastKeywordAll(el) {
+
+			const ulElement = document.querySelector('.ratePlan-keyword-list');
+			if (ulElement) {
+			    const liElements = ulElement.querySelectorAll('li');
+			    liElements.forEach(li => li.remove());
+			}
+			
+			var cklist = listCookies("searchText");
+						
+			for (let i = 0; i < cklist.length; i++) {
+				deleteCookie(cklist[i].name);
+		    }
+			$("#dvLastSearch").hide();
+						
+		}
+		
+		function setSearchText(val) {
+			$("#popSearchKeyword").val(val);
+			$("#searchKeyword").val($("#popSearchKeyword").val());
+			$("#popSearchKeyworClose").click();
+			$('#pageIdx').val('1');
+			viewResult();
+			
+		}
+		
+
+		// 함수: 검색어 추가
+		function addSearchTerm(term) {
+			const unixTimestampMillis = Date.now();
+		   setCookie('searchText'+unixTimestampMillis, term, 7);
+		}
+		
+		
+		function listCookies(prefix) {
+		    const cookies = document.cookie.split("; ");
+		    return cookies
+		        .filter(cookie => cookie.startsWith(prefix)) // 접두사로 시작하는 쿠키 필터링
+		        .map(cookie => {
+		            const [key, value] = cookie.split("=");
+		            return { name: key, value: decodeURIComponent(value) };
+		        });
+		}
+		
+		
+		// li 동적 추가 함수
+		function addKeywordToList(ulId, keyword) {
+		    // ul 태그 선택
+		    const ulElement = document.getElementById(ulId);
+	
+		    // li 요소 생성
+		    const li = document.createElement("li");
+			li.setAttribute("data-ck", keyword);
+	
+		    // div 요소 생성 및 클래스 추가
+		    const div = document.createElement("div");
+		    div.classList.add("ratePlan-keyword");
+	
+		    // a 태그 생성
+		    const a = document.createElement("a");
+		    a.href = "#";
+		    a.textContent = keyword; // 전달받은 키워드 텍스트
+		    a.setAttribute("onclick", "setSearchText('"+keyword+"')");
+	
+		    // button 태그 생성
+		    const button = document.createElement("button");
+		    button.type = "button";
+		    button.classList.add("ui-btn", "remove");
+		    button.setAttribute("onclick", "removeLastKeyword(this)");
+	
+		    // i 태그 생성 및 클래스 추가
+		    const icon = document.createElement("i");
+		    icon.classList.add("ui-icn", "icn-16-remove-bk");
+		    icon.setAttribute("aria-hidden", "true");
+	
+		    // 요소들 계층 구조로 추가
+		    button.appendChild(icon); // button 안에 i 추가
+		    div.appendChild(a); // div 안에 a 추가
+		    div.appendChild(button); // div 안에 button 추가
+		    li.appendChild(div); // li 안에 div 추가
+		    ulElement.appendChild(li); // ul 안에 li 추가
+		}
+		
+
+		
+		
+		function searchByTag(codeGroup) {
+			$('#pageIdx').val('1');
+			$("#searchTagVal").val(codeGroup);
+			
+
+		   // 모든 버튼 순회
+		   const buttons = document.querySelectorAll(".ratePlan-chip");
+		   buttons.forEach((button) => {
+		       if (button.getAttribute("data-code-group") === codeGroup) {
+				   button.classList.add("is-selected");
+				   
+		       } else {
+				   button.classList.remove("is-selected");
+		       }
+		   });
+			   
+			   			
+			viewResult();
+		}
+
+	</script>
+
+</th:block>
+
+
+<!-- Container -->
+<main role="main" class="container">
+<input type="hidden" id="searchTagVal">
+	<!-- content -->
+	<div class="content F-P01-01-page">
+		<!-- 요금제 카테고리 섹션 -->
+		<!-- <section class="ratePlan-cate-sec">
+			<div class="sec-inner">
+			</div>
+		</section> -->
+		<!-- // 요금제 카테고리 섹션 -->
+
+		<!-- 요금제 필터 섹션 -->
+		<section class="ratePlan-filter-sec">
+			<div class="sec-inner">
+				<!--<div class="sec-header">
+					<h2 class="sec-tit">어떤 요금제를 찾고 계세요?</h2>
+					<p class="sec-explain">요금제 구성을 알려주시면 세모통이 추천해드려요!</p>
+				</div>-->
+				<div class="sec-header">
+					<h2 class="sec-tit" th:if="${type eq 'mvno'}">알뜰요금제 비교</h2>
+					<h2 class="sec-tit" th:if="${type eq 'mno'}">SKT, KT, U+ 요금제 비교</h2>
+					<p class="sec-explain">데이터, 통신망, 혜택을 쉽게 확인해 보세요.</p>
+				</div>
+				<div class="sec-body">
+					
+					<!-- 요금제 배너목록 -->
+					<!-- 2차 수정 : 요금제 카테고리 위치 변경 -->
+					<!--<ul class="ratePlan-cate-list">
+						<li>
+							<button type="button" class="ratePlan-cate-btn" onclick="topFilter('longtime')">
+								<i class="ui-icn icn-44-plan-cate-02" aria-hidden="true"></i>
+								<span>장기 할인<br> 요금제</span>
+							</button>
+						</li>
+						<li>
+							<button type="button" class="ratePlan-cate-btn" onclick="topFilter('eternal')">
+								<i class="ui-icn icn-44-plan-cate-03" aria-hidden="true"></i>
+								<span>평생 할인<br> 요금제</span>
+							</button>
+						</li>
+						<li>
+							<button type="button" class="ratePlan-cate-btn" onclick="topFilter('internet')">
+								<i class="ui-icn icn-44-plan-cate-01" aria-hidden="true"></i>
+								<span>인터넷<br> 결합 요금제</span>
+							</button>
+						</li>
+					</ul>-->
+					<!-- // 요금제 배너목록 -->
+
+					<!-- 필터목록 -->
+					<!-- 2차 수정 : 필터 키워드형으로 변경
+						- 새로고침 제외, 키워드 설정완료 태태추가, 삭제버튼 제외
+					 -->
+					<!--<ul class="ratePlan-filter-list">
+						<li style="display:none;" class="filter-list" id="viewDataFilter">
+							<button class="filter-chip" data-bs-toggle="modal" data-bs-target="#FP0101P01Modal">
+								<span>데이터</span>
+							</button>
+						</li>
+						<li style="display:none;" class="filter-list" id="viewPriceFilter">
+							<button class="filter-chip" data-bs-toggle="modal" data-bs-target="#FP0101P01Modal">
+								<span>가격</span>
+							</button>
+						</li>
+						<li style="display:none;" class="filter-list" id="viewQosFilter">
+							<button class="filter-chip" data-bs-toggle="modal" data-bs-target="#FP0101P01Modal">
+								<span>소진시 속도</span>
+							</button>
+						</li>
+						<li style="display:none;" class="filter-list" id="viewPromoPeriodFilter">
+							<button class="filter-chip" data-bs-toggle="modal" data-bs-target="#FP0101P01Modal">
+								<span>할인 기간</span>
+							</button>
+						</li>
+						<li style="display:none;" class="filter-list" id="viewCallFilter">
+							<button class="filter-chip" data-bs-toggle="modal" data-bs-target="#FP0101P01Modal">
+								<span>통화</span>
+							</button>
+						</li>
+						<li style="display:none;" class="filter-list" id="viewSmsFilter">
+							<button class="filter-chip" data-bs-toggle="modal" data-bs-target="#FP0101P01Modal">
+								<span>문자</span>
+							</button>
+						</li>
+						<li style="display:none;" class="filter-list" id="viewNetInfoFilter">
+							<button class="filter-chip" data-bs-toggle="modal" data-bs-target="#FP0101P01Modal">
+								<span>통신정보</span>
+							</button>
+						</li>
+						<li style="display:none;" class="filter-list" id="viewcompanyFilter">
+							<button class="filter-chip" data-bs-toggle="modal" data-bs-target="#FP0101P01Modal">
+								<span>통신사</span>
+							</button>
+						</li>
+						<li style="display:none;" class="filter-list" id="viewCombinationFilter">
+							<button class="filter-chip" data-bs-toggle="modal" data-bs-target="#FP0101P01Modal">
+								<span>인터넷 결합</span>
+							</button>
+						</li>
+					</ul>-->
+					<!-- // 필터목록 -->
+					
+					
+					<div class="ratePlan-search">
+						<div class="ratePlan-search-form">
+							<div class="ui-inp">
+								<input type="text" name="" value="" placeholder="검색어를 입력해 주세요." class="inp"  id="searchKeyword" onclick="popSearchKeywordModal();"/>
+								<div class="on-right">
+									<span class="ui-btn btn-srch" onclick="popSearchKeywordModal();">
+										<i class="ui-icn icn-20-srch-bk" aria-label="검색"></i>
+									</span>
+								</div>
+							</div>
+							<button type="button" class="ui-btn filter-btn is-setting" data-bs-toggle="modal" data-bs-target="#FP0101P01Modal">
+								<i class="ui-icn icn-24-filter-bk" aria-hidden="true"></i>
+								<span class="blind">필터</span>
+							</button>
+						</div>
+
+						<div class="ratePlan-search-cont">
+							<div class="ratePlan-search-title">
+								<p class="tit">어떤 요금제가 필요하세요?</p>
+							</div>
+							<ul class="ratePlan-chip-list">
+								<li>
+									<!-- Case 선택시 is-selected 추가 -->
+									<button class="ratePlan-chip is-selected" data-code-name="">
+										<span>전체</span>
+									</button>
+								</li>
+								<th:block  th:if="${type == 'mvno'}">
+									<li th:each="tagList : ${tagCodelist}" th:if="${tagList.etc1 == '1'}">
+										<button class="ratePlan-chip" th:attr="data-code-group=${tagList.code}">
+									        <span th:text="${tagList.codeName}">인터넷 결합 요금제</span>
+										</button>
+									</li>
+								</th:block>
+								<th:block  th:if="${type == 'mno'}">
+									<li th:each="tagList : ${tagCodelist}" th:if="${tagList.etc1 == '2'}">
+										<button class="ratePlan-chip" th:attr="data-code-group=${tagList.code}">
+									        <span th:text="${tagList.codeName}">인터넷 결합 요금제</span>
+										</button>
+									</li>							
+								</th:block>
+							</ul>
+						</div>
+					</div>					
+				</div>
+			</div>
+		</section>
+		<!-- // 요금제 필터 섹션 -->
+
+		<!-- 상품 리스트 섹션 -->
+		<section class="ratePlanC-sec">
+			<div class="sec-inner">
+				<!-- 요금제 상품그룹 -->
+				<div class="ratePlanC-list-wrap">
+					<!-- 요금제 상품 툴바 -->
+					<div class="ratePlanC-toolbar">
+						<p class="count">총&nbsp;<em id="totalCnt">0개</em>&nbsp;요금제</p>
+						<div class="sort">
+							<!-- 2차 수정 : 모든화면 추천순제외 -->
+							<button type="button" class="ui-btn" id="frmSort" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#selectSortModal">
+								<i class="ui-icn icn-16-sort-gr" aria-hidden="true"></i>
+								<span>추천 순</span>
+								<i class="ui-icn icn-16-select-arw" aria-hidden="true"></i>
+							</button>
+						</div>
+					</div>
+					<!-- // 요금제 상품 툴바 -->
+
+					<!-- 요금제 공통 타입 C : 요금제 상품 리스트 -->
+					<ul class="ratePlanC-list" id="planList">
+						
+					</ul>
+					<!-- // 요금제 공통 타입 C : 요금제 상품 리스트 -->
+
+					<!-- Case 목록이 많은 경우 더보기 -->
+					<input type="hidden" id="pageIdx" value="1"/>
+					<button type="button" class="ui-btn btn-more-list" onClick="viewResult()">
+						<i class="ui-icn icn-16-more-list-gr" aria-hidden="true"></i>
+						<span>더보기</span>
+					</button>
+				</div>
+				<!-- // 요금제 상품그룹 -->
+			</div>
+		</section>
+		<!-- // 상품 리스트 섹션 -->
+
+		<!-- 최근 본 요금제 섹션 -->
+		<section class="recent-ratePlanC-sec">
+			<div class="sec-inner">
+				<div class="sec-header">
+					<h2 class="sec-tit">최근 본 요금제</h2>
+				</div>
+				<div class="sec-body">
+					<!-- 요금제 공통 타입 C : 요금제 상품 리스트 -->
+					<ul class="ratePlanC-list" id="lastViewplanList">
+						
+					</ul>
+					<!-- // 요금제 공통 타입 C : 요금제 상품 리스트 -->
+				</div>
+			</div>
+		</section>
+		<!-- // 최근 본 요금제 섹션 -->
+
+	</div>
+	<!-- // content -->
+</main>
+
+	<!--
+		[모달 가이드]
+		모달 효과 : fade (공통)
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+		// 1차 수정 : fade-pc 사용안함, fade 공통으로 사용
+		// 1차 수정 : 필터 항목 변경(할인기간, 통화, 문자)
+	-->
+	<!-- 필터 modal basic -->
+	<div class="modal modal-basic fade" id="FP0101P01Modal" tabindex="-1" role="dialog" aria-labelledby="FP0101P01ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-P01-01-P01-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FP0101P01ModalLabel">필터</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- Spyscroll 탭 목록 -->
+					<div class="ui-tab tab-style2" id="navbarSpyscroll">
+						<div class="swiper tab-swiper">
+							<div class="swiper-wrapper">
+								<div class="swiper-slide" role="presentation">
+									<a href="#filter-01-pane" class="tab-link active">데이터</a>
+								</div>
+								<div class="swiper-slide" role="presentation">
+									<a href="#filter-02-pane" class="tab-link">가격</a>
+								</div>
+								<div class="swiper-slide" role="presentation">
+									<a href="#filter-03-pane" class="tab-link">소진시 속도</a>
+								</div>
+								<div class="swiper-slide" role="presentation">
+									<a href="#filter-04-pane" class="tab-link">할인 기간</a>
+								</div>
+								<div class="swiper-slide" role="presentation">
+									<a href="#filter-05-pane" class="tab-link">통화</a>
+								</div>
+								<div class="swiper-slide" role="presentation">
+									<a href="#filter-06-pane" class="tab-link">문자</a>
+								</div>
+								<div class="swiper-slide" role="presentation" id="filter-07">
+									<a href="#filter-07-pane" class="tab-link">통신 정보</a>
+								</div>
+								<div class="swiper-slide" role="presentation">
+									<a href="#filter-08-pane" class="tab-link">인터넷 결합</a>
+								</div>
+								<!-- <div class="swiper-slide" role="presentation">
+									<a href="#filter-09-pane" class="tab-link">부가 서비스</a>
+								</div> -->
+								<div class="swiper-slide" role="presentation">
+									<a href="#filter-10-pane" class="tab-link">통신사</a>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- // Spyscroll 탭 목록 -->
+
+					<!-- Spyscroll 탭 내용 -->
+					<div class="tab-content" data-bs-spy="scroll" data-bs-target="#navbarSpyscroll" data-bs-root-margin="0px 0px -85%" data-bs-smooth-scroll="true">
+						<!-- F-CS01-T01-page -->
+						<div class="tab-pane fade show active" id="filter-01-pane">
+							<section class="filter-sec">
+								<div class="sec-inner">
+									<div class="sec-header">
+										<h4 class="sec-tit">데이터</h4>
+									</div>
+									<div class="sec-body">
+										<div class="filter-rdo-frm">
+											<label class="filter-rdo">
+												<input type="radio" name="searchData" value="0" checked>
+												<span class="rdo"><span>전체</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchData" value="1">
+												<span class="rdo"><span>~ 7GB</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchData" value="2">
+												<span class="rdo"><span>7 ~ 15GB</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchData" value="3">
+												<span class="rdo"><span>15GB ~ 71GB</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchData" value="4">
+												<span class="rdo"><span>71GB ~</span></span>
+											</label>
+										</div>
+									</div>
+								</div>
+							</section>
+						</div>
+						<div class="tab-pane fade show active" id="filter-02-pane">
+							<section class="filter-sec">
+								<div class="sec-inner">
+									<div class="sec-header">
+										<h4 class="sec-tit">가격</h4>
+										<p class="sec-valued" id="rangeValues"></p>
+									</div>
+									<div class="sec-body">
+										<div class="filter-range-frm">
+											<div class="range-wrapper">
+												<input type="range" id="range1" min="0" max="200000" value="0" class="range" />
+												<input type="range" id="range2" min="0" max="200000" value="200000" class="range" />
+											</div>
+										</div>
+									</div>
+								</div>
+								<input type="hidden" name="searchSalePriceTermFrom" id="searchSalePriceTermFrom" value=""/>
+								<input type="hidden" name="searchSalePriceTermTo" id="searchSalePriceTermTo" value=""/>
+							</section>
+						</div>
+						<div class="tab-pane fade show active" id="filter-03-pane">
+							<section class="filter-sec">
+								<div class="sec-inner">
+									<div class="sec-header">
+										<h4 class="sec-tit">소진시 속도</h4>
+									</div>
+									<div class="sec-body">
+										<!-- Case 한 줄 처리시 nowrap -->
+										<div class="filter-rdo-frm is-nowwrap">
+											<label class="filter-rdo has-tit">
+												<input type="radio" name="searchQos" value="" checked>
+												<span class="rdo"><span><strong>전체</strong></span></span>
+											</label>
+											<label class="filter-rdo has-tit">
+												<input type="radio" name="searchQos" value="0">
+												<span class="rdo"><span><strong>제공 전체</strong>소진시 속도를 제공하는 모든 요금제</span></span>
+											</label>
+											<label class="filter-rdo has-tit">
+												<input type="radio" name="searchQos" value="1024">
+												<span class="rdo"><span><strong>1Mbps</strong>텍스트와 용량이 작은 이미지는 확인할 수 있어요</span></span>
+											</label>
+											<label class="filter-rdo has-tit">
+												<input type="radio" name="searchQos" value="3072">
+												<span class="rdo"><span><strong>3Mbps</strong>큰 용량 이미지 OK! 유튜브 720p로 재생돼요</span></span>
+											</label>
+											<label class="filter-rdo has-tit">
+												<input type="radio" name="searchQos" value="5120">
+												<span class="rdo"><span><strong>5Mbps</strong>모든 상황에서 쾌적하게 확인할 수 있어요</span></span>
+											</label>
+										</div>
+									</div>
+								</div>
+							</section>
+						</div>
+						<div class="tab-pane fade show active" id="filter-04-pane">
+							<section class="filter-sec">
+								<div class="sec-inner">
+									<div class="sec-header">
+										<h4 class="sec-tit">할인기간</h4>
+									</div>
+									<div class="sec-body">
+										<div class="filter-rdo-frm">
+											<label class="filter-rdo">
+												<input type="radio" name="searchPromoPeriod" value="0" checked>
+												<span class="rdo"><span>전체</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchPromoPeriod" value="1">
+												<span class="rdo"><span>6개월 미만</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchPromoPeriod" value="2">
+												<span class="rdo"><span>6개월 이상 ~ 12개월 미만</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchPromoPeriod" value="3">
+												<span class="rdo"><span>12개월 이상 ~ 24개월 미만</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchPromoPeriod" value="4">
+												<span class="rdo"><span>24개월 이상</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchPromoPeriod" value="5"  >
+												<span class="rdo"><span>평생</span></span>
+											</label>
+										</div>
+									</div>
+								</div>
+							</section>
+						</div>
+						<div class="tab-pane fade show active" id="filter-05-pane">
+							<section class="filter-sec">
+								<div class="sec-inner">
+									<div class="sec-header">
+										<h4 class="sec-tit">통화</h4>
+									</div>
+									<div class="sec-body">
+										<div class="filter-rdo-frm">
+											<label class="filter-rdo">
+												<input type="radio" name="searchCall" value="0" checked>
+												<span class="rdo"><span>전체</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchCall" value="1">
+												<span class="rdo"><span> ~ 60분</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchCall" value="2">
+												<span class="rdo"><span>60분 ~ 180분</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchCall" value="3">
+												<span class="rdo"><span>180분 ~ 300분</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchCall" value="4">
+												<span class="rdo"><span>300분 ~ </span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchCall" value="9999">
+												<span class="rdo"><span>무제한</span></span>
+											</label>
+										</div>
+									</div>
+								</div>
+							</section>
+						</div>
+						<div class="tab-pane fade show active" id="filter-06-pane">
+							<section class="filter-sec">
+								<div class="sec-inner">
+									<div class="sec-header">
+										<h4 class="sec-tit">문자</h4>
+									</div>
+									<div class="sec-body">
+										<div class="filter-rdo-frm">
+											<label class="filter-rdo">
+												<input type="radio" name="searchSms" value="0" checked>
+												<span class="rdo"><span>전체</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchSms" value="1">
+												<span class="rdo"><span> ~ 50건</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchSms" value="2">
+												<span class="rdo"><span>50건 ~ 100건</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchSms" value="3">
+												<span class="rdo"><span>100건 ~ 300건</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchSms" value="4">
+												<span class="rdo"><span>300건 ~ 500건</span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchSms" value="5">
+												<span class="rdo"><span>500건 ~ </span></span>
+											</label>
+											<label class="filter-rdo">
+												<input type="radio" name="searchSms" value="9999">
+												<span class="rdo"><span>무제한</span></span>
+											</label>
+										</div>
+									</div>
+								</div>
+							</section>
+						</div>
+						<div class="tab-pane fade show active" id="filter-07-pane">
+							<section class="filter-sec">
+								<div class="sec-inner">
+									<div class="sec-header">
+										<h4 class="sec-tit">통신 정보</h4>
+									</div>
+									<div class="sec-body">
+										<div class="filter-chk-frm">
+											<div class="filter-chk-group" th:if="${type == 'mvno'}">
+												<h5 class="filter-tit">통신망</h5>
+												<label class="ui-chk chk-style1">
+													<input type="checkbox" name="searchMno" value="SKT">
+													<span class="chk"><span>SKT망</span></span>
+												</label>
+												<label class="ui-chk chk-style1">
+													<input type="checkbox" name="searchMno" value="KT">
+													<span class="chk"><span>KT망</span></span>
+												</label>
+												<label class="ui-chk chk-style1">
+													<input type="checkbox" name="searchMno" value="LGU">
+													<span class="chk"><span>U+망</span></span>
+												</label>
+											</div>
+											<div class="filter-chk-group">
+												<h5 class="filter-tit">통신기술</h5>
+												<label class="ui-chk chk-style1">
+													<input type="checkbox" name="searchNetrok" value="LTE">
+													<span class="chk"><span>LTE</span></span>
+												</label>
+												<label class="ui-chk chk-style1">
+													<input type="checkbox" name="searchNetrok" value="5G">
+													<span class="chk"><span>5G</span></span>
+												</label>
+											</div>
+										</div>
+									</div>
+								</div>
+							</section>
+						</div>
+						<div class="tab-pane fade show active" id="filter-08-pane">
+							<section class="filter-sec">
+								<div class="sec-inner">
+									<div class="sec-header">
+										<h4 class="sec-tit">인터넷 결합</h4>
+									</div>
+									<div class="sec-body">
+										<div class="filter-chk-frm">
+											<div class="filter-chk-group">
+												<label class="ui-chk chk-style1">
+													<input type="checkbox" name="searchCombination" value="1">
+													<span class="chk"><span>결합 가능</span></span>
+												</label>
+											</div>
+										</div>
+									</div>
+								</div>
+							</section>
+						</div>
+						<!-- <div class="tab-pane fade show active" id="filter-09-pane">
+							<section class="filter-sec">
+								<div class="sec-inner">
+									<div class="sec-header">
+										<h4 class="sec-tit">부가 서비스</h4>
+									</div>
+									<div class="sec-body">
+										<div class="filter-chk-frm">
+											<div class="filter-chk-group">
+												<label class="ui-chk chk-style1">
+													<input type="checkbox" name="frmCombi">
+													<span class="chk"><span>소액 결제</span></span>
+												</label>
+												<label class="ui-chk chk-style1">
+													<input type="checkbox" name="frmCombi">
+													<span class="chk"><span>해외 로밍</span></span>
+												</label>
+												<label class="ui-chk chk-style1">
+													<input type="checkbox" name="frmCombi">
+													<span class="chk"><span>모바일 핫스팟</span></span>
+												</label>
+												<label class="ui-chk chk-style1">
+													<input type="checkbox" name="frmCombi">
+													<span class="chk"><span>데이터 쉐어링</span></span>
+												</label>
+											</div>
+										</div>
+									</div>
+								</div>
+							</section>
+						</div> -->
+						<div class="tab-pane fade show active" id="filter-10-pane">
+							<section class="filter-sec">
+								<div class="sec-inner">
+									<div class="sec-header">
+										<h4 class="sec-tit">통신사</h4>
+									</div>
+									<div class="sec-body">
+										<div class="filter-chk-frm">
+											<div class="filter-chk-group">
+												<label class="ui-chk chk-style1" th:each="list : ${list}">
+													<input type="checkbox" name="host" th:value="${list.id}">
+													<span class="chk"><span th:text="${list.name}"></span></span>
+												</label>
+											</div>
+										</div>
+									</div>
+								</div>
+							</section>
+						</div>
+					</div>
+					<!-- // Spyscroll 탭 내용 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action" onClick="resetFilter();">
+						<span>초기화</span>
+					</button>
+					<button type="button" class="ui-btn btn-action primary" id="viewResult">
+						<span><em class="count" id="filter-total-cnt">1,789</em>개 결과 보기</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 필터 modal basic -->
+	
+	<!-- 정렬 modal select -->
+	<div class="modal modal-select fade" id="selectSortModal" tabindex="-1" role="dialog" aria-labelledby="selectSortModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="selectSortModalLabel">정렬기준 선택</h3>
+					<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 콤보박스 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<!-- modal-select 공통 -->
+							<ul class="select-listbox" role="listbox" id="order-type">
+								<!-- setSelectValued 는 퍼블 확인용입니다. -->
+								<!-- 이미 선택목록이 있는 경우 class="is-selected" 추가 -->
+								<!-- <li class="is-selected" role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this)">추천순</li> 2차 수정 : 모든화면 추천순제외 -->
+								<li id="reOrder" class="is-selected" data-type="RE" role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this, '', selectOrder)">추천 순</li>
+								<li id="spOrder" data-type="SP" role="option" tabindex="0" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this, '', selectOrder)">낮은 가격 순</li> <!-- 2차 수정 : 드롭다운 띄어쓰기 정리 -->
+								<li id="apOrder12" role="option" tabindex="0" data-type="AP12" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this, '', selectOrder)">12개월 합산 낮은 가격 순</li>
+								<li id="apOrder24" role="option" tabindex="0" data-type="AP24" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this, '', selectOrder)">24개월 합산 낮은 가격 순</li>
+								<li id="dataOrder" role="option" tabindex="0" data-type="DATA" data-bs-dismiss="modal" onclick="setSelectValued('#frmSort', this, '', selectOrder)">데이터 많은 순</li>
+							</ul>
+						</div>
+					</section>
+					<!-- // 콤보박스 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 정렬 modal select -->
+	
+	<!-- 요금제 조회 필터 모달-->
+	<div class="modal modal-full" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content F-P01-01-srch-page">
+					<div class="modal-header">
+						<h3 class="modal-title" id="searchModalLabel">검색</h3>
+						<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close" id="popSearchKeyworClose">
+							<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+						</button>
+
+					</div>
+					<div class="modal-body">
+						<!-- 컨텐츠 섹션 -->
+						<section class="ratePlan-search-sec">
+							<div class="ratePlan-search">
+								<div class="ratePlan-search-form">
+									<div class="ui-inp">
+										<input type="text" name="" value="" placeholder="검색어를 입력해 주세요." class="inp" id="popSearchKeyword"/>
+										<div class="on-right">
+											<button type="button" class="ui-btn btn-srch" onclick="searchByKeyword();">
+												<i class="ui-icn icn-20-srch-bk" aria-label="검색"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+
+								<!-- 최근검색어 -->
+								<div class="ratePlan-search-cont" id="dvLastSearch">
+									<div class="ratePlan-search-title">
+										<p class="tit">최근 검색어</p>
+										<p class="info">
+											<button type="button" class="ui-btn texted" onclick="removeLastKeywordAll()">
+												<span>모두 지우기</span>
+											</button>
+										</p>
+									</div>
+									<ul class="ratePlan-keyword-list" id="ulSearchTextList">
+										<li>
+											<div class="ratePlan-keyword" >
+												<a href = "#" onclick="setSearchText()">데이터1</a>
+												<button type="button" class="ui-btn remove" onclick="removeLastKeyword(this)">
+													<i class="ui-icn icn-16-remove-bk" aria-hidden="true"></i>
+												</button>
+											</div>
+										</li>
+										
+									</ul>
+								</div>
+								<!-- //최근검색어 -->
+
+								<!-- 이런요금제 필요하세요 -->
+								<div class="ratePlan-search-cont">
+									<div class="ratePlan-search-title">
+										<p class="tit">어떤 요금제가 필요하세요?</p>
+									</div>
+									<ul class="ratePlan-chip-list">
+										<li th:each="tagList : ${tagCodelist}">
+											<button class="ratePlan-chip primary"  th:attr="data-code-group=${tagList.code}">
+												<span th:text="${tagList.codeName}">인터넷 결합 요금제</span>
+											</button>
+										</li>
+									</ul>
+								</div>
+								<!-- //이런요금제 필요하세요 -->
+							</div>
+						</section>
+
+						<div class="divider-sec"></div>
+
+						<section class="ratePlan-vogue-sec">
+							<div class="ratePlan-search">
+								<div class="ratePlan-search-cont">
+									<div class="ratePlan-search-title">
+										<p class="tit">주간 Top 5 인기 요금제</p>
+										<p class="info" th:text="|${#dates.format(mondayDate, 'MM.dd')} 10:00 기준|"></p>
+									</div>
+									<ul class="ratePlan-vogue-list" id="populerPlan">
+										<li th:each="poplist,index : ${popPlanList}">
+											<th:block th:if="${poplist.companyMngCode == 'SKT' or poplist.companyMngCode == 'KT' or poplist.companyMngCode == 'LGU'}">
+												<a th:href="@{'/pbm/plan/planDetail/mvno?planid=' + ${poplist.id}}"  class="ratePlan-vogue-link" target="_blank">
+											</th:block>
+											<th:block th:unless="${poplist.companyMngCode == 'SKT' or poplist.companyMngCode == 'KT' or poplist.companyMngCode == 'LGU'}">
+												<a th:href="@{'/pbm/plan/planDetail/mno?planid=' + ${poplist.id}}"  class="ratePlan-vogue-link" target="_blank">
+											</th:block>
+												<b>[[${index.index + 1}]]</b>
+												<span th:text="|[${poplist.hostNm}] ${poplist.planName}|"></span>
+												<i class="ui-icn icn-16-more-gr"></i>
+											</a>
+										</li>
+										
+									</ul>
+								</div>
+							</div>
+						</section>
+						<!-- // 컨텐츠 섹션 -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- // modal default -->
+	<!-- 요금제 조회 필터 모달-->
+
+<!-- // Container -->

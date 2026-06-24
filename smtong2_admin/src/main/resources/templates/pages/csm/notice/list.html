@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='07',menuId ='0401'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+
+	 <script id="searchListTmpl" type="text/x-jquery-tmpl">
+		<tr>
+		    <td>${id}</td>
+		    <td>
+		        <div class="d-flex gap-2">
+		            <button class="action-btn btn-sm" onclick="location.href='/cms/notice/edit?searchId=${id}'">
+		                <i class="fas fa-edit me-1"></i>
+		                수정
+		            </button>
+		            <button class="action-btn btn-sm" onclick="deleteRow('${id}');">
+		                <i class="fas fa-trash me-1"></i>
+		                삭제
+		            </button>
+		        </div>
+		    </td>
+		    <td>${title}</td>
+		    <td>
+   				<div class="form-check form-switch mb-3">
+					{{if displayYn == '1' }}
+                    	<input class="form-check-input form-check-switch" type="checkbox" role="switch" id="flexSwitchCheckLarge" style="transform: scale(1.5);" value="${id}" checked>
+					{{else}}
+						<input class="form-check-input form-check-switch" type="checkbox" role="switch" id="flexSwitchCheckLarge" style="transform: scale(1.5);" value="${id}">
+					{{/if}}
+                </div>
+            </td>
+		    <td>${createUserName}</td>
+		    <td>{{html dateToString(createDate)}}</td>
+		</tr>
+	</script>
+	
+              
+	<script type="text/javascript">
+		document.addEventListener('DOMContentLoaded', function () {
+			currentPage =1;
+			searchList();
+		});
+		
+		function changeCombo(){
+			currentPage = 1;
+			searchList()
+		}
+		
+		function renderPage(page) {
+			currentPage = page;
+			searchList();
+		}
+		
+		function deleteRow(delId) {
+			showConfirm( '삭제하시겠습니까?',
+                    () => { deleteProc(delId) },
+                    () => { },
+                    '공지삭제'
+             )
+			
+		}
+		
+		function deleteProc(delId) {
+			
+			
+			$.ajax({
+				   url : '/cms/notice/delete',
+			       type : 'DELETE',
+				   data : {id : parseInt(delId)},
+					success: function (data) {
+						searchList();
+				    },
+					error : function(request, status, error){
+			            alert(error);
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+			});
+		}
+		
+		
+		function updateDisplay(mngId,displayYn) {
+			
+			var params = {
+					 id : parseInt(mngId),
+					 displayYn : displayYn
+				}
+			console.log(params);
+			$.ajax({
+				   url : '/cms/notice/ajaxUpdate',
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+					success: function (data) {
+						
+				    },
+					error : function(request, status, error){
+			            alert(error);
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+			});
+		}
+		
+		function searchList() {
+			
+			var page = currentPage;
+			if(page =="" || page == null) page =1;
+			var _recordSize =  parseInt($("#recordSize").val());
+			var params = {
+				 keyword : $("#keyword").val(),
+				 searchStartDt : $("#searchStartDt").val(),
+				 searchEndDt : $("#searchEndDt").val(),
+				 searchDisplayYn : $('input[name=searchDisabledYn]:checked').val(),
+				 page : page,
+				 recordSize : _recordSize
+			}
+			
+			$.ajax({
+					   url : '/cms/notice/ajaxlist',
+				       type : 'POST',
+				       dataType : "json",
+				       contentType:"application/json",
+					   data : JSON.stringify(params),
+						success: function (data) {
+							$('#searchList').empty();
+							$('#listCount').html("총 " + data.totalCnt +"건" );
+							if(data.totalCnt > 0) {
+								$('#searchListTmpl').tmpl(data.data).appendTo('#searchList');
+								handleSwichCheckboxSelect();
+								renderPagination(page,data.totalCnt,_recordSize);
+							}
+					    },
+						error : function(request, status, error){
+				            alert(error);
+				        },
+				        complete:function(){
+				           // $('#loading').addClass('display-none');
+				        }
+					});
+		}
+		
+		function handleSwichCheckboxSelect() {
+			  
+			const bodyCheckboxes = document.querySelectorAll('tbody .form-check-switch');
+			 
+			bodyCheckboxes.forEach(check => {
+		      check.addEventListener('change', function() {
+		          var mngId = $(this).val();
+		          var displayYn = "" ;
+		          if($(this).prop("checked")) {
+		        	  var displayYn = "1" ;  
+		          } else {
+		        	  var displayYn = "0" ;
+		          }
+		          updateDisplay(mngId,displayYn);
+		      });
+		    });
+		}
+		
+		function toggleSearchInit(){
+			$("#keyword").val('');
+			$("#searchDisabledYne01").prop('checked', true); // 노출여부
+			//$('.period-button[value="7"]').trigger("click");
+			periodButtonInit();
+			currentPage = 1;
+		}
+		
+		function dateToString(date) {
+			var str = '';
+			if ( date != null ) {
+				var temp = moment(date);
+				str = temp.format('YYYY.MM.DD HH:mm:ss');
+			}
+			return str;
+		}
+	</script>
+</th:block>
+
+<div class="main-content">
+            <div class="container-fluid">
+                 <!-- 로케이션 & 제목 영역 추가 -->
+                <div class="page-header mb-4">
+                    <div class="location mb-2">
+                        <small class="text-secondary">
+                            <i class="fas fa-home me-1"></i>
+                            <a href="#">홈</a> > <a href="/svc/mainbanner/dealList">서비스관리</a> > <a href="/cms/notice/list">게시판관리</a> > <a href="/cms/notice/list">공지</a>
+                        </small>
+                    </div>
+                    <h2 class="page-title fs-4 mb-4">공지관리</h2>
+                </div>
+                
+                <div class="search-section">
+                    <div class="row align-items-center mb-2">
+                        <div class="form-row full-width">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="form-label mb-0">검색기간</div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="date" class="form-control" style="width: 150px" id="searchStartDt">
+                                    <span class="text-secondary">-</span>
+                                    <input type="date" class="form-control" style="width: 150px" id="searchEndDt">
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="period-button" value="0">오늘</button>
+                                    <button class="period-button" value="7">1주일</button>
+                                    <button class="period-button" value="30">1개월</button>
+                                    <button class="period-button" value="90">3개월</button>
+                                    <button class="period-button" value="180">6개월</button>
+                                    <button class="period-button" value="365">1년</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-3">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="form-label mb-0">상태</div>
+                                <div class="radio-group">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="searchDisabledYn" id="searchDisabledYne01" value="" checked>
+                                        <label class="form-check-label" for="searchDisabledYne01">전체</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="searchDisabledYn" id="searchDisabledYn02" value="1">
+                                        <label class="form-check-label" for="searchDisabledYn02">노출</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="searchDisabledYn" id="searchDisabledYn03" value="0">
+                                        <label class="form-check-label" for="searchDisabledYn03">비노출</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+ 					<!-- 검색어 -->
+                    <div class="col-12 mb-2">
+                        <div class="form-row full-width">
+                            <div class="form-label mb-0">검색어</div>
+                            <div class="position-relative col-9">
+                                <i class="fas fa-search position-absolute" style="left: 16px; top: 15.5px; color: #94a3b8;"></i>
+                                <input type="text" class="form-control ps-5" placeholder="검색어를 입력하세요" id="keyword">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 text-end mt-2">
+                            <button class="btn btn-light me-2 btn-sm"onclick="toggleSearchInit()">
+                                <i class="fas fa-redo"></i>
+                                초기화
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="searchList();">
+                                <i class="fas fa-search"></i>
+                                검색
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="stats-badge">
+                                <i class="fas fa-calculator me-1"></i>
+                                <span id="listCount"></span>
+                            </div>
+                            <select class="form-select" style="width: 100px" id="recordSize" onchange="changeCombo()">
+                                <option value="10">10개씩</option>
+								<option value="20">20개씩</option>
+								<option value="30">30개씩</option>
+								<option value="40">40개씩</option>
+								<option value="50">50개씩</option>
+                            </select>
+                        </div>
+                        <div class="header-actions">
+                            <!-- <button class="btn btn-light btn-sm">
+                                <i class="fas fa-download"></i>
+                                다운로드
+                            </button> -->
+                            <button class="btn btn-primary btn-sm" onclick="location.href='/cms/notice/edit'">
+                                <i class="fas fa-plus"></i>
+                                신규등록
+                            </button>
+                        </div>
+                    </div>
+
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th>번호</th>
+                                <th>편집</th>
+                                <th>제목</th>
+                                <th>노출</th>
+                                <th>작성자</th>
+                                <th>등록일</th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchList">
+                            
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-left mt-4">
+                        <ul class="pagination">
+                            
+                        </ul>
+                    </div>
+                </div>
+            </div>
+</DIV>

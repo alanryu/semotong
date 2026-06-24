@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Forms | 세모통 스타일가이드</title>
+	<meta http-equiv="X-UA-Compatible" content="ie=edge chrome=1" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="프로젝트가이드, 세모통 스타일가이드" />
+	<meta name="description" content="프로젝트가이드, 세모통 스타일가이드" />
+	<link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 인크루드 설정용도(개발적용안함) -->
+	<link rel="stylesheet" type="text/css" href="css/guide.css" /><!-- 가이드전용 -->
+</head>
+
+<body>
+	<div class="wrapper sub_page">
+		<!-- Header -->
+		<div data-include="include_header.html"></div>
+		<!-- // Header -->
+
+		<!-- Container -->
+		<div class="container">
+			<main id="content" class="content" role="main">
+				<div class="content-body">
+					<div class="out-sec in-sec">
+						<h1 class="g-h1">Forms</h1>
+					</div>
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">기본 구조</h2>
+						</div>
+						<div class="g-section-body">
+							<ul class="g-desc">
+								<li>&lt;label&gt; 태그는 for/id 반드시 연결한다.</li>
+								<li>&lt;label&gt; 생략된 input, select, textbox 는 반드시 title을 추가한다.</li>
+								<li>title은 가급적 입력형식 우선순위로 설명한다. </li>
+								<li>서식들의 아이디는 다른 기능과 중복되지 않도록 frm아이디 규칙을 적용한다.</li>
+							</ul>
+							<xmp style="max-height: none;">
+<!-- 폼 레이아웃 -->
+<div action="" class="ui-frm">
+	<!-- 폼 서식 그룹 -->
+	<fieldset class="frm-fieldset">
+		<legend>Personal Information</legend>
+
+		<!-- 제목 -->
+		<div class="frm-field">
+			<div class="frm-title"></div>
+			<div class="frm-content"></div>
+		</div>
+		<!-- // 폼 제목 -->
+
+		<!-- 제목 -->
+		<div class="frm-field">
+			<div class="frm-title">
+				<div class="frm-tit">
+					<label for="frmInp1" class="tit">폼 제목</label>
+					<em class="required" aria-label="필수입력">*</em>
+				</div>
+			</div>
+			<div class="frm-content">
+				<div class="frm-elements">
+					<!-- 폼 엘리먼트 위치 -->
+					<div class="ui-inp"></div>
+					<div class="ui-sel"></div>
+					<button class="ui-btn"></button>
+				</div>
+
+				<!-- 폼 서식 정보 -->
+				<div class="frm-desc">
+					<p>폼 기술 정보 (입력 방법)</p>
+				</div>
+				<div aria-live="assertive" class="frm-alert is-failed">
+					<p>폼 알림 정보 (실패 시)</p>
+				</div>
+				<div aria-live="assertive" class="frm-alert is-successed">
+					<p>폼 알림 정보 (성공 시)</p>
+				</div>
+			</div>
+		</div>
+		<!-- // 제목 -->
+	</fieldset>
+	<!-- // 폼 서식 그룹 -->
+
+	<!-- 폼 서식 그룹 -->
+	<fieldset class="frm-fieldset">
+		<legend>Personal Information</legend>
+
+		<div class="frm-field"></div>
+		<div class="frm-field"></div>
+	</fieldset>
+	<!-- //폼 서식 그룹 -->
+
+	<button type="submit" class="ui-btn btn-submit">
+		<span>전송버튼</span>
+	</button>
+</div>
+							</xmp>
+						</div>
+					</section>
+					<!-- // Section -->
+
+					<!-- Section -->
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">Form Cases</h2>
+						</div>
+						<div class="g-section-body">
+
+						</div>
+					</section>
+					<!-- // Section -->
+				</div>
+			</main>
+		</div>
+		<!-- // Container -->
+
+		<!-- Footer (include_footer.html) -->
+		<div data-include="include_footer.html"></div>
+		<!-- // Footer -->
+	</div>
+</body>
+
+</html>

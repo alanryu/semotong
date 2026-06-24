@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>다른 요금제 안내 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<!-- 페이지 스크립트 영역 -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.0.0/swiper-bundle.min.css" />
+	<script src="https://cdn.jsdelivr.net/npm/swiper@7.0.0/swiper-bundle.min.js"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			// 모달 바로 볼 수 있도록 호출
+			var FCB0202Modal = new bootstrap.Modal(document.getElementById('FCB0202Modal'));
+			FCB0202Modal.show();
+
+			// 모달이 완전히 나타난 후 실행됨!
+			document.getElementById("FCB0202Modal").addEventListener("shown.bs.modal", function () {
+				// s: 내게 맞는 요금제
+				let ratePlanASwiper = null;
+				function initSwiper() {
+					if (window.innerWidth >= 768 && !ratePlanASwiper) {
+						// 모바일 화면일 때 Swiper 초기화
+						ratePlanASwiper = new Swiper(".ratePlanA-swiper", {
+							threshold: 3,
+							slidesPerView: 'auto',
+							spaceBetween: 10,
+							breakpoints: {
+								768: {
+									navigation: {
+										nextEl: ".cb-ratePlanA-sec .ratePlanA-button-next",
+										prevEl: ".cb-ratePlanA-sec .ratePlanA-button-prev",
+									},
+								}
+							}
+						});
+					} else if (window.innerWidth < 768 && ratePlanASwiper) {
+						ratePlanASwiper.destroy(true, true);
+						ratePlanASwiper = null;
+					}
+				}
+				initSwiper();
+				window.addEventListener('resize', initSwiper);
+				// e: 내게 맞는 요금제
+			});
+		});
+	</script>
+</head>
+
+<body>
+	<div class="wrapper">
+		<div style="padding: 30rem;">
+			<!-- 트리거로 모달 띄우기 -->
+			<button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#FCB0202Modal">
+				MODAL OPEN
+			</button>
+		</div>
+	</div>
+
+	<!--
+		[모달 가이드]
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+	-->
+	<!-- modal 다른 요금제 안내 -->
+	<div class="modal modal-full fade" id="FCB0202Modal" tabindex="-1" role="dialog" aria-labelledby="FCB0202ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-CB02-02-page">
+				<div class="modal-header">
+					<button type="button" class="ui-btn">
+						<i class="ui-icn icn-32-back-bk" aria-label="뒤로가기"></i>
+					</button>
+					<h3 class="modal-title blind" id="FCB0202ModalLabel">다른 요금제 안내</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 모통봇 소개 섹션 -->
+					<section class="cb-intro-sec">
+						<div class="sec-inner">
+							<div class="intro-img">
+								<i class="ui-icn icn-62-motong" aria-hidden="true"></i>
+							</div>
+							<div class="intro-con">
+								<p>다른 요금제가 궁금하세요?</p>
+								<p>고객님께 요금을 추천드리기 위해<br> 데이터가 얼마나 필요하신지 알아볼게요. </p>
+							</div>
+						</div>
+					</section>
+					<!-- // 모통봇 소개 섹션 -->
+
+
+					<!-- 내게 맞는 요금제 섹션 -->
+					<section class="cb-ratePlanA-sec">
+						<div class="sec-inner">
+							<!-- 요금제 공통 타입 A : 요금제 리스트 타입 -->
+							<div class="swiper ratePlanA-swiper">
+								<ul class="ratePlanA-list swiper-wrapper">
+									<li class="ratePlanA-item swiper-slide">
+										<div class="ratePlanA-card" role="button" tabindex="0">
+											<div class="card-thumb">
+												<img src="../../assets/images/common/icn-40-plan-cate-01.png" alt="" />
+											</div>
+											<div class="card-body">
+												<p class="card-tit"><strong>메신저, 웹서핑, <br>저화질영상 정도면 충분!</strong></p>
+												<p class="card-tag">#가볍게 #실속형</p>
+												<p class="card-charge">월 4,400원 부터</p>
+												<p class="card-data"><strong>7GB+</strong></p>
+											</div>
+										</div>
+									</li>
+									<li class="ratePlanA-item swiper-slide">
+										<div class="ratePlanA-card" role="button" tabindex="0">
+											<div class="card-thumb">
+												<img src="../../assets/images/common/icn-40-plan-cate-02.png" alt="" />
+											</div>
+											<div class="card-body">
+												<p class="card-tit"><strong>적당한 데이터로 <br>일상에서 무난하게!</strong></p>
+												<p class="card-tag">#딱좋아 #합리파</p>
+												<p class="card-charge">월 7,000원 부터</p>
+												<p class="card-data"><strong>10GB+</strong></p>
+											</div>
+										</div>
+									</li>
+									<li class="ratePlanA-item swiper-slide">
+										<div class="ratePlanA-card" role="button" tabindex="0">
+											<div class="card-thumb">
+												<img src="../../assets/images/common/icn-40-plan-cate-03.png" alt="" />
+											</div>
+											<div class="card-body">
+												<p class="card-tit"><strong>웹툰, 음악, <br>유튜브도 부담없이!</strong></p>
+												<p class="card-tag">#즐겨보자 #BGM필수</p>
+												<p class="card-charge">월 10,900원 부터</p>
+												<p class="card-data"><strong>15GB+</strong></p>
+											</div>
+										</div>
+									</li>
+									<li class="ratePlanA-item swiper-slide">
+										<div class="ratePlanA-card" role="button" tabindex="0">
+											<div class="card-thumb">
+												<img src="../../assets/images/common/icn-40-plan-cate-04.png" alt="" />
+											</div>
+											<div class="card-body">
+												<p class="card-tit"><strong>동영상+게임 자유롭게! <br>사실상 무제한급!</strong></p>
+												<p class="card-tag">#렉없는 삶 #마음껏</p>
+												<p class="card-charge">월 16,900원 부터</p>
+												<p class="card-data"><strong>71GB+</strong></p>
+											</div>
+										</div>
+									</li>
+									<li class="ratePlanA-item swiper-slide">
+										<div class="ratePlanA-card" role="button" tabindex="0">
+											<div class="card-thumb">
+												<img src="../../assets/images/common/icn-40-plan-cate-05.png" alt="" />
+											</div>
+											<div class="card-body">
+												<p class="card-tit"><strong>데이터 걱정없이 <br>무제한!</strong></p>
+												<p class="card-tag">#끝판왕 #제한없이</p>
+												<p class="card-charge">월 19,000원 부터</p>
+												<p class="card-data"><strong>100GB+</strong></p>
+											</div>
+										</div>
+									</li>
+									<li class="ratePlanA-item swiper-slide">
+										<div class="ratePlanA-card" role="button" tabindex="0">
+											<div class="card-thumb">
+												<img src="../../assets/images/common/icn-40-plan-cate-06.png" alt="" />
+											</div>
+											<div class="card-body">
+												<p class="card-tit"><strong>저렴하게, <br>똑똑하게!</strong></p>
+												<p class="card-tag">#알뜰파 #세컨폰</p>
+												<p class="card-charge">월 110원 부터</p>
+												<p class="card-data"><strong>가성비</strong></p>
+											</div>
+										</div>
+									</li>
+								</ul>
+							</div>
+							<button type="button" class="ui-btn ratePlanA-button-prev">
+								<i class="ui-icn icn-28-arw" aria-label="Prev"></i>
+							</button>
+							<button type="button" class="ui-btn ratePlanA-button-next">
+								<i class="ui-icn icn-28-arw" aria-label="Next"></i>
+							</button>
+							<!-- // 요금제 공통 타입 A : 요금제 리스트 타입 -->
+						</div>
+					</section>
+					<!-- // 내게 맞는 요금제 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary">
+						<span>처음으로</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal default -->
+</body>
+
+</html>

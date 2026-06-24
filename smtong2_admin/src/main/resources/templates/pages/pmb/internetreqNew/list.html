@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='05', menuId = ${menuId ?: '0201'}">
+
+
+<script th:inline="javascript">
+    var menuId = /*[[${menuId}]]*/ '';
+</script>
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<!--	<link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script id="searchListTmpl" type="text/x-jquery-tmpl">
+		<tr style="cursor: pointer;">
+			<td>${id}</td>
+			<td>{{html getincomSp(incomSp)}}</td>
+			<td>{{html getReqStateNm(reqState)}}</td>
+			<td>${internetPlanMnoNew}</td>
+			<td><a href="javascript:void(0)" onclick="goDetail('${id}')">${internetPlanNmNew}</a></td>
+			<td>{{html maskName(inputName)}}</td>
+			<td>{{html maskPhoneNumber(inputNumber)}}</td>
+			<td>{{html getDateStr(createDate)}}</td>
+			<td>{{html getDateStr(modifiedDate)}}</td>
+		</tr>
+	</script>
+
+	<script id="searchCompanyListTmpl" type="text/x-jquery-tmpl">
+	 <tr>
+		<th class="gift-select__td">${id}</th>
+		<td class="gift-select__td">${name}</td>
+		<td class="gift-select__td"><input type="text" value="${alamRcvNum}" style="width:100%" class="form-control" id="txtAlamRcv${id}" ></td>
+		<td class="gift-select__td"><button class="gift-btn-modify" th:onclick="updateAlamRcv('${id}')">수정</button></td>
+	</tr>
+	</script>
+
+	var authType = "";
+
+
+	<script type="text/javascript">
+
+		function getincomSp(val) {
+			var res = "홈페이지";
+			if(val=="03") {
+				res = "수동등록";
+			}
+			if(val=="02") {
+				res = "랜딩 페이지";
+			}
+			return res;
+		}
+
+
+		function goDetail(id) {
+			window.location.href = "/pmb/internetreq/editNew?searchId=" + id;
+		}
+
+
+
+		document.addEventListener('DOMContentLoaded', () => {
+
+			authType = "[[${session.loginUser.authType}]]";
+
+			if(authType == "MKT") $("#searchIncomSp03").prop("checked", true);
+
+			if(authType == "SKYLIFE") {
+		        // 전체 체크박스 숨기기
+		        $("#searchMnoALL").closest('.form-check').hide();
+
+		        // 모든 MNO 체크박스를 순회하면서 SKYLIFE가 아닌 것들 숨기기
+		        $("input[name='searchMno']").each(function() {
+		            var checkboxValue = $(this).val(); // compnyList의 id 값
+		            var label = $(this).closest('.form-check').find('label').text().trim();
+
+		            if(label !== 'SKYLIFE') {
+		                $(this).closest('.form-check').hide();
+		            } else {
+		                // SKYLIFE인 경우 체크하기
+		                $(this).prop('checked', true);
+										$(this).prop('disabled', true);
+		            }
+		        });
+			}
+
+			searchList();
+			searchCompanyList();
+			//콜센터 분기 현재 상태
+			getOutboundCenterStatus();
+
+
+			if(location.pathname=="/pmb/internetreq/listNew") {
+				$('.tab-menu li').eq(0).addClass('active');
+			} else if(location.pathname=="/pmb/internetreq/listNew2"){
+				$('.tab-menu li').eq(0).addClass('active');
+			} else {
+				$('.tab-menu li').eq(1).addClass('active');
+			}
+
+
+
+
+		});
+
+
+
+
+		function changeCombo(){
+			currentPage = 1;
+			searchList()
+		}
+
+		function getReqStateNm(sp) {
+			var ret = "";
+			if(sp == "REQ") {
+			  	ret= "상담신청";
+			}
+
+			if(sp == "CALL") {
+			  	ret= "해피콜";
+			}
+
+			if(sp == "DEFER") {
+			  	ret= "보류";
+			}
+
+			if(sp == "REQCOMP") {
+			  	ret= "접수완료";
+			}
+
+			if(sp == "ABS") {
+			  	ret= "부재";
+			}
+
+			if(sp == "CANCEL") {
+				ret= "고객취소";
+			}
+			if(sp == "COMPLET") {
+				ret= "개통완료";
+			}
+			return ret;
+		}
+
+		function renderPage(page) {
+			currentPage = page;
+			searchList();
+		}
+
+
+		function searchList() {
+			var page = currentPage;
+			if(page ==null|| page == "") page =1;
+	  		var pageSize = $("#pageSizse").val();
+
+
+			var params = {
+				searchType : $("#searchType").val(),
+				 keyword : $("#keyword").val(),
+				 searchStartDt : $("#searchStartDt").val(),
+				 searchEndDt : $("#searchEndDt").val(),
+				 searchState : getCheckedCompanies("searcState"),
+				 searchMno : getCheckedCompanies("searchMno"),
+				 searchSiteSp : "01",
+				 searchIncomSp :  $("input[name='searchIncomSp']:checked").val(),
+				 searchisNewYn : "Y",
+				 outboundCenter : menuId === "0201" ? "INTERNET" : "INTERNET2",
+				 page : page,
+				 recordSize : pageSize
+				}
+
+				$.ajax({
+				   url : '/pmb/internetreq/ajaxList',
+				   type : 'POST',
+				   dataType : "json",
+				   contentType:"application/json",
+				   data : JSON.stringify(params),
+				   success: function (data) {
+					   $('#searchList').empty();
+						console.log(data);
+						$('#totla_count').html("총 "+data.totalCnt+"건");
+						if(data.totalCnt > 0) {
+							$('#searchListTmpl').tmpl(data.data).appendTo('#searchList');
+						}
+
+						renderPagination(page,data.totalCnt,pageSize);
+					},
+					error : function(request, status, error){
+						showAlert(error);
+					},
+					complete:function(){
+					   // $('#loading').addClass('display-none');
+					}
+				});
+		}
+
+
+		function selMno(id) {
+
+			// SKYLIFE 권한일 때는 다른 체크박스 조작 방지
+			if(authType == "SKYLIFE") {
+					return;
+			}
+
+			if(id=="") {
+
+
+				$("input[id^='searchMno']").prop("checked", false);
+				$("#searchMnoALL").prop("checked", true);
+			} else {
+				$("#searchMnoALL").prop("checked", false);
+			}
+
+		}
+
+
+		function selState(id) {
+
+			if(id=="") {
+				$("input[id^='searcState']").prop("checked", false);
+				$("#searcState01").prop("checked", true);
+			} else {
+				$("#searcState01").prop("checked", false);
+			}
+
+		}
+
+
+		function toggleSearchInit(){
+			$("#keyword").val('');
+			selState("");
+			selMno("");
+
+			$('.period-button[value="180"]').trigger("click");
+			currentPage = 1;
+		}
+
+
+
+
+		//02.03 - sancho
+		function downloadExcel() {
+			console.log("downloadExcel")
+			var page = 1;
+	  		var pageSize = 9999;
+
+			var params = {
+				searchType : $("#searchType").val(),
+				 keyword : $("#keyword").val(),
+				 searchStartDt : $("#searchStartDt").val(),
+				 searchEndDt : $("#searchEndDt").val(),
+				 searchState : getCheckedCompanies("searchState"),
+				 searchMno : getCheckedCompanies("searchMno"),
+				 searchSiteSp : "01",
+				 searchisNewYn : "Y",
+				 searchIncomSp :  $("input[name='searchIncomSp']:checked").val(),
+				 outboundCenter : menuId === "0201" ? "INTERNET" : "INTERNET2",
+				 page : page,
+				 recordSize : pageSize
+			}
+
+			var _url = '/pmb/internetreq/exceldown';
+
+			downloadExcelProc(params,_url,"InternetRequestList");
+
+		}
+
+		function updateAlamRcv(id) {
+
+
+			 var params = {
+					id : id,
+					alamRcvNum : $('#txtAlamRcv'+id).val(),
+				 	outboundCenter : menuId === "0201" ? "INTERNET" : "INTERNET2"
+			}
+
+			$.ajax({
+				   url : '/pmb/internetreq/updateAlamRcv',
+			       type : 'POST',
+			       dataType : "json",
+			       contentType:"application/json",
+				   data : JSON.stringify(params),
+					success: function (data) {
+						showAlert("알람 수신인이 업데이트 되었습니다.",closeAlamPop);
+
+				    },
+					error : function(request, status, error){
+			            alert(error);
+			        },
+			        complete:function(){
+			           // $('#loading').addClass('display-none');
+			        }
+			});
+		}
+
+		function closeAlamPop() {
+			$("#btnClosePop").click();
+			searchCompanyList();
+		}
+
+
+
+			function searchCompanyList() {
+				$.ajax({
+					   url : '/pmb/internetreq/ajaxCompanyList',
+					   type : 'GET',
+					   dataType : "json",
+					   contentType:"application/json",
+					   data: {
+   				           useYn: 'Y',  // 요청 파라미터 useYn
+   				           isNewYn: 'Y', // 요청 파라미터 isNewYn
+						   outboundCenter : menuId === "0201" ? "INTERNET" : "INTERNET2"
+   				       },
+					   success: function (data) {
+						   $('#searchCompanyList').empty();
+
+							// authType이 SKYLIFE인 경우 필터링
+							var filteredData = data.data;
+							if(authType == "SKYLIFE") {
+								filteredData = data.data.filter(function(item) {
+										return item.name === "SKYLIFE";
+								});
+							}
+
+							$('#searchCompanyListTmpl').tmpl(filteredData).appendTo('#searchCompanyList');
+
+						},
+						error : function(request, status, error){
+							showAlert(error);
+						},
+						complete:function(){
+						   // $('#loading').addClass('display-none');
+						}
+					});
+			}
+
+
+			function exceldownUpload() {
+				var params = {
+
+				}
+
+				var _url = '/pmb/internetreq/exceldownUpload';
+
+				downloadExcelProc(params,_url,"InternetReqUload");
+			}
+
+
+			function uploadMapExcel(){
+
+				var formData = new FormData($('#uploadform')[0]);
+
+			if(location.pathname=="/pmb/internetreq/listNew") {
+				formData.append("outboundCenter", "1");
+			} else if(location.pathname=="/pmb/internetreq/listNew2"){
+				formData.append("outboundCenter", "2");
+			}
+
+				$.ajax({
+					url 		: '/pmb/internetreq/excel/uploadReqData',
+					type 		: 'post',
+					enctype 	: 'multipart/form-data',
+					data 		: formData,
+					async 		: false,
+					contentType : false,
+					processData : false,
+					success 	: function (data) {
+						$("#btncloseUpload").click();
+						showAlert("등록되었습니다.",searchList);
+					},
+					error 		: function(request, status, error){
+						alert(error);
+					},
+					complete 	: function(){
+					}
+				});
+			}
+
+			function uploadCancel() {
+				$("#filenameDv").empty();
+				$('#mapFile').val('');
+			}
+
+			function toggleStatus(status) {
+
+				var params = {
+					codeGroup : "admin_outbound_center",
+					code: "150",
+					useYn: status === "Y" ? "Y" : "N"
+				}
+
+				$.ajax({
+						url : '/cmm/cmmcode/code/update',
+							type : 'POST',
+							dataType : "json",
+							contentType:"application/json",
+						data : JSON.stringify(params),
+						success: function (data) {
+							if(status === "Y"){
+								showAlert("콜센터 분기 ON 됐습니다.", () => {
+									location.reload();
+								});
+							}else{
+								showAlert("콜센터 분기 OFF 됐습니다.", () => {
+									location.reload();
+								});
+							}
+
+						},
+						error : function(request, status, error){
+										alert(error);
+								},
+								complete:function(){
+									// $('#loading').addClass('display-none');
+								}
+				});
+			}
+
+			function getOutboundCenterStatus() {
+				console.log("getOutboundCenterStatus")
+
+				var params = {
+					groupCode : "admin_outbound_center",
+					code: "150"
+				}
+
+				$.ajax({
+						url : '/cmm/cmmcode/code/detail',
+							type : 'GET',
+							dataType : "json",
+						data : params,
+						success: function (data) {
+							 if(data.data.useYn === "Y"){
+									$("#statusDisplay").html('<i class="fas fa-circle text-success me-1"></i>현재 콜센터 분기 ON (분기중)');
+							}else{
+									$("#statusDisplay").html('<i class="fas fa-circle text-danger me-1"></i>현재 콜센터 분기 OFF (분기중 아님)');
+							}
+						},
+						error : function(request, status, error){
+										alert(error);
+								},
+								complete:function(){
+									// $('#loading').addClass('display-none');
+								}
+				});
+			}
+
+
+
+	</script>
+
+
+
+</th:block>
+
+<div class="main-content">
+		<div class="container-fluid">
+			<!-- 로케이션 & 제목 영역 추가 -->
+			<div class="page-header mb-4">
+					<div class="location mb-2">
+							<small class="text-secondary">
+									<i class="fas fa-home me-1"></i>
+									<a href="/mbm/adminuser/list">홈</a> > <a href="/pmb/plan-request/list">신청관리</a> >
+									<span th:if="${menuId == '0201'}">
+											<a th:href="@{/pmb/internetreq/listNew}">인터넷 신청내역</a>
+									</span>
+									<span th:if="${menuId == '02012'}">
+											<a th:href="@{/pmb/internetreq/listNew2}">인터넷 신청내역</a>
+									</span>
+							</small>
+					</div>
+					<h2 class="page-title fs-4 mb-4" th:text="${menuId == '0201' ? '인터넷 신청내역 (세모통)' : '인터넷 신청내역 (세모통) CS'}"></h2>
+			</div>
+			<!-- 로케이션 & 제목 영역 추가 -->
+			<!-- 탭 영역-->
+			<div class="container mt-4 mb-4" id="tab-menu" style="margin-left:0px">
+		        <ul class="tab-menu">
+		            <li>
+		              <a href="/pmb/internetreq/listNew">신규</a>
+		            </li>
+		            <li>
+		              <a href="/pmb/internetreq/list/01">기존</a>
+		            </li>
+		        </ul>
+		    </div>
+			<!-- 탭 영역-->
+			<div class="search-section">
+				<!-- 검색어 -->
+				<div class="col-12 mb-2">
+					<div class="form-row full-width">
+						<div class="form-label mb-0">검색어</div>
+						<div class="position-relative col-9">
+							<i class="fas fa-search position-absolute" style="left: 16px; top: 15.5px; color: #94a3b8;"></i>
+							<input type="text" class="form-control ps-5" placeholder="검색어를 입력하세요" id="keyword" name="keyword">
+						</div>
+					</div>
+				</div>
+				<div class="row align-items-center mb-3">
+					<div class="col-12">
+						<div class="d-flex align-items-center gap-3">
+							<div class="form-label mb-0">상태</div>
+							<div class="radio-group">
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="checkbox" name="searcState" id="searcState01" value="" checked onclick="selState('')">
+									<label class="form-check-label" for="searcState01">전체</label>
+								</div>
+								<div class="form-check form-check-inline" th:each="item,index : ${stateList}">
+									<input class="form-check-input" type="checkbox" name="searcState" th:id="|searcState0${index.index +2}|" th:value="${item.code}" th:attr="data-code=${item.code}" onclick="selState(this.getAttribute('data-code'))">
+									<label class="form-check-label" th:for="|searcState0${index.index +2}|" th:text="${item.codeName}">상담신청</label>
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+				 <!-- MNO -->
+				<div class="row align-items-center mb-3">
+					  <div class="form-row mb-3">
+						  <div class="form-label mb-0">MNO</div>
+						  <div class="form-control-wrap">
+							  <div class="form-check-group">
+								  <div class="form-check form-check-inline">
+									  <input class="form-check-input" type="checkbox" id="searchMnoALL" value="" onclick="selMno('');" checked>
+									  <label class="form-check-label" for="searchMnoALL">전체</label>
+								  </div>
+							  	<th:block th:each="item,index : ${compnyList}">
+								   <div class="form-check form-check-inline">
+									   <input class="form-check-input" type="checkbox" name="searchMno" th:id="${'searchMno' + index.index}"  th:value="${item.id}" th:onclick="|selMno('${item.id}');|">
+									   <label class="form-check-label" th:for="${'searchMno' + index.index}" th:text="${item.name}">KG모바일</label>
+								   </div>
+								  </th:block>
+							  </div>
+						  </div>
+					  </div>
+				 </div>
+
+				 <div class="row align-items-center mb-3">
+				 	<div class="col-12">
+				 		<div class="d-flex align-items-center gap-3">
+				 			<div class="form-label mb-0">상태</div>
+							<div class="radio-group">
+							  <div class="form-check form-check-inline" th:if="${session.loginUser.authType ne 'MKT'}">
+								 <input class="form-check-input" type="radio" name="searchIncomSp" id="searchIncomSp01" value="" checked>
+								 <label class="form-check-label" for="searchIncomSp01">전체</label>
+							  </div>
+							  <div class="form-check form-check-inline" th:if="${session.loginUser.authType ne 'MKT'}">
+								 <input class="form-check-input" type="radio" name="searchIncomSp" id="searchIncomSp02" value="01">
+								 <label class="form-check-label" for="searchIncomSp02">홈페이지</label>
+							  </div>
+							  <div class="form-check form-check-inline">
+								 <input class="form-check-input" type="radio" name="searchIncomSp" id="searchIncomSp03" value="02">
+								 <label class="form-check-label" for="searchIncomSp03">랜딩페이지</label>
+							  </div>
+							  <div class="form-check form-check-inline">
+  								 <input class="form-check-input" type="radio" name="searchIncomSp" id="searchIncomSp04" value="03">
+  								 <label class="form-check-label" for="searchIncomSp04">수동등록</label>
+  							  </div>
+						   </div>
+				 		</div>
+				 	</div>
+				 </div>
+				<div class="row align-items-center mb-2">
+					<div class="form-row full-width">
+						<div class="d-flex align-items-center gap-3">
+							<div class="form-label mb-0">신청일</div>
+							<div class="d-flex align-items-center gap-2">
+								<input type="date" class="form-control" style="width: 150px" id="searchStartDt">
+								<span class="text-secondary">-</span>
+								<input type="date" class="form-control" style="width: 150px" id="searchEndDt">
+							</div>
+							<div class="d-flex gap-2">
+								<button class="period-button" value="0">오늘</button>
+								<button class="period-button" value="7">1주일</button>
+								<button class="period-button" value="30">1개월</button>
+								<button class="period-button" value="90">3개월</button>
+								<button class="period-button" value="180">6개월</button>
+								<button class="period-button" value="365">1년</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+<!--
+
+<li class="submenu-item" th:classappend="${menuIdGroup} == '04' and ${menuId} == '04' ? active" th:if="${session.loginUser.authType == 'ADMIN' or session.loginUser.authType == 'MANAGE'}">
+              <a href="/pbm/plan/planOrderMng/list" class="submenu-link">요금제 추천관리</a>
+            </li>
+
+						 -->
+
+				<div class="row">
+					<div class="col-12 text-end mt-2">
+						<span id="outboundCenterStatus" th:if="${(session.loginUser.authType == 'ADMIN' or session.loginUser.authType == 'MANAGE') and menuId == '02012'}">
+
+							<b class="me-2" id="statusDisplay"></b>
+							<button class="btn btn-light me-2 btn-sm"
+											onclick="toggleStatus('Y')">
+									<i class="fas fa-toggle-on"></i>
+									콜센터 분기 ON
+							</button>
+
+							<button class="btn btn-light me-5 btn-sm"
+											onclick="toggleStatus('N')">
+									<i class="fas fa-toggle-off"></i>
+									콜센터 분기 OFF
+							</button>
+						</span>
+
+						<button class="btn btn-light me-2 btn-sm" onclick="toggleSearchInit()">
+							<i class="fas fa-redo"></i>
+							초기화
+						</button>
+						<button class="btn btn-primary btn-sm" onclick="changeCombo();">
+							<i class="fas fa-search"></i>
+							검색
+						</button>
+						<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#alamRcvModal" onclick="searchCompanyList();">
+                               <i class="fas fa-comment"></i>
+                               알람 수신인 관리
+                        </button>
+					</div>
+				</div>
+			</div>
+
+			<div class="table-section">
+				<div class="d-flex justify-content-between align-items-center mb-4">
+					<div class="d-flex align-items-center gap-3">
+						<div class="stats-badge">
+							<i class="fas fa-calculator me-1"></i>
+							<span id="totla_count">총 450건</span>
+						</div>
+						<select class="form-select" style="width: 100px" id="pageSizse" onchange="changeCombo()">
+							<option value= "10">10개씩</option>
+							<option value= "20">20개씩</option>
+							<option value= "30">30개씩</option>
+							<option value= "40">40개씩</option>
+							<option value= "50">50개씩</option>
+						</select>
+					</div>
+					<div class="header-actions">
+						<button class="btn btn-light btn-sm">
+							<i class="fas fa-download"></i>
+							다운로드
+						</button>
+						<div class="custom-dropdown">
+                            <button class="btn btn-primary btn-sm btnDrop" onclick="toggleDropdown()">
+                                <i class="fas fa-plus"></i>
+                                등록
+                            </button>
+                            <div id="myDropdown" class="dropdown-content">
+                                <a href="#" onclick="exceldownUpload()">등록 양식 다운로드</a>
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#uploadModal">신청내역 업로드</a>
+                            </div>
+                        </div>
+					</div>
+				</div>
+
+				<table class="table custom-table">
+					<thead>
+						<tr>
+							<th>번호</th>
+							<th>유입경로</th>
+							<th>상태</th>
+							<th>MNO</th>
+							<th>신청상품</th>
+							<th>신청자</th>
+							<th>전화번호</th>
+							<th>신청일시</th>
+							<th>완료일시</th>
+						</tr>
+					</thead>
+					<tbody id="searchList">
+
+					</tbody>
+				</table>
+
+				<div class="d-flex justify-content-left mt-4">
+					<ul class="pagination">
+
+					</ul>
+				</div>
+			</div>
+		</div>
+
+
+<div class="gift-manager__modal" id="detailViewModal" style="display: none;">
+	<div class="gift-manager__modal-content">
+		<div class="gift-manager__modal-header">
+			<div class="gift-manager__modal-title"> 신청내역 상세보기</div>
+			<span class="gift-select__close">&times;</span>
+		</div>
+		<div class="custom-table-outer">
+			<table class="table custom-table">
+				<tr>
+					<th>유입구분</th>
+					<td id="dvtreqSp"> </td>
+				</tr>
+				<tr>
+					<th>랜딩URL</th>
+					<td id="dvtlinkUrl"> </td>
+				</tr>
+				<tr>
+					<th>신청자</th>
+					<td id="dvtreqNm"> </td>
+				</tr>
+				<tr>
+					<th>연락처</th>
+					<td id="dvtreqPhonNum"> </td>
+				</tr>
+				<tr>
+					<th>MNO</th>
+					<td id="dvtplanMno"> </td>
+				</tr>
+				<tr>
+					<th>사업자</th>
+					<td id="dvtplanCompanyNm"> </td>
+				</tr>
+				<tr>
+					<th>요금제명</th>
+					<td id="dvtreqProdNm"> </td>
+				</tr>
+				<tr>
+					<th>기본요금</th>
+					<td id="dvtnormalPrice"> </td>
+				</tr>
+				<tr>
+					<th>할인요금</th>
+					<td id="dvtsalePrice"> </td>
+				</tr>
+				<tr>
+					<th>할인기간</th>
+					<td id="dvtpromotionPeriod"> </td>
+				</tr>
+			</table>
+		</div>
+		<div class="gift-select__footer">
+			<button class="gift-select__btn gift-select__btn--apply gift-select-close4">확인</button>
+		</div>
+	</div>
+</div>
+
+
+	<!-- Modal 팝업 : 알람수신인 설정 -->
+        <div class="modal fade" id="alamRcvModal" tabindex="-1" aria-labelledby="alamRcvModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" style="max-width: 800px; ">
+                <div class="modal-content" style="height:560px">
+                    <div class="modal-header border-0 pb-0 mb-4">
+                        <h5 class="modal-title fs-6 fw-bold" id="alamRcvModalLabel">알람수신인 설정</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="gift-select__table__outer" style="height:560px">
+                        <table class="gift-select__table">
+	                        <thead>
+	                            <tr>
+	                                <th class="gift-select__th" style="width: 50px">No</th>
+	                                <th class="gift-select__th" style="width: 100px">통신사</th>
+	                                <th class="gift-select__th">수신인</th>
+	                                <th class="gift-select__th" style="width:100px">수정</th>
+	                            </tr>
+	                        </thead>
+	                        <tbody id="searchCompanyList">
+
+							</tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-secondary px-4 btm-sm" data-bs-dismiss="modal" id="btnClosePop">닫기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+		<!-- Modal 팝업 : 수동 업로드 -->
+		<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+		    <div class="modal-dialog modal-dialog-centered">
+		        <div class="modal-content">
+		            <div class="modal-header border-0 pb-0 mb-4">
+		                <h5 class="modal-title fs-6 fw-bold" id="uploadModalLabel">신청내역 업로드</h5>
+		                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		            </div>
+		            <form id="uploadform">
+						<input type="hidden" name="isNew" id="isNew" value="1"/>
+
+		                <div class="modal-body pt-2 pb-4">
+							<div class="form-control-wrap-modal">
+								등록 양식을 다운로드 한 후, 양식에 맞게 업로드하세요.등록 양식과 다른 형식이거나, 필수 항목이 누락된 경우 업로드가 실패할 수 있습니다.
+	                        </div>
+		                    <div class="form-row-modal">
+		                        <div class="form-row-modal" style="margin-top:10px;">
+		                            <div class="form-label-modal">파일첨부</div>
+		                            <div class="form-control-wrap-modal">
+		                            	<input type="file" class="uploader__input" id="mapFile" accept=".xls,.xlsx" name="uploadMapData" onchange="BannerUploader.getfilenameExcel(this, 'filenameDv')" />
+		                            	<div class="uploader__preview" id="filenameDv"></div>
+		                                <button type="button" class="btn btn-primary"  onclick="BannerUploader.trigger('mapFile')">첨부하기</button>
+		                            </div>
+		                        </div>
+		                    </div>
+		                </div>
+		            </form>
+		            <div class="modal-footer border-0 pt-0">
+		                <button type="button" class="btn btn-secondary px-4 btm-sm" data-bs-dismiss="modal" id="btncloseUpload" onclick="uploadCancel();">취소</button>
+		                <button type="button" class="btn btn-dark px-4 btm-sm" onclick="uploadMapExcel();">업로드</button>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+</DIV>

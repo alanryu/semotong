@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>카드형 요금제 선택 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<!-- 페이지 스크립트 영역 -->
+	<!-- Swiper Librarys -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.0.0/swiper-bundle.min.css" />
+	<script src="https://cdn.jsdelivr.net/npm/swiper@9.0.0/swiper-bundle.min.js"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+			// Bootstrap Popover + Custom
+			setPopover('ui-popover popover-style1'); // 공통 컴포넌트 규칙 ui- 반영
+
+			// 키워드 스와이프
+		    var keywordSwiper = new Swiper(".keyword-swiper", {
+				threshold: 3,
+				slidesPerView: 'auto',
+				spaceBetween: 8,
+				freeMode: true,
+				resistance: true,
+				resistanceRatio: 0
+			});
+		})
+	</script>
+</head>
+
+<body>
+	<!-- 레이아웃 유형구분
+		메인: main-wrapper,
+		서브: sub-wrapper,
+		기타: [기타]-wrapper
+	 -->
+	<div class="wrapper sub-wrapper">
+		<!-- Header Deaktop -->
+		<header class="header-desktop">
+			<div class="header-skip">
+				<a href="#content">본문 바로가기</a>
+			</div>
+
+			<div class="header-sec">
+				<h1 class="title">
+					<!-- 로고 베타 추가 -->
+					<a href="../scenario/F-M01-01.html" class="logo"><span class="blind">세모통</span></a>
+					<!-- <span class="logo-beta"><img src="../../assets/images/common/img-logo-header-beta.png" alt=""></span> -->
+				</h1>
+				<nav class="header-nav">
+					<ul class="nav-list">
+						<li class="nav-item">
+							<!-- 선택된 상태 : is-selected -->
+							<a href="../F-G/F-G01-01.html" role="link" class="ui-btn nav-link">
+								<span>세모통 설명서</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<div class="ui-dropdown">
+								<a href="../scenario/F-P01-01.html" role="link" class="ui-btn nav-link" data-bs-toggle="dropdown" aria-expanded="false">
+									<span>요금제 찾기</span>
+								</a>
+								<div class="dropdown-menu">
+									<ul class="sub-nav">
+										<li class="sub-nav-item">
+											<a href="../scenario/F-P01-01.html" role="link" class="ui-btn sub-nav-link">
+												<span>알뜰요금제</span>
+											</a>
+										</li>
+										<li class="sub-nav-item">
+											<a href="../scenario/F-P01-01.html" role="link" class="ui-btn sub-nav-link">
+												<i class="ui-icn icn-h20-sk" aria-label="SKT"></i>
+												<i class="ui-icn icn-h20-kt" aria-label="KT"></i>
+												<i class="ui-icn icn-h20-lgu-02" aria-label="U+"></i>
+												요금제
+											</a>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</li>
+						<li class="nav-item">
+							<a href="../F-I/F-I01-01.html" role="link" class="ui-btn nav-link">
+								<span>인터넷</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../F-E/F-E01-01.html" role="link" class="ui-btn nav-link">
+								<span>이벤트</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../F-MY/F-MY01-01.html" role="link" class="ui-btn nav-link">
+								<span>마이페이지</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+		<!-- // Header Deaktop -->
+
+		<!-- Header Mobile -->
+		<header class="header-mobile">
+			<section class="header-sec">
+				<button type="button" class="ui-btn" onclick="navigateTo('./F-M01-01.html')">
+					<i class="ui-icn icn-32-back-bk" aria-label="뒤로가기"></i>
+				</button>
+				<h1 class="title">추천 요금제</h1>
+				<button type="button" class="ui-btn btn-aside" data-bs-toggle="modal" data-bs-target="#asideModal">
+					<i class="ui-icn icn-32-anb-bk" aria-label="메뉴열기"></i>
+				</button>
+			</section>
+			<!-- // Header Mobile -->
+		</header>
+		<!-- // Header -->
+
+		<!-- Aside Modal (include_mobileNav.html) -->
+		<aside class="modal modal-full fade aside-modal" id="asideModal" tabindex="-1" role="dialog" aria-labelledby="asideModalLabel" aria-hidden="true"></aside>
+		<!-- Aside Modal -->
+
+		<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-M02-01-T01-page">
+				<!-- 카드형 요금제 섹션 -->
+				<!-- 4차 수정 : 내게 맞는 요금제 현행화 -->
+				<section class="ratePlanB-sec">
+					<div class="sec-inner">
+						<!-- 요금제 공통 타입 B : 선택 요금제 -->
+						<div class="ratePlanB-card" role="button">
+							<div class="card-body">
+								<p class="card-img" aria-hidden="true"><img src="../../assets/images/common/icn-40-plan-cate-01.png" alt="" /></p>
+								<p class="card-tit"><strong>월 4,400원 부터 7GB+</strong></p>
+								<p class="card-txt">메신저, 웹서핑, 저화질영상 정도면 충분!</p>
+								<p class="card-tag">
+									<span class="tag">#가볍게</span>
+									<span class="tag">#실속형</span>
+								</p>
+							</div>
+						</div>
+						<!-- // 요금제 공통 타입 B : 선택 요금제 -->
+
+						<br>
+
+						<!-- 요금제 공통 타입 B : 선택 요금제 -->
+						<div class="ratePlanB-card" role="button">
+							<div class="card-body">
+								<p class="card-img" aria-hidden="true"><img src="../../assets/images/common/icn-40-plan-cate-02.png" alt="" /></p>
+								<p class="card-tit"><strong>월 7,000원 부터 10GB+</strong></p>
+								<p class="card-txt">적당한 데이터로 일상에서 무난하게!</p>
+								<p class="card-tag">
+									<span class="tag">#딱좋아</span>
+									<span class="tag">#합리파</span>
+								</p>
+							</div>
+						</div>
+						<!-- // 요금제 공통 타입 B : 선택 요금제 -->
+
+						<br>
+
+						<!-- 요금제 공통 타입 B : 선택 요금제 -->
+						<div class="ratePlanB-card" role="button">
+							<div class="card-body">
+								<p class="card-img" aria-hidden="true"><img src="../../assets/images/common/icn-40-plan-cate-03.png" alt="" /></p>
+								<p class="card-tit"><strong>월 10,900원 부터 15GB+</strong></p>
+								<p class="card-txt">웹툰, 음악, 유튜브도 부담없이!</p>
+								<p class="card-tag">
+									<span class="tag">#즐겨보자</span>
+									<span class="tag">#BGM필수</span>
+								</p>
+							</div>
+						</div>
+						<!-- // 요금제 공통 타입 B : 선택 요금제 -->
+
+						<br>
+
+						<!-- 요금제 공통 타입 B : 선택 요금제 -->
+						<div class="ratePlanB-card" role="button">
+							<div class="card-body">
+								<p class="card-img" aria-hidden="true"><img src="../../assets/images/common/icn-40-plan-cate-04.png" alt="" /></p>
+								<p class="card-tit"><strong>월 16,900원 부터 71GB+</strong></p>
+								<p class="card-txt">동영상+게임 자유롭게! 사실상 무제한급!</p>
+								<p class="card-tag">
+									<span class="tag">#렉없는 삶</span>
+									<span class="tag">#마음껏</span>
+								</p>
+							</div>
+						</div>
+						<!-- // 요금제 공통 타입 B : 선택 요금제 -->
+
+						<br>
+
+						<!-- 요금제 공통 타입 B : 선택 요금제 -->
+						<div class="ratePlanB-card" role="button">
+							<div class="card-body">
+								<p class="card-img" aria-hidden="true"><img src="../../assets/images/common/icn-40-plan-cate-05.png" alt="" /></p>
+								<p class="card-tit"><strong>월 19,000원 부터 100GB+</strong></p>
+								<p class="card-txt">데이터 걱정없이 무제한!</p>
+								<p class="card-tag">
+									<span class="tag">#끝판왕</span>
+									<span class="tag">#제한없이</span>
+								</p>
+							</div>
+						</div>
+						<!-- // 요금제 공통 타입 B : 선택 요금제 -->
+
+						<br>
+
+						<!-- 요금제 공통 타입 B : 선택 요금제 -->
+						<div class="ratePlanB-card" role="button">
+							<div class="card-body">
+								<p class="card-img" aria-hidden="true"><img src="../../assets/images/common/icn-40-plan-cate-06.png" alt="" /></p>
+								<p class="card-tit"><strong>월 110원 부터 갓성비</strong></p>
+								<p class="card-txt">저렴하게, 똑똑하게!</p>
+								<p class="card-tag">
+									<span class="tag">#알뜰파</span>
+									<span class="tag">#세컨폰</span>
+								</p>
+							</div>
+						</div>
+						<!-- // 요금제 공통 타입 B : 선택 요금제 -->
+					</div>
+				</section>
+				<!-- // 카드형 요금제 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+
+		<!-- Footer (include_footer.html) -->
+		<footer class="footer"></footer>
+		<!-- // Footer -->
+	</div>
+</body>
+
+</html>

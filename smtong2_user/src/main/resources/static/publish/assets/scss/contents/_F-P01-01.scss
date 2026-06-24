@@ -1,0 +1,318 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 요금제
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 요금제 페이지
+.F-P01-01-page {
+
+	// 페이시 여백
+	padding-top: 10rem;
+	@include bottom-spacer;
+
+	// s: 요금제 카테고리 섹션
+	// .ratePlan-cate-sec {
+	// }
+	// e: 요금제 카테고리 섹션
+
+	// s: 요금제 필터 섹션
+	.ratePlan-filter-sec {
+		.sec-header {
+			margin-bottom: 20rem;
+			.sec-tit {
+				font-weight: 600;
+				font-size: 18rem;
+				line-height: 25rem;
+				color: #000;
+			}
+			.sec-explain {
+				margin-top: 4rem;
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #5A5D60;
+			}
+		}
+
+		// 2차 수정 : 요금제 카테고리 위치 변경
+		// .ratePlan-cate-list {
+		// 	display: flex;
+		// 	gap: 8rem;
+		// 	overflow: auto;
+		// 	margin: 0 calc(#{$mobile-outer-spacer} * -1);
+		// 	margin-bottom: 28rem;
+		// 	&::-webkit-scrollbar {
+		// 		height: 0rem;
+		// 	}
+		// 	li {
+		// 		flex: 1 1 auto;
+		// 		min-width: 140rem;
+		// 		box-sizing: border-box;
+		// 		&:first-child {
+		// 			margin-left: $mobile-outer-spacer;
+		// 		}
+		// 		&:last-child {
+		// 			margin-right: $mobile-outer-spacer;
+		// 		}
+
+		// 		.ratePlan-cate-btn {
+		// 			display: flex;
+		// 			align-items: center;
+		// 			width: 100%;
+		// 			padding: 8rem 10rem;
+		// 			border-radius: 12rem;
+		// 			gap: 6rem;
+		// 			font-weight: 600;
+		// 			font-size: 14rem;
+		// 			line-height: 20rem;
+		// 			color: #000;
+		// 			span {
+		// 				text-align: left;
+		// 			}
+		// 			@include media-tablet-xs {
+		// 				justify-content: center;
+		// 				br {
+		// 					display: none;
+		// 				}
+		// 			}
+		// 		}
+		// 		&:nth-child(1) .ratePlan-cate-btn {
+		// 			background-color: #EBF3FE;
+		// 		}
+		// 		&:nth-child(2) .ratePlan-cate-btn {
+		// 			background-color: #FCEFE7;
+		// 		}
+		// 		&:nth-child(3) .ratePlan-cate-btn {
+		// 			background-color: #EDF8F0;
+		// 		}
+		// 	}
+		// }
+
+		.ratePlan-search {
+			background-color: #F2F5FB;
+			margin: 0 calc(#{$mobile-outer-spacer} * -1);
+			padding: 20rem $mobile-outer-spacer;
+
+			@include media-tablet-xs {
+				margin: 0;
+			}
+
+			.ratePlan-search-form {
+				display: flex;
+				gap: 8rem;
+
+				.ui-inp .inp {
+					cursor: pointer;
+				}
+
+				.filter-btn {
+					display: flex;
+					align-items: center;
+					position: relative;
+					flex:none;
+					gap: 2rem;
+					height: 52rem;
+					width: 52rem;
+					padding: 0;
+					border-radius: 4rem;
+					background-color: #fff;
+					border:1px solid #CFD0D1;
+					&.is-setting {
+						border-color: #36383A;
+						&::after {
+							content:'';
+							position: absolute;
+							top: 12rem;
+							left: 33rem;
+							z-index: 2;
+							display: block;
+							width: 5rem;
+							height: 5rem;
+							border-radius: 50%;
+							background-color: #EA2A2A;
+						}
+					}
+				}
+
+			}
+			.ratePlan-search-cont {
+				margin-top: 16rem;
+
+				.ratePlan-search-title {
+					.tit {
+						margin-bottom: 8rem;
+						font-weight: 700;
+						font-size: 14rem;
+						line-height: 20rem;
+						color: #000;
+					}
+				}
+
+				.ratePlan-chip-list {
+					display: flex;
+					gap: 8rem;
+					overflow: auto;
+					margin: 0 calc(#{$mobile-outer-spacer} * -1);
+					padding: 0 $mobile-outer-spacer;
+					&::-webkit-scrollbar {
+						height: 0;
+					}
+					li {
+						flex:none;
+						display: flex;
+						width: auto;
+						box-sizing: border-box;
+
+						.ratePlan-chip {
+							flex:none;
+							display: flex;
+							justify-content: center;
+							align-items: center;
+							gap: 2rem;
+							height: 36rem;
+							background-color: #fff;
+							padding: 4rem 10rem;
+							border-radius: 6rem;
+							font-weight: 500;
+							font-size: 14rem;
+							line-height: 20rem;
+							color: #828588;
+							border:1px solid transparent;
+							&.is-selected {
+								background-color: #EAE6FB;
+								border-color: $color-primary;
+								color: $color-primary;
+							}
+						}
+					}
+					@include media-tablet-xs {
+						margin: 0;
+						padding: 0;
+						flex-wrap: wrap;
+						li {
+							&:first-child {
+								margin-left: 0;
+							}
+							&:last-child {
+								margin-right: 0;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	// e: 요금제 필터 섹션
+
+	// s: 상품리스트 섹션
+	.ratePlanC-sec {
+		margin-top: 30rem;
+		@include sec-basic;
+
+		@include media-tablet-xs {
+			padding-top: 0;
+			border-top: 0;
+		}
+
+		// 요금제 상품 툴바
+		.ratePlanC-toolbar {
+			display: flex;
+			align-items: center;
+			gap: 8rem;
+			.count {
+				font-weight: 500;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #000;
+			}
+			.opt {
+				display: flex;
+				align-items: center;
+				flex: none;
+				gap: 4rem;
+				p {
+					font-weight: 500;
+					font-size: 12rem;
+					line-height: 16rem;
+					color: #63666A;
+				}
+			}
+			.sort {
+				display: flex;
+				margin-left: auto;
+				overflow: hidden;
+				.ui-btn {
+					font-weight: 600;
+					font-size: 12rem;
+					line-height: 16rem;
+					color: #36383A;
+					gap: 4rem;
+					width: 100%;
+					> span {
+						@include ellipsis1;
+					}
+				}
+			}
+			+ .ratePlanC-toolbar {
+				margin-top: 12rem;
+			}
+		}
+	}
+	// e: 상품리스트 섹션
+
+	// s: 최근본요금제 섹션
+	.recent-ratePlanC-sec {
+		margin-top: 50rem;
+		@include sec-basic;
+
+		.sec-header {
+			margin-bottom: 0;
+		}
+	}
+	// e: 최근본요금제 섹션
+
+	// 요금제 상품 리스트 공통
+	.ratePlanC-list {
+		@include ratePlanC-list;
+
+		// 요금제 상품 리스트 카드 공통
+		.ratePlanC-card {
+			@include ratePlanC-card;
+		}
+	}
+
+	// nodata 공통
+	.nodata {
+		@include nodata;
+	}
+
+}
+// e: 요금제 페이지
+
+
+// Qos테이블
+.qos-table { /* 5차 수정 : QoS 팝업 추가(여기부터) */
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	border-spacing: 0;
+	td, th {
+		padding: 8rem;
+		border:1px solid #dddddd;
+		font-weight: 500;
+		font-size: 14rem;
+		line-height: 22rem;
+		color: #2a2b2d;
+		word-break: keep-all;
+		vertical-align: middle;
+		text-align: center;
+	}
+	thead {
+		th { /* 5차 수정 : QoS 팝업 추가(여기까지) */
+			font-weight: 600;
+			background-color: #f1eefb;
+			border-bottom: 1px solid #542FDD;
+		}
+	}
+}
+

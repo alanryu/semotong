@@ -1,0 +1,62 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : MNO 요금제
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: MNO 요금제 페이지
+.F-M05-page {
+
+	// 페이지별 섹션 여백 설정
+	@include bottom-spacer;
+
+	// s: 상품리스트 섹션
+	.ratePlanC-sec {
+		padding-top: 16rem;
+		@include sec-basic;
+
+		// 요금제 상품 툴바
+		.ratePlanC-toolbar { /* 1차 수정: 툴바 전체 수정(셀렉트 말줄임 적용) */
+			display: flex;
+			align-items: center;
+			gap: 8rem;
+			.sort {
+				display: flex;
+				margin-left: auto;
+				overflow: hidden;
+				.ui-btn {
+					font-weight: 600;
+					font-size: 12rem;
+					line-height: 16rem;
+					color: #36383A;
+					gap: 4rem;
+					width: 100%;
+					> span {
+						@include ellipsis1;
+					}
+				}
+			}
+			+ .ratePlanC-toolbar { /* 4차 수정 : 요금제 개수 추가 */
+				margin-top: 20rem;
+			}
+		}
+
+
+		// 요금제 상품 리스트 공통
+		.ratePlanC-list {
+			@include ratePlanC-list;
+
+			// 요금제 상품 리스트 카드 공통
+			.ratePlanC-card {
+				@include ratePlanC-card;
+			}
+		}
+
+		// nodata 공통
+		.nodata {
+			@include nodata;
+		}
+
+	}
+	// e: 상품리스트 섹션
+}
+// e: MNO 요금제 페이지

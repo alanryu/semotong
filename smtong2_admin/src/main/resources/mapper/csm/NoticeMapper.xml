@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.csm.mapper.NoticeMapper">
+	<sql id="listWhere">
+			<if test='searchDisplayYn != null and searchDisplayYn !=""'>
+				AND display_yn = #{searchDisplayYn}
+			</if>
+
+			<if test='keyword != null and keyword !=""'>
+	    		AND (b.user_name LIKE CONCAT('%', #{keyword}, '%') OR a.title LIKE CONCAT('%', #{keyword}, '%'))
+	    	</if> 
+		    	 <!-- 기간 조회-->
+	          <if test='searchStartDt != null and searchStartDt !=""'>
+	              AND a.create_date  <![CDATA[>=]]> #{searchStartDt}
+	          </if>
+	          <if test='searchEndDt != null and searchEndDt !=""'>
+	              AND a.create_date <![CDATA[<=]]> #{searchEndDt}
+	          </if>
+	</sql>
+	<sql id="Base_Column_list">
+		a.id
+		,a.display_yn
+		,a.top_yn
+		,a.title
+		,a.content
+		,a.create_date
+		,a.create_id
+		,a.modified_date
+		,a.modified_id
+		,b.user_name as createUserName
+        ,c.user_name as modifiedUserName
+				
+	</sql>
+	
+	<select id="getListNotice" parameterType="kr.co.ucomp.web.csm.dto.NoticeSearchDto" resultType="kr.co.ucomp.web.csm.entity.NoticeEntity">
+    SELECT
+        <include refid="Base_Column_list" />
+     FROM
+        tb_csm_notice a
+        LEFT JOIN tb_mbm_admin_user b ON a.create_id = b.id
+        LEFT JOIN tb_mbm_admin_user c ON a.modified_id = c.id
+    WHERE 1=1
+    <include refid="listWhere" />
+    ORDER BY a.id DESC
+    LIMIT #{offset}, #{recordSize}
+</select>
+
+
+	<select id="getListNoticeCount" parameterType="kr.co.ucomp.web.csm.dto.NoticeSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+	     FROM
+	        tb_csm_notice a
+        LEFT JOIN tb_mbm_admin_user b ON a.create_id = b.id
+        LEFT JOIN tb_mbm_admin_user c ON a.modified_id = c.id
+	    WHERE 1=1
+	        <include refid="listWhere" />
+	</select>
+	
+	
+	<select id="getNotice" parameterType="Int" resultType="kr.co.ucomp.web.csm.entity.NoticeEntity">
+		SELECT
+	            <include refid="Base_Column_list" />
+		     FROM
+	        tb_csm_notice a
+	        LEFT JOIN tb_mbm_admin_user b ON a.create_id = b.id
+	        LEFT JOIN tb_mbm_admin_user c ON a.modified_id = c.id
+		    WHERE a.id=#{id}
+	</select>
+
+	<insert id="create"  parameterType="kr.co.ucomp.web.csm.entity.NoticeEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+	
+	INSERT INTO tb_csm_notice (title, content, display_yn, top_yn, create_id, modified_id)
+	VALUES(#{title},
+			#{content},
+			#{displayYn},
+			#{topYn},
+			#{createId},
+			#{modifiedId}
+	);
+	
+	
+	</insert>
+	
+	<update id="update"  parameterType="kr.co.ucomp.web.csm.entity.NoticeEntity" >
+	UPDATE tb_csm_notice SET modified_id=#{modifiedId},
+				<if test='title != null and title !=""'>
+					title=#{title}, 
+				</if>
+				<if test='title != null and title !=""'>
+					content=#{content}, 
+				</if>
+				<if test='displayYn != null and displayYn !=""'>
+					display_yn=#{displayYn},
+				</if>
+				<if test='topYn != null and topYn !=""'>
+					top_yn=#{topYn},
+				</if>
+				modified_date=Now()
+	WHERE id=#{id}
+	</update>
+	
+	
+	<delete id="delNotice" parameterType="Int">
+		DELETE FROM tb_csm_notice
+	    WHERE id=#{id}
+	</delete>
+</mapper>

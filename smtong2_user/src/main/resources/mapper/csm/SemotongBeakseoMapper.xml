@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.csm.info.mapper.SemotongBaekseoMapper">
+	
+	<sql id="searchCondition">
+		<if test='title != null and title !=""'>
+			AND title LIKE CONCAT('%', #{title}, '%')
+		</if>
+		<if test='contentSp != null and contentSp !="" and contentSp =="01"'>
+			AND content_sp = #{contentSp}
+		</if>
+		<if test='contentSp != null and contentSp !="" and contentSp =="02"'>
+			AND ((display_start_dttm <![CDATA[<=]]> Now() AND display_end_dttm <![CDATA[>=]]> Now()) OR display_sp = '0')
+			AND content_sp = #{contentSp}
+		</if>
+	</sql>
+
+	<sql id="Base_Column_list">
+		id
+		,content_sp
+		,display_sp
+		,display_start_dttm
+		,display_end_dttm
+		,image
+		,title
+		,content
+		,create_date
+		,create_id
+		,modified_date
+		,modified_id
+		,GET_ADMIN_USER_NM(create_id) as createNm
+		,GET_ADMIN_USER_NM(modified_id) as modifiedNm
+	</sql>
+	
+	<select id="getListBaekseo" parameterType="kr.co.ucomp.web.csm.info.dto.SemotongBaekseoDto" resultType="kr.co.ucomp.web.csm.info.entity.SemotongBaekseoEntity">
+		SELECT
+			<include refid="Base_Column_list" />
+		FROM
+			tb_csm_semotong_baekseo
+		WHERE
+			1=1
+		<include refid="searchCondition"/>
+		ORDER BY
+			create_date DESC
+		LIMIT #{offset}, #{recordSize}
+	</select>
+	<select id="getListBaekseoCount" parameterType="kr.co.ucomp.web.csm.info.dto.SemotongBaekseoDto" resultType="java.lang.Long">
+		SELECT
+			count(1)
+		FROM
+			tb_csm_semotong_baekseo
+		WHERE
+			1=1
+		<include refid="searchCondition"/>
+	</select>
+	
+
+	<select id="getBaekseo" parameterType="int" resultType="kr.co.ucomp.web.csm.info.entity.SemotongBaekseoEntity">
+		SELECT
+			<include refid="Base_Column_list" />
+		FROM
+			tb_csm_semotong_baekseo
+		WHERE id=#{id}
+	</select>
+
+
+	<select id="getMvnoInfo"  resultType="kr.co.ucomp.web.csm.info.entity.SemotongBaekseoEntity">
+		SELECT
+			<include refid="Base_Column_list" />
+		FROM
+			tb_csm_semotong_baekseo
+		 WHERE content_sp = '01' and display_sp =1  ORDER BY id DESC LIMIT 1
+	</select>
+
+
+</mapper>

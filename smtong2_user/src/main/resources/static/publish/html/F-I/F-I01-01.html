@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>인터넷 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<!-- 페이지 스크립트 영역 -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.0.0/swiper-bundle.min.css" />
+	<script src="https://cdn.jsdelivr.net/npm/swiper@7.0.0/swiper-bundle.min.js"></script>
+	<script>
+		function planViewHendler(id){
+			const planViewSec = document.querySelectorAll('.plan-view-sec');
+			planViewSec.forEach((element) => {
+				if (element.id === id) {
+					// 주어진 id와 일치하는 요소는 is-hide 클래스 제거
+					element.classList.remove('is-hide');
+				} else {
+					// 나머지 요소는 is-hide 클래스 추가
+					element.classList.add('is-hide');
+				}
+			});
+		}
+
+		document.addEventListener("DOMContentLoaded", () => {
+			// 상품 스와이프
+		    var productChoiceSwiper = new Swiper("#productSwiper", {
+				threshold: 3,
+				slidesPerView: 'auto',
+				spaceBetween: 12,
+				// 4차 수정 : 상풍 스와이프 버튼 옵션 추가
+				navigation: {
+					nextEl: ".product-choice-sec .choice-button-next",
+					prevEl: ".product-choice-sec .choice-button-prev",
+				}
+			});
+
+			// 인터넷 선택 스와이프
+		    var internetChoiceSwiper = new Swiper("#internetSwiper", {
+				threshold: 3,
+				slidesPerView: 'auto',
+				spaceBetween: 12,
+				// 4차 수정 : 인터넷 스와이프 버튼 옵션 추가
+				navigation: {
+					nextEl: ".internet-choice-sec .choice-button-next",
+					prevEl: ".internet-choice-sec .choice-button-prev",
+				}
+			});
+		})
+	</script>
+</head>
+
+<body>
+	<!-- 레이아웃 유형구분
+		메인: main-wrapper,
+		서브: sub-wrapper,
+		기타: [기타]-wrapper
+	 -->
+	<div class="wrapper sub-wrapper">
+		<!-- Header Deaktop -->
+		<header class="header-desktop">
+			<div class="header-skip">
+				<a href="#content">본문 바로가기</a>
+			</div>
+
+			<div class="header-sec">
+				<h1 class="title">
+					<!-- 로고 베타 추가 -->
+					<a href="../scenario/F-M01-01.html" class="logo"><span class="blind">세모통</span></a>
+					<!-- <span class="logo-beta"><img src="../../assets/images/common/img-logo-header-beta.png" alt=""></span> -->
+				</h1>
+				<nav class="header-nav">
+					<ul class="nav-list">
+						<li class="nav-item">
+							<!-- 선택된 상태 : is-selected -->
+							<a href="../F-G/F-G01-01.html" role="link" class="ui-btn nav-link">
+								<span>세모통 설명서</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<div class="ui-dropdown">
+								<a href="../scenario/F-P01-01.html" role="link" class="ui-btn nav-link" data-bs-toggle="dropdown" aria-expanded="false">
+									<span>요금제 찾기</span>
+								</a>
+								<div class="dropdown-menu">
+									<ul class="sub-nav">
+										<li class="sub-nav-item">
+											<a href="../scenario/F-P01-01.html" role="link" class="ui-btn sub-nav-link">
+												<span>알뜰요금제</span>
+											</a>
+										</li>
+										<li class="sub-nav-item">
+											<a href="../scenario/F-P01-01.html" role="link" class="ui-btn sub-nav-link">
+												<i class="ui-icn icn-h20-sk" aria-label="SKT"></i>
+												<i class="ui-icn icn-h20-kt" aria-label="KT"></i>
+												<i class="ui-icn icn-h20-lgu-02" aria-label="U+"></i>
+												요금제
+											</a>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</li>
+						<li class="nav-item">
+							<a href="../F-I/F-I01-01.html" role="link" class="ui-btn nav-link">
+								<span>인터넷</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../F-E/F-E01-01.html" role="link" class="ui-btn nav-link">
+								<span>이벤트</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../F-MY/F-MY01-01.html" role="link" class="ui-btn nav-link">
+								<span>마이페이지</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+		<!-- // Header Deaktop -->
+
+		<!-- Header Mobile -->
+		<!-- 모바일 헤더에 로고가 나오는 케이스에 한하여 모바일전용 클래스 only-mo 적용 -->
+		<header class="header-mobile only-mo">
+			<section class="header-sec">
+				<h1 class="title">
+					<!-- 로고 베타 추가 -->
+					<a href="../scenario/F-M01-01.html" class="logo"><span class="blind">세모통</span></a>
+					<!-- <span class="logo-beta"><img src="../../assets/images/common/img-logo-header-beta.png" alt=""></span> -->
+				</h1>
+				<button type="button" class="ui-btn btn-aside" data-bs-toggle="modal" data-bs-target="#asideModal">
+					<i class="ui-icn icn-32-anb-bk" aria-label="메뉴열기"></i>
+				</button>
+			</section>
+			<!-- // Mobile Header -->
+		</header>
+		<!-- // Header -->
+
+		<!-- Mobile Nav Modal (include_mobileNav.html) -->
+		<aside class="modal modal-full fade aside-modal" id="asideModal" tabindex="-1" role="dialog" aria-labelledby="asideModalLabel" aria-hidden="true"></aside>
+		<!-- Mobile Nav Modal -->
+
+		<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<!-- 2024-11-28 조찬기 : 주요내용 전체변경 -->
+
+			<div class="content F-I01-01-page">
+				<!-- 인터넷 소개 섹션
+				<section class="internet-intro-sec">
+					<div class="sec-inner">
+						<div class="intro-box">
+							<div class="intro-img">
+								2차 수정 : 캐릭터 이미지 파일 교체
+								<img src="../../assets/images/common/img-80-int-char.png" alt="" />
+							</div>
+							<div class="intro-con">
+								<p class="tit">세모통에서 <em>요금제 개통</em>하신 고객님!</p>
+								<p class="txt">인터넷 결합하시면 더 많은 혜택이 준비되어 있어요! <br>바로 상담 받아 보세요!</p>
+							</div>
+						</div>
+
+					</div>
+				</section> -->
+				<!-- // 인터넷 소개 섹션 -->
+
+				<!-- 이벤트 섹션 -->
+				<!-- 8차 수정 : 이벤트 섹션 추가 -->
+				<section class="event-sec">
+					<div class="sec-inner">
+						<div class="swiper event-swiper">
+							<div class="swiper-wrapper">
+								<div class="swiper-slide">
+									<div class="event-bnr">
+										<img src="../../assets/images/upload/@bnr-event-02-mo.png" alt="이벤트 내용" class="only-mo" />
+										<img src="../../assets/images/upload/@bnr-event-02-pc.png" alt="이벤트 내용" class="only-pc" />
+									</div>
+								</div>
+							</div>
+							<div class="swiper-pagination"></div>
+						</div>
+					</div>
+				</section>
+				<!-- // 이벤트 섹션 -->
+
+				<!-- 통신사 선택 섹션 -->
+				<section class="telecom-choice-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">통신사를 선택해주세요</h2>
+						</div>
+						<div class="sec-body">
+							<ul class="telecom-list">
+								<li class="telecom-item">
+									<label class="telecom-rdo is-selected">
+										<input type="radio" name="frmTelecom" onchange="setRadioSelected('frmTelecom', '.telecom-rdo'); planViewHendler('planViewKT')" checked>
+										<span class="telecom-con">
+											<i class="ui-icn icn-104-choice-kt-nor" aria-label="KT"></i>
+										</span>
+									</label>
+								</li>
+								<li class="telecom-item">
+									<label class="telecom-rdo">
+										<input type="radio" name="frmTelecom" onchange="setRadioSelected('frmTelecom', '.telecom-rdo'); planViewHendler('planViewLGUplus')">
+										<span class="telecom-con">
+											<i class="ui-icn icn-104-choice-lg-nor" aria-label="LG U+"></i>
+										</span>
+									</label>
+								</li>
+								<li class="telecom-item">
+									<label class="telecom-rdo">
+										<input type="radio" name="frmTelecom" onchange="setRadioSelected('frmTelecom', '.telecom-rdo'); planViewHendler('planViewSK')">
+										<span class="telecom-con">
+											<i class="ui-icn icn-104-choice-sk-nor" aria-label="SK"></i>
+										</span>
+									</label>
+								</li>
+								<li class="telecom-item">
+									<label class="telecom-rdo">
+										<input type="radio" name="frmTelecom" onchange="setRadioSelected('frmTelecom', '.telecom-rdo'); planViewHendler('planViewSkylife')">
+										<span class="telecom-con">
+											<i class="ui-icn icn-104-choice-skylife-nor" aria-label="skyLife"></i>
+										</span>
+									</label>
+								</li>
+								<li class="telecom-item">
+									<label class="telecom-rdo">
+										<input type="radio" name="frmTelecom" onchange="setRadioSelected('frmTelecom', '.telecom-rdo'); planViewHendler('planViewLGHV')">
+										<span class="telecom-con">
+											<i class="ui-icn icn-104-choice-lghv-nor" aria-label="LG HelloVision"></i>
+										</span>
+									</label>
+								</li>
+								<li class="telecom-item">
+									<label class="telecom-rdo">
+										<input type="radio" name="frmTelecom" onchange="setRadioSelected('frmTelecom', '.telecom-rdo'); planViewHendler('planViewSKB')">
+										<span class="telecom-con">
+											<i class="ui-icn icn-104-choice-skb-nor" aria-label="SKB"></i>
+										</span>
+									</label>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<!-- // 통신사 선택 섹션 -->
+
+				<!-- 상품 선택 섹션 -->
+				<section class="product-choice-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">상품을 선택해주세요.</h2>
+						</div>
+						<div class="sec-body">
+							<!-- 2024-12-23 조찬기 : 상품 Swiper 적용
+							[SCSS] 2024-12-23 조찬기 상품 Swiper 적용 및 list 수정
+							-->
+							<div class="swiper choice-swiper" id="productSwiper">
+								<ul class="choice-list swiper-wrapper">
+									<li class="choice-item swiper-slide">
+										<!-- [SCSS] 2024-12-23 조찬기 상품 내용 수정 -->
+										<label class="choice-rdo">
+											<input type="radio" name="frmInternet" onchange="setRadioSelected('frmInternet', '.choice-rdo')">
+											<span class="choice-con">
+												<!-- <span class="icons">
+													<i class="ui-icn icn-28-antena-gr" aria-hidden="true"></i>
+												</span> -->
+												<strong class="tit">인터넷</strong>
+												<span class="txt">&nbsp;</span>
+											</span>
+										</label>
+									</li>
+									<li class="choice-item swiper-slide">
+										<label class="choice-rdo">
+											<input type="radio" name="frmInternet" onchange="setRadioSelected('frmInternet', '.choice-rdo')">
+											<span class="choice-con">
+												<!-- <span class="icons">
+													<i class="ui-icn icn-28-antena-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-16-plus-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-28-tv-gr" aria-hidden="true"></i>
+												</span> -->
+												<strong class="tit">인터넷<br>+베이직</strong>
+												<span class="txt">236채널</span>
+											</span>
+										</label>
+									</li>
+									<li class="choice-item swiper-slide">
+										<label class="choice-rdo">
+											<input type="radio" name="frmInternet" onchange="setRadioSelected('frmInternet', '.choice-rdo')">
+											<span class="choice-con">
+												<!-- <span class="icons">
+													<i class="ui-icn icn-28-antena-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-16-plus-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-28-tv-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-16-plus-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-28-tel-gr" aria-hidden="true"></i>
+												</span> -->
+												<strong class="tit">인터넷<br>+라이트</strong>
+												<span class="txt">240채널</span>
+											</span>
+										</label>
+									</li>
+									<li class="choice-item swiper-slide">
+										<label class="choice-rdo">
+											<input type="radio" name="frmInternet" onchange="setRadioSelected('frmInternet', '.choice-rdo')">
+											<span class="choice-con">
+												<!-- <span class="icons">
+													<i class="ui-icn icn-28-antena-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-16-plus-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-28-tv-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-16-plus-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-28-tel-gr" aria-hidden="true"></i>
+												</span> -->
+												<strong class="tit">인터넷<br>+에센스</strong>
+												<span class="txt">283채널</span>
+											</span>
+										</label>
+									</li>
+									<li class="choice-item swiper-slide">
+										<label class="choice-rdo">
+											<input type="radio" name="frmInternet" onchange="setRadioSelected('frmInternet', '.choice-rdo')">
+											<span class="choice-con">
+												<!-- <span class="icons">
+													<i class="ui-icn icn-28-antena-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-16-plus-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-28-tv-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-16-plus-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-28-tel-gr" aria-hidden="true"></i>
+												</span> -->
+												<strong class="tit">인터넷+키즈랜드팩 초이스</strong>
+												<span class="txt">266채널</span>
+											</span>
+										</label>
+									</li>
+									<li class="choice-item swiper-slide">
+										<label class="choice-rdo">
+											<input type="radio" name="frmInternet" onchange="setRadioSelected('frmInternet', '.choice-rdo')">
+											<span class="choice-con">
+												<!-- <span class="icons">
+													<i class="ui-icn icn-28-antena-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-16-plus-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-28-tv-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-16-plus-gr" aria-hidden="true"></i>
+													<i class="ui-icn icn-28-tel-gr" aria-hidden="true"></i>
+												</span> -->
+												<strong class="tit">인터넷+넷플릭스 HD</strong>
+												<span class="txt">266채널</span>
+											</span>
+										</label>
+									</li>
+								</ul>
+							</div>
+							<!-- 4차 수정 : 상품 스와이프 버튼 추가 -->
+							<button type="button" class="ui-btn choice-button-prev">
+								<i class="ui-icn icn-28-arw" aria-label="Prev"></i>
+							</button>
+							<button type="button" class="ui-btn choice-button-next">
+								<i class="ui-icn icn-28-arw" aria-label="Next"></i>
+							</button>
+						</div>
+					</div>
+				</section>
+				<!-- // 상품 선택 섹션 -->
+
+				<!-- 인터넷 선택 섹션 -->
+				<section class="internet-choice-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">사용하실 인터넷을 선택해주세요.</h2>
+						</div>
+						<div class="sec-body">
+							<!-- 2024-12-23 조찬기 : 인터넷 Swiper 적용
+								[SCSS] 2024-12-23 조찬기 인터넷 Swiper 적용 및 list 수정
+							-->
+							<div class="swiper choice-swiper" id="internetSwiper">
+								<ul class="choice-list swiper-wrapper">
+									<li class="choice-item swiper-slide">
+										<label class="choice-rdo">
+											<input type="radio" name="frmChanel" onchange="setRadioSelected('frmChanel', '.choice-rdo')">
+											<span class="choice-con">
+												<!-- <i class="ui-icn icn-28-bps-100m" aria-hidden="true"></i> -->
+												<strong class="tit">100Mbps</strong>
+												<span class="txt">보통 속도</span>
+												<span class="txt">1인 가구</span>
+												<i class="ui-icn icn-h20-speed-low" aria-hidden="true"></i>
+											</span>
+										</label>
+									</li>
+									<li class="choice-item swiper-slide">
+										<label class="choice-rdo">
+											<input type="radio" name="frmChanel" onchange="setRadioSelected('frmChanel', '.choice-rdo')">
+											<span class="choice-con">
+												<!-- <i class="ui-icn icn-28-bps-100m" aria-hidden="true"></i> -->
+												<strong class="tit">160Mbps</strong>
+												<span class="txt">보통 속도</span>
+												<span class="txt">1~2인 가구</span>
+												<i class="ui-icn icn-h20-speed-low" aria-hidden="true"></i>
+											</span>
+										</label>
+									</li>
+									<li class="choice-item swiper-slide">
+										<label class="choice-rdo">
+											<input type="radio" name="frmChanel" onchange="setRadioSelected('frmChanel', '.choice-rdo')">
+											<span class="choice-con">
+												<!-- <i class="ui-icn icn-28-bps-1g" aria-hidden="true"></i> -->
+												<strong class="tit">200Mbps</strong>
+												<span class="txt">보통 속도</span>
+												<span class="txt">3인 가구</span>
+												<i class="ui-icn icn-h20-speed-nor" aria-hidden="true"></i>
+											</span>
+										</label>
+									</li>
+									<li class="choice-item swiper-slide">
+										<label class="choice-rdo">
+											<input type="radio" name="frmChanel" onchange="setRadioSelected('frmChanel', '.choice-rdo')">
+											<span class="choice-con">
+												<!-- <i class="ui-icn icn-28-bps-1g" aria-hidden="true"></i> -->
+												<strong class="tit">500Mbps</strong>
+												<span class="txt">빠른 속도</span>
+												<span class="txt">4인 가구</span>
+												<i class="ui-icn icn-h20-speed-high" aria-hidden="true"></i>
+											</span>
+										</label>
+									</li>
+									<li class="choice-item swiper-slide">
+										<label class="choice-rdo">
+											<input type="radio" name="frmChanel" onchange="setRadioSelected('frmChanel', '.choice-rdo')">
+											<span class="choice-con">
+												<!-- <i class="ui-icn icn-28-bps-1g" aria-hidden="true"></i> -->
+												<strong class="tit">1Gbps</strong>
+												<span class="txt">매우 빠른 속도</span>
+												<span class="txt">라이브 전문 방송인</span>
+												<i class="ui-icn icn-h20-speed-high" aria-hidden="true"></i>
+											</span>
+										</label>
+									</li>
+								</ul>
+							</div>
+							<!-- 4차 수정 : 인터넷 스와이프 버튼 추가 -->
+							<button type="button" class="ui-btn choice-button-prev">
+								<i class="ui-icn icn-28-arw" aria-label="Prev"></i>
+							</button>
+							<button type="button" class="ui-btn choice-button-next">
+								<i class="ui-icn icn-28-arw" aria-label="Next"></i>
+							</button>
+						</div>
+					</div>
+				</section>
+				<!-- // 인터넷 선택 섹션 -->
+
+				<!-- 요금제 누눈에 보기 섹션 - 숨김처리: is-hide -->
+				<!-- Case KT -->
+				<section class="plan-view-sec" id="planViewKT">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">KT 요금제 한눈에 보기</h2>
+						</div>
+						<div class="sec-body">
+							<div class="plan-table">
+								<!-- 2차 수정 : 사은품 만원단위로 변경 -->
+								<script>$('#planViewKT .plan-table').load('./include-table-kt.html')</script>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- //Case KT -->
+
+				<!-- Case LGU+ -->
+				<section class="plan-view-sec is-hide" id="planViewLGUplus">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">LGU+ 요금제 한눈에 보기</h2>
+						</div>
+						<div class="sec-body">
+							<div class="plan-table">
+								<!-- 2차 수정 : 사은품 만원단위로 변경 -->
+								<script>$('#planViewLGUplus .plan-table').load('./include-table-lg.html')</script>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- //Case LGU+ -->
+
+				<!-- Case SK -->
+				<section class="plan-view-sec is-hide" id="planViewSK">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">SK 요금제 한눈에 보기</h2>
+						</div>
+						<div class="sec-body">
+							<div class="plan-table">
+								<!-- 2차 수정 : 사은품 만원단위로 변경 -->
+								<script>$('#planViewSK .plan-table').load('./include-table-sk.html')</script>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- //Case SK -->
+
+				<!-- Case skylife -->
+				<section class="plan-view-sec is-hide" id="planViewSkylife">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">skyLife 요금제 한눈에 보기</h2>
+						</div>
+						<div class="sec-body">
+							<div class="plan-table">
+								<!-- 2차 수정 : 요금표 업데이트 -->
+								<script>$('#planViewSkylife .plan-table').load('./include-table-skylife.html')</script>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- //Case skylife -->
+
+				<!-- Case 헬로비전 -->
+				<section class="plan-view-sec is-hide" id="planViewLGHV">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">LG HelloVision 요금제 한눈에 보기</h2>
+						</div>
+						<div class="sec-body">
+							<div class="plan-table">
+								<!-- 2차 수정 : 요금표 업데이트 -->
+								<script>$('#planViewLGHV .plan-table').load('./include-table-lghv.html')</script>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- //Case 헬로비전 -->
+
+				<!-- Case SKB -->
+				<section class="plan-view-sec is-hide" id="planViewSKB">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">SKB 요금제 한눈에 보기</h2>
+						</div>
+						<div class="sec-body">
+							<div class="plan-table">
+								<!-- 2차 수정 : 요금표 업데이트 -->
+								<script>$('#planViewSKB .plan-table').load('./include-table-skb.html')</script>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- //Case SKB -->
+				<!-- // 요금제 누눈에 보기 섹션 -->
+
+				<!-- 인터넷 가입절차 섹션 -->
+				<section class="join-steps-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">인터넷 가입 절차 알려드려요</h2>
+						</div>
+						<div class="sec-body">
+							<ol class="join-steps">
+								<li>
+									<em class="num">1</em>
+									<dl class="con">
+										<dt>친절 상담</dt>
+										<dd>최적요금제 추천, 업셀링 NO!</dd>
+									</dl>
+								</li>
+								<li>
+									<em class="num">2</em>
+									<dl class="con">
+										<dt>신청서 작성</dt>
+										<dd>3분이면 작성완료!</dd>
+									</dl>
+								</li>
+								<li>
+									<em class="num">3</em>
+									<dl class="con">
+										<dt>본사 접수</dt>
+										<dd>상담 후 3시간 이내</dd>
+									</dl>
+								</li>
+								<li>
+									<em class="num">4</em>
+									<dl class="con">
+										<dt>설치 완료</dt>
+										<dd>원하는 날짜에 설치 가능! (신청 후 1~2일)</dd>
+									</dl>
+								</li>
+								<li>
+									<em class="num">5</em>
+									<dl class="con">
+										<dt>사은품 입금</dt>
+										<dd>설치 당일 혹은 익일 입금!</dd>
+									</dl>
+								</li>
+							</ol>
+						</div>
+					</div>
+				</section>
+				<!-- // 인터넷 가입절차 섹션 -->
+
+				<!-- 납부금액 알림 섹션 -->
+				<section class="payment-noti-sec">
+					<div class="sec-inner">
+						<div class="payment-noti">
+							<div class="payment-tit">
+								<h2 class="blind">월 납부금액 알려드릴게요.</h2>
+								<p class="charge"><strong>월 납부금액</strong> <strong>월 25,500원</strong></p>
+								<p class="merge"><em>알뜰폰 결합시</em> <strong>월 25,500원</strong></p>
+								<p class="freeGift"><span>현급 지급 사은품</span> <strong>최대 480,000원</strong></p>
+								<p class="explan"><i class="ui-icn icn-14-info-gr"></i>자세한 요금은 상담 시 안내드릴게요</p>
+							</div>
+							<div class="payment-btn">
+								<button type="button" class="ui-btn btn-action primary" data-bs-toggle="modal" data-bs-target="#FI0101P01Modal">
+									<span>상담 신청하기</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- // 납부금액 알림 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+	</div>
+
+	<!--
+		[모달 가이드]
+		모달 효과 : fade (공통)
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+		// 1차 수정 : fade-pc 사용안함, fade 공통으로 사용
+	-->
+	<!-- 인터넷 상품 상담 신청하기 modal basic -->
+	<div class="modal modal-basic fade" id="FI0101P01Modal" tabindex="-1" role="dialog" aria-labelledby="FI0101P01ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-I01-01-P01-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FI0101P01ModalLabel">신청하신 요금제는 인터넷을 결합하면 <br>요금 할인이 되는 요금제예요. <br>상담 신청하시면 빠르게 <br>안내해 드릴게요.</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 상담신청 섹션 -->
+					<section class="consult-frm-sec">
+						<div class="sec-inner">
+							<!-- 등록폼 -->
+							<div class="consult-frm">
+								<!-- 이름 입력 -->
+								<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label class="tit" for="frmName">이름</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="text" name="" id="frmName" value="" placeholder="이름을 입력해 주세요." title="" class="inp" />
+										</div>
+									</div>
+								</div>
+								<!-- // 이름 입력 -->
+
+								<!-- 전화번호 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmTitle" class="tit">전화번호</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="tel" name="" id="frmTitle" value="" placeholder="전화번호를 입력해 주세요." title="" class="inp" oninput="setRegularNumber(this)"/>
+										</div>
+									</div>
+								</div>
+								<!-- // 전화번호 입력 -->
+							</div>
+							<!-- // 등록폼 -->
+
+							<div class="consult-links">
+								<button type="button" class="ui-btn btn-texted"><span>개인정보 수집 이용</span></button>
+								<button type="button" class="ui-btn btn-texted"><span>개인정보 제3자 제공</span></button>
+							</div>
+						</div>
+					</section>
+					<!-- // 상담신청 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary">
+						<span>상담 신청하기</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 인터넷 상품 상담 신청하기 modal basic -->
+</body>
+
+</html>

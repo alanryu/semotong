@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/order_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='가입방식 선택'">
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ 
+ <script>
+	
+	
+	$( document ).ready(function() {
+		
+		   $("#dvAddrDetail").hide();
+		   
+		});
+		
+		
+		function openSearchAddrPop() {
+			window.open("/api/roadAdress/searchAddrPop", "auth_popup", "width=600,height=712,scrollbar=yes");
+		}
+		
+		function setAddr(zipcode, addr1, addr2) {
+			$("#addrZipCode").val(zipcode);
+			$("#frmAddr01").val(addr1);
+			$("#dvAddrDetail").show();
+		}
+		
+		function inputValidChk() {
+			$('#btnNext').removeAttr("disabled");
+		}
+		
+		function goNext() {
+			$("#recvNm").val($("#orderNm").val());
+			$("#recvPhone").val($("#orderPhone").val());
+
+			
+			$("#orderZipCd").val($("#addrZipCode").val());
+			$("#orderAddr").val($("#frmAddr01").val() + $("#frmAddr02").val());
+			$("#orderAddr1").val($("#frmAddr01").val());
+			$("#orderAddr2").val($("#frmAddr02").val());
+			moveNextOrder('/order/selPersonCert');
+			
+			
+			
+		}
+	
+	
+ </script>
+</th:block>
+
+<!-- Container -->
+<main role="main" class="container">
+<th:block th:include="pages/order/incOrderForm :: orderFormFragment"></th:block>
+<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-QU-page F-QU01-09-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">주소지를 입력해 주세요.</h2>
+						</div>
+						<div class="sec-body">
+							<!-- 등록폼 -->
+							<div class="basic-frm">
+								<!-- 주소 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="addrZipCode" class="tit">주소</label>
+									</div>
+									<div class="frm-content">
+										<div class="frm-group">
+											<div class="ui-inp">
+												<input type="tel" id="addrZipCode" value="" placeholder="우편번호 5자리" title="" class="inp" readonly/>
+											</div>
+											<button type="button" class="ui-btn btn-sub xl" data-bs-toggle="modal" data-bs-target="#addressModal" onclick="openSearchAddrPop()"><span>주소 검색</span></button>
+										</div>
+										<div class="frm-group">
+											<div class="ui-inp">
+												<input type="text" id="frmAddr01" value="" placeholder="주소를 검색해주세요." title="" class="inp" readonly/>
+											</div>
+										</div>
+										<div class="frm-group" id="dvAddrDetail">
+											<div class="ui-inp">
+												<input type="text" id="frmAddr02" value="" placeholder="상세주소를 검색해주세요." title="" class="inp" oninput="inputValidChk();"/>
+											</div>
+										</div>
+									</div>
+								</div>
+								<!-- // 주소 입력 -->
+							</div>
+							<!-- // 등록폼 -->
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" disabled id="btnNext" onclick="goNext()">
+							<span>다음</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 페이지 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+
+</main>
+
+	
+</html>

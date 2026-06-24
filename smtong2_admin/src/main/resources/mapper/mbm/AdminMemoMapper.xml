@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- tb_mbm_admin_user_memo -->
+<mapper namespace="kr.co.ucomp.web.mbm.mapper.AdminMemoMapper">
+
+    <sql id="searchCondition">
+        <if test='userId !=null and userId != 0'>
+            AND user_id = #{userId}
+        </if>
+        
+		<if test='memoType != null and memoType !=""'>
+            AND memo_type = #{memoType}
+        </if>
+        
+    </sql>
+
+    <select id="adminMemoList" parameterType="kr.co.ucomp.web.mbm.dto.AdminMemoDto" resultType="kr.co.ucomp.web.mbm.entity.AdminMemoEntity">
+        SELECT
+            id,
+            memo_type,
+            memo,
+            user_id,
+            etc1,
+            etc2,
+            etc3,
+            create_date,
+            create_id,
+            modified_date,
+            modified_id,
+            GET_ADMIN_USER_NM(create_id) as createNm,
+			GET_ADMIN_USER_NM(modified_id) as modifiedNm		
+        FROM
+            tb_mbm_admin_user_memo
+        WHERE 1=1 
+        <include refid="searchCondition"/>
+        order by create_date desc
+    </select>
+
+    <select id="adminMemo" parameterType="kr.co.ucomp.web.mbm.dto.AdminMemoDto" resultType="kr.co.ucomp.web.mbm.entity.AdminMemoEntity">
+        SELECT
+            id,
+            memo,
+            memo_type,
+            user_id,
+            etc1,
+            etc2,
+            etc3,
+            create_date,
+            create_id,
+            modified_date,
+            modified_id
+        FROM
+            tb_mbm_admin_user_memo
+        WHERE
+            id = #{id}
+    </select>
+
+    <insert id="insertAdminMemo" parameterType="kr.co.ucomp.web.mbm.entity.AdminMemoEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_mbm_admin_user_memo (memo_type,memo, user_id, 
+        <if test='etc1 != null and etc1 !=""'>
+            etc1,
+        </if>
+		<if test='etc2 != null and etc2 !=""'>
+            etc2,
+        </if>   
+		<if test='etc3 != null and etc3 !=""'>
+            etc3,
+        </if>           
+        create_id)
+        VALUES (
+                   #{memoType},
+                   #{memo},
+                   #{userId},
+				<if test='etc1 != null and etc1 !=""'>
+		            #{etc1},
+		        </if>     
+				<if test='etc2 != null and etc2 !=""'>
+		            #{etc2},
+		        </if>  
+				<if test='etc3 != null and etc3 !=""'>
+		            #{etc3},
+		        </if>                   
+                   #{createId}
+               )
+    </insert>
+
+    <update id="updateAdminMemo" parameterType="kr.co.ucomp.web.mbm.entity.AdminMemoEntity">
+        UPDATE tb_mbm_admin_user_memo
+        SET
+        	memo_type = #{memoType},
+            memo = #{memo},
+            user_id = #{userId},
+            <if test='etc1 != null and etc1 !=""'>
+            etc1 = #{etc1},
+            </if>
+            <if test='etc2 != null and etc2 !=""'>
+            etc2 = #{etc2},
+            </if>
+            <if test='etc3 != null and etc3 !=""'>
+            etc3 = #{etc3},
+            </if>
+            modified_id = #{modifiedId}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteAdminMemo" parameterType="Long">
+        DELETE FROM tb_mbm_admin_user_memo
+        WHERE id = #{id}
+    </delete>
+
+</mapper>

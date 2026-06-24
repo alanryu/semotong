@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>요금제 상세 공통 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+
+	<!-- 페이지 스크립트 영역 -->
+	<!-- Swiper Librarys -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+	<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+	<script>
+		// 인터넷 결합시 할인 금액 보기
+		function toggleActiveClass(checkbox, targetId) {
+			const targetElement = document.getElementById(targetId);
+			if (checkbox.checked) {
+				targetElement.classList.add('is-sale');
+			} else {
+				targetElement.classList.remove('is-sale');
+			}
+		}
+
+		function secExpandHendler(id, button) {
+			const $expand = document.querySelector(id);
+			const isExpanded = button.getAttribute('aria-expanded') === 'true';
+			$expand.classList.toggle('is-expanded');
+			button.setAttribute('aria-expanded', !isExpanded);
+		}
+
+
+		// DOMContentLoaded
+		document.addEventListener("DOMContentLoaded", function() {
+			// Bootstrap Popover + Custom
+			setPopover('ui-popover popover-style1'); // 공통 컴포넌트 규칙 ui- 반영
+
+			const tabSwiper = new Swiper(".tab-swiper", {
+				threshold: 3,
+				spaceBetween: 16,
+				slidesPerView: 'auto',
+				freeMode: true,
+				resistance: true,
+				resistanceRatio: 0
+			});
+
+			// 비슷한 요금제 스와이프
+			const similarPlanSwiper = new Swiper(".similar-plan-swiper", {
+				threshold: 3,
+				spaceBetween: 10,
+				slidesPerView: 'auto',
+				resistance: true,
+				resistanceRatio: 0
+			});
+
+			// 결합배너 스와이프
+			var combiSwiper = new Swiper(".combi-swiper", {
+				threshold: 3,
+				spaceBetween: 10,
+				pagination: {
+					el: ".swiper-pagination",
+				},
+				autoplay: {
+					delay: 2500,
+					disableOnInteraction: false,
+				},
+			});
+		});
+	</script>
+</head>
+
+<body>
+	<!-- 레이아웃 유형구분
+		메인: main-wrapper,
+		서브: sub-wrapper,
+		기타: [기타]-wrapper
+	 -->
+	<div class="wrapper sub-wrapper">
+		<!-- Header Deaktop -->
+		<header class="header-desktop">
+			<div class="header-skip">
+				<a href="#content">본문 바로가기</a>
+			</div>
+
+			<div class="header-sec">
+				<h1 class="title">
+					<!-- 로고 베타 추가 -->
+					<a href="../scenario/F-M01-01.html" class="logo"><span class="blind">세모통</span></a>
+					<!-- <span class="logo-beta"><img src="../../assets/images/common/img-logo-header-beta.png" alt=""></span> -->
+				</h1>
+				<nav class="header-nav">
+					<ul class="nav-list">
+						<li class="nav-item">
+							<!-- 선택된 상태 : is-selected -->
+							<a href="../F-G/F-G01-01.html" role="link" class="ui-btn nav-link">
+								<span>세모통 설명서</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<div class="ui-dropdown">
+								<a href="../scenario/F-P01-01.html" role="link" class="ui-btn nav-link" data-bs-toggle="dropdown" aria-expanded="false">
+									<span>요금제 찾기</span>
+								</a>
+								<div class="dropdown-menu">
+									<ul class="sub-nav">
+										<li class="sub-nav-item">
+											<a href="../scenario/F-P01-01.html" role="link" class="ui-btn sub-nav-link">
+												<span>알뜰요금제</span>
+											</a>
+										</li>
+										<li class="sub-nav-item">
+											<a href="../scenario/F-P01-01.html" role="link" class="ui-btn sub-nav-link">
+												<i class="ui-icn icn-h20-sk" aria-label="SKT"></i>
+												<i class="ui-icn icn-h20-kt" aria-label="KT"></i>
+												<i class="ui-icn icn-h20-lgu-02" aria-label="U+"></i>
+												요금제
+											</a>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</li>
+						<li class="nav-item">
+							<a href="../F-I/F-I01-01.html" role="link" class="ui-btn nav-link">
+								<span>인터넷</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../F-E/F-E01-01.html" role="link" class="ui-btn nav-link">
+								<span>이벤트</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../F-MY/F-MY01-01.html" role="link" class="ui-btn nav-link">
+								<span>마이페이지</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+		<!-- // Header Deaktop -->
+
+		<!-- Header Mobile -->
+		<header class="header-mobile only-mo">
+			<section class="header-sec">
+				<h1 class="title">
+					<!-- 로고 베타 추가 -->
+					<a href="../scenario/F-M01-01.html" class="logo"><span class="blind">세모통</span></a>
+					<!-- <span class="logo-beta"><img src="../../assets/images/common/img-logo-header-beta.png" alt=""></span> -->
+				</h1>
+				<button type="button" class="ui-btn btn-aside" data-bs-toggle="modal" data-bs-target="#asideModal">
+					<i class="ui-icn icn-32-anb-bk" aria-label="메뉴열기"></i>
+				</button>
+			</section>
+			<!-- // Mobile Header -->
+		</header>
+		<!-- // Header -->
+
+		<!-- Mobile Nav Modal (include_mobileNav.html) -->
+		<aside class="modal modal-full fade aside-modal" id="asideModal" tabindex="-1" role="dialog" aria-labelledby="asideModalLabel" aria-hidden="true"></aside>
+		<!-- Mobile Nav Modal -->
+
+		<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-P02-01-page">
+				<!-- 2025-05-08 조찬기 : 요금제 상세 UI/UX 개선 -->
+				<!-- 요금제 결합 섹션 -->
+				<section class="ratePlan-combi-sec">
+					<div class="sec-inner">
+						<!-- 7차 수정 : 결합배너 스와이프로 변경 -->
+						<div class="swiper combi-swiper">
+							<div class="swiper-wrapper">
+								<div class="swiper-slide">
+									<button type="button" class="combi-bnr">
+										<img src="../../assets/images/upload/@bnr-event-01-mo.png" alt="이벤트 내용" class="only-mo" />
+										<img src="../../assets/images/upload/@bnr-event-01-pc.png" alt="이벤트 내용" class="only-pc" />
+									</button>
+								</div>
+								<div class="swiper-slide">
+									<button type="button" class="combi-bnr">
+										<img src="../../assets/images/upload/@bnr-event-02-mo.png" alt="이벤트 내용" class="only-mo" />
+										<img src="../../assets/images/upload/@bnr-event-02-pc.png" alt="이벤트 내용" class="only-pc" />
+									</button>
+								</div>
+							</div>
+							<div class="swiper-pagination"></div>
+						</div>
+					</div>
+				</section>
+				<!-- // 요금제 결합 섹션 -->
+
+				<!-- 상품 리스트 섹션 -->
+				<section class="ratePlanC-sec">
+					<div class="sec-inner">
+						<!--  요금제 공통 타입 C : 요금제 상품 리스트 카드 -->
+						<div class="ratePlanC-card">
+							<div class="card-body">
+								<div class="card-util">
+									<div class="card-util-label">
+										<span class="label skt">SKT</span>
+										<span class="label kt">KT</span>
+										<span class="label lgu">U+</span>
+										<span class="label semotong">세모통 Only</span>
+										<span class="label merge">인터넷 결합</span>
+										<span class="label open">간편개통</span>
+									</div>
+									<div class="card-util-btn">
+										<button type="button" class="ui-btn is-selected" aria-selected="true">
+											<i class="ui-icn icn-20-plan-like-gr" aria-label="좋아요"></i>
+										</button>
+										<!-- 2024-12-11 조찬기 : 공유하기 모달 추가 -->
+										<button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#shareModal">
+											<i class="ui-icn icn-20-plan-share-gr" aria-label="공유하기"></i>
+										</button>
+									</div>
+								</div>
+								<div class="card-tit">
+									<strong>150GB+최대 5Mbps</strong>
+									<!-- <button type="button" class="ui-btn" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="auto"
+										data-bs-content="텍스트와 용량이 작은 이미지 페이지 까지 확인할 수 있어요. 유튜브 480p로 재생돼요.">
+										<i class="ui-icn icn-16-plan-quse-gr" aria-label="툴팁"></i>
+									</button> -->
+								</div>
+								<div class="card-name">
+									<p>[모빌카드 스페셜] 통화, 데이터 마음대로 11GB+</p>
+								</div>
+								<div class="card-info">
+									<span class="label"><i class="ui-icn icn-12-tel-gr" aria-hidden="true"></i>무제한</span>
+									<span class="split" aria-hidden="true"></span>
+									<span class="label"><i class="ui-icn icn-12-mail-gr" aria-hidden="true"></i>무제한</span>
+									<span class="split" aria-hidden="true"></span>
+									<span class="label"><i class="ui-icn icn-12-antena-gr" aria-hidden="true"></i>LTE</span>
+								</div>
+								<div class="card-charge">
+									<div class="brand">
+										<img src="../../assets/images/partner/logo-snowman.svg" alt="안녕 알뜰폰 snowman" />
+										<!-- <span class="brand-rating"><i class="ui-icn icn-14-plan-star-pr" aria-label="평점"></i>4.5</span> -->
+									</div>
+									<div class="charge">
+										<p class="charge-tit">58,700원</p>
+										<p class="charge-point"><em class="tit">실제 체감가</em> 48,100원</p>
+										<p class="charge-txt">7개월 이후 49,000원</p>
+									</div>
+								</div>
+								<!-- 카드 클릭영역 (상세에서는 사용하지 않음)  -->
+								<!-- <button type="button" class="card-button">
+									<span class="blind">요금제 자세히 보기</span>
+								</button> -->
+							</div>
+						</div>
+						<!--  // 요금제 공통 타입 C : 요금제 상품 카드 -->
+
+						<div class="ratePlan-info">
+							<button type="button" class="ui-btn btn-texted" aria-expanded="false">
+								<span>요금제 정보가 잘못 되었나요?</span>
+							</button>
+						</div>
+					</div>
+				</section>
+				<!-- // 상품 리스트 섹션 -->
+
+				<!-- 탭 목록 -->
+				<!-- <div class="ui-tab tab-style2">
+					<div class="swiper tab-swiper">
+						<div class="swiper-wrapper" role="tablist">
+							<div class="swiper-slide" role="presentation">
+								<button class="tab-link active" id="tab-01" data-bs-toggle="tab" data-bs-target="#tab-01-pane" type="button" role="tab" aria-controls="tab-01-pane" aria-selected="true">요금제 상세 정보</button>
+							</div>
+							<div class="swiper-slide" role="presentation">
+								<button class="tab-link" id="tab-02" data-bs-toggle="tab" data-bs-target="#tab-02-pane" type="button" role="tab" aria-controls="tab-02-pane" aria-selected="false">사은품</button>
+							</div>
+							<div class="swiper-slide" role="presentation">
+								<button class="tab-link" id="tab-03" data-bs-toggle="tab" data-bs-target="#tab-03-pane" type="button" role="tab" aria-controls="tab-03-pane" aria-selected="false">요금제 리뷰</button>
+							</div>
+							<div class="swiper-slide" role="presentation">
+								<button class="tab-link" id="tab-04" data-bs-toggle="tab" data-bs-target="#tab-04-pane" type="button" role="tab" aria-controls="tab-04-pane" aria-selected="false">자주묻는 질문</button>
+							</div>
+						</div>
+					</div>
+				</div> -->
+				<!-- // 탭 목록 -->
+
+				<!-- 섹션 펼쳐보기/접어보기 -->
+				<div class="expand-sec-group" id="secExpand">
+					<!-- 이런 혜택을 받을 수 있어요 -->
+					<section class="benefit-sec">
+						<div class="sec-inner">
+							<div class="sec-header">
+								<h2 class="sec-tit">이런 혜택을 받을 수 있어요</h2>
+							</div>
+							<div class="sec-body">
+								<!-- 혜택: 고고모바일 -->
+								<div class="benefit-box">
+									<h3 class="benefit-tit">고고모바일이 드려요</h3>
+									<ul class="benefit-list">
+										<li class="benefit-item">
+											<div class="benefit-card">
+												<div class="benefit-card-img">
+													<img src="../../assets/images/upload/@benefit-naver.png" alt="네이버 페이" />
+												</div>
+												<div class="benefit-card-con">
+													<p class="tit"><button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#benefitModal">가입 축하금 최대 12만원</button><i class="ui-icn icn-16-more-bk"></i></p>
+													<p class="txt">가입 시 신세계orCU 상품권 5만원, 6개월 유지: 상품권 2만원, 1년 유지:상품권 5만원</p>
+												</div>
+											</div>
+										</li>
+										<li class="benefit-item">
+											<div class="benefit-card">
+												<div class="benefit-card-img">
+													<img src="../../assets/images/upload/@benefit-naver.png" alt="네이버 페이" />
+												</div>
+												<div class="benefit-card-con">
+													<p class="tit"><button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#benefitModal">[KT]인터넷 결합 시, 데이터20GB 추가 증정</button><i class="ui-icn icn-16-more-bk"></i></p>
+													<p class="txt">가입 시 신세계orCU 상품권 5만원, 6개월 유지: 상품권 2만원, 1년 유지:상품권 5만원</p>
+												</div>
+											</div>
+										</li>
+										<li class="benefit-item">
+											<div class="benefit-card">
+												<div class="benefit-card-img">
+													<img src="../../assets/images/upload/@benefit-naver.png" alt="네이버 페이" />
+												</div>
+												<div class="benefit-card-con">
+													<p class="tit"><button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#benefitModal">가입 축하금 최대 12만원</button><i class="ui-icn icn-16-more-bk"></i></p>
+													<p class="txt">가입 시 신세계orCU 상품권 5만원, 6개월 유지: 상품권 2만원, 1년 유지:상품권 5만원,  2년 유지:상품권 10만원</p>
+												</div>
+											</div>
+										</li>
+									</ul>
+								</div>
+								<!-- //혜택: 고고모바일 -->
+
+								<!-- 혜택: 세모통 -->
+								<div class="benefit-box">
+									<h3 class="benefit-tit">고고모바일이 드려요</h3>
+									<ul class="benefit-list">
+										<li class="benefit-item">
+											<div class="benefit-card">
+												<div class="benefit-card-img">
+													<img src="../../assets/images/upload/@benefit-naver.png" alt="네이버 페이" />
+												</div>
+												<div class="benefit-card-con">
+													<p class="tit"><button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#benefitModal">가입 축하금 최대 12만원</button><i class="ui-icn icn-16-more-bk"></i></p>
+													<p class="txt">가입 시 신세계orCU 상품권 5만원, 6개월 유지: 상품권 2만원, 1년 유지:상품권 5만원</p>
+												</div>
+											</div>
+										</li>
+									</ul>
+								</div>
+								<!-- //혜택: 세모통 -->
+
+								<!-- 혜택: 인터넷결합 -->
+								<div class="benefit-box primary">
+									<h3 class="benefit-tit">인터넷 결합하면 받을 수 있어요.</h3>
+									<ul class="benefit-list">
+										<li class="benefit-item">
+											<div class="benefit-card">
+												<div class="benefit-card-img">
+													<img src="../../assets/images/upload/@benefit-naver.png" alt="네이버 페이" />
+												</div>
+												<div class="benefit-card-con">
+													<p class="tit"><button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#benefitModal">[KT]인터넷 결합 시, 데이터20GB 추가 증정</button><i class="ui-icn icn-16-more-bk"></i></p>
+													<p class="txt">가입 시 신세계orCU 상품권 5만원, 6개월 유지: 상품권 2만원, 1년 유지:상품권 5만원</p>
+												</div>
+											</div>
+										</li>
+									</ul>
+								</div>
+								<!-- //혜택: 인터넷결합 -->
+							</div>
+						</div>
+					</section>
+					<!-- // 이런 혜택을 받을 수 있어요 -->
+
+					<!-- 요금제 상세 정보 섹션 -->
+					<section class="ratePlan-detail-sec">
+						<div class="sec-inner">
+							<div class="sec-header">
+								<h2 class="sec-tit">요금제 상세 정보</h2>
+							</div>
+							<div class="sec-body">
+								<!-- 요금제 상세 카드 -->
+								<div class="ratePlan-detail-card">
+									<div class="card-header">
+										<p class="card-tit">The 착함 데이터 유심 11GB</p>
+										<p class="card-explain">지금 이 요금제로 가입한다면 이동통신 3사 요금제를 이용하는 것보다 1년 동안 평균 40만원을 아낄 수 있어요!</p>
+									</div>
+									<div class="card-body">
+										<!-- 통신비 정보 -->
+										<div class="price-info">
+											<div class="price-desc">1년 평균 통신비</div>
+											<div class="price-item-group">
+												<div class="price-item type-a">
+													<div class="price-label">
+														<i class="ui-icn icn-h20-sk" aria-label="SKT"></i>
+														<i class="ui-icn icn-h20-kt" aria-label="KT"></i>
+														<i class="ui-icn icn-h20-lgu-02" aria-label="LG U+"></i>
+													</div>
+													<div class="price-progress">
+														<div class="progress" role="progressbar">
+															<span class="progress-label" style="width: calc(70/70*100%)">약 70만원</span>
+														</div>
+													</div>
+												</div>
+												<div class="price-divider"></div>
+												<div class="price-item type-b">
+													<div class="price-label">
+														<img src="../../assets/images/partner/logo-snowman.svg" alt="안녕 알뜰폰 snowman" />
+													</div>
+													<div class="price-progress" role="progressbar">
+														<div class="progress">
+															<span class="progress-label" style="width: calc(30/70*100%)">약 30만원</span>
+															<span class="progress-label" style="width: calc(40/70*100%)">40만원 이득</span>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<!-- //통신비 정보 -->
+
+										<!-- 요금제 정보 -->
+										<ul class="card-info">
+											<li><strong class="tit">통화</strong><span class="txt">무제한</span></li>
+											<li><strong class="tit">문자</strong><span class="txt">무제한</span></li>
+											<li><strong class="tit">통신망</strong><span class="txt">LGU+망</span></li>
+											<li><strong class="tit">통신 기술</strong><span class="txt">LTE</span></li>
+											<li><strong class="tit">데이터</strong><span class="txt">200G</span></li>
+											<li><strong class="tit">QoS</strong><span class="txt">1Mbps</span></li>
+											<li><strong class="tit">할인</strong><span class="txt">6개월</span></li>
+											<li><strong class="tit">부가통화</strong><span class="txt">300분</span></li>
+										</ul>
+										<!-- //요금제 정보 -->
+
+										<button type="button" class="ui-btn btn-more-list" data-bs-toggle="modal" data-bs-target="#FP0201P03Modal">
+											<span>유심 준비하면 좀 더 빠르게 신청이 가능해요!</span>
+											<i class="ui-icn icn-16-more-02-gr" aria-hidden="true"></i>
+										</button>
+
+									</div>
+								</div>
+								<!-- // 요금제 상세 카드 -->
+
+								<!-- 요금제상세 아코디언 -->
+								<!-- 8차 수정 : 요금제 상세 정보 내용 수정 -->
+								<div class="ratePlan-detail-acco" id="planAccordion">
+									<div class="acco-item">
+										<h3 class="acco-header">
+											<button class="acco-button collapsed" type="button" data-bs-toggle="collapse"
+												data-bs-target="#planAccordion3" aria-expanded="false" aria-controls="planAccordion3">
+												<span>초과이용요금</span>
+												<i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+											</button>
+										</h3>
+										<div id="planAccordion3" class="acco-collapse collapse" data-bs-parent="#planAccordion">
+											<div class="acco-body">
+												<div class="acco-answer">
+													<p>음성 1.98원/초</p>
+													<p>영상 3.3원/초</p>
+													<p>문자 22원/건</p>
+													<p>데이터 22.53원/MB</p>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="acco-item">
+										<h3 class="acco-header">
+											<button class="acco-button collapsed" type="button" data-bs-toggle="collapse"
+												data-bs-target="#planAccordion4" aria-expanded="false" aria-controls="planAccordion4">
+												<span>데이터 (상세)</span>
+												<i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+											</button>
+										</h3>
+										<div id="planAccordion4" class="acco-collapse collapse" data-bs-parent="#planAccordion">
+											<div class="acco-body">
+												<div class="acco-answer">
+													<p>데이터 무제한 혜택을 상업적으로 이용하여 네트워크 품질을 영향을 미치거나 네트워크 상황에 따라 장애 발생 우려가 있는 경우에는 일반 사용자 보호를 위해 데이터의 속도제어, 이용제한, 차단, 해지가 될 수 있어요.</p>
+													<p>기본 제공 데이터내에서 m-Voip(무선 인터넷망을 활용해 무료로 음성통화를 이용하는 서비스. 예를 들면 카카오 보이스톡, 네이버 라인 등이 있어요) 사용이 가능해요.</p>
+													<p>기본제공량 초과 시 별도 요금은 부과되지 않지만 속도가 제어되면서 네트워크 환경에 따라 속도가 일시적으로 느려질 수 있어요. QoS 이용 시 속도는 평균 속도이며, 사용 환경에 따라 다를 수 있어요.</p>
+													<div>
+														<h3>QoS(Quality of Service : 통신 서비스 품질, 보통 데이터 속도를 말해요) 체감 속도는 다음과 같아요. </h3>
+														<ol>
+															<li>1Mbps : 텍스트와 용량이 작은 이미지 페이지 이용가능하며 재생 속도는 480p로 스마트폰이나 화면이 작은 장치에서 일반적으로 사용해요.</li>
+															<li>3Mbps : 용량이 큰 이미지 파일 등 큰 불편함 없이 이용가능하며 재생 속도는 720p로 480p보다 2배 더 선명하고 더 큰 화면에서 볼 수 있어요.</li>
+															<li>광고성 스팸 메시지를 발송과 같이 상업적 목적으로 이용하거나 물리적 장치 또는 자동발송 프로그램을 이용하는 경우</li>
+															<li>5Mbps : 대부분 쾌적하게 이용가능하며 재생 속도는 1080p로 영화를 보기에 가장 뛰어난 고화질로 품질이 가장 높아요.</li>
+														</ol>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="acco-item">
+										<h3 class="acco-header">
+											<button class="acco-button collapsed" type="button" data-bs-toggle="collapse"
+												data-bs-target="#planAccordion5" aria-expanded="false" aria-controls="planAccordion5">
+												<span>음성 (상세)</span>
+												<i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+											</button>
+										</h3>
+										<div id="planAccordion5" class="acco-collapse collapse" data-bs-parent="#planAccordion">
+											<div class="acco-body">
+												<div class="acco-answer">
+													<p>부가통화 이용시 부가통화 사업자가 정하는 바에 따라 별도의 정보이용료가 발생될 수 있어요. 불법스팸/상업적 용도 사용/비정상적인 과도한 사용을 방지하기 위해 경우에 따라 서비스를 제한할 수 있어요. </p>
+													<div>
+														<h3>아래 내용을 참고하세요.</h3>
+														<ol>
+															<li>음성통화량이 일 600분을 초과하는 횟수가 월 중 3회가 넘는 경우 : 영상통화는 음성의 1.66배로 차감</li>
+															<li>음성/영상통화량 수신처가 월 1천 회선(합산) 초과하는 경우 : 광고 및 상업적 목적으로 이용하는 것으로 간주</li>
+															<li>음성통화량이 월 6,000분을 초과할 경우</li>
+														</ol>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="acco-item">
+										<h3 class="acco-header">
+											<button class="acco-button collapsed" type="button" data-bs-toggle="collapse"
+												data-bs-target="#planAccordion6" aria-expanded="false" aria-controls="planAccordion6">
+												<span>메시지 (상세)</span>
+												<i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+											</button>
+										</h3>
+										<div id="planAccordion6" class="acco-collapse collapse" data-bs-parent="#planAccordion">
+											<div class="acco-body">
+												<div class="acco-answer">
+													<p>문자의 '기본제공' 혜택 제한 기준은 아래를 참고하세요.</p>
+													<div>
+														<h3>SMS, MMS(텍스트형, 멀티미디어형) 포함</h3>
+														<ol>
+															<li>일 SMS&MMS 사용량이 (SKT망 : 500건 / KT망 : 500건 / LG망 : 500건)을 초과하는 경우</li>
+															<li>일 SMS&MMS 사용량이 (SKT망 : 200건 / KT&LGU+망 : 150건)을 초과하는 횟수가 월 중 10회를 넘는 경우</li>
+															<li>광고성 스팸 메시지를 발송과 같이 상업적 목적으로 이용하거나 물리적 장치 또는 자동발송 프로그램을 이용하는 경우</li>
+															<li>수신처가 (SKT망 : 월 3,000개 / KT&LGU+망 : 월 2,000개) 회선을 초과하는 경우</li>
+														</ol>
+														<p><small>※ 기본 제공되는 문자 미소진시, 잔여량은 이월되지 않아요.</small></p>
+													</div>
+													<p>문자메시지 기본 제공량 소진시 문자 SMS 22원/건, LMS 44원/건, MMS(사진/그림/배경음악 첨부) 220원/건, MMS(동영상 첨부) 440원/건 청구돼요.</p>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<!-- // 요금제상세 아코디언 -->
+							 </div>
+						</div>
+					</section>
+					<!-- // 요금제 상세 정보 섹션 -->
+
+					<!-- 통신사 리뷰 섹션 -->
+					<section class="review-sec">
+						<div class="sec-inner">
+							<div class="sec-header">
+								<h2 class="sec-tit">통신사 리뷰</h2>
+							</div>
+							<div class="sec-body">
+								<!-- 통신사 리뷰 평점 -->
+								<div class="review-brand-sat">
+									<button type="button" class="ui-btn" data-bs-toggle="modal" data-bs-target="#benefitModal">
+										<span class="brand">
+											<img src="../../assets/images/partner/logo-snowman.svg" alt="안녕 알뜰폰 snowman" />
+											<span class="brand-rating"><i class="ui-icn icn-14-plan-star-pr" aria-label="평점"></i>4.5</span>
+										</span>
+										<i class="ui-icn icn-16-more-gr" aria-label="자세히보기"></i>
+									</button>
+								</div>
+								<!-- // 통신사 리뷰 평점 -->
+								<!-- 이용자 리뷰 평점 -->
+								<div class="review-user-sat">
+									<ul class="review-list">
+										<li class="review-item">
+											<div class="review-card">
+												<p class="review-name">홍길동</p>
+												<p class="review-sat">
+													<i class="ui-icn icn-16-star-pr" aria-hidden="true"></i>
+													<strong class="val">5.0</strong>
+												</p>
+												<p class="review-con">
+													리뷰 텍스트 영역입니다.
+												</p>
+											</div>
+										</li>
+										<li class="review-item">
+											<div class="review-card">
+												<p class="review-name">홍길동</p>
+												<p class="review-sat">
+													<i class="ui-icn icn-16-star-pr" aria-hidden="true"></i>
+													<strong class="val">5.0</strong>
+												</p>
+												<p class="review-con">
+													리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용
+												</p>
+											</div>
+										</li>
+										<li class="review-item">
+											<div class="review-card">
+												<p class="review-name">홍길동</p>
+												<p class="review-sat">
+													<i class="ui-icn icn-16-star-pr" aria-hidden="true"></i>
+													<strong class="val">5.0</strong>
+												</p>
+												<p class="review-con">
+													리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용. 리뷰 텍스트 영역입니다. 최대 3줄 노출. 초과시 말줄임표 사용
+												</p>
+											</div>
+										</li>
+									</ul>
+									<button type="button" class="ui-btn btn-more-list">
+										<i class="ui-icn icn-16-more-list-gr"></i>
+										<span>더보기</span>
+									</button>
+								</div>
+								<!-- // 이용자 리뷰 평점 -->
+							</div>
+						</div>
+					</section>
+					<!-- // 통신사 리뷰 섹션 -->
+
+					<!-- 자주묻는 질문 섹션 -->
+					<section class="faq-sec">
+						<div class="sec-inner">
+							<div class="sec-header">
+								<h2 class="sec-tit">자주묻는질문</h2>
+							</div>
+							<div class="sec-body">
+								<!-- 자주묻는 질문 아코디언 -->
+								<div class="faq-accordion" id="faqAccordion">
+									<div class="acco-item">
+										<h3 class="acco-header">
+											<button class="acco-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqAccordionOne"
+												aria-expanded="false" aria-controls="faqAccordionOne">
+												<strong class="part">요금제소개</strong>
+												<span>쓰던 번호 그대로 알뜰폰 가입할 수 있나요? 어떻게 그럴수 있죠?</span>
+												<i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+											</button>
+										</h3>
+										<div id="faqAccordionOne" class="acco-collapse collapse" data-bs-parent="#faqAccordion">
+											<div class="acco-body">
+												<div class="acco-answer">
+													<p>문자의 '기본제공' 혜택 제한 기준은 아래를 참고하세요. 문자의 '기본제공' 혜택 제한 기준은 아래를 참고하세요. 문자의 '기본제공' 혜택 제한 기준은 아래를 참고하세요</p>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="acco-item">
+										<h3 class="acco-header">
+											<button class="acco-button collapsed" type="button" data-bs-toggle="collapse"
+												data-bs-target="#faqAccordionTwo" aria-expanded="false" aria-controls="faqAccordionTwo">
+												<strong class="part">요금제소개</strong>
+												<span>쓰던 번호 그대로 알뜰폰 가입할 수 있나요? 어떻게 그럴수 있죠?</span>
+												<!-- <span><em>Q.</em>기존 통신사를 해지하고 알뜰폰 가입해야 하나요?</span> -->
+												<i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+											</button>
+										</h3>
+										<div id="faqAccordionTwo" class="acco-collapse collapse" data-bs-parent="#faqAccordion">
+											<div class="acco-body">
+												<div class="acco-answer">
+													<p>번호이동으로 요금제 신청을 완료하고 개통이 완료되면 기존 통신사는 자동으로 해지됩니다. 신규가입으로 개통했다면, 기존 통신사는 유지되어요.</p>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="acco-item">
+										<h3 class="acco-header">
+											<button class="acco-button collapsed" type="button" data-bs-toggle="collapse"
+												data-bs-target="#faqAccordionThree" aria-expanded="false" aria-controls="faqAccordionThree">
+												<strong class="part">요금제소개</strong>
+												<span>쓰던 번호 그대로 알뜰폰 가입할 수 있나요? 어떻게 그럴수 있죠?</span>
+												<!-- <span><em>Q.</em>기존 통신사를 해지하고 알뜰폰 가입해야 하나요?</span> -->
+												<i class="ui-icn icn-16-acco-arw" aria-label="Toggle"></i>
+											</button>
+										</h3>
+										<div id="faqAccordionThree" class="acco-collapse collapse" data-bs-parent="#faqAccordion">
+											<div class="acco-body">
+												<div class="acco-answer">
+													<p>문자의 '기본제공' 혜택 제한 기준은 아래를 참고하세요. 문자의 '기본제공' 혜택 제한 기준은 아래를 참고하세요. 문자의 '기본제공' 혜택 제한 기준은 아래를 참고하세요</p>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<!-- // 자주묻는 질문 아코디언 -->
+							</div>
+						</div>
+					</section>
+					<!-- // 자주묻는 질문 섹션 -->
+
+					<!-- 알뜽폰 개통 방법 -->
+					<section class="account-sol-sec">
+						<div class="sec-inner">
+							<h2 class="sec-tit">알뜰폰 개통 방법 궁금하시죠?</h2>
+							<div class="ui-tab tab-style3">
+								<ul class="tab-list" role="tablist">
+									<li class="tab-item" role="presentation">
+										<button class="tab-link active" id="tab-11" data-bs-toggle="tab" data-bs-target="#tab-11-pane" type="button" role="tab" aria-controls="tab-11-pane" aria-selected="true">쓰던 번호로 개통</button>
+									</li>
+									<li class="tab-item" role="presentation">
+										<button class="tab-link" id="tab-12" data-bs-toggle="tab" data-bs-target="#tab-12-pane" type="button" role="tab" aria-controls="tab-12-pane" aria-selected="false">새 번호 사용</button>
+									</li>
+								</ul>
+							</div>
+							<!-- 8차 수정 : 개통 방법 내용 변경 -->
+							<div class="tab-content">
+								<div class="tab-pane fade show active" id="tab-11-pane" role="tabpanel" aria-labelledby="tab-11" tabindex="0">
+									<ol class="solution-steps">
+										<li><em class="num">1</em>요금제 조회하고 유심 구매 (오프라인 또는 배송 받기)</li>
+										<li><em class="num">2</em>번호이동으로 가입 신청</li>
+										<li><em class="num">3</em>번호이동 사전인증 진행</li>
+										<li><em class="num">4</em>개통 완료 안내받으면 유심 교체!</li>
+									</ol>
+								</div>
+								<div class="tab-pane fade" id="tab-12-pane" role="tabpanel" aria-labelledby="tab-12" tabindex="0">
+									<ol class="solution-steps">
+										<li><em class="num">1</em>요금제 조회하고 유심 구매 (오프라인 또는 배송 받기)</li>
+										<li><em class="num">2</em>신규가입으로 가입 신청</li>
+										<li><em class="num">3</em>해피콜 받기</li>
+										<li><em class="num">4</em>개통 완료 안내받으면 유심 넣고 바로 사용!</li>
+									</ol>
+								</div>
+							</div>
+						</div>
+					</section>
+					<!-- // 알뜽폰 개통 방법 -->
+
+					<!-- 펼치기 토글 -->
+					<div class="expand-sec-btn">
+						<button type="button" class="ui-btn btn-expand" aria-expanded="false" onclick="secExpandHendler('#secExpand', this)">
+							<span>상세정보</span>
+							<i class="ui-icn icn-20-expand-arw-gr" aria-hidden="true"></i>
+						</button>
+					</div>
+				</div>
+
+				<!-- 비슷한 요금제 섹션 -->
+				<section class="similar-plan-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">비슷한 요금제</h2>
+						</div>
+						<div class="sec-body">
+							<!-- 비슷한 요금제 스와이프 -->
+							<div class="swiper similar-plan-swiper">
+								<div class="swiper-wrapper">
+									<div class="swiper-slide">
+										<div class="similar-plan-card">
+											<div class="card-body">
+												<p class="card-tit"><strong>[SKT] 150G+최대5Mbps</strong></p>
+												<dl class="card-con">
+													<dt>음성</dt>
+													<dd>무제한+부가통화 300분</dd>
+													<dt>데이터</dt>
+													<dd>71GB+다 쓰면 최대 5Mbps</dd>
+													<dt>문자메시지</dt>
+													<dd>기본제공</dd>
+												</dl>
+												<p class="card-charge">19,540원</p>
+												<p class="card-point"><em class="tit">실제 체감가 (12개월간)</em> 12,100원</p>
+												<button type="button" class="card-button">
+													<span class="blind">요금제 자세히보기</span>
+												</button>
+											</div>
+										</div>
+									</div>
+									<div class="swiper-slide">
+										<div class="similar-plan-card">
+											<div class="card-body">
+												<p class="card-tit"><strong>[SKT] 150G+최대5Mbps aaaaaaaaaaaaaaaaaaaaa</strong></p>
+												<dl class="card-con">
+													<dt>음성</dt>
+													<dd>무제한+부가통화+부가기능 300분</dd>
+													<dt>데이터</dt>
+													<dd>71GB+다 쓰면 최대 5Mbps aaaaaaaaaaaaaaaa</dd>
+													<dt>문자메시지</dt>
+													<dd>기본제공</dd>
+												</dl>
+												<p class="card-charge">19,540원</p>
+												<p class="card-point"><em class="tit">실제 체감가 (12개월간)</em> 12,100원</p>
+												<button type="button" class="card-button">
+													<span class="blind">요금제 자세히보기</span>
+												</button>
+											</div>
+										</div>
+									</div>
+									<div class="swiper-slide">
+										<div class="similar-plan-card">
+											<div class="card-body">
+												<p class="card-tit"><strong>[SKT] 150G+최대5Mbps</strong></p>
+												<dl class="card-con">
+													<dt>음성</dt>
+													<dd>무제한+부가통화 300분</dd>
+													<dt>데이터</dt>
+													<dd>71GB+다 쓰면 최대 5Mbps</dd>
+													<dt>문자메시지</dt>
+													<dd>기본제공</dd>
+												</dl>
+												<p class="card-charge">19,540원</p>
+												<p class="card-point"><em class="tit">실제 체감가 (12개월간)</em> 12,100원</p>
+												<button type="button" class="card-button">
+													<span class="blind">요금제 자세히보기</span>
+												</button>
+											</div>
+										</div>
+									</div>
+									<div class="swiper-slide">
+										<div class="similar-plan-card">
+											<div class="card-body">
+												<p class="card-tit"><strong>[SKT] 150G+최대5Mbps</strong></p>
+												<dl class="card-con">
+													<dt>음성</dt>
+													<dd>무제한+부가통화 300분</dd>
+													<dt>데이터</dt>
+													<dd>71GB+다 쓰면 최대 5Mbps</dd>
+													<dt>문자메시지</dt>
+													<dd>기본제공</dd>
+												</dl>
+												<p class="card-charge">19,540원</p>
+												<button type="button" class="card-button">
+													<span class="blind">요금제 자세히보기</span>
+												</button>
+											</div>
+										</div>
+									</div>
+									<div class="swiper-slide">
+										<div class="similar-plan-card">
+											<div class="card-body">
+												<p class="card-tit"><strong>[SKT] 150G+최대5Mbps</strong></p>
+												<dl class="card-con">
+													<dt>음성</dt>
+													<dd>무제한+부가통화 300분</dd>
+													<dt>데이터</dt>
+													<dd>71GB+다 쓰면 최대 5Mbps</dd>
+													<dt>문자메시지</dt>
+													<dd>기본제공</dd>
+												</dl>
+												<p class="card-charge">19,540원</p>
+												<button type="button" class="card-button">
+													<span class="blind">요금제 자세히보기</span>
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- // 비슷한 요금제 스와이프 -->
+						</div>
+					</div>
+				</section>
+				<!-- // 비슷한 요금제 섹션 -->
+
+				<!-- 납부금액 알림 섹션 -->
+				<section class="payment-noti-sec">
+					<div class="sec-inner">
+						<!-- Case 인터넷 결합 시 할인 금액 보기: is-sale 클래스 추가 -->
+						<div class="payment-noti" id="paymentNoti">
+							<div class="payment-tit">
+								<h2 class="blind">월 납부금액 알려드릴게요.</h2>
+								<p class="charge"><strong>월 25,500원</strong></p> <!-- Case 월 납부금액 보기 -->
+								<!-- <p class="charge-sale"><strong>월 25,500원</strong><span>(인터넷 결합 할인 예상 금액)</span></p> Case 인터넷 결합 시 할인 금액 보기 -->
+								<p class="explan"><em>7</em>개월 이후 <em class="price">45,000원</em>으로 변동돼요!</p>
+							</div>
+							<div class="payment-con">
+								<div class="item">
+									<p class="tit">12개월 합산 금액</p>
+									<p class="charge">1,000,000원</p>
+								</div>
+								<div class="item">
+									<p class="tit">24개월 합산 금액</p>
+									<p class="charge">2,000,000원</p>
+								</div>
+							</div>
+							<div class="payment-btn">
+								<button type="button" class="ui-btn btn-action primary">
+									<span>신청하기</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- // 납부금액 알림 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+	</div>
+
+	<!--
+		[모달 가이드]
+		모달 효과 : fade (공통)
+		모달 기본 : modal
+		모달 유형 : modal-full / modal-basic / modal-alert / modal-confirm / modal-select
+		화면 이름 : 화면아이디-page (modal-select 제외)
+		// 1차 수정 : fade-pc 사용안함, fade 공통으로 사용
+	-->
+	<!-- modal 제보문의 -->
+	<div class="modal modal-confirm fade" id="FP0201P01Modal" tabindex="-1" role="dialog" aria-labelledby="FP0201P01ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-P02-01-P01-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FP0201P01ModalLabel"></h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 컨텐츠 섹션 -->
+					<section>
+						<div class="sec-inner">
+							<!-- 모달 가이드 -->
+							<a href="./F-P02-01-P01.html">F-P02-01-P01 페이지로 이동</a>
+						</div>
+					</section>
+					<!-- // 컨텐츠 섹션 -->
+				</div>
+				<div class="modal-footer"></div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal 제보문의 -->
+
+	<!-- modal 유심 구매 안내 -->
+	<div class="modal modal-full fade-pc" id="FP0201P03Modal" tabindex="-1" role="dialog" aria-labelledby="FP0201P03ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-P02-01-P03-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FP0201P03ModalLabel"></h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+
+				</div>
+				<div class="modal-body">
+					<!-- 컨텐츠 섹션 -->
+					<section>
+						<div class="sec-inner">
+							<!-- 모달 가이드 -->
+							<a href="./F-P02-01-P03.html">F-P02-01-P03 페이지로 이동</a>
+						</div>
+					</section>
+					<!-- // 컨텐츠 섹션 -->
+				</div>
+				<div class="modal-footer"></div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal 유심 구매 안내 -->
+
+	<!-- modal default -->
+	<div class="modal fade modal-full" id="benefitModal" tabindex="-1" role="dialog" aria-labelledby="benefitModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content benefit-modal-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="benefitModalLabel">가입 축하금 최대 12만원</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+
+				</div>
+				<div class="modal-body">
+					<!-- 컨텐츠 섹션 -->
+					<section class="benefit-detail-sec">
+						<!-- Case 이미지 -->
+						<div class="benefit-image">
+							<img src="../../assets/images/upload/@benefit-detail.png" alt="혜택 상세 정보" />
+						</div>
+
+						<!-- Case 텍스트 -->
+						<div class="benefit-text">
+							<div class="data-view">
+								<p class="tit">기본 사은품 지급 및 일정 안내</p>
+								<ul class="bul">
+									<li>유심 요금제 가입 시 요금제 금액별 100% 전원 증정 가입 사은품 1~3만원이 증정됩니다.</li>
+									<li>사은품 : ① 신세계 상품권 3만원 ② CU 상품권 3만원 (택1)
+										<p>1) 3만원 증정(2만원 이상 요금제 가입 시)</p>
+										<p>2) 2만원 증정(1만원 이상 ~ 2만원 미만 요금제 가입 시)</p>
+										<p>3) 1만원 증정(5천원 이상 ~ 1만원 미만 요금제 가입 시)</p>
+									</li>
+									<li>대상자 : 이벤트 기간 내 접수 및 5/3까지 개통한 고객님</li>
+									<li>사은품 선택 문자 발송 : 개통일 기준 D+15,16,17일에 LMS가 발송됩니다.( D+19자정까지 LMS 내 링크가 유효하며, 이후에는 선택이 불가합니다.)</li>
+									<li>사은품 발송 : 2025년 7월 3주차</li>
+								</ul>
+							</div>
+						</div>
+					</section>
+					<!-- // 컨텐츠 섹션 -->
+				</div>
+
+				<!-- Case 혜택등록시 -->
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary">
+						<span>혜택 보러가기</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal default -->
+</body>
+
+</html>

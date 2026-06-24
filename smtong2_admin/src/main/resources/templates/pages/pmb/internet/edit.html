@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	 th:with="menuIdGroup ='04',menuId =${'03' + siteSp}">
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	<script type="text/javascript">
+
+	
+	document.addEventListener('DOMContentLoaded', () => {
+		var procMsg = "[[${procMsg}]]";
+		
+		if(procMsg!="" || procMsg !="") {
+			if(procMsg == "sucess") {
+				showAlert("저장되었습니다.",goList);
+			} else {
+				showAlert(procMsg);
+			}
+			
+		}
+	});
+	
+		
+	
+	
+		function saveData(procSp) {
+			
+			
+		if($("input[name='internetMnoId']:checked").val()==undefined) {
+			  showAlert("통신사를 선택해주세요.");
+			  return;
+		  }
+		  if($("input[name='internetSpeed']:checked").val()==undefined) {
+			  showAlert("인터넷을 선택해주세요.");
+			  return;
+		  }
+		  
+		  
+		  if($("#prodName").val()=="") {
+			  showAlert("상품명을 입력해주세요.");
+			  return;
+		  }
+		  
+		  if($("#normalPrice").val()=="") {
+			  showAlert("미결합금액을 입력해주세요.");
+			  return;
+		  }
+		  
+		  if($("#combinationPrice").val()=="") {
+			  showAlert("결합 금액을 입력해주세요.");
+			  return;
+		  }
+		  
+		  if($("#normalFreeblePrice").val()=="") {
+			  showAlert("미결합사은품을 입력해주세요.");
+			  return;
+		  }
+		  
+		  if($("#combinationFreeblePrice").val()=="") {
+			  showAlert("결합사은품을 입력해주세요.");
+			  return;
+		  }
+		  
+		  
+		  showConfirm( '저장 하시겠습니까?', () => {
+	                  saveProc();
+	              },
+	              () => {
+	                  
+	                  // 취소 시 실행할 로직
+	              },
+	              "인터넷 상품 저장"
+	        )
+	              
+		}
+		function saveProc() { 
+
+			$("#submitForm").submit();
+		}
+		
+		function refreshView(){
+			window.location.href="/pmb/internetreq/edit"+$("#siteSp").val()+"?searchId="+$("#reqId").val();
+		}
+		
+		function goList(){
+			window.location.href="/pmb/internetplan/list/"+$("#siteSp").val();
+		}
+	</script>
+		
+</th:block>
+
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="location mb-2">
+            <small class="text-secondary">
+                <i class="fas fa-home me-1"></i>
+                <a href="/mbm/adminuser/list">홈</a> > <a href="/pbm/plan/list">상품관리</a> > <a th:href="@{/pmb/internetplan/list/{siteSp}(siteSp=${siteSp})}">인터넷</a>
+            </small>
+        </div>
+        <h2 class="page-title fs-4 mb-4">
+            인터넷 상품 상세
+            <th:block th:if="${siteSp eq '01'}">(세모통)</th:block>
+			<th:block th:if="${siteSp eq '02'}">(오늘에통신)</th:block>
+        </h2>
+  		<form method="POST" id="submitForm" th:object="${record}" th:action="${record.id == null or record.id == 0} ? '/pmb/internetplan/create' : '/pmb/internetplan/update'">
+       		<input type="hidden" th:field="*{id}">
+       		<input type="hidden" id="siteSp"  name="siteSp" th:value="${siteSp}">
+	        <div class="search-section detail">
+	            <!-- 신청일시 -->
+	            <div class="form-row">
+	                <div class="form-label"> 최초 등록일 </div>
+	                <div class="form-control-wrap" th:text="${record.createDate}"> </div>
+	            </div>
+	  			<!-- 완료일시 -->
+	            <div class="form-row">
+	                <div class="form-label"> 최근 수정일 </div>
+	                <div class="form-control-wrap" th:text="${record.modifiedDate}"> </div>	                
+	            </div>
+	            
+				<!-- 상태 -->
+	            <div class="form-row full-width">
+	                <div class="form-label"> 상태 </div>
+	                <div class="form-check-group">
+						<div class="form-check">
+	                         <input class="form-check-input" type="radio" id="useYn01" name="useYn" th:checked="${record.useYn == 'Y' or record.useYn == null}" value="Y">
+	                         <label class="form-check-label" for="useYn01">노출</label>
+	                     </div>
+	                     <div class="form-check">
+	                         <input class="form-check-input" type="radio" id="useYn02" name="useYn" th:checked="${record.useYn == 'N'}" value="N">
+	                         <label class="form-check-label" for="useYn02">미노출</label>
+	                     </div>
+	                </div>
+	            </div>
+	            
+				<!-- 통신사 -->
+	             <div class="form-row full-width">
+	                <div class="form-label"> 통신사 </div>
+	                <div class="form-check-group">
+	                	 <th:block th:each="item,index : ${compnyList}">
+                           <div class="form-check form-check-inline">
+                               <input class="form-check-input" type="radio" name="internetMnoId" th:id="${'internetMnoId' + index.index}" 
+                               th:value="${item.id}" th:checked="${record.internetMnoId != null and record.internetMnoId == item.id}">
+                               <label class="form-check-label" th:for="${'internetMnoId' + index.index}" th:text="${item.name}">KG모바일</label>
+                           </div>
+                          </th:block>
+	                </div>
+	            </div>
+	            
+	            <!-- 인터넷 스피드 -->
+	            <div class="form-row full-width">
+	                <div class="form-label"> 인터넷 </div>
+	                <div class="form-check-group">
+						<div class="form-check">
+	                         <input class="form-check-input" type="radio" id="internetSpeed01" name="internetSpeed" th:checked="${record.internetSpeed == 'S100'}" value="S100">
+	                         <label class="form-check-label" for="internetSpeed01">100Mbps</label>
+	                     </div>
+	                     <div class="form-check">
+	                         <input class="form-check-input" type="radio" id="internetSpeed02" name="internetSpeed" th:checked="${record.internetSpeed == 'S160'}" value="S160">
+	                         <label class="form-check-label" for="internetSpeed02">160Mbps</label>
+	                     </div>
+	                      <div class="form-check">
+	                         <input class="form-check-input" type="radio" id="internetSpeed03" name="internetSpeed" th:checked="${record.internetSpeed == 'S200'}" value="S200">
+	                         <label class="form-check-label" for="internetSpeed03">200Mbps</label>
+	                     </div>
+	                      <div class="form-check">
+	                         <input class="form-check-input" type="radio" id="internetSpeed04" name="internetSpeed" th:checked="${record.internetSpeed == 'S500'}" value="S500">
+	                         <label class="form-check-label" for="internetSpeed04">500Mbps</label>
+	                     </div>
+	                      <div class="form-check">
+	                         <input class="form-check-input" type="radio" id="internetSpeed05" name="internetSpeed" th:checked="${record.internetSpeed == 'S1000'}" value="S1000">
+	                         <label class="form-check-label" for="internetSpeed02">1Gbps</label>
+	                     </div>
+	                </div>
+	            </div>
+	            
+	          	<!-- 상품명 -->
+	            <div class="form-row">
+	                <div class="form-label"> 상품명 <span class="required">*</span></div>
+	                <div class="form-control-wrap"><input type="text" class="form-control" placeholder="상품명 입력"  th:field="*{prodName}" maxlength="30"> </div>
+	            </div>
+	            <!-- TV 채널 -->
+	            <div class="form-row">
+	                <div class="form-label"> TV 채널 </div>
+	                <div class="form-control-wrap"><input type="text" class="form-control numberonly" placeholder="채널수 입력(숫자만 입력)"  th:field="*{channelCount}" maxlength="5"> </div>
+	            </div>   
+	            
+	          	<!-- 미결합 금액 -->
+	            <div class="form-row">
+	                <div class="form-label"> 미결합 금액 <span class="required">*</span> </div>
+	                <div class="form-control-wrap"><input type="text" class="form-control numberonly" placeholder="미결합 금액 입력(숫자만 입력)"  th:field="*{normalPrice}" maxlength="10"> </div>
+	            </div>
+	            <!-- 결합 금액 -->
+	            <div class="form-row">
+	                <div class="form-label"> 결합 금액  <span class="required">*</span></div>
+	                <div class="form-control-wrap"><input type="text" class="form-control numberonly" placeholder="결함금액 입력(숫자만 입력)"  th:field="*{combinationPrice}" maxlength="10"> </div>
+	            </div>  
+	            
+	           	<!-- 미결합 금액 -->
+	            <div class="form-row">
+	                <div class="form-label"> 미결합 사은품  <span class="required">*</span></div>
+	                <div class="form-control-wrap"><input type="text" class="form-control numberonly" placeholder="미결합 사은품 금액 입력(숫자만 입력)"  th:field="*{normalFreeblePrice}" maxlength="10"> </div>
+	            </div>
+	            <!-- 결합 금액 -->
+	            <div class="form-row">
+	                <div class="form-label"> 결합 사은품  <span class="required">*</span></div>
+	                <div class="form-control-wrap"><input type="text" class="form-control numberonly" placeholder="결합 사은품 입력(숫자만 입력)"  th:field="*{combinationFreeblePrice}" maxlength="10"> </div>
+	            </div>
+	            <!-- 강조 문구 -->
+	            <div class="form-row">
+	                <div class="form-label"> 강조 문구  </div>
+	                <div class="form-control-wrap"><input type="text" class="form-control" placeholder="강조문구 입력"  th:field="*{stressTxt}"> </div>
+	            </div>            
+      	  </div>
+        </form>
+        
+        <!-- 버튼 영역 -->
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="goList();">
+                목록
+            </button>
+            <button type="button" class="btn btn-lg btn-dark px-4 btn-sm" onclick="saveData();">
+                저장
+            </button>     
+        </div>
+    </div>
+</div>

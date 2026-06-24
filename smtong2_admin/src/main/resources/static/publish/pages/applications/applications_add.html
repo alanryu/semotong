@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>세모통</title>
+        <link
+            href="../../css/bootstrap.min.css"
+            rel="stylesheet">
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            rel="stylesheet">
+          <link
+            href="../../css/design.css"
+            rel="stylesheet">
+    </head>
+    <body>
+        <div class="sidebarWrapper">
+            <div class="left-sidebar">
+                <div class="admin-profile">
+                    <div class="profile-letter">A</div>
+                    <div>
+                        <div class="fw-semibold text-dark">관리자 - 아무개님</div>
+                        <small class="text-muted">UPDATE -<br> 2024-12-12 18:02</small>
+                    </div>
+                </div>
+                <ul class="menu-list">
+                    <!-- 계정권한관리 -->
+                    <li class="menu-item">
+                        <a href="../account/account.html" class="menu-link">
+                            <i class="fas fa-user-cog"></i>
+                            <span>계정권한관리</span>
+                        </a>
+                    </li>
+                    <!-- 회원관리 -->
+                    <li class="menu-item">
+                        <a href="../members/members.html" class="menu-link">
+                            <i class="fas fa-users"></i>
+                            <span>회원관리</span>
+                        </a>
+                    </li>
+                    <!-- 입점사관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="#" class="menu-link">
+                            <i class="fas fa-building"></i>
+                            <span>입점사관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                                <a href="../business/list.html" class="submenu-link">사업자 목록</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../business/manage.html" class="submenu-link">입점사 관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 상품관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="#" class="menu-link">
+                            <i class="fas fa-box"></i>
+                            <span>상품관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item ">
+                                <a href="../product/rateplan.html" class="submenu-link">요금제</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../product/scraping.html" class="submenu-link">스크래핑 관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="javascript:;" class="submenu-link">인터넷</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 신청관리 -->
+                    <li class="menu-item has-submenu active open">
+                        <a href="../applications/applications.html" class="menu-link">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>신청관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item ">
+                                <a href="../product/rateplan.html" class="submenu-link">요금제 신청내역</a>
+                            </li>
+                            <li class="submenu-item active">
+                                <a href="../product/internet.html" class="submenu-link">인터넷 신청내역</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 정산관리 -->
+                    <li class="menu-item">
+                        <a href="../settlements/settlements.html" class="menu-link">
+                            <i class="fas fa-calculator"></i>
+                            <span>정산관리</span>
+                        </a>
+                    </li>
+                    <!-- 서비스관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="../services/services.html" class="menu-link">
+                            <i class="fas fa-cog"></i>
+                            <span>서비스관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                                <a href="../services/services.html" class="submenu-link">배너관리</a>
+                                <ul class="subsubmenu">
+                                    <li><a href="../services/services.html" class="submenu-link ">메인</a></li>
+                                    <li><a href="../services/services_combination.html" class="submenu-link">결합</a></li>
+                                    <li><a href="../services/services_chatbot.html" class="submenu-link">챗봇</a></li>
+                                </ul>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/board.html" class="submenu-link">게시판관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/member.html" class="submenu-link">회원관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/event.html" class="submenu-link">이벤트관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/tax.html" class="submenu-link">세무통설명서관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/after.html" class="submenu-link">후기관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/quality.html" class="submenu-link">질문진단보관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/chat.html" class="submenu-link">챗봇관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/portfolio.html" class="submenu-link">포트폴리오관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <button class="toggle-sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+
+        <div class="main-content">
+            <div class="container-fluid">
+                <div class="page-header  d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="location mb-2">
+                            <small class="text-secondary">
+                                <i class="fas fa-home me-1"></i>
+                                <a href="javascript:;">홈</a>
+                                >
+                                <a href="javascript:;">신청 관리</a>
+                                >
+                                <a href="../applications/applications.html">인터넷 신청내역</a>
+                            </small>
+                        </div>
+                        <h2 class="page-title fs-4 mb-4">
+                            인터넷 신청내역 상세
+                        </h2>
+                    </div>
+                </div>
+
+                <!-- Modal 팝업 -->
+                <div class="modal fade" id="businessSelectModal" tabindex="-1" aria-labelledby="businessSelectModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header border-0 pb-0 mb-4">
+                                <h5 class="modal-title fs-6 fw-bold" id="businessSelectModalLabel">사업자 불러오기</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body pt-2 pb-4">
+                                <div class="form-row-modal">
+                                    <div class="form-label-modal">사업자</div>
+                                    <div class="form-control-wrap-modal">
+                                        <select class="form-select">
+                                            <option selected>사업자 선택</option>
+                                            <option>KG모바일</option>
+                                            <option>고고모바일</option>
+                                            <option>쉐이크모바일</option>
+                                            <option>아이즈모바일</option>
+                                            <option>에르엘</option>
+                                            <option>에이모바일</option>
+                                            <option>이치모바일</option>
+                                            <option>인스모바일</option>
+                                            <option>티플러스</option>
+                                            <option>프리티</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0 pt-0">
+                                <button type="button" class="btn btn-secondary px-4 btn-sm" data-bs-dismiss="modal btm-sm">취소</button>
+                                <button type="button" class="btn btn-dark px-4 btm-sm">확인</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <!-- 등록 폼 섹션 -->
+                <div class="search-section detail">
+                    <!-- 신청일시 -->
+                    <div class="form-row">
+                        <div class="form-label">
+                            신청일시
+                        </div>
+                        <div class="form-control-wrap">
+                            <input type="text" 
+                                class="form-control"
+                                value="2023.12.17-08:21"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <!-- 완료일시 -->
+                    <div class="form-row">
+                        <div class="form-label">
+                            완료일시
+                        </div>
+                        <div class="form-control-wrap">
+                            <input type="text" 
+                                class="form-control"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <!-- 신청자 -->
+                    <div class="form-row">
+                        <div class="form-label">
+                            신청자
+                        </div>
+                        <div class="form-control-wrap">
+                            <input type="text" 
+                                class="form-control"
+                                value="홍길동"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <!-- 전화번호 -->
+                    <div class="form-row">
+                        <div class="form-label">
+                            전화번호
+                        </div>
+                        <div class="form-control-wrap">
+                            <input type="text" 
+                                class="form-control"
+                                value="010-1234-1234"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <!-- 상태 -->
+                    <div class="form-row full-width">
+                        <div class="form-label">
+                            상태
+                        </div>
+                        <div class="form-control-wrap">
+                            <input type="text" 
+                                class="form-control"
+                                value="상담신청"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <!-- MNO -->
+                    <div class="form-row">
+                        <div class="form-label">
+                            MNO
+                        </div>
+                        <div class="form-control-wrap">
+                            <input type="text" 
+                                class="form-control"
+                                value="KT"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <!-- 인터넷 -->
+                    <div class="form-row">
+                        <div class="form-label">
+                            인터넷
+                        </div>
+                        <div class="form-control-wrap">
+                            <input type="text" 
+                                class="form-control"
+                                value="100Mbps"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <!-- 상품명 -->
+                    <div class="form-row">
+                        <div class="form-label">
+                            상품명
+                        </div>
+                        <div class="form-control-wrap">
+                            <input type="text" 
+                                class="form-control"
+                                value="인터넷+지니TV베이직"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <!-- TV채널 -->
+                    <div class="form-row">
+                        <div class="form-label">
+                            TV채널
+                        </div>
+                        <div class="form-control-wrap">
+                            <input type="text" 
+                                class="form-control"
+                                value="236채널"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <!-- 미결합금액 -->
+                    <div class="form-row">
+                        <div class="form-label">
+                            미결합금액
+                        </div>
+                        <div class="form-control-wrap">
+                            <input type="text" 
+                                class="form-control"
+                                value="37,400"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <!-- 결합금액 -->
+                    <div class="form-row">
+                        <div class="form-label">
+                            결합금액
+                        </div>
+                        <div class="form-control-wrap">
+                            <input type="text" 
+                                class="form-control"
+                                value="31,900"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <!-- 사은품 -->
+                    <div class="form-row full-width">
+                        <div class="form-label">
+                            사은품
+                        </div>
+                        <div class="form-control-wrap">
+                            <input type="text" 
+                                class="form-control"
+                                value="370,000"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <!-- 상담내용 -->
+                    <div class="form-row full-width">
+                        <div class="form-label">
+                            상담내용
+                        </div>
+                        <div class="form-control-wrap">
+                            <textarea class="form-control"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 처리내용 -->
+                    <div class="form-row full-width">
+                        <div class="form-label">
+                            처리내용
+                        </div>
+                        <div class="form-control-wrap">
+                            <textarea class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 버튼 영역 -->
+                <div class="d-flex justify-content-center gap-2 mt-4">
+                    <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm">
+                        취소
+                    </button>
+                    <button type="button" class="btn btn-lg btn-danger px-4 btn-sm" onclick="
+                            showConfirm(
+                            '변경된 내용은 되돌릴 수 없습니다.<br> 상태를 변경하시겠습니까?',
+                            () => {
+                                console.log('확인 클릭');
+                                // 확인 시 실행할 로직
+                            },
+                            () => {
+                                console.log('취소 클릭');
+                                // 취소 시 실행할 로직
+                            },
+                            '고객취소'
+                            )
+                    ">
+                        고객 취소
+                    </button>
+                    <button type="button" class="btn btn-lg btn-dark px-4 btn-sm" onclick="
+                            showConfirm(
+                            '변경된 내용은 되돌릴 수 없습니다.<br> 상태를 변경하시겠습니까?',
+                            () => {
+                                console.log('확인 클릭');
+                                // 확인 시 실행할 로직
+                            },
+                            () => {
+                                console.log('취소 클릭');
+                                // 취소 시 실행할 로직
+                            },
+                            '개통완료'
+                            )
+                    ">
+                        개통완료
+                    </button>
+                </div>
+
+                <!-- Confirm Modal -->
+                <div class="modal fade" id="commonConfirmModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                        <div class="modal-content">
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="modal-title fs-6 fw-bold">확인</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center pb-4" id="commonConfirmMessage">
+                            <!-- 메시지가 여기에 동적으로 들어갑니다 -->
+                        </div>
+                        <div class="modal-footer border-0 pt-0 justify-content-center">
+                            <button type="button" class="btn btn-secondary px-4 btn-sm" id="confirmModalCancelBtn">취소</button>
+                            <button type="button" class="btn btn-dark px-4 btn-sm" id="confirmModalConfirmBtn">확인</button>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            <script src="../../js/bootstrap.bundle.min.js"></script>
+            <script src="../../js/script.js"></script>
+        </body>
+    </html>

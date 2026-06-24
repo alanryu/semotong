@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='10'">
+	  
+<th:block layout:fragment="css">
+</th:block>
+
+<th:block layout:fragment="script">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script> 
+<script type="text/javascript">
+	
+	$(document).ready(function(){
+		searchResult();
+	})
+	
+	var currentPage = 1;
+	
+	function searchResult() {
+		
+		var params = {
+			  page : currentPage
+			, recordSize : 10
+			, searchEarningId : $('#id').val()
+		}
+		
+		$.ajax({
+			url 		: '/stl/earning/detailProc',
+			type 		: 'post',
+			dataType 	: 'json',
+			contentType : 'application/json',
+			data 		: JSON.stringify(params),
+			async 		: false,
+			success 	: function (data) {
+				
+				console.log(data);
+				
+				$('#listCount').html("총 " + data.totalCnt + "건");
+				
+				$('#list-area').empty();
+				
+				if(data.totalCnt == 0) {
+					//
+				} else {
+					
+					var totalCnt = data.totalCnt;
+					$.each(data.data, function(idx, obj){
+						var rIdx = totalCnt - ((params.page - 1) * params.recordSize + idx);
+						obj.rIdx = rIdx;
+					});
+					$('#earningDetailList').tmpl(data.data).appendTo('#list-area');
+				}
+				
+				renderPagination(params.page, data.totalCnt, params.recordSize);
+				$('.pagination').show();
+			},
+			error 		: function(request, status, error){
+				console.log(error);
+				alert(error);
+			},
+			complete 	: function(){
+			}
+		});
+	}
+	
+	function excelDownload() {
+		
+		var params = {
+			searchEarningId : $('#id').val()
+		}
+		
+		var _url = '/stl/earning/excelDownload';
+		
+		downloadExcelProc(params,_url,"earningDetailList");
+	}
+</script>
+
+<script id="earningDetailList" type="text/x-jquery-tmpl">
+	<tr>
+		<td>${rIdx}</td>
+		<td>${agencyName}</td>
+		<td>${appDate}</td>
+		<td>${openDate}</td>
+		<td>${mno}</td>
+		<td>${contractNum}</td>
+		<td>${accType}</td>
+		<td>${phoneNum}</td>
+		<td>${accName}</td>
+		<td>${planName}</td>
+		<td>${status}</td>
+	</tr>
+</script>
+</th:block>
+
+<div class="main-content">
+	
+	<div class="container-fluid">
+		<!-- 로케이션 & 제목 영역 추가 -->
+	    <div class="page-header mb-4">
+	        <div class="location mb-2">
+	            <small class="text-secondary">
+	                <i class="fas fa-home me-1"></i>
+	                <a href="javascript:;">홈</a>
+	                >
+	                <a href="javascript:;">실적 관리</a>
+	            </small>
+	        </div>
+	        <h2 class="page-title fs-4 mb-4"><span class="title-txt">실적</span>관리 상세</h2>
+	    </div>
+	    
+	    <div class="search-section">
+	        <div class="row g-3">
+	            <div class="col-6">
+	                <div class="form-row full-width mb-3">
+	                    <div class="form-label mb-0">실적 해당 월</div>
+	                    <div class="form-control-wrap flex-grow-1">
+	                        <input type="text" class="form-control" placeholder="" th:value="${entity.generateDate}" readonly style="min-width:auto">
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="col-6">
+	                <div class="form-row full-width mb-3">
+	                    <div class="form-label mb-0">등록일자</div>
+	                    <div class="form-control-wrap flex-grow-1">
+	                        <input type="text" class="form-control" placeholder="" th:value="${#temporals.format(entity.createDate, 'yyyy.MM.dd')}" readonly style="min-width:auto">
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	
+	        <div class="row g-3">
+	            <div class="col-6">
+	                <div class="form-row full-width mb-3">
+	                    <div class="form-label mb-0">입점사</div>
+	                    <div class="form-control-wrap flex-grow-1">
+	                        <input type="text" class="form-control" placeholder="" th:value="${entity.companyName}" readonly style="min-width:auto">
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="col-6">
+	                <div class="form-row full-width mb-3">
+	                    <div class="form-label mb-0">등록자</div>
+	                    <div class="form-control-wrap flex-grow-1">
+	                        <input type="text" class="form-control" placeholder="" th:value="${entity.createName}" readonly style="min-width:auto">
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    
+	    <!-- contents 영역 -->
+	    <div class="table-section">
+	    	<input type="hidden" id="id" th:value="${entity.id}"/>
+		    <div class="d-flex justify-content-between align-items-center mb-4">
+		    	<div class="d-flex align-items-center gap-3">
+					<div class="stats-badge">
+    					<i class="fas fa-calculator me-1"></i>
+    					<span id="listCount"></span>
+					</div>
+                </div>
+                <div class="header-actions">
+                	<button class="btn btn-primary btn-sm" onClick="excelDownload()">
+                        <i class="fas fa-list"></i>
+                        내역 다운로드
+                    </button>
+                </div>
+		    </div>
+		    
+		    <table class="table custom-table">
+	            <thead>
+	                <tr>
+	                    <th>No</th>
+	                    <th>신청대리점</th>
+	                    <th>신청일</th>
+	                    <th>개통일</th>
+	                    <th>통신망</th>
+	                    <th>계약번호</th>
+	                    <th>가입유형</th>
+	                    <th>가입자 번호</th>
+	                    <th>가입자</th>
+	                    <th>요금제(상품)</th>
+	                    <th>상태</th>
+	                </tr>
+	            </thead>
+	            <tbody id="list-area">
+	            </tbody>
+	        </table>
+	        
+	        <div class="d-flex justify-content-between mt-4 align-items-start">
+                <ul class="pagination"></ul>
+                <button class="btn btn-dark btn-sm" onClick="location.href='/stl/earning/list'">
+                	목록으로 이동
+           		</button>
+            </div>
+	    </div>
+	</div>
+</div>

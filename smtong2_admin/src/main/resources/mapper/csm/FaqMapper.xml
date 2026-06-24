@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.csm.mapper.FaqMapper">
+
+	<sql id="listWhere">
+		<where>
+			<if test='displayYn != null and displayYn !=""'>
+				AND a.display_yn = #{displayYn}
+			</if>
+			
+			<if test='categoryId != null and categoryId !=""'>
+				AND a.faq_category = #{categoryId}
+			</if>
+ 		<!-- 기간 조회-->
+          <if test='searchStartDt != null and searchStartDt !=""'>
+              AND a.create_date  <![CDATA[>=]]> #{searchStartDt}
+          </if>
+          <if test='searchEndDt != null and searchEndDt !=""'>
+              AND a.create_date <![CDATA[<=]]> #{searchEndDt}
+          </if>
+          
+	         <if test='keyword != null and keyword !=""'>
+	    		AND (b.user_name LIKE CONCAT('%', #{keyword}, '%') OR a.inquiry LIKE CONCAT('%', #{keyword}, '%'))
+	    	</if> 
+						
+		</where>
+	</sql>
+	
+	<sql id="Base_Column_list">
+		a.id
+		,a.faq_category
+		,a.inquiry
+		,a.ans_content
+		,a.display_yn
+		,a.create_date
+		,a.create_id
+		,a.modified_date
+		,a.modified_id
+		,b.user_name AS createNm
+		,c.user_name AS modifiedNm
+		,d.code_name AS faqCategoryNm
+
+	</sql>
+	
+	<select id="getListFaq" parameterType="kr.co.ucomp.web.csm.dto.FaqSearchDto" resultType="kr.co.ucomp.web.csm.entity.FaqEntity">
+		  SELECT
+	            <include refid="Base_Column_list" />
+	        FROM 
+			tb_csm_faq_list a 
+			LEFT JOIN tb_mbm_admin_user b ON a.create_id = b.id
+			LEFT JOIN tb_mbm_admin_user c ON a.modified_id = c.id
+			LEFT JOIN tb_cmm_code d ON a.faq_category = d.code
+			AND d.code_group='faq_cate'
+	        <include refid="listWhere" />
+	        ORDER BY a.id DESC
+	        LIMIT #{offset}, #{recordSize}
+
+	</select>
+
+	<select id="getListFaqCount" parameterType="kr.co.ucomp.web.csm.dto.FaqSearchDto" resultType="long">
+		  SELECT
+	            count(1)
+	        FROM 
+			tb_csm_faq_list a 
+			LEFT JOIN tb_mbm_admin_user b ON a.create_id = b.id
+			LEFT JOIN tb_mbm_admin_user c ON a.modified_id = c.id
+			LEFT JOIN tb_cmm_code d ON a.faq_category = d.code
+			AND d.code_group='faq_cate'
+	        <include refid="listWhere" />
+	</select>
+	
+	
+	<select id="getFaq" parameterType="Int" resultType="kr.co.ucomp.web.csm.entity.FaqEntity">
+		SELECT
+	            <include refid="Base_Column_list" />
+	        FROM 
+			tb_csm_faq_list a 
+			LEFT JOIN tb_mbm_admin_user b ON a.create_id = b.id
+			LEFT JOIN tb_mbm_admin_user c ON a.modified_id = c.id
+			LEFT JOIN tb_cmm_code d ON a.faq_category = d.code
+			AND d.code_group='faq_cate'
+	        WHERE a.id=#{id}
+	</select>
+	
+	<insert id="create"  parameterType="kr.co.ucomp.web.csm.entity.FaqEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+	
+	INSERT INTO tb_csm_faq_list (faq_category,inquiry,ans_content,display_yn,create_id,modified_id) 
+	VALUES(	#{faqCategory},
+			#{inquiry},
+			#{ansContent},
+			#{displayYn},
+			#{createId},
+			#{modifiedId}
+	);
+	
+	
+	</insert>
+	
+	<update id="update"  parameterType="kr.co.ucomp.web.csm.entity.FaqEntity" >
+	UPDATE tb_csm_faq_list SET modified_id=#{modifiedId},
+				<if test='inquiry != null and inquiry !=""'> 
+					inquiry=#{inquiry}, 
+				</if>
+				<if test='ansContent != null and ansContent !=""'>
+					ans_content=#{ansContent}, 
+				</if>
+				<if test='faqCategory != null and faqCategory !=""'>
+					faq_category=#{faqCategory}, 
+				</if>
+				<if test='displayYn != null and displayYn !=""'>
+					display_yn=#{displayYn}, 
+				</if>
+				modified_date=NOW()
+	WHERE id=#{id};
+	
+	</update>
+	
+	<delete id="delFaq" parameterType="Int">
+		DELETE FROM tb_csm_faq_list
+	    WHERE id=#{id}
+	</delete>
+</mapper>

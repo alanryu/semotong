@@ -1,0 +1,112 @@
+plugins {
+	id 'java'
+	id 'war'
+	id 'org.springframework.boot' version '3.3.3'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'kr.co.ucomp'
+version = '0.0.1-SNAPSHOT'
+apply plugin: 'war'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+	
+	
+	// redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.session:spring-session-data-redis'
+	
+	// Security & JWT
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    
+	//thymeleaf
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+	
+	
+    // MyBatis
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+	implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
+	
+    // Database
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    
+    	
+	// Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+	
+	
+	// Excel �옉�뾽�슜
+    implementation 'org.apache.poi:poi:5.2.3'          
+    implementation 'org.apache.poi:poi-ooxml:5.2.3' 
+    
+    //Jasypt 
+    implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'// jasypt
+    
+    // Utilities
+    implementation 'org.modelmapper:modelmapper:3.0.0'
+    implementation 'org.apache.commons:commons-lang3:3.17.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+	
+	 // Apache HttpClient 5 (client5)
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.3'
+    // Apache HttpCore
+    implementation 'org.apache.httpcomponents.core5:httpcore5:5.3'
+    
+    // Dev Tools
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	
+	// coocon card cert
+	// implementation fileTree(dir:'/src/main/resources/lib',includes:['*.jar']) 
+    // 由щ늼�뒪�뿉�꽌 �긽��寃쎈줈 �씤�떇�쑝濡� �씤�븳 �닔�젙
+    implementation fileTree(dir: 'src/main/resources/lib', include: ['*.jar'])
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.4'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	
+	implementation 'org.apache.commons:commons-text:1.13.0'
+	
+}
+
+tasks.named('bootRun') {
+    systemProperty 'spring.profiles.active', System.getenv('SPRING_PROFILES_ACTIVE') ?: 'local'
+    doFirst {
+        println "BootRun with active profile: ${System.getenv('SPRING_PROFILES_ACTIVE') ?: 'local'}"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    // �솚寃� 蹂��닔 �삉�뒗 紐낅졊以� �씤�닔�뿉�꽌 媛��졇�삤湲�
+    systemProperty 'spring.profiles.active', System.getenv('SPRING_PROFILES_ACTIVE') ?: 'local'
+    doFirst {
+        println "Running tests with active profile: ${System.getenv('SPRING_PROFILES_ACTIVE') ?: 'local'}"
+    }
+}
+
+bootWar {
+    archiveBaseName = "ROOT"
+    archiveFileName = "ROOT.war"
+    archiveVersion= "0.0.0"
+}

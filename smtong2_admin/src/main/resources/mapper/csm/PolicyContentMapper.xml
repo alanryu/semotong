@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.csm.mapper.PolicyContentMapper">
+	<sql id="listWhere">
+		<if test="keyword != null and keyword != ''">
+			AND content LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		<if test="searchStatus != null and searchStatus != ''">
+			AND disp_yn = #{searchStatus}
+		</if>
+		<if test="searchPolSp != null and searchPolSp != ''">
+			AND content_category = #{searchPolSp}
+		</if>
+	</sql>
+	<sql id="Base_Column_list">
+		id
+		,title
+		,content
+		,content_category
+		,app_date
+		,disp_yn
+		,create_date
+		,create_id
+		,modified_date
+		,modified_id
+		,GET_ADMIN_USER_NM(create_id) as createNm
+		,GET_ADMIN_USER_NM(modified_id) as modifiedNm	
+				
+	</sql>
+	
+	<select id="getList" parameterType="kr.co.ucomp.web.csm.dto.PolicyContentSearchDto" resultType="kr.co.ucomp.web.csm.entity.PolicyContentEntity">
+		  SELECT
+	            <include refid="Base_Column_list" />
+							
+	        FROM
+	            tb_csm_policy_content
+	        WHERE 1=1
+	        <include refid="listWhere" />
+	        ORDER BY id DESC
+	        LIMIT #{offset}, #{recordSize}
+
+	</select>
+
+	<select id="getListCount" parameterType="kr.co.ucomp.web.csm.dto.PolicyContentSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+	       FROM
+           tb_csm_policy_content 
+	        WHERE 1=1
+	        <include refid="listWhere" />
+	</select>
+	
+	
+	<select id="getDetail" parameterType="int" resultType="kr.co.ucomp.web.csm.entity.PolicyContentEntity">
+		SELECT
+	            <include refid="Base_Column_list" />
+	        FROM
+           	tb_csm_policy_content
+	        WHERE id=#{id}
+	</select>
+
+	
+	<insert id="create"  parameterType="kr.co.ucomp.web.csm.entity.PolicyContentEntity"  useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+	
+	INSERT INTO tb_csm_policy_content (title, content, content_category, app_date,disp_yn, create_id, modified_id)
+	VALUES(#{title},
+			#{content},
+			#{contentCategory},
+			#{appDate},
+			#{dispYn},
+			#{createId},
+			#{modifiedId}
+	);
+	</insert>
+	
+	<update id="update"  parameterType="kr.co.ucomp.web.csm.entity.PolicyContentEntity" >
+	UPDATE tb_csm_policy_content SET
+			modified_id=#{modifiedId},
+			<if test="title != null and title != ''"> 
+				title=#{title}, 
+			</if>
+			<if test="content != null and content != ''">
+				content=#{content}, 
+			</if>
+			<if test="contentCategory != null and contentCategory != ''">
+				content_category=#{contentCategory}, 
+			</if>
+			<if test="appDate != null and appDate != ''">
+				app_date=#{appDate},
+			</if>
+			<if test="dispYn != null and dispYn != ''">
+				disp_yn=#{dispYn},
+			</if>
+				modified_date = Now()
+	WHERE id=#{id};
+	
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		DELETE FROM tb_csm_policy_content
+	    WHERE id=#{id}
+	</delete>
+</mapper>

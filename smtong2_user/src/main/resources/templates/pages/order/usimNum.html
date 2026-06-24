@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/order_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='약관동의'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ 
+ <script>
+	
+	
+	$( document ).ready(function() {
+		var companyId = $("#companyId").val();
+		// 쉐이크 모바일 따로 적용
+		if(companyId =="22") {
+			$("#dvUsimBuy").show();
+		}
+	   
+	});
+	
+	function chkInputValid() {
+		$('#btnNext').attr('disabled', 'disabled');
+		$('#txtUsimNum').val($('#txtUsimNum01').val()+$('#txtUsimNum02').val()+$('#txtUsimNum03').val()+$('#txtUsimNum04').val()+$('#txtUsimNum05').val())
+		var txtUsimNumLength = $('#txtUsimNum').val().length;
+		
+		var companyId = $("#companyId").val();
+		if(companyId =="22") {
+			var usimBuy = $("#usimBuy").val();
+			if(txtUsimNumLength > 8 && usimBuy !="") {
+				$('#btnNext').removeAttr("disabled");		
+			}
+			
+		} else {
+			if(txtUsimNumLength > 8) {
+				$('#btnNext').removeAttr("disabled");		
+			}			
+		}
+		
+		
+
+	}
+	
+	
+	function setUsimNum() {
+		var _txtUsimNum = $('#txtUsimNum').val();
+		if(_txtUsimNum.indexOf("F") ==-1) _txtUsimNum = _txtUsimNum + "F";
+		$("#usimModelNm").val( _txtUsimNum.substr(0,5));
+		$("#usimSerialNum").val( _txtUsimNum);
+		moveNextOrder('/order/indentifyCert');
+	}
+	
+	
+	
+	
+	function selUsimBuy(sp,element) {
+		
+		$('#selUsimBuyList li').removeClass('is-selected');
+	    $(element).addClass('is-selected');
+	    
+	    
+	    if (!$('#spUsimBuyNm').hasClass('partner-option')) {
+		    $('#spUsimBuyNm').addClass('partner-option');
+		}
+		_html = '<strong class="partner-name">'+sp+'</strong>';
+		$('#spUsimBuyNm').html(_html);
+		
+	    
+		$("#usimBuy").val(sp);
+		chkInputValid();
+	}
+ </script>
+</th:block>
+
+<!-- Container -->
+<main role="main" class="container">
+<th:block th:include="pages/order/incOrderForm :: orderFormFragment"></th:block>
+<!-- content -->
+			<div class="content F-QU-page F-QU01-07-01-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">유심 정보를 적어주세요.</h2>
+						</div>
+						<div class="sec-body">
+							<!-- 유심카드 -->
+							 <div class="usim-image">
+								<img src="/images/common/img-usim-demo.png" alt="">
+							 </div>
+							<!-- //유심카드 -->
+							<!-- 등록폼 -->
+							<div class="basic-frm">
+							
+								<!-- 전화번호 입력 -->
+								<div class="frm-field" id="dvUsimBuy" style="display:none">
+									<div class="frm-title">
+										<label for="btUsimBuy" class="tit">유심구매처</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-sel">
+											<button type="button" id="btUsimBuy" class="sel is-placeholder" role="combobox" aria-haspopup="listbox" data-bs-toggle="modal" data-bs-target="#FQU0106P01Modal">
+												<span id="spUsimBuyNm">유심구매처를 선택해 주세요.</span>
+												<i class="ui-icn icn-20-select-arw" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+								</div>							
+								<!-- 일련번호 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmTitle" class="tit">일련번호</label>
+									</div>
+									<div class="frm-content">
+										<div class="frm-group type-serial">
+											<input type="hidden" id="txtUsimNum">
+											<div class="ui-inp ">
+												<input type="tel" id="txtUsimNum01" value="" placeholder="0000" title="" class="inp" oninput="chkInputMax(this,'txtUsimNum02');chkInputValid();" maxlength="4"/>
+											</div>
+											<div class="ui-inp">
+												<input type="tel" id="txtUsimNum02" value="" placeholder="0000" title="" class="inp" oninput="chkInputMax(this,'txtUsimNum03');chkInputValid();" maxlength="4"/>
+											</div>
+											<div class="ui-inp">
+												<input type="tel" id="txtUsimNum03" value="" placeholder="0000" title="" class="inp" oninput="chkInputMax(this,'txtUsimNum04');chkInputValid();" maxlength="4"/>
+											</div>
+											<div class="ui-inp">
+												<input type="tel" id="txtUsimNum04" value="" placeholder="0000" title="" class="inp" oninput="chkInputMax(this,'txtUsimNum05');chkInputValid();" maxlength="4"/>
+											</div>
+											<div class="ui-inp">
+												<input type="tel" id="txtUsimNum05" value="" placeholder="000F" title="" class="inp" oninput="chkInputMax(this,'');chkInputValid();" maxlength="4"/>
+											</div>
+										</div>
+									</div>
+									<!-- 2025-02-26 조찬기 : 일련번호 안내 추가 -->
+									<!-- 일련번호 안내 -->
+									<div class="help-msg">
+										<p class="help-msg-tit">
+											<i class="ui-icn icn-16-info-gr" aria-hidden="true"></i>
+											<span>아래의 가이드에 따라 전체 유심번호를 등록해주세요.</span>
+										</p>
+										<ul class="help-msg-list">
+											<li><em>SKT : </em> 유심 우측 하단에 있는 일련번호 끝 14자리</li>
+											<li><em>KT : </em> 유심 우측 하단에 있는 일련번호 끝자리(F)를 포함한 20자리</li>
+											<li><em>LG U : </em> 유심 우측 하단에 있는 모델명(영문, 숫자 포함)과 일련번호 12~15자리</li>
+											<li><em>그 외 : </em> 노출된 일련번호 모두 입력(영문, 숫자 포함)</li>
+										</ul>
+									</div>
+									<!-- //일련번호 안내 -->
+								</div>
+								<!-- // 일련번호 입력 -->
+								
+							</div>
+							<!-- // 등록폼 -->
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" disabled id="btnNext" onclick="setUsimNum();">
+							<span>다음</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 페이지 섹션 -->
+			</div>
+			<!-- // content -->
+</main>
+
+
+	<div class="modal modal-select fade" id="FQU0106P01Modal" tabindex="-1" role="dialog" aria-labelledby="FQU0106P01ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FQU0106P01ModalLabel">통신사</h3>
+					<!-- 닫기버튼은 CSS로 숨기고 필요시 활성화 예정 -->
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 콤보박스 섹션 -->
+					<section class="select-sec">
+						<div class="sec-inner">
+							<!-- modal-select 공통 -->
+							<ul class="select-listbox" role="listbox" id="selUsimBuyList">
+								<!-- 이미 선택목록이 있는 경우 class="is-selected" 추가 -->
+								<li role="option" tabindex="0" data-bs-dismiss="modal"  onclick="selUsimBuy('11번가',this)">11번가</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal"  onclick="selUsimBuy('네이버',this)">네이버</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal"  onclick="selUsimBuy('롯데ON',this)">롯데ON</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal"  onclick="selUsimBuy('쉐이크모바일',this)">쉐이크모바일</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal"  onclick="selUsimBuy('옥션',this)">옥션</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal"  onclick="selUsimBuy('위메프',this)">위메프</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal"  onclick="selUsimBuy('이마트24',this)">이마트24</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal"  onclick="selUsimBuy('쿠팡',this)">쿠팡</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal"  onclick="selUsimBuy('바로배송',this)">티몬</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal"  onclick="selUsimBuy('CU',this)">CU</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal"  onclick="selUsimBuy('GS25',this)">GS25</li>
+								<li role="option" tabindex="0" data-bs-dismiss="modal"  onclick="selUsimBuy('SSG',this)">SSG</li>SSG
+							</ul>
+						</div>
+					</section>
+					<!-- // 콤보박스 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 정렬 modal select -->
+	
+	
+</html>

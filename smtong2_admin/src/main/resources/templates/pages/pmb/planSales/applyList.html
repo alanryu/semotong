@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='08',menuId ='01'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script> 
+
+	<script id="searchlistTmpl" type="text/x-jquery-tmpl">
+		<tr>
+			<!-- 번호 -->
+			<td>${rIdx}</td>
+			<td>${orderStateNm}</td>
+			<td>{{if entrType =='01'}} 신규가입 {{else}} 번호이동{{/if}}</td>
+			<td><a href="/pmb/plan-sales/applyDetail?orderId=${id}">{{html listView('name',orderNm)}}</a> </td>
+			<td>{{html listView('phone',orderPhone)}}</td>
+			<td>${telecomCd}</td>
+			<td>${companyNm}</td>
+			<td><a href="/pmb/plan-sales/applyDetail?orderId=${id}">${planNm}</a></td>
+			<td>${recomUserAdminId}</td>
+			<td>{{if pointPlanYn}} Y {{else}} N{{/if}}</td>
+			<td>{{html strDttmToStringDash(orderDttm)}}</td>
+			<td>${openCompDttm}</td>
+		</tr>
+	</script>
+ <!-- index.html 고유 스크립트 추가 -->
+	
+	 <script type="text/javascript">
+	 	$(document).ready(function(){
+	 		$.data(document, "currentPage", 1);
+	 		var authType = "[[${session.loginUser.authType}]]";
+	 		searchList();
+	 	})
+	 	
+	 	function listView(sp,val) {
+	 		var authType = "[[${session.loginUser.authType}]]";
+	 		if(authType =="SALES") {
+	 			if(sp =="name") {
+	 				val = maskName(val);
+	 			}
+				if(sp =="phone") {
+					val = maskPhoneNumber(val);
+	 			}
+	 		}
+	 		return val;
+	 	}
+	 	
+	 	function renderPage(page) {
+			currentPage = $.data(document, "currentPage", page);
+			searchList();
+		}
+	 	
+	 	function searchList() {
+	 		
+			var page = $.data(document, "currentPage");
+			if(page =="" || page == null) page =1;
+			var _recordSize =  parseInt($("#recordSize").val());
+			
+			var params = {
+				keyword : $("#keyword").val(),
+				searchOrderState : getCheckedCompanies("searchOrderState"),
+		 		searchStartDt : $("#searchStartDt").val(),
+		 		searchEndDt : $("#searchEndDt").val(),
+		 		searchBizPlanMngId : $('#id').val(),
+		 		page : page,
+		 		recordSize : _recordSize
+			}
+			
+			$.ajax({
+				url : '/pbm/order/ajaxList'
+				,type : 'POST'
+				,dataType : "json"
+				,contentType:"application/json"
+				,data : JSON.stringify(params)
+				,success: function (data) {
+					
+					$('#searchList').empty();
+					var totalCnt = data.totalCnt;
+					
+					if(totalCnt > 0) {
+						
+						$.each(data.data, function(idx, obj){
+							var rIdx = data.totalCnt - ((params.page - 1) * params.recordSize + idx);
+							obj.rIdx = rIdx;
+						});
+						
+						$('#searchlistTmpl').tmpl(data.data).appendTo('#searchList');
+					}
+					$('#totla_count').html("총 "+totalCnt+"건");
+					
+					renderPagination(page, totalCnt, _recordSize)
+				},
+				error : function(request, status, error){
+					alert(error);
+				},
+				complete:function(){
+					// $('#loading').addClass('display-none');
+				}
+			});
+		}
+	 	
+		function downloadExcel() {
+			var params = {
+				keyword : $("#keyword").val(),
+				searchOrderState : getCheckedCompanies("searchOrderState"),
+		 		searchStartDt : $("#searchStartDt").val(),
+		 		searchEndDt : $("#searchEndDt").val(),
+		 		searchBizPlanMngId : $('#id').val()
+			}
+			
+			var _url = '/pmb/plan-sales/applyExceldown';
+			
+			downloadExcelProc(params,_url,"planSalesApplyList");
+			
+		}
+	 </script>
+	 
+	 function changeCombo(){
+		currentPage = 1;
+		searchList()
+	}
+	
+</th:block>
+
+<div class="main-content">
+	<div class="container-fluid">
+		<div class="page-header mb-4">
+	        <div class="location mb-2">
+	            <small class="text-secondary">
+	                <i class="fas fa-home me-1"></i>
+	                <a href="javascript:;">홈</a> > <a href="javascript:;">영업관리</a> > <a href="javascript:;">영업상품 관리</a>
+	            </small>
+	        </div>
+	        <h2 class="page-title fs-4 mb-4">
+	            영업상품 신청내역
+	        </h2>
+	    </div>
+	    
+	    <!-- 영업자 정보 섹션 -->
+        <div class="salesmanInfo mb-4">
+            <div class="card border shadow-sm">
+                <div class="card-body p-0">
+                    <!-- 영업자 정보 컨텐츠 -->
+                    <div class="p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-secondary small">영업담당자</div>
+                                        <div class="fw-bold fs-5" th:text="${entity.adminId}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                                        <i class="fas fa-link text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-secondary small">접속 URL</div>
+                                        <a th:href="|https://www.smtong.co.kr${entity.url}|" class="text-primary fw-semibold text-decoration-none" target="_blank">
+                                            https://www.smtong.co.kr[[${entity.url}]]
+                                            <i class="fas fa-external-link-alt ms-2 small"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 검색 구간 -->
+		<div class="search-section">
+			<input type="hidden" id="id" th:value="${entity.id}"/>
+			<div class="col-12 mb-2">
+				<div class="form-row full-width">
+					<div class="form-label mb-0">검색어</div>
+					<div class="position-relative col-9">
+						<i class="fas fa-search position-absolute" style="left: 16px; top: 15.5px; color: #94a3b8;"></i>
+						<input type="text" class="form-control ps-5" placeholder="검색어를 입력하세요" id="keyword" name="keyword">
+					</div>
+				</div>
+			</div>
+			 <!-- 상태 구분 -->
+             <div class="form-row full-width mb-3">
+                 <div class="form-label mb-0">상태 구분</div>
+                 <div class="form-control-wrap">
+                     <div class="form-check-group">
+                         <div class="form-check">
+                             <input class="form-check-input" type="radio" name="searchOrderState" id="searchOrderStateALL" value="" checked onclick="selstate('');" >
+                             <label class="form-check-label" for="searchOrderStateALL">전체</label>
+                         </div>
+                         <div class="form-check">
+                             <input class="form-check-input" type="radio" name="searchOrderState" id="searchOrderState00" value="00" onclick="selstate('00');">
+                             <label class="form-check-label" for="searchOrderState00">접수대기</label>
+                         </div>
+                         <div class="form-check">
+                             <input class="form-check-input" type="radio" name="searchOrderState" id="searchOrderState01" value="01" onclick="selstate('01');">
+                             <label class="form-check-label" for="searchOrderState01">접수</label>
+                         </div>
+                         <div class="form-check">
+                             <input class="form-check-input" type="radio" name="searchOrderState" id="searchOrderState02" value="02" onclick="selstate('02');">
+                             <label class="form-check-label" for="searchOrderState02">접수완료</label>
+                         </div>
+                          <div class="form-check">
+                             <input class="form-check-input" type="radio" name="searchOrderState" id="searchOrderState03" value="03" onclick="selstate('03');">
+                             <label class="form-check-label" for="searchOrderState03">배송중</label>
+                         </div>
+                          <div class="form-check">
+                             <input class="form-check-input" type="radio" name="searchOrderState" id="searchOrderState04" value="06" onclick="selstate('06');">
+                             <label class="form-check-label" for="searchOrderState04">개통완료</label>
+                         </div>
+                          <div class="form-check">
+                             <input class="form-check-input" type="radio" name="searchOrderState" id="searchOrderState05" value="99" onclick="selstate('99');">
+                             <label class="form-check-label" for="searchOrderState05">개통취소</label>
+                         </div>
+                         <div class="form-check">
+                             <input class="form-check-input" type="radio" name="searchOrderState" id="searchOrderState06" value="98" onclick="selstate('98');">
+                             <label class="form-check-label" for="searchOrderState06">개통불가</label>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+			<div class="row align-items-center mb-2">
+				<div class="form-row">
+					<div class="form-label mb-0">신청일</div>
+					<div class="d-flex align-items-center gap-3">
+						<div class="d-flex align-items-center gap-2">
+							<input type="date" class="form-control" style="width: 150px" id="searchStartDt">
+							<span class="text-secondary">-</span>
+							<input type="date" class="form-control" style="width: 150px" id="searchEndDt">
+						</div>
+						<div class="d-flex gap-2">
+							<button class="period-button" value="0">오늘</button>
+							<button class="period-button" value="7" id="defaultWeek">1주일</button>
+							<button class="period-button" value="30">1개월</button>
+							<button class="period-button" value="90">3개월</button>
+							<button class="period-button" value="180">6개월</button>
+							<button class="period-button" value="365">1년</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 검색 구간 -->
+
+			<div class="row">
+				<div class="col-12 text-end mt-2">
+					<button class="btn btn-primary btn-sm" onclick="searchList();">
+						<i class="fas fa-search"></i>
+						검색
+					</button>
+					<button class="btn btn-light me-2 btn-sm" onclick="toggleSearchInit()">
+						<i class="fas fa-redo"></i>
+						초기화
+					</button>
+				</div>
+			</div>
+		</div>
+		
+		<!-- contents 영역 -->
+		<div class="table-section">
+			<div class="d-flex justify-content-between align-items-center mb-4">
+				<div class="d-flex align-items-center gap-3">
+					<div class="stats-badge">
+						<i class="fas fa-calculator me-1"></i>
+						<span id="totla_count">총 450건</span>
+					</div>
+					<select class="form-select" style="width: 100px" id="recordSize" onchange="changeCombo()">
+						<option value="10">10개씩</option>
+						<option value="20">20개씩</option>
+						<option value="30">30개씩</option>
+						<option value="40">40개씩</option>
+						<option value="50">50개씩</option>
+					</select>
+				</div>
+								
+				<div class="header-actions">
+					<div class="custom-dropdown">
+						<button class="btn btn-success btn-sm">
+		                    <i class="fas fa-file-excel"></i>
+		                    엑셀 다운로드
+		                </button>
+					</div>
+				</div>
+			</div>
+			
+			<table class="table custom-table">
+				<thead>
+					<tr>
+					
+						<th>No</th>
+						<th>상태</th>
+						<th>가입유형</th>
+						<th>신청자</th>
+						<th>연락처</th>
+						<th>MNO</th>
+						<th>사업자</th>
+						<th>요금제</th>
+						<th>추천인</th>
+						<th>포인트<br>요금제</th>
+						<th>신청일</th>
+						<th>개통완료일</th>
+					</tr>
+				</thead>
+				<tbody id="searchList">
+				</tbody>
+			</table>
+			
+			<div class="d-flex justify-content-left mt-4">
+				<ul class="pagination">
+				</ul>
+			</div>
+		</div>
+		
+	</div>
+</div>
+
+</html>

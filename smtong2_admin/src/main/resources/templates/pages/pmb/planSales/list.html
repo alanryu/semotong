@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{common/layout/default_layout}"
+  layout:fragment="Content"
+  th:with="menuIdGroup ='08',menuId ='01'"
+>
+  <!-- index.html 고유 CSS 추가 -->
+  <th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+  </th:block>
+  <!-- index.html 고유 스크립트 추가 -->
+  <th:block layout:fragment="script">
+    <!-- index.html 고유 스크립트 추가 -->
+    <script id="searchListTmpl" type="text/x-jquery-tmpl">
+      <tr>
+      	<td>${id}</td>
+      	<td>${comUserNm}</td>
+      	<td><a href="/pmb/plan-sales/form?id=${id}">${title}</a></td>
+      	<td><a href="{{html getLinkUrl(url)}}" target="_blank">{{html getLinkUrl(url)}}</a></td>
+      	<td>
+      		<a href="javascript:urlCopyBtn('https://www.smtong.co.kr${url}')" class="btn btn-light btn-sm">
+                    	<i class="fa fa-copy"></i>
+                    </a>
+      	</td>
+      	<td>
+      		<div class="form-check form-switch mb-3">
+                    	<input class="form-check-input" type="checkbox" role="switch" {{if useYn == 1}}checked="true"{{/if}} style="transform: scale(1.5);" onclick="useYnProc('${id}', this)">
+                    </div>
+      	</td>
+      	<td>{{html getDateStr(createDate)}}</td>
+      	<td>
+      		<a href="#none;" class="btn btn-primary btn-sm" onclick="location.href='/pmb/plan-sales/apply?id=' + ${id}">
+                    	<i class="fas fa-list"></i>
+                        개통내역 보기
+                    </a>
+      		<a href="#none;" class="btn btn-primary btn-sm" onclick="location.href='/pmb/plan-sales/reqList?id=' + ${id}">
+                    	<i class="fas fa-list"></i>
+                        신청내역 보기
+                    </a>
+      	</td>
+      </tr>
+    </script>
+
+    <script type="text/javascript">
+      $(document).ready(function () {
+        searchList();
+      });
+
+      function getLinkUrl(url) {
+        var host = window.location.host;
+        var protocol = window.location.protocol + "//";
+
+        if (host.startsWith("tb")) {
+          host = "tb.smtong.co.kr";
+        } else if (host.startsWith("admin")) {
+          host = "www.smtong.co.kr";
+        } else {
+          host = "127.0.0.1:8080";
+        }
+
+        var res = protocol + host + url;
+
+        return res;
+      }
+
+      function renderPage(page) {
+        currentPage = page;
+        searchList();
+      }
+
+      function searchList() {
+        var params = {
+          page: currentPage,
+          recordSize: $("#pageSizse").val(),
+          keyword: $("#keyword").val(),
+          searchStartDt: $("#searchStartDt").val(),
+          searchEndDt: $("#searchEndDt").val(),
+          useYn: $("input[name=searchUseYn]:checked").val(),
+        };
+
+        $.ajax({
+          url: "/pmb/plan-sales/listProc",
+          type: "post",
+          dataType: "json",
+          contentType: "application/json",
+          data: JSON.stringify(params),
+          async: false,
+          success: function (data) {
+            $("#searchList").empty();
+
+            $("#totla_count").html("총 " + data.totalCnt + "건");
+            if (data.totalCnt > 0) {
+              $.each(data.data, function (idx, obj) {
+                var rIdx = data.totalCnt - ((params.page - 1) * params.recordSize + idx);
+                obj.rIdx = rIdx;
+              });
+
+              $("#searchListTmpl").tmpl(data.data).appendTo("#searchList");
+            }
+
+            renderPagination(params.page, data.totalCnt, params.recordSize);
+          },
+          error: function (request, status, error) {
+            alert(error);
+          },
+          complete: function () {},
+        });
+      }
+
+      function urlCopyBtn(url) {
+        var nowHost = url;
+        navigator.clipboard.writeText(nowHost).then((res) => {});
+      }
+
+      function changeCombo() {
+        $("#pageIdx").val("1");
+        searchList();
+      }
+
+      function useYnProc(id, element) {
+        var useYn = $(element).is(":checked") ? "Y" : "N";
+
+        $.ajax({
+          url: "/pmb/plan-sales/useYn",
+          type: "POST",
+          data: { id: id, useYn: useYn },
+          success: function (data) {
+            searchList();
+          },
+          error: function (request, status, error) {
+            alert(error);
+          },
+          complete: function () {},
+        });
+      }
+
+      /* 초기화 */
+      function toggleSearchInit() {
+        $("#keyword").val("");
+        $("input[name=searchUseYn]").eq(0).prop("checked", true);
+        $(".period-button").eq(1).trigger("click");
+      }
+
+      function downloadExcel() {
+        const authType = "[[${session.loginUser.authType}]]";
+        const id = "[[${session.loginUser.id}]]";
+        var params = {
+          page: $("#pageIdx").val(),
+          recordSize: $("#pageSizse").val(),
+          keyword: $("#keyword").val(),
+          searchStartDt: $("#searchStartDt").val(),
+          searchEndDt: $("#searchEndDt").val(),
+          useYn: $("input[name=searchUseYn]:checked").val(),
+          authType: authType,
+          comUserId: id,
+        };
+
+        var _url = "/pmb/plan-sales/exceldown";
+        downloadExcelProc(params, _url, "planSalesList");
+      }
+    </script>
+  </th:block>
+  <!-- list 템플릿 -->
+  <div class="main-content">
+    <div class="container-fluid">
+      <div class="page-header mb-4">
+        <div class="location mb-2">
+          <small class="text-secondary">
+            <i class="fas fa-home me-1"></i>
+            <a href="javascript:;">홈</a> > <a href="/pbm/plan/list">영업관리</a> > <a href="/pbm/plan/list">영업상품 관리</a>
+          </small>
+        </div>
+        <h2 class="page-title fs-4 mb-4">영업상품 관리</h2>
+      </div>
+
+      <div class="search-section">
+        <input type="hidden" id="pageIdx" value="1" />
+        <div class="col-12 mb-2">
+          <div class="form-row full-width">
+            <div class="form-label mb-0">검색어</div>
+            <div class="position-relative col-9">
+              <i class="fas fa-search position-absolute" style="left: 16px; top: 15.5px; color: #94a3b8"></i>
+              <input type="text" class="form-control ps-5" placeholder="검색어를 입력하세요" id="keyword" name="keyword" />
+            </div>
+          </div>
+        </div>
+
+        <div class="row align-items-center mb-3">
+          <div class="col-12">
+            <div class="d-flex align-items-center gap-3">
+              <div class="form-label mb-0">사용여부</div>
+              <div class="radio-group">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="searchUseYn" id="searchUseYn01" value="" checked />
+                  <label class="form-check-label" for="searchUseYn01">전체</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="searchUseYn" id="searchUseYn02" value="1" />
+                  <label class="form-check-label" for="searchUseYn02">사용</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="searchUseYn" id="searchUseYn03" value="0" />
+                  <label class="form-check-label" for="searchUseYn03">미사용</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row align-items-center mb-2">
+          <div class="form-row full-width">
+            <div class="d-flex align-items-center gap-3">
+              <div class="form-label mb-0">등록일</div>
+              <div class="d-flex align-items-center gap-2">
+                <input type="date" class="form-control" style="width: 150px" id="searchStartDt" />
+                <span class="text-secondary">-</span>
+                <input type="date" class="form-control" style="width: 150px" id="searchEndDt" />
+              </div>
+              <div class="d-flex gap-2">
+                <button class="period-button" value="0">오늘</button>
+                <button class="period-button" value="7">1주일</button>
+                <button class="period-button" value="30">1개월</button>
+                <button class="period-button" value="90">3개월</button>
+                <button class="period-button" value="180">6개월</button>
+                <button class="period-button" value="365">1년</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12 text-end mt-2">
+            <button class="btn btn-light me-2 btn-sm" onclick="toggleSearchInit()">
+              <i class="fas fa-redo"></i>
+              초기화
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="searchList();">
+              <i class="fas fa-search"></i>
+              검색
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="d-flex align-items-center gap-3">
+            <div class="stats-badge">
+              <i class="fas fa-calculator me-1"></i>
+              <span id="totla_count">총 450건</span>
+            </div>
+            <select class="form-select" style="width: 100px" id="pageSizse" onchange="changeCombo()">
+              <option value="10">10개씩</option>
+              <option value="20">20개씩</option>
+              <option value="30">30개씩</option>
+              <option value="40">40개씩</option>
+              <option value="50">50개씩</option>
+            </select>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary btn-sm" onclick="location.href='/pmb/plan-sales/form'">
+              <i class="fas fa-plus"></i>
+              상품등록
+            </button>
+            <button class="btn btn-success btn-sm" onclick="downloadExcel()">
+              <i class="fas fa-file-excel"></i>
+              엑셀 다운로드
+            </button>
+          </div>
+        </div>
+
+        <table class="table custom-table">
+          <colgroup>
+            <col width="50px" />
+            <col width="150px" />
+            <col width="auto" />
+            <col width="300px" />
+            <col width="80px" />
+            <col width="80px" />
+            <col width="150px" />
+            <col width="300px" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th>번호</th>
+              <th>영업자</th>
+              <th>제목</th>
+              <th>url</th>
+              <th>링크복사</th>
+              <th>사용여부</th>
+              <th>등록일</th>
+              <th>신청내역</th>
+            </tr>
+          </thead>
+          <tbody id="searchList"></tbody>
+        </table>
+
+        <div class="d-flex justify-content-left mt-4">
+          <ul class="pagination"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</html>

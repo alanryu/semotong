@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Swipers | 세모통 스타일가이드</title>
+	<meta http-equiv="X-UA-Compatible" content="ie=edge chrome=1" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="프로젝트가이드, 세모통 스타일가이드" />
+	<meta name="description" content="프로젝트가이드, 세모통 스타일가이드" />
+	<link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 인크루드 설정용도(개발적용안함) -->
+	<link rel="stylesheet" type="text/css" href="css/guide.css" /><!-- 가이드전용 -->
+</head>
+
+<body>
+	<div class="wrapper sub_page">
+		<!-- Header -->
+		<div data-include="include_header.html"></div>
+		<!-- // Header -->
+
+		<!-- Container -->
+		<div class="container">
+			<main id="content" class="content" role="main">
+				<div class="content-body">
+					<div class="out-sec in-sec">
+						<h1 class="g-h1">Swiper</h1>
+					</div>
+					<section class="g-section in-sec">
+						<div class="g-section-head">
+							<h2 class="g-h2">API</h2>
+						</div>
+						<div class="g-section-body">
+							<div class="g-tbl-area">
+								<div class="g-tbl-type1">
+									<table>
+										<caption></caption>
+										<colgroup>
+											<col style="width:300px">
+											<col>
+										</colgroup>
+										<tbody>
+											<tr>
+												<th scope="row" class="align_c" colspan="2">Default</th>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">initialSlide: 0</th>
+												<td>시작 슬라이드번호</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">speed: 300</th>
+												<td>속도</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">autoHeight: false</th>
+												<td>자동높이</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">roundLengths: true</th>
+												<td>텍스트가 흐리게 나오지 않도록 영역반올림</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">nested: true</th>
+												<td>중첩된 Swiper 이벤트차단 (부모와 방향이 같을때 사용)</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_c" colspan="2">Slides grid</th>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">spaceBetween: 0</th>
+												<td>간격</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">slidesPerView: 'auto'</th>
+												<td>슬라이드 노출개수</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">slidesPerGroup: 1</th>
+												<td>슬라이드 그룹개수</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">centeredSlides: false</th>
+												<td>모든슬라이드 센터모드</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">centeredSlidesBounds: false</th>
+												<td>좌우간격없는 센터모드</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">centerInsufficientSlides: false</th>
+												<td>slidesPerView보다 슬라이드개수가 부족할때 센터모드</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_c" colspan="2">Touches</th>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">touchRatio: 1</th>
+												<td>터치비율</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">simulateTouch: true</th>
+												<td>마우스사용 허용</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">followFinger: true</th>
+												<td>비활성화시 손가락을 놓았을땨만 반응함</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">allowTouchMove: true</th>
+												<td>다음/이전 버튼으로만 슬라이드 가능</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">threshold: 0</th>
+												<td>슬라이드가 반응하기 시작하는 터치 거리<br>
+													(Mac에서는 스와이프가 민감하여 링크 클릭시 먹통되므로 최소값을 5이상 줘야 함)
+												</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_c" colspan="2">Touch Resistance</th>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">resistance: true</th>
+												<td>내성 한계를 적용한다. (슬라이드가 처음이거나 끝일때)</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">resistanceRatio true</th>
+												<td>내성 저항비 적용</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_c" colspan="2">Clicks</th>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">slideToClickedSlide: true</th>
+												<td>클릭한 슬라이드로 전환됨</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_c" colspan="2">Progress</th>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">watchSlidesVisibility</th>
+												<td>보이는 슬라이드에 swipe-slide-visible 클래스가 적용됨</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_c" colspan="2">Observer</th>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">observer</th>
+												<td>슬라이드 영역이 변경될 경우 업데이트 됨</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">observeParents</th>
+												<td>부모 스와이프 영역이 변경될 경우 업데이트 됨</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">observeSlideChildren</th>
+												<td>자식 스와이프 영역이 변경될 경우 업데이트 됨</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_c" colspan="2">Thumbnails</th>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">thumbs: { }</th>
+												<td>
+													<xmp style="border:0; padding:0">swiper: 스와이퍼 이름</xmp>
+													<xmp style="border:0; padding:0">swiper: {
+														el: '.swiper-container-thumbs',
+														slidesPerView: 5,
+														}</xmp>
+												</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_c" colspan="2">Methods</th>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">slideNext()</th>
+												<td>mySwiper.slideNext(speed, runCallbacks); //다음 슬라이드 실행</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">slidePrev()</th>
+												<td>mySwiper.slidePrev(speed, runCallbacks); //이전 슬라이드 실행</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">slideTo()</th>
+												<td>mySwiper.slideTo(index, speed, runCallbacks); //지정 슬라이드 이동</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">updateAutoHeight()</th>
+												<td>mySwiper.updateAutoHeight(speed); //자동 높이 설정</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">update()</th>
+												<td>mySwiper.update(); //새로고침</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">destroy()</th>
+												<td>mySwiper.destroy(deleteInstance, cleanStyles); //초기화</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_c" colspan="2">Events</th>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">공통예시</th>
+												<td>
+													<xmp style="border:0; padding:0;">on: {
+														init: function({
+														실행
+														});
+														}</xmp>
+													mySwiper.on('init', function(){ 실행 });<br>
+													mySwiper.init(function(){ 실행 });
+												</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">slideChangeTransitionStart</th>
+												<td>에니메이션 시작시 이벤트가 다른 슬라이드로 시작됨</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">slideChangeTransitionEnd</th>
+												<td>에니메이션 종료후 이벤트가 다른 슬라이드로로 시작됨</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">resize</th>
+												<td>창 리사이즈시</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">observerUpdate</th>
+												<td>영역의 사이즈가 변경될 시</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">init</th>
+												<td>스와이프 로드시</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_c" colspan="2">Components</th>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">navigation: { }</th>
+												<td>
+													<xmp style="border:0; padding:0;">nextEl: '.swiper-button-next',
+														//다음 슬라이드
+														prevEl: '.swiper-button-prev', //이번 슬라이드
+													</xmp>
+												</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l" rowspan="4">pagination: { }</th>
+												<td>
+													기본옵션
+													<xmp style="border:0; padding:0;">el: '.swiper-pagination',
+														type: 'bullets',
+														clickable: false,
+													</xmp>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													사용자정의 1
+													<xmp style="border:0; padding:0;">renderBullet: function (index,
+														className) {
+														return '<span class="' + className + '">' + (index + 1) +
+															'</span>';
+														}
+													</xmp>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													사용자정의 2
+													<xmp style="border:0; padding:0;">renderFraction: function
+														(currentClass, totalClass) {
+														return '<span class="' + currentClass + '"></span>' + ' of ' +
+														'<span class="' + totalClass + '"></span>';
+														}
+													</xmp>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													사용자정의 3
+													<xmp style="border:0; padding:0;">renderCustom: function (swiper,
+														current, total) {
+														return current + ' of ' + total;
+														}
+													</xmp>
+												</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_c" colspan="2">Autoplay</th>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">autoplay: {}</th>
+												<td>delay: 5000 //지연시간</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">mySwiper.autoplay.start()</th>
+												<td>자동 재생 시작</td>
+											</tr>
+											<tr>
+												<th scope="row" class="align_l">mySwiper.autoplay.stop()</th>
+												<td>자동 재생 중지</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</section>
+				</div>
+			</main>
+		</div>
+		<!-- // Container -->
+
+		<!-- Footer (include_footer.html) -->
+		<div data-include="include_footer.html"></div>
+		<!-- // Footer -->
+	</div>
+</body>
+
+</html>

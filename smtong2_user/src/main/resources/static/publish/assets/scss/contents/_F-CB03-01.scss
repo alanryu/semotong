@@ -1,0 +1,43 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 통신사 선택
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 통신사 선택 페이지
+.F-CB03-01-page {
+	// s: 모통봇 소개 섹션
+	.cb-intro-sec {
+		@include cb-intro-sec;
+	}
+	// e: 모통봇 소개 섹션
+
+	// s: 챗봇 설문 섹션
+	.cb-survey-sec {
+		margin-top: 40rem;
+
+		// 설문 리스트
+		.survey-list {
+			@include survey-list;
+
+			.survey-rdo .rdo.type-icn > span {
+				font-weight: 500;
+			}
+		}
+	}
+	// e: 챗봇 설문 섹션
+
+	// s: 이벤트 섹션
+	.cb-event-sec {
+		margin-top: 28rem;
+
+		.event-swiper {
+			@include event-swiper;
+		}
+
+		.event-bnr {
+			@include event-bnr;
+		}
+	}
+	// e: 이벤트 섹션
+}
+// e: 통신사 선택 페이지

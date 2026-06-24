@@ -1,0 +1,157 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 파트너사 상세
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 파트너사 상세 페이지
+.F-O01-page {
+
+	// 페이지여백
+	padding-top: 20rem;
+	@include bottom-spacer;
+
+	// s: 파트너사 섹션
+	.partner-detail-sec {
+		margin-bottom: 16rem;
+		.partner-detail-card {
+			padding: 16rem 18rem;
+			border-radius: 6rem;
+			border:2px solid $color-primary;
+
+			.card-label {
+				width: 100%;
+				margin-bottom: 4rem;
+
+				.label {
+					display: inline-flex;
+					padding: 3rem 8rem;
+					font-weight: 600;
+					font-size: 12rem;
+					line-height: 16rem;
+					color: #fff;
+					border-radius: 6rem;
+					&.type-sk {
+						background-color: #3617CE;
+					}
+					&.type-kt {
+						background-color: #EC1B23;
+					}
+					&.type-lg {
+						background-color: #D0006F;
+					}
+				}
+			}
+
+			.card-partner {
+				display: flex;
+				align-items: center;
+				.partner-logo {
+					display: flex;
+					height: 32rem;
+					img {
+						height: 100%;
+					}
+				}
+				.partner-sat {
+					display: inline-flex;
+					align-items: center;
+					margin-left: auto;
+					padding: 4rem 8rem;
+					gap: 2rem;
+					font-weight: 600;
+					font-size: 14rem;
+					line-height: 20rem;
+					color: #5A5D60;
+					background-color: #EFF0F0;
+					border-radius: 20rem;
+					.ui-icn {
+						top: -1rem;
+					}
+				}
+			}
+		}
+	}
+	// e: 파트너사 섹션
+
+	// s: 기본정보 섹션
+	.partner-info-sec {
+		@include tab-sec-basic;
+		margin-top: 0;
+
+		.partner-info {
+			dt {
+				margin-top: 12rem;
+				font-weight: 600;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #828588;
+				&:first-child {
+					margin-top: 0;
+				}
+			}
+			dd {
+				font-weight: 600;
+				font-size: 14rem;
+				line-height: 20rem;
+				color: #46484B;
+			}
+		}
+	}
+	// e: 기본정보 섹션
+
+	// s: 리뷰 섹션
+	.review-sec {
+		@include tab-sec-basic;
+		.sec-header {
+			margin-bottom: 0;
+		}
+
+		.review-list {
+			@include review-list-02;
+		}
+
+		.review-card {
+			@include review-card-02;
+		}
+
+	}
+	// e: 리뷰 섹션
+
+	// s: 요금제 상품 섹션
+	.ratePlanC-sec {
+		@include tab-sec-basic;
+		.sec-header {
+			margin-bottom: 0;
+		}
+
+		.ratePlanC-list {
+			@include ratePlanC-list;
+			.ratePlanC-card {
+				@include ratePlanC-card;
+			}
+		}
+	}
+	// e: 요금제 상품 섹션
+
+	// s: 이벤트 섹션
+	.event-sec {
+		@include tab-sec-basic;
+		margin-bottom: 0;
+
+		.event-swiper {
+			@include event-swiper;
+		}
+
+		.event-bnr {
+			@include event-bnr;
+		}
+
+		.nodata {
+			@include nodata;
+			padding-top: 86rem;
+			padding-bottom: 100rem;
+		}
+	}
+	// e: 이벤트 섹션
+}
+// e: 파트너사 상세 페이지

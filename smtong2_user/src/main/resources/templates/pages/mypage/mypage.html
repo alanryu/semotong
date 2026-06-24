@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='마이페이지', layoutSubTitleYN='N', layoutFooterYn='Y', layoutNavYn='Y' , funcType='cscenter', mainWrapper='Y', menuId='05' ">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<!--	<link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+	
+<!-- 페이지 스크립트 영역 -->
+
+<!-- Swiper Librarys -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+	//session 에 값 있다. 두려워말고 진행 시켜~!
+	document.addEventListener("DOMContentLoaded", () => {
+		// 이벤트 스와이프
+		var eventSwiper = new Swiper(".event-swiper", {
+			threshold: 3,
+			spaceBetween: 10,
+			pagination: {
+				el: ".swiper-pagination",
+			},
+			autoplay: {
+				delay: 2500,
+				disableOnInteraction: false,
+			},
+		});
+	})
+	
+	$( document ).ready(function() {
+		searchMyPlan();
+	})
+	
+	function searchMyPlan() {
+		
+		var params = {
+			point : "2345"
+		}
+		
+		$.ajax({
+			url : '/users/getMyPlan'
+			,type : 'POST'
+			,dataType : "json"
+			,contentType:"application/json"
+			,data : JSON.stringify(params)
+			,beforeSend: function(xhr){
+				xhr.setRequestHeader(header,token);
+			}
+			,success: function (data) {
+				
+				if(data.totalCnt == 0) {
+					$('#nodata').show();
+				}else{
+					$('#planDTmpl').show();
+					// 보여지는 금액 필드 추가
+					//data.data.displayPrice = 0;
+					//data.data.displayPrice = 12;		// 12개월 합산 금액 
+					//data.data.displayPrice = 24;		// 24개월 합산 금액 
+					$('#ratePlanDTmpl').tmpl(data.data).appendTo('#planDTmpl');
+				}
+			}
+			,error : function(request, status, error){
+				//alertModalShow(error,"");
+			}
+			,complete:function(){
+			}
+		});
+	}
+	
+	
+	
+		
+		
+	
+	function logoutClick(){
+		  showConfirm(
+		 '로그아웃 하시겠습니까?',
+		 () => {
+			 goLogOut();
+			 // 확인 시 실행할 로직
+		 },
+		 () => {
+			 
+			 // 취소 시 실행할 로직
+		 },
+		 '로그아웃'
+		 )
+	}
+	
+	function goLogOut(){
+		window.location.href="/users/logout";
+	}
+	
+	function kakaoChat() {
+		window.open('https://pf.kakao.com/_EwxoVn/chat');
+	}
+
+	function kakaoChatUrl() {
+		window.location = 'https://pf.kakao.com/_EwxoVn';
+	}
+
+	// S 캐쉬 page 이동
+	function goScashPage(){
+		alertModalShow("S캐쉬 전환 페이지로 이동합니다. ", "", goNaverLogin);
+	}
+	
+	function goNaverLogin(){
+		navigateTo('/scash/myscash');			//model.addAttribute("callback"	, "N"); 여기서는 N 으로 들어간다.
+	}
+	
+	
+		
+</script>
+
+	<!-- 요금제 공통 타입 D - 텝플릿 : mypage, 신청한요금제  2025.02.26 sancho -->
+	<script id="ratePlanDTmpl" type="text/x-jquery-tmpl">
+	<div class="my-info-rateplan-data">
+		<!-- 요금제 공통 타입 D : 요금제 상품 상세 -->
+		<div class="ratePlanD-card">
+			<div class="card-body">
+				<p class="card-opening">{{html openCompDttm.substr(0,10).replaceAll("-",".")}} 개통완료</p>
+				<p class="card-state is-current">현재 사용 중인 요금제</p>
+				<div class="card-tit">
+					<span class="label primary">${mno}</span>
+					<strong>
+						{{if supDataVal == 10238976}}
+						무제한
+						{{else}}
+						월 {{html getDataStr(supDataVal)}}
+						{{/if}}
+						{{if dailyData > 0}}
+						+ 매일 {{html getDataStr(dailyData)}}
+						{{/if}}
+						{{if supQos > 0}}
+						+ {{html getQosStr(supQos)}}
+						{{/if}}
+					</strong>
+					{{if supQos > 0}}
+					<button type="button" class="ui-btn" onclick="openQosModal('QosModal')">
+						<i class="ui-icn icn-16-plan-quse-gr" aria-label="툴팁"></i>
+					</button>
+					{{/if}}
+				</div>
+				<div class="card-name">
+					<p>{{html getPlanNm(planName,planNameSmt)}}</p>
+				</div>
+				<div class="card-info">
+					<span class="label"><i class="ui-icn icn-12-tel-gr" aria-hidden="true"></i>{{html getCallStr(supCallVal)}}</span>
+					<span class="split" aria-hidden="true"></span>
+					<span class="label"><i class="ui-icn icn-12-mail-gr" aria-hidden="true"></i>{{html getSmsStr(supSmsVal)}}</span>
+					<span class="split" aria-hidden="true"></span>
+					<span class="label"><i class="ui-icn icn-12-antena-gr" aria-hidden="true"></i>${planType}</span>
+					<span class="split" aria-hidden="true"></span>
+					<span class="label"><i class="ui-icn icn-12-wifi-gr" aria-hidden="true"></i>${mno}</span>
+				</div>
+			</div>
+			<div class="card-footer">
+				<div class="card-charge">
+					<div class="brand"><img src="${planLogoImg}" alt="{hostNm} 로고" /></div>
+					<div class="charge">
+						<p class="charge-tit">{{html getPriceStr(salePrice)}}</p>
+						{{if secondPrice != null && secondPrice != ''}}
+							<p class="charge-point"><em class="tit">실제 체감가</em>${secondPrice}</p>
+						{{/if}}
+						{{if promotionPeriodVal == 9999}}
+							<p class="charge-txt">${promotionPeriod} </p>
+						{{else promotionPeriodVal > 0 && afterPrice >0}}
+							<p class="charge-txt">{{html getDiscountStr(promotionPeriod, afterPrice)}}</p>
+						{{/if}}
+					</div>
+				</div>
+			</div>
+			<!-- 카드 클릭영역  -->
+			<button type="button" class="card-button" onclick="javascript:goPlanDetail('${id}','${hostNm}');">
+				<span class="blind">요금제 자세히 보기</span>
+			</button>
+		</div>
+		<!-- // 요금제 공통 타입 D : 요금제 상품 상세 -->
+	</div>
+	</script>
+		
+</th:block>
+
+	<!-- Container -->
+	<main role="main" class="container">
+		<!-- content -->
+		<div class="content F-MY01-01-page">
+			<!-- 나의정보 섹션 -->
+			<section class="my-info-sec">
+				<div class="sec-inner">
+					<!-- 나의정보 -->
+					<div class="my-info-profile">
+						<p class="name"><strong>[[${session.userInfo.username		}]] 님, 환영합니다!</strong></p>
+						<div class="info">
+							<button type="button" class="ui-btn btn-more">
+								<span th:onclick="|location.href='@{/users/myinfo}'|">내 정보 확인</span>
+								<i class="ui-icn icn-16-more-gr" aria-label="더보기"></i>
+							</button>
+						</div>
+						<button type="button" class="ui-btn btn-cs" onclick="kakaoChat()">
+							<i class="ui-icn icn-32-headset-bk" aria-label="고객센터"></i>
+						</button>
+					</div>
+					<!-- // 나의정보 -->
+
+					<!-- Case 이용중인 요즘제 없음 -->
+					<div class="my-info-rateplan-nodata" style="display:none;" id="nodata">
+						<p>
+							<i class="ui-icn icn-14-noti-gr" aria-hidden="true"></i>
+							<span>아직 이용 중인 요금제가 없어요.</span>
+						</p>
+					</div>
+					<!-- // Case 이용중인 요즘제 없음 -->
+
+					<!-- Case 이용중인 요금제 있음 -->
+					<div class="my-info-rateplan-data" style="display:none;" id="planDTmpl">
+						
+					</div>
+					<!-- // Case 이용중인 요금제 있음 -->
+					
+					<!-- 내 S캐쉬 -->
+					<div class="my-info-rateplan-myCash">
+						<p class="myCash-tit">내 S캐쉬</p>
+						<div class="myCash-con">
+							<div class="myCash-val">
+								<!-- <button type="button" class="ui-btn btn-texted" data-bs-toggle="modal" data-bs-target="#FSC01P01Modal"> -->
+								<button type="button" class="ui-btn btn-texted" data-bs-toggle="modal" data-bs-target="#FSC01P01Modal">
+									<span>[[${pointEnt.balance == 0 ? '0' : #numbers.formatInteger(pointEnt.balance, 0, 'COMMA')}]] 캐쉬</span>
+								</button>
+							</div>
+							
+							<div class="myCash-btn">
+								<button type="button" class="ui-btn btn-sub xs" onclick="goScashPage()">
+									<span>전환하기</span>
+								</button>
+							</div>
+						</div>
+					</div>
+					<!-- //내 S캐쉬 -->
+					
+					<!-- 요금제 대시보드 -->
+					<div class="my-info-rateplan-status">
+						<ul class="status-list">
+							<li class="status-item" th:onclick="|location.href='@{/users/nearview}'|">
+								<strong class="tit">최근 본 요금제</strong>
+								<em class="val" th:text="|${nearCnt}개|">1개</em>
+							</li>
+							<li class="status-item" th:onclick="|location.href='@{/users/jjimview}'|">
+								<strong class="tit">찜한 요금제</strong>
+								<em class="val" th:text="|${zzimCnt}개|">10개</em>
+							</li>
+							<li class="status-item" th:onclick="|location.href='@{/users/appliedview}'|">
+								<strong class="tit">신청 요금제</strong>
+								<em class="val" th:text="|${applyCnt}개|">0개</em>
+							</li>
+						</ul>
+
+						<div class="status-more">
+							<button type="button" class="ui-btn" onClick="window.open('/svc/chatbot/index')">
+								<i class="ui-icn icn-16-emo-hand"></i>
+								<span>세모통이 추천하는 <em>나만의 요금제</em>를 확인해보세요.</span>
+								<i class="ui-icn icn-16-more-gr" aria-label="더보기"></i>
+							</button>
+						</div>
+					</div>
+					<!-- // 요금제 대시보드 -->
+				</div>
+			</section>
+			<!-- // 나의정보 섹션 -->
+
+			<!-- 고객지원 섹션 -->
+			<section class="cscenter-sec">
+				<div class="sec-inner">
+					<div class="sec-header">
+						<h2 class="sec-tit"><i class="ui-icn icn-20-headset-bk"></i>고객지원</h2>
+					</div>
+					<div class="sec-body">
+						<ul class="cs-menu-list">
+							<li class="cs-menu-item">
+								<a th:href="@{/cms/notice/noticeList}" class="cs-menu-btn">
+									<span>공지사항</span>
+									<i class="ui-icn icn-16-more-gr" aria-hidden="true"></i>
+								</a>
+							</li>
+							<li class="cs-menu-item">
+								<a href="javascript:kakaoChatUrl()" class="cs-menu-btn">
+									<span>1:1 문의</span>
+									<i class="ui-icn icn-16-more-gr" aria-hidden="true"></i>
+								</a>
+							</li>
+							<li class="cs-menu-item">
+								<a th:href="@{/cms/faq/faqlist}" class="cs-menu-btn">
+									<span>자주묻는 질문</span>
+									<i class="ui-icn icn-16-more-gr" aria-hidden="true"></i>
+								</a>
+								<!--   둘 다 됨
+								<a href="/cms/faq/faqlist" class="cs-menu-btn">
+									<span>자주묻는 질문</span>
+									<i class="ui-icn icn-16-more-gr" aria-hidden="true"></i>
+								</a> 
+								-->
+								
+								
+							</li>
+							<li class="cs-menu-item" onclick="logoutClick()">
+								<a class="cs-menu-btn">
+									<span>로그아웃</span>
+									<i class="ui-icn icn-16-more-gr" aria-hidden="true"></i>
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</section>
+			<!-- // 고객지원 섹션 -->
+
+			<!-- 이벤트 섹션 -->
+			<section class="event-sec">
+				<div class="sec-inner">
+					<div class="swiper event-swiper">
+						<div class="swiper-wrapper">
+							<div class="swiper-slide" th:each="list : ${bannerList}">
+								<button type="button" class="event-bnr" th:attr="onclick=|navigateTo('${list.url}');|">
+									<img th:src="@{${list.imageMo}}" th:alt="${list.bannerAlt}" class="only-mo" />
+									<img th:src="@{${list.imagePc}}" th:alt="${list.bannerAlt}" class="only-pc" />
+								</button>
+							</div>
+						</div>
+						<div class="swiper-pagination"></div>
+					</div>
+				</div>
+			</section>
+			<!-- // 이벤트 섹션 -->
+			</div>
+		<!-- // content -->
+	</main>
+	<!-- // Container -->
+	
+	
+	<!-- modal default -->
+	<div class="modal modal-basic fade" id="FSC01P01Modal" tabindex="-1" role="dialog" aria-labelledby="FSC01P01ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-SC01-P01-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FSC01P01ModalLabel">S캐쉬 보유 현황</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+
+				</div>
+				<div class="modal-body">
+					<!-- S캐쉬 섹션 -->
+					<section class="sCash-sec">
+						<div class="sec-inner">
+							<!-- 보유 S캐쉬 -->
+							<div class="sCash-box">
+								<p class="sCash-tit">보유 S캐쉬</p>
+								<p class="sCash-val">[[${#numbers.formatInteger(pointEnt.balance, 0, 'COMMA')}]] 캐쉬</p>
+							</div>
+							<p class="sCash-info">※ 포인트의 기본 유효 기간은 적립일로부터 1년입니다.</p>
+							<!-- //보유 S캐쉬 -->
+
+							<!-- 캐쉬 리스트 -->
+							<div class="sCash-list-wrap">
+								<ul class="sCash-list">
+									
+									<th:block  th:each="scashItm:${pointHEnt}">
+									<li class="sCash-item">
+										<div class="sCash-wrap">
+											<div class="sCash-label">
+												
+												<!-- 전환 이력은 아예 안보여주기 -->
+												<th:block th:if="${#strings.isEmpty(scashItm.drPointType)}">
+													<th:block th:if="${#strings.equals(scashItm.crPointType, 'DED')}">
+														<p class="label minus">차감</p>
+													</th:block>
+													<th:block th:unless="${#strings.equals(scashItm.crPointType, 'DED')}">
+														<p class="label minus"	th:if="${#strings.equals(scashItm.drCr, 'DR')}">사용</p>	<!-- 차변 DR 자본, 비용 증가 -->
+														<p class="label plus"	th:if="${#strings.equals(scashItm.drCr, 'CR')}">적립</p>	<!-- 대변 CR Credit(신용,자본,수익) 증가 -->
+													</th:block>
+													
+												</th:block>
+												<th:block th:unless="${#strings.isEmpty(scashItm.drPointType)}">
+												</th:block>
+												
+											</div>
+											<div class="sCash-con">
+												<th:block th:if="${#strings.isEmpty(scashItm.drPointType)}">
+													<p class="title">[[${scashItm.crPointTypeName}]]</p>
+													<p class="date">[[${#temporals.format(scashItm.createDate, 'yyyy.MM.dd')}]]</p>
+												</th:block>
+												<th:block th:unless="${#strings.isEmpty(scashItm.drPointType)}">
+													<p class="val">[[${scashItm.detailDrPointTypeName}]]</p>
+												</th:block>
+												
+											</div>
+											<div class="sCash-val">
+												<th:block th:if="${#strings.isEmpty(scashItm.drPointType)}">
+													
+													<th:block th:if="${#strings.equals(scashItm.crPointType, 'DED')}">
+														<p class="val">-[[${#numbers.formatInteger(scashItm.displayAmount, 0, 'COMMA') + '캐쉬'}]]</p>
+													</th:block>
+													<th:block th:unless="${#strings.equals(scashItm.crPointType, 'DED')}">
+														<p class="val">[[${#numbers.formatInteger(scashItm.displayAmount, 0, 'COMMA') + '캐쉬'}]]</p>
+													</th:block>
+													
+												</th:block>
+												<th:block th:unless="${#strings.isEmpty(scashItm.drPointType)}">	
+													<!-- 포인트 사용 현황 ▶◀ ◁ -->
+													<th:block th:if="${#strings.equals(scashItm.drPointType, 'CAN')}">
+														<p class="val">◁ [[${#numbers.formatInteger(scashItm.actAmt, 0, 'COMMA')}]]</p>
+													</th:block>
+													<th:block th:unless="${#strings.equals(scashItm.drPointType, 'CAN')}">
+														<p class="val">▶ [[${#numbers.formatInteger(scashItm.actAmt, 0, 'COMMA')}]]</p>
+													</th:block>
+												</th:block>
+											</div>
+										</div>
+									</li>
+									</th:block>
+								</ul>
+							</div>
+						</div>
+					</section>
+					<!-- // S캐쉬 섹션 -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // modal default -->
+	
+	
+	
+</html>

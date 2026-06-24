@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta name="keywords" content="세모통" />
+	<meta name="description" content="세모통" />
+	<title>간편개통 | 세모통</title>
+	<link rel="stylesheet" type="text/css" href="../../assets/css/semotong.css" />
+
+	<script src="../../assets/js/libs/jquery.min.js"></script>
+	<script src="../../assets/js/libs/librurys.min.js"></script>
+	<script src="../../assets/js/ui/ui.common.js"></script>
+	<script src="../../assets/js/ui/ui.publish.js"></script><!-- 퍼블리싱 전용 (개발적용안함) -->
+</head>
+
+<body>
+	<!-- 레이아웃이 없는 경우  -->
+	<div class="wrapper only-container">
+		<!-- Container -->
+		<main role="main" class="container">
+			<!-- content -->
+			<div class="content F-QU-page F-QU01-13-page">
+				<!-- 간편개통 섹션 -->
+				<section class="complete-sec">
+					<div class="sec-inner">
+						<div class="complete-wrap">
+							<i class="ui-icn icn-140-complete" aria-hidden="true"></i>
+							<strong>간편 개통 신청이 완료되었어요!</strong>
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary">
+							<span>신청한 요금제 확인하기</span>
+							<i class="ui-icn icn-20-link-wh" aria-hidden="true"></i>
+						</button>
+						<button type="button" class="ui-btn btn-action primary" data-bs-toggle="modal" data-bs-target="#FI0101P01Modal">
+							<span>인터넷 결합하고 알뜰폰 할인하러 가기</span>
+							<i class="ui-icn icn-20-link-wh" aria-hidden="true"></i>
+						</button>
+					</div>
+				</section>
+				<!-- // 플로팅 섹션 -->
+			</div>
+			<!-- // content -->
+		</main>
+		<!-- // Container -->
+	</div>
+
+	<!-- 2025-02-26 조찬기 : 인터넷 상품 상담 신청하기 팝업 추가 -->
+	<!-- 인터넷 상품 상담 신청하기 modal basic -->
+	<div class="modal modal-basic fade" id="FI0101P01Modal" tabindex="-1" role="dialog" aria-labelledby="FI0101P01ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content F-I01-01-P01-page">
+				<div class="modal-header">
+					<h3 class="modal-title" id="FI0101P01ModalLabel">신청하신 요금제는 인터넷을 결합하면 <br>요금 할인이 되는 요금제예요. <br>상담 신청하시면 빠르게 안내해 드릴게요.</h3>
+					<button type="button" class="ui-btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+						<i class="ui-icn icn-32-close-bk" aria-label="닫기"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- 상담신청 섹션 -->
+					<section class="consult-frm-sec">
+						<div class="sec-inner">
+							<!-- 등록폼 -->
+							<div class="consult-frm">
+								<!-- 이름 입력 -->
+								<!-- input.scss: ui-input, ui-textarea, ui-sel, ui-file -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label class="tit" for="frmName">이름</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="text" name="" id="frmName" value="" placeholder="이름을 입력해 주세요." title="" class="inp" />
+										</div>
+									</div>
+								</div>
+								<!-- // 이름 입력 -->
+
+								<!-- 전화번호 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmTitle" class="tit">전화번호</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="tel" name="" id="frmTitle" value="" placeholder="전화번호를 입력해 주세요." title="" class="inp" oninput="setRegularNumber(this)"/>
+										</div>
+									</div>
+								</div>
+								<!-- // 전화번호 입력 -->
+							</div>
+							<!-- // 등록폼 -->
+
+							<div class="consult-links">
+								<button type="button" class="ui-btn btn-texted"><span>개인정보 수집 이용</span></button>
+								<button type="button" class="ui-btn btn-texted"><span>개인정보 제3자 제공</span></button>
+							</div>
+						</div>
+					</section>
+					<!-- // 상담신청 섹션 -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="ui-btn btn-action primary">
+						<span>상담 신청하기</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- // 인터넷 상품 상담 신청하기 modal basic -->
+</body>
+
+</html>

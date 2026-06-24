@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.mbm.mapper.AdminUserMapper">
+
+	<sql id="listWhere">
+	
+           <!-- 기간 조회-->
+          <if test='searchStartDt != null and searchStartDt !=""'>
+              AND a.create_date  <![CDATA[>=]]> #{searchStartDt}
+          </if>
+          <if test='searchEndDt != null and searchEndDt !=""'>
+              AND a.create_date <![CDATA[<=]]> #{searchEndDt}
+          </if>
+          
+        
+ 		<choose>
+			<when test="searchMenuType == 'HOST'">
+				<if test='searchAuthType != null and searchAuthType !=""'>
+					AND a.auth_type = #{searchAuthType}
+				</if>
+			</when>
+			<otherwise>
+				<if test='searchAuthType != null and searchAuthType !=""'>
+					AND a.auth_type = #{searchAuthType}
+				</if>
+					AND  a.auth_type <![CDATA[<>]]> 'HOST' 
+			</otherwise>
+		</choose>
+		
+		
+		<if test='searchDisabledYn != null and searchDisabledYn !=""'>
+			AND a.disable = #{searchDisabledYn}
+		</if>
+		
+		
+		<if test='searchAdminid != null and searchAdminid !=""'>
+			AND a.admin_id = #{searchAdminid}
+		</if>
+		
+		<if test='searchType != null and searchType !=""'>
+			 <choose>
+			 	 <when test="searchType == 'name'">
+			 	 	<if test='keyword != null and keyword !=""'>
+			    		AND a.user_name LIKE CONCAT('%', #{keyword}, '%')
+			    	</if>   
+			   	 </when>
+			   	 <when test="searchType == 'admin_id'">
+			   	 	<if test='keyword != null and keyword !=""'>
+			   	 		AND a.admin_id LIKE CONCAT('%', #{keyword}, '%')
+			   	 	</if>
+			   	 </when>
+			   	 
+			   	 <when test="searchType == 'company_nm'">
+			   	 	<if test='keyword != null and keyword !=""'>
+			   	 		AND b.company_nm LIKE CONCAT('%', #{keyword}, '%')
+			   	 	</if>
+			   	 </when>
+			   	 
+			  </choose>
+		</if>
+		
+		<if test='keyword != null and keyword !="" and (searchType == null or searchType =="")'>
+				AND (a.user_name LIKE CONCAT('%', #{keyword}, '%') or a.admin_id LIKE CONCAT('%', #{keyword}, '%') or b.company_nm LIKE CONCAT('%', #{keyword}, '%'))
+		</if>
+		
+		
+		
+		<if test='searchCompanyMno != null and searchCompanyMno !=""'>
+			<choose>
+			 	 <when test="searchCompanyMno == 'KT'">
+			 	 	 AND b.company_mno LIKE CONCAT('%', #{searchCompanyMno}, '%')
+			 	 	 AND FIND_IN_SET(#{searchCompanyMno}, b.company_mno) = 0
+			   	 </when>
+			   	 <otherwise> 
+			   	     AND b.company_mno LIKE CONCAT('%', #{searchCompanyMno}, '%')
+			   	 </otherwise>
+			  </choose>
+		</if>
+		
+	</sql>
+	
+	<sql id="Base_Column_list">
+		 a.id
+		,a.admin_id
+		,a.password
+		,a.user_name
+		,a.user_name as adminUserName
+		,a.auth_type
+		,GET_CODE_NAME('admin_auth_type', auth_type) authTypeNm
+		,a.com_group
+		,AES_DECRYPT(FROM_BASE64(phone_number), 'tb_mbm_admin_user') phone_number
+		,AES_DECRYPT(FROM_BASE64(email), 'tb_mbm_admin_user') email
+		,a.all_auth_yn
+		,a.admin_mem_auth_yn
+		,a.user_mng_yn
+		,a.company_mng_yn
+		,a.prod_mng_yn
+		,a.req_mng_yn
+		,a.settle_mng_yn
+		,a.service_mng_yn
+		,a.service_mng_yn
+		,a.service_mng_yn
+		,a.service_mng_yn
+		,a.point_mng_yn
+		,a.sales_mng_yn
+		,a.kakao_msg_mng_yn
+		,a.manage_id
+		,a.disable
+		,a.create_date
+		,a.create_id
+		,a.modified_date
+		,a.modified_id
+		,GET_ADMIN_USER_NM(a.create_id) as createNm
+		,GET_ADMIN_USER_NM(a.modified_id) as modifiedNm
+		,a.company_code
+		,b.name companyNm
+		,b.company_nm businessNm
+		,b.company_code businessCode
+		,b.company_mno companyMno
+		,b.simple_open_yn
+	</sql>
+	
+	<select id="getList" parameterType="kr.co.ucomp.web.mbm.dto.AdminUserSearchDto" resultType="kr.co.ucomp.web.mbm.entity.AdminUserEntity">
+		  SELECT
+	            <include refid="Base_Column_list" />
+	        FROM tb_mbm_admin_user a LEFT OUTER JOIN tb_mbm_company_list b
+			 ON a.company_code = b.id
+	        WHERE 1=1
+	        <include refid="listWhere" />
+	        ORDER BY a.create_date DESC
+	        LIMIT #{offset}, #{recordSize}
+
+	</select>
+
+	<select id="getListCount" parameterType="kr.co.ucomp.web.mbm.dto.AdminUserSearchDto" resultType="Long">
+		  SELECT
+	            count(1)
+	         FROM tb_mbm_admin_user a LEFT OUTER JOIN tb_mbm_company_list b
+			 ON a.company_code = b.id
+	        WHERE 1=1
+	        <include refid="listWhere" />
+	</select>
+	
+	
+	<select id="getDetail" parameterType="Int" resultType="kr.co.ucomp.web.mbm.entity.AdminUserEntity">
+		SELECT
+	            <include refid="Base_Column_list" />
+	        FROM tb_mbm_admin_user a LEFT OUTER JOIN tb_mbm_company_list b
+			 ON a.company_code = b.id
+	        WHERE a.id=#{id}
+	</select>
+	
+	<select id="getDetailById" parameterType="Map" resultType="kr.co.ucomp.web.mbm.dto.AdminUserDto">
+		SELECT
+	            <include refid="Base_Column_list" />
+	        FROM tb_mbm_admin_user a LEFT OUTER JOIN tb_mbm_company_list b
+			 ON a.company_code = b.id
+	        WHERE a.admin_id=#{userId}
+	</select>	
+		
+	
+	<insert id="create"  parameterType="kr.co.ucomp.web.mbm.entity.AdminUserEntity" useGeneratedKeys="true" keyProperty="id"  keyColumn="id">
+	
+	INSERT INTO tb_mbm_admin_user (admin_id, password, user_name, auth_type, com_group, phone_number, email, all_auth_yn, admin_mem_auth_yn, 
+	user_mng_yn, company_mng_yn, prod_mng_yn, req_mng_yn, settle_mng_yn,service_mng_yn ,point_mng_yn ,sales_mng_yn ,kakao_msg_mng_yn, 
+	company_code, manage_id, disable, create_id,  modified_id) 
+	VALUES(	
+		#{adminId},
+		#{password},
+		#{userName},
+		#{authType},
+		#{comGroup},
+		TO_BASE64(AES_ENCRYPT(#{phoneNumber},'tb_mbm_admin_user')),
+		TO_BASE64(AES_ENCRYPT(#{email},'tb_mbm_admin_user')),
+		#{allAuthYn},
+		#{adminMemAuthYn},
+		#{userMngYn},
+		#{companyMngYn},
+		#{prodMngYn},
+		#{reqMngYn},
+		#{settleMngYn},
+		#{serviceMngYn},
+		#{pointMngYn},
+		#{salesMngYn},
+		#{kakaoMsgMngYn},
+		#{companyCode},
+		#{manageId},
+		#{disable},
+		#{createId},
+		#{modifiedId}
+	);
+	
+	
+	</insert>
+	
+	<update id="update"  parameterType="kr.co.ucomp.web.mbm.entity.AdminUserEntity" >
+	UPDATE tb_mbm_admin_user SET admin_id  = #{adminId},
+				<if test="password != null and password !=''">
+					password = #{password},
+				</if>
+				user_name = #{userName},
+				auth_type = #{authType},
+				com_group = #{comGroup},
+				phone_number = TO_BASE64(AES_ENCRYPT(#{phoneNumber},'tb_mbm_admin_user')),
+				email = TO_BASE64(AES_ENCRYPT(#{email},'tb_mbm_admin_user')),
+				all_auth_yn = #{allAuthYn},
+				admin_mem_auth_yn = #{adminMemAuthYn},
+				user_mng_yn = #{userMngYn},
+				company_mng_yn = #{companyMngYn},
+				prod_mng_yn = #{prodMngYn},
+				req_mng_yn = #{reqMngYn},
+				settle_mng_yn = #{settleMngYn},
+				service_mng_yn = #{serviceMngYn},
+				point_mng_yn  = #{pointMngYn},
+				sales_mng_yn  = #{salesMngYn},
+				kakao_msg_mng_yn = #{kakaoMsgMngYn},
+				company_code = #{companyCode},
+				manage_id = #{manageId},
+				disable   = #{disable},
+				create_id = #{createId},
+				modified_id = #{modifiedId},
+				modified_date=NOW()
+	WHERE id=#{id};
+	
+	</update>
+	
+	
+	
+	<update id="updatePwd"  parameterType="kr.co.ucomp.web.mbm.entity.AdminUserEntity" >
+	UPDATE tb_mbm_admin_user SET admin_id  = #{adminId},
+				password  = #{password},
+				create_id = #{createId},
+				modified_id = #{modifiedId},
+				modified_date=NOW()
+	WHERE id=#{id};
+	
+	</update>
+	
+	<delete id="del" parameterType="Int">
+		DELETE FROM tb_mbm_admin_user
+	    WHERE id=#{id}
+	</delete>
+</mapper>

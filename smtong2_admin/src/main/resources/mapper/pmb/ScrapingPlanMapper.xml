@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.pmb.mapper.ScrapingPlanMapper">
+	<sql id="baseColList">
+		id,
+		uuid,
+		telecom,
+		mno,
+		plan_type,
+		plan_name,
+		normal_price,
+		sale_price,
+		after_price,
+		promotion_period,
+		data,
+		qos,
+		voice_call,
+		baga_tell,
+		message,
+		combination,
+		benefit,
+		freebies,
+		url,
+		business_name,
+		etc,
+		sale_status,
+		create_date,
+		modified_date
+	</sql>
+	
+	<select id="getScrapingPlanList" resultType="kr.co.ucomp.web.pmb.entity.ScrapingPlanEntity">
+		SELECT
+		<include refid="baseColList" />
+		FROM
+		tb_pmb_plan_data
+	</select>
+
+	<select id="getScrapingPlanListCnt" resultType="long">
+		SELECT COUNT(*)
+		FROM tb_pmb_plan_data
+	</select>
+</mapper>

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>세모통</title>
+        <link
+            href="../../css/bootstrap.min.css"
+            rel="stylesheet">
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            rel="stylesheet">
+          <link
+            href="../../css/design.css"
+            rel="stylesheet">
+    </head>
+    <body>
+        <div class="sidebarWrapper">
+            <div class="left-sidebar">
+                <div class="admin-profile">
+                    <div class="profile-letter">A</div>
+                    <div>
+                        <div class="fw-semibold text-dark">관리자 - 아무개님</div>
+                        <small class="text-muted">UPDATE -<br> 2024-12-12 18:02</small>
+                    </div>
+                </div>
+                <ul class="menu-list">
+                    <!-- 계정권한관리 -->
+                    <li class="menu-item">
+                        <a href="../account/account.html" class="menu-link">
+                            <i class="fas fa-user-cog"></i>
+                            <span>계정권한관리</span>
+                        </a>
+                    </li>
+                    <!-- 회원관리 -->
+                    <li class="menu-item">
+                        <a href="../members/members.html" class="menu-link">
+                            <i class="fas fa-users"></i>
+                            <span>회원관리</span>
+                        </a>
+                    </li>
+                    <!-- 입점사관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="#" class="menu-link">
+                            <i class="fas fa-building"></i>
+                            <span>입점사관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                                <a href="../business/list.html" class="submenu-link">사업자 목록</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../business/manage.html" class="submenu-link">입점사 관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 상품관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="#" class="menu-link">
+                            <i class="fas fa-box"></i>
+                            <span>상품관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item ">
+                                <a href="../product/rateplan.html" class="submenu-link">요금제</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../product/scraping.html" class="submenu-link">스크래핑 관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="javascript:;" class="submenu-link">인터넷</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 신청관리 -->
+                    <li class="menu-item has-submenu">
+                        <a href="../applications/applications.html" class="menu-link">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>신청관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item ">
+                                <a href="../product/rateplan.html" class="submenu-link">요금제 신청내역</a>
+                            </li>
+                            <li class="submenu-item active">
+                                <a href="../product/internet.html" class="submenu-link">인터넷 신청내역</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- 정산관리 -->
+                    <li class="menu-item">
+                        <a href="../settlements/settlements.html" class="menu-link">
+                            <i class="fas fa-calculator"></i>
+                            <span>정산관리</span>
+                        </a>
+                    </li>
+                    <!-- 서비스관리 -->
+                    <li class="menu-item has-submenu active open">
+                        <a href="../services/services.html" class="menu-link">
+                            <i class="fas fa-cog"></i>
+                            <span>서비스관리</span>
+                            <i class="fas fa-chevron-down submenu-arrow ms-auto"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item active">
+                                <a href="../services/services.html" class="submenu-link">배너관리</a>
+                                <ul class="subsubmenu">
+                                    <li class="active"><a href="../services/services.html" class="subsubmenu-link">메인</a></li>
+                                    <li><a href="../services/services_combination.html" class="subsubmenu-link">결합</a></li>
+                                    <li><a href="../services/services_chatbot.html" class="subsubmenu-link">챗봇</a></li>
+                                </ul>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/board.html" class="submenu-link">게시판관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/member.html" class="submenu-link">회원관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/event.html" class="submenu-link">이벤트관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/tax.html" class="submenu-link">세무통설명서관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/after.html" class="submenu-link">후기관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/quality.html" class="submenu-link">질문진단보관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/chat.html" class="submenu-link">챗봇요금제관리</a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="../services/portfolio.html" class="submenu-link">포트폴리오관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <button class="toggle-sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="main-content">
+            <div class="container-fluid">
+                <div>
+                    <div class="location mb-2">
+                        <small class="text-secondary">
+                            <i class="fas fa-home me-1"></i>
+                            <a href="javascript:;">홈</a>
+                            >
+                            <a href="javascript:;">서비스 관리</a>
+                            >
+                            <a href="javascript:;">배너 관리</a>
+                            >
+                            <a href="../services/services.html">메인</a>
+                        </small>
+                    </div>
+                    <h2 class="page-title fs-4 mb-4">
+                        배너관리
+                    </h2>
+                </div>
+
+                <div class="mt-4 mb-4">
+                    <ul class="tab-menu">
+                        <li>
+                          <a href="../services/services.html">추천딜</a>
+                        </li>
+                        <li>
+                          <a href="../services/service_topevent.html">상단 이벤트</a>
+                        </li>
+                        <li>
+                          <a href="../services/service_rateplan.html">요금제 소개</a>
+                        </li>
+                        <li class="active">
+                          <a href="../services/service_midbanner.html">중단 배너</a>
+                        </li>
+                        <li>
+                          <a href="../services/service_event.html">이벤트</a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="search-section">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="col-12">
+                                <div class="form-row full-width">
+                                    <div class="form-label mb-0">게시기간</div>
+                                    <div class="form-control-wrap d-flex align-items-center gap-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="date" class="form-control" value="2024-12-18">
+                                            <span class="text-secondary">-</span>
+                                            <input type="date" class="form-control" value="2024-12-18">
+                                        </div>
+                                        <div class="period-buttons">
+                                            <div class="d-flex gap-2">
+                                              <button class="period-button">오늘</button>
+                                              <button class="period-button">1주일</button>
+                                              <button class="period-button">1개월</button>
+                                              <button class="period-button">3개월</button>
+                                              <button class="period-button">6개월</button>
+                                              <button class="period-button">1년</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row full-width">
+                                  <div class="form-label mb-0">등록일</div>
+                                  <div class="form-control-wrap d-flex align-items-center gap-2">
+                                      <div class="d-flex align-items-center gap-2">
+                                          <input type="date" class="form-control" value="2024-12-18">
+                                          <span class="text-secondary">-</span>
+                                          <input type="date" class="form-control" value="2024-12-18">
+                                      </div>
+                                      <div class="period-buttons">
+                                            <div class="d-flex gap-2">
+                                              <button class="period-button">오늘</button>
+                                              <button class="period-button">1주일</button>
+                                              <button class="period-button">1개월</button>
+                                              <button class="period-button">3개월</button>
+                                              <button class="period-button">6개월</button>
+                                              <button class="period-button">1년</button>
+                                            </div>
+                                      </div>
+                                  </div>
+                              </div>
+                            </div>
+
+                            <!-- 노출여부 -->
+                            <div class="form-row full-width mb-4 mt-4">
+                              <div class="form-label mb-0">상태</div>
+                              <div class="form-control-wrap">
+                                  <div class="form-check-group">
+                                      <div class="form-check">
+                                          <input class="form-check-input" type="radio" name="exposure" id="expAll" checked>
+                                          <label class="form-check-label" for="expAll">전체</label>
+                                      </div>
+                                      <div class="form-check">
+                                          <input class="form-check-input" type="radio" name="exposure" id="expShow">
+                                          <label class="form-check-label" for="expShow">대기</label>
+                                      </div>
+                                      <div class="form-check">
+                                          <input class="form-check-input" type="radio" name="exposure" id="expCancel">
+                                          <label class="form-check-label" for="expHide">노출</label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="exposure" id="expEnd">
+                                        <label class="form-check-label" for="expHide">종료</label>
+                                    </div>
+                                  </div>
+                              </div>
+                            </div>
+
+                            <!-- 검색어 -->
+                            <div class="form-row full-width mb-3">
+                              <div class="form-label mb-0">검색어</div>
+                              <div class="form-control-wrap flex-grow-1">
+                                  <input type="text" class="form-control" placeholder="검색어를 입력해주세요">
+                              </div>
+                            </div>
+
+                            <div class="row">
+                              <div class="col-12 text-end mt-2">
+                                  <button class="btn btn-primary btn-sm me-2">
+                                      <i class="fas fa-search"></i>
+                                      검색
+                                  </button>
+                                  <button class="btn btn-light btn-sm">
+                                      <i class="fas fa-redo"></i>
+                                      초기화
+                                  </button>
+                              </div>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                        </div>
+                        <div class="header-actions">
+                            <div class="custom-dropdown">
+                                <button class="btn btn-primary btn-sm btnDrop" onclick="location.href='./service_midbanner_add.html'">
+                                    <i class="fas fa-calculator"></i>
+                                    등록
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table custom-table">
+                        <colgroup>
+                            <col style=""/>
+                            <col style="width:170px;"/>
+                            <col style=""/>
+                            <col style=""/>
+                            <col style=""/>
+                            <col style=""/>
+                            <col style=""/>
+                            <col style=""/>
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>편집</th>
+                                <th>구분</th>
+                                <th>게시 기간</th>
+                                <th>항목명</th>
+                                <th>랜딩 URL</th>
+                                <th>이미지</th>
+                                <th>사용</th>
+                                <th>등록자</th>
+                                <th>등록일</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>3</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                    <button class="action-btn btn-sm" onclick="location.href='../business/list_modify.html'">
+                                        <i class="fas fa-edit me-1"></i>
+                                        수정
+                                    </button>
+                                    <button class="action-btn btn-sm">
+                                        <i class="fas fa-trash me-1"></i>
+                                        삭제
+                                    </button>
+                                </div>
+                                </td>
+                                <td>노출</td>
+                                <td>
+                                    2024.11.01 - 00:00 ~ 2024.11.30 - 23:59
+                                </td>
+                                <td>주간 베스트 10 요금제</td>
+                                <td>
+                                    <a href="https://semotong.com/bestplan">https://semotong.com/bestplan</a>
+                                </td>
+                                <td>
+                                    <img src="../../images/SMT1-1.png" alt="" class="img-event">
+                                </td>
+                                <td>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckLarge" style="transform: scale(1.5);">
+                                    </div>
+                                </td>
+                                <td>utechon2</td>
+                                <td>2024/10/29</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                    <button class="action-btn btn-sm" onclick="location.href='../business/list_modify.html'">
+                                        <i class="fas fa-edit me-1"></i>
+                                        수정
+                                    </button>
+                                    <button class="action-btn btn-sm">
+                                        <i class="fas fa-trash me-1"></i>
+                                        삭제
+                                    </button>
+                                </div>
+                                </td>
+                                <td>노출</td>
+                                <td>
+                                    2024.11.01 - 00:00 ~ 2024.11.30 - 23:59
+                                </td>
+                                <td>주간 베스트 10 요금제</td>
+                                <td>
+                                    <a href="https://semotong.com/bestplan">https://semotong.com/bestplan</a>
+                                </td>
+                                <td>
+                                    <img src="../../images/SMT1-1.png" alt="" class="img-event">
+                                </td>
+                                <td>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckLarge" style="transform: scale(1.5);">
+                                    </div>
+                                </td>
+                                <td>utechon2</td>
+                                <td>2024/10/29</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                    <button class="action-btn btn-sm" onclick="location.href='../business/list_modify.html'">
+                                        <i class="fas fa-edit me-1"></i>
+                                        수정
+                                    </button>
+                                    <button class="action-btn btn-sm">
+                                        <i class="fas fa-trash me-1"></i>
+                                        삭제
+                                    </button>
+                                </div>
+                                </td>
+                                <td>노출</td>
+                                <td>
+                                    2024.11.01 - 00:00 ~ 2024.11.30 - 23:59
+                                </td>
+                                <td>주간 베스트 10 요금제</td>
+                                <td>
+                                    <a href="https://semotong.com/bestplan">https://semotong.com/bestplan</a>
+                                </td>
+                                <td>
+                                    <img src="../../images/SMT1-1.png" alt="" class="img-event">
+                                </td>
+                                <td>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckLarge" style="transform: scale(1.5);">
+                                    </div>
+                                </td>
+                                <td>utechon2</td>
+                                <td>2024/10/29</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-between mt-4 align-items-start">
+                        <ul class="pagination">
+                            <li class="page-item">
+                                <a class="page-link" href="#">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item active">
+                                <a class="page-link" href="#">1</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">2</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">3</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">4</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">5</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">6</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">7</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">8</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">9</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">10</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <script src="../../js/bootstrap.bundle.min.js"></script>
+            <script src="../../js/script.js"></script>
+        </body>
+    </html>

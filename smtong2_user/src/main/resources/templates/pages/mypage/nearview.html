@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='최근 본 요금제', layoutSubTitleYN='Y', funcType ='neardelete', menuId='05' "><!-- 헤더에 아이콘 on -->
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+	<!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+<script>
+	$( document ).ready(function() {
+		getLastViewPlanList();
+	})
+	
+	
+	function readMore(){
+		var nowpage = $('#nowpage').val();
+		var newpage = Number(nowpage) +1;
+		$('#nowpage').val(newpage);
+		
+		getLastViewPlanList();
+	}
+	
+	//최근 본 요금제 3개 
+	function getLastViewPlanList() {
+		var nowpage 		= $('#nowpage').val()		;
+		var params = {keyword : "",searchType : "2", page: nowpage}
+		$.ajax({
+			url : '/users/getPlanlist',
+			type : 'POST',
+			dataType : "json",
+			contentType:"application/json",
+			data : JSON.stringify(params),
+			beforeSend: function(xhr){
+			    xhr.setRequestHeader(header,token);
+			},
+			success: function (data) {
+				
+				if(data.totalCnt == 0){
+					$('#lastViewSection').remove();
+				}else{
+					
+					$('#nodataSection').remove();
+					$('#nodataFloating').remove();
+					
+					
+					$.each(data.data, function(idx, obj){
+						obj.displayPrice = 0;
+					});
+					//$('#lastViewplanList').empty();
+					$('#planListTmpl').tmpl(data.data).appendTo('#lastViewplanList');
+				}
+				
+				const cardCnt = $('.ratePlanC-item').length;
+				
+				if(cardCnt == data.totalCnt){
+					$('#readMoreBtn').hide();
+				}else{
+					$('#readMoreBtn').show();
+				}
+				
+			},
+			error : function(request, status, error){
+				alertModalShow(error,"");
+			},
+			complete:function(){
+			}
+		});
+	}
+</script>
+</th:block>
+
+
+	<!-- Container -->
+	<main role="main" class="container">
+		
+		<input type="hidden" name="nowpage"			id="nowpage" 			value="1">
+		
+		
+		<!-- content -->
+		<div class="content F-MY01-03-page">
+		
+		
+			<!-- ----------------------------------------- No Data ----------------------------------------- -->
+			<!-- Case 노데이터 섹션 -->
+			<section class="nodata-sec" id="nodataSection">
+				<div class="sec-inner">
+					<!-- 최근 본 요금제 없음 -->
+					<div class="nodata">
+						<i class="ui-icn icn-100-nodata-recent" aria-hidden="true"></i>
+						<p class="nodata-tit"><strong>아직 둘러 본 요금제가 없어요.</strong></p>
+					</div>
+					<!-- // 최근 본 요금제 없음 -->
+				</div>
+			</section>
+			<!-- // Case 노데이터 섹션 -->
+
+			<!-- 플로팅 섹션 -->
+			<section class="floating-sec" id="nodataFloating">
+				<div class="sec-inner">
+					<button type="button" class="ui-btn btn-action primary" onclick="location.href='/pbm/plan/planList/mvno'">
+						<span>요금제 보러가기</span>
+					</button>
+				</div>
+			</section>
+			<!-- // 플로팅 섹션 -->
+			
+			
+			
+			<!-- ----------------------------------------- Data List ----------------------------------------- -->
+			<!-- 상품 리스트 섹션 -->
+			<section class="ratePlanC-sec" id="lastViewSection">
+				<div class="sec-inner">
+					<div class="sec-body">
+						<!-- 요금제 공통 타입 C : 요금제 상품 리스트 -->
+						<div class="ratePlanC-list-wrap">
+							<ul class="ratePlanC-list" id="lastViewplanList">
+							</ul>
+															
+															
+							<!-- Case 목록이 많은 경우 더보기 -->
+							<button type="button" class="ui-btn btn-more-list" onclick="javascript:readMore();"  id="readMoreBtn">
+								<i class="ui-icn icn-16-more-list-gr" aria-hidden="true"></i>
+								<span>더보기</span>
+							</button>
+						</div>
+						<!-- // 요금제 공통 타입 C : 요금제 상품 리스트 -->
+					</div>
+				</div>
+			</section>
+			<!-- // 상품 리스트 섹션 -->
+				
+				
+		
+		
+			
+			
+			
+		</div>
+		<!-- // content -->
+	</main>
+	<!-- // Container -->
+	
+</html>

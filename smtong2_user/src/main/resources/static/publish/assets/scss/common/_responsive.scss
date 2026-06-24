@@ -1,0 +1,64 @@
+@charset 'utf-8';
+//-------------------------------------------------------------------
+//    Media Responsive
+//-------------------------------------------------------------------
+// 분기점이 되는 해상도는 해당구간의 최소 해상도로 한다.(Mobile Base 기준)
+$media-mobile-xl: 480px; // 갤럭시 S23 울트라 세로모드 가로 해상도: 432px 기준
+$media-tablet-xs: 720px;
+$media-tablet-xl: 1024px;
+$media-desktop-xs: 1280px;
+$media-mobile-landscape: 940px; // 아이폰 14 프로 맥스 가로모드의 가로 해상도: 926px
+
+// 기준 해상도
+@mixin media-mobile-xl {
+	@media all and (min-width: $media-mobile-xl) {
+		@content;
+	}
+}
+
+@mixin media-mobile-landscape {
+	@media all and (min-width: $media-mobile-landscape) and (min-height: $media-mobile-xl) {
+		@content;
+	}
+}
+
+@mixin media-tablet-xs {
+	@media all and (min-width: $media-tablet-xs) {
+		@content;
+	}
+	@include media-mobile-landscape {
+		@content;
+	}
+}
+
+@mixin media-tablet-xl {
+	@media all and (min-width: $media-tablet-xl) {
+		@content;
+	}
+}
+
+@mixin media-desktop-xl {
+	@media all and (min-width: $media-desktop-xs) {
+		@content;
+	}
+}
+
+// 사용자정의 해상도
+@mixin media-min-width($width) {
+	@media all and (min-width: $width) {
+		@content;
+	}
+}
+
+// Orientation
+@mixin media-portrait {
+	@media all and (orientation: portrait) {
+		@content;
+	}
+}
+
+@mixin media-landscape {
+	@media all and (orientation: landscape) {
+		@content;
+	}
+}

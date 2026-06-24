@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.ucomp.web.plan.mapper.ErrorReportMapper">
+
+    <sql id="searchCondition">
+        <if test='processSp != null and processSp !=""'>
+            AND process_sp = #{processSp}
+        </if>
+    </sql>
+
+
+	<sql id="Base_Column_list_Info">
+		id
+		,plan_id
+		,report_type
+		,report_content
+		,memo
+		,process_sp
+		,process_manager
+		,create_date
+		,create_id
+		,modified_date
+		,modified_id
+		,GET_ADMIN_USER_NM(create_id) as createNm
+		,GET_ADMIN_USER_NM(modified_id) as modifiedNm
+	</sql>
+	
+    <select id="errorReportList" parameterType="kr.co.ucomp.web.plan.dto.ErrorReportDto" resultType="kr.co.ucomp.web.plan.entity.ErrorReportEntity">
+        SELECT
+			<include refid="Base_Column_list_Info" />
+        FROM
+            tb_pmb_plan_error_report
+        WHERE
+            1=1
+        <include refid="searchCondition"/>
+        ORDER BY
+            create_date DESC
+    </select>
+
+    <select id="errorReport" parameterType="kr.co.ucomp.web.plan.dto.ErrorReportDto" resultType="kr.co.ucomp.web.plan.entity.ErrorReportEntity">
+        SELECT
+           <include refid="Base_Column_list_Info" />
+        FROM
+            tb_pmb_plan_error_report
+        WHERE id=#{id}
+    </select>
+
+
+    <insert id="insertErrorReport" parameterType="kr.co.ucomp.web.plan.entity.ErrorReportEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO tb_pmb_plan_error_report (plan_id, report_type,report_content, process_sp, create_id)
+        VALUES (
+            #{planId},
+            #{reportType},
+            #{reportContent},
+            #{processSp},
+            #{createId}
+       );
+    </insert>
+
+    <update id="updateErrorReport" parameterType="kr.co.ucomp.web.plan.entity.ErrorReportEntity">
+        UPDATE tb_pmb_plan_error_report SET
+            plan_id=#{planId},
+            report_type=#{reportType},            
+            report_content=COALESCE(#{reportContent},reportContent),
+            process_sp=#{processSp},
+            modified_date=NOW()
+            modified_id=#{modifiedId}
+        WHERE id=#{id}
+    </update>
+
+    <delete id="deleteErrorReport" parameterType="int">
+        DELETE FROM tb_pmb_plan_error_report
+        WHERE id=#{id}
+    </delete>
+
+
+</mapper>

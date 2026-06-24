@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='07',menuId ='0101'">
+	  
+<th:block layout:fragment="css">
+</th:block>
+
+<th:block layout:fragment="script">
+	<script type="text/javascript">
+	
+		$(document).ready(function(){
+			
+			$(document).on('change', '.select-company', function(){
+				selectPlanList($(this));
+			});
+			
+			if ( $(location).attr('href').indexOf('Insert') != -1 ) {
+				$('.btn-proc').html('등록');
+			}
+			
+			/* 수정일 경우 요금제 리스트 자동 출력 */
+			if ( $(location).attr('href').indexOf('Update') != -1 ) {
+				$('.select-company').each(function(idx, obj){
+					selectPlanList($(this));
+				});
+				
+				$('.btn-proc').html('수정');
+				
+				/* 글자 카운트 세팅 */
+				$('input[name=planContent]').each(function(){
+					var length = $(this).val().length;
+					$(this).parent().find('.counting').html(length);
+				});
+				
+				/* 이미지 파일 이름 set */
+				$('#fileText1').val($('#orgImagePc').val());
+			}
+			
+			/* 등록 확인 버튼 */
+			$('#confirm').on('click', function(){
+				window.history.back();
+			});
+			
+			$(document).on('keyup', 'input[name=planContent]', function(e){
+				var length = $(this).val().length;
+				
+				if ( length > 16 ) {
+					var val = $(this).val().substring(0,16);
+					$(this).val( val );
+				}
+				
+				$(this).parent().find('.counting').html(length);
+			});
+		})
+		
+		/* 통신사별 요금제 불러오기 */
+		function selectPlanList(element) {
+			
+			var id = element.val();
+			
+			$.ajax({
+				url 		: '/svc/mainbanner/dealPlanList',
+				type 		: 'post',
+				dataType 	: 'json',
+				data 		: {id : id},
+				async 		: false,
+				success 	: function (data) {
+					console.log(data);
+					var html = '<option value="">요금제 선택</option>'
+					$.each(data.data, function(idx, obj){
+						var selected = '';
+						if ( element.data('plan-id') == obj.id ) {
+							selected = 'selected';
+						}
+						html += '<option value="' + obj.id + '" ' + selected + '>' + obj.planName + '</option>'
+					});
+					element.next('select').html(html);
+				},
+				error 		: function(request, status, error){
+					alert(error);
+				},
+				complete 	: function(){
+				}
+			});
+		}
+		
+		/* 등록/수정 */
+		function insupdProc() {
+			
+			var formData = new FormData($('#form')[0]);
+			
+			var isValid = validationCheck();
+		
+			
+			const resultArray = [];
+			
+			$('#form .cloneitems').each(function(index) {
+				
+				var mainDealId = $(this).find('input[name="timeDealId"]').val();
+				var type = $(this).find('input[name^=exposure]:checked').val()
+				var planContent = $(this).find('input[name="planContent"]').val();
+				var planMno = $(this).find('select[name="planMno"]').val();
+				var planId = $(this).find('select[name="planId"]').val();
+				var linkUrl = $(this).find('input[name="linkUrl"]').val();
+				var orderNo = index + 1;
+				
+				const item = {
+		            mainDealId: mainDealId,
+		            type: type,
+		            planContent: planContent,
+		            planMno: planMno,
+		            planId: planId,
+		            linkUrl: linkUrl,
+		            orderNo: orderNo
+		        };
+				
+		        resultArray.push(item);
+			});
+			formData.append('itemArray', JSON.stringify(resultArray));
+			
+			
+			
+			/* 모든 조건을 충족시키면 넘긴다. */
+			
+			if ( isValid ) {
+				$.ajax({
+					url 		: '/svc/mainbanner/dealInsupdProc',
+					type 		: 'post',
+					enctype 	: 'multipart/form-data',
+					data 		: formData,
+					async 		: false,
+					contentType : false,
+					processData : false,
+					success 	: function (data) {
+						
+						var alertTxt = '등록되었습니다';
+						if ( $(location).attr('href').indexOf('Update') != -1 ) {
+							alertTxt = '수정되었습니다.';
+						}
+						
+						showAlert(alertTxt);
+					},
+					error 		: function(request, status, error){
+						alert(error);
+					},
+					complete 	: function(){
+					}
+				});
+			} 
+		}
+		
+		/* 요금제 삭제 */
+		function planDelete(id) {
+			
+			if ( confirm('삭제하시겠습니까?') ) {
+				deleteProc(id);
+			}
+		}
+		
+		function deleteProc(id) {
+			
+			$.ajax({
+			   url 		: '/svc/mainbanner/dealPlanDelete',
+			   type 	: 'DELETE',
+			   data 	: {delId: id},
+			   async 	: false,
+			   success 	: function (data) {
+				   
+			   },
+			   error 	: function(request, status, error){
+		       		alert(error);
+		       },
+		       complete :function(){
+		       }
+			});
+		}
+		
+		/* validation 체크 */
+		function validationCheck() {
+			
+			var validIdx = 0
+			
+			/* 소개 문구 */
+			if ( $.trim($('#title').val()) == '' ) {
+				$('#req-title').find('.required').remove();
+				$('#req-title').append('<span class="required">소개문구를 입력해주세요.</span>');
+				validIdx++;
+			} 
+			
+			/* 게시기간 */
+			if ( $.trim( $('#std').val() ) == '' || $.trim( $('#stdHm').val() ) == '' || $.trim( $('#etd').val() ) == '' || $.trim( $('#std').val() ) == '' ) {
+				$('#req-date').find('.required').remove();
+				$('#req-date').append('<span class="required">게시기간을 입력해주세요.</span>');
+				validIdx++;
+			}
+			
+			/* 상단버튼이 안내팝업일경우 */
+			if ( $('input[name=btnType]:checked').val() == '01' ) {
+				
+				/* 안내팝업 이미지 필수 등록 */
+				if ( $('#fileText1').val() == '' ) {
+					$('#req-imagePc').find('.required').remove();
+					$('#req-imagePc').append('<span class="required">안내팝업을 등록해주세요.</span>');
+					validIdx++;
+				} else {
+					$('#req-imagePc').find('.required').remove();
+				}
+			} else {
+				$('#req-imagePc').find('.required').remove();
+			}
+			
+			/* 문구 입력 */
+			$('input[name=planContent]').each(function(idx){
+				if ( $.trim(this.value) == '' ) {
+					$('.req-content').eq(idx).find('.required').remove();
+					$('.req-content').eq(idx).append('<span class="required">요금제를 선택해주세요.</span>');
+					validIdx++;
+				}
+			});
+			
+			/* 통신사 선택 */
+			$('select[name=planMno]').each(function(idx){
+				if ( $.trim(this.value) == '' ) {
+					$('.req-content').eq(idx).find('.required').remove();
+					$('.req-content').eq(idx).append('<span class="required">요금제를 선택해주세요.</span>');
+					validIdx++;
+				}
+			})
+			
+			/* 요금제 선택 */
+			$('select[name=planId]').each(function(idx){
+				if ( $.trim(this.value) == '' ) {
+					$('.req-content').eq(idx).find('.required').remove();
+					$('.req-content').eq(idx).append('<span class="required">요금제를 선택해주세요.</span>');
+					validIdx++;
+				}
+			})
+			
+			var flag = true;
+			if ( validIdx > 0 ) {
+				flag = false;
+			}
+			return flag;
+		}
+		
+		/* 닫기 버튼 */
+		function formClose() {
+			showConfirm('입력한 내용이 저장되지 않습니다.<br/> 목록으로 돌아가시겠습니까?',
+					() => { window.history.back() },
+					() => {},
+					'메인배너 수정'
+			)
+		}
+	</script>
+</th:block>
+<div class="main-content">
+	<div class="container-fluid">
+		<!-- 로케이션 & 제목 영역 추가 -->
+	    <div class="page-header mb-4">
+	        <div class="location mb-2">
+	            <small class="text-secondary">
+	                <i class="fas fa-home me-1"></i>
+	                <a href="/mbm/adminuser/list">홈</a> > <a href="#none;">서비스관리</a> > <a href="#none;">메인 배너관리</a>
+	            </small>
+	        </div>
+	        <h2 class="page-title fs-4 mb-4">메인배너 <span class="btn-proc">수정</span></h2>
+	    </div>
+	</div>
+	
+	<form name="form" id="form">
+	<input type="hidden" name="type" id="type" value="08"/>
+	<input type="hidden" name="id" id="id" th:value="${entity?.id}"/>
+	<div class="search-section detail">
+		<div class="form-row full-width">
+	        <div class="form-label mb-0">소개 문구<span class="required">*</span></div>
+	        <div class="form-control-wrap" id="req-title">
+	            <input type="text" class="form-control" id="title" name="title" placeholder="항목명을 입력해주세요." th:value="${entity?.title}">
+	        </div>
+	    </div>
+	    
+	    <div class="form-row full-width">
+	        <div class="form-label mb-0">대기화면 문구</div>
+	        <div class="form-control-wrap" id="req-title">
+	            <input type="text" class="form-control" id="dim_title" name="dim_title" placeholder="항목명을 입력해주세요." th:value="${entity?.dim_title}">
+	        </div>
+	    </div>
+	    
+	    <div class="form-row full-width">
+	    	<div class="form-label mb-0">게시기간<span class="required">*</span></div>
+            <div class="form-control-wrap d-flex align-items-center gap-2" id="req-date">
+                <div class="d-flex align-items-center gap-2">
+                    <input type="date" class="form-control" name="std" id="std" th:value="${#temporals.format(entity?.start_date, 'yyyy-MM-dd')}">
+                    <input type="time" class="form-control" name="stdHm" id="stdHm" th:value="${#temporals.format(entity?.start_date, 'HH:mm')}">
+                    <span class="text-secondary">-</span>
+                    <input type="date" class="form-control" name="etd" id="etd" th:value="${#temporals.format(entity?.end_date, 'yyyy-MM-dd')}">
+                    <input type="time" class="form-control" name="etdHm" id="etdHm" th:value="${#temporals.format(entity?.end_date, 'HH:mm')}">
+                </div>
+            </div>
+	    </div>
+	    
+	    <div class="form-row full-width">
+	    	<div class="form-label mb-0">노출기간</div>
+            <div class="form-control-wrap d-flex align-items-center gap-2">
+                <select class="form-select mb-2" name="exposure_time" style="width:100px;">
+                    <option value="">없음</option>
+                    <option value="10" th:selected="${entity?.exposure_time == 10}">10분</option>
+                    <option value="30" th:selected="${entity?.exposure_time == 30}">30분</option>
+                    <option value="60" th:selected="${entity?.exposure_time == 60}">1시간</option>
+                    <option value="120" th:selected="${entity?.exposure_time == 120}">2시간</option>
+                    <option value="180" th:selected="${entity?.exposure_time == 180}">3시간</option>
+                    <option value="240" th:selected="${entity?.exposure_time == 240}">4시간</option>
+                    <option value="300" th:selected="${entity?.exposure_time == 300}">5시간</option>
+                    <option value="360" th:selected="${entity?.exposure_time == 360}">6시간</option>
+                    <option value="420" th:selected="${entity?.exposure_time == 420}">7시간</option>
+                    <option value="480" th:selected="${entity?.exposure_time == 480}">8시간</option>
+                    <option value="540" th:selected="${entity?.exposure_time == 540}">9시간</option>
+                    <option value="600" th:selected="${entity?.exposure_time == 600}">10시간</option>
+                    <option value="660" th:selected="${entity?.exposure_time == 660}">11시간</option>
+                    <option value="720" th:selected="${entity?.exposure_time == 720}">12시간</option>
+                </select>
+            </div>
+	    </div>
+	    
+	    <!--/*<div class="form-row full-width">
+	        <div class="form-label">
+	            상단 버튼
+	        </div>
+	        <div class="form-control-wrap">
+	            <div class="form-check-group">
+	                <div class="form-check">
+	                    <input class="form-check-input" type="radio" name="btnType" th:checked="${entity?.btn_type eq '01' || entity == null}" value="01">
+	                    <label class="form-check-label" for="memberActive">안내팝업</label>
+	                </div>
+	                <div class="form-check">
+	                    <input class="form-check-input" type="radio" name="btnType" th:checked="${entity?.btn_type eq '02'}" value="02">
+	                    <label class="form-check-label" for="memberActive">전체보기</label>
+	                </div>
+	            </div>
+	        </div>
+	    </div>*/-->
+	    
+	    <div class="form-row full-width">
+	        <div class="form-label">안내 팝업 등록</div>
+	        <div class="form-control-wrap" id="req-imagePc">
+	            <div class="file-input-wrap">
+	            	<input type="hidden" id="orgImagePc" th:value="${entity?.orgImagePc}">
+	                <input type="text" class="form-control" readonly id="fileText1">
+	                <input type="file" name="imagePc" id="fileInput1" class="file-input" style="display: none;" accept="image/*">
+	                <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput1').click()" style="min-width:70px">찾기</button>
+	            </div>
+	            <div class="file-info c_red">
+	                이미지 형식의 파일만 업로드 가능합니다. (jpg, png, jpeg) / 권장 사이즈: 지정해주세요
+	            </div>
+	            <div class="preview-wrap">
+	            	<img id="preview1" class="preview-image" th:src="@{${entity?.pop_image}}" style="display:none;">
+	            </div>
+	        </div>
+	    </div>
+	    
+	    <div class="form-row full-width">
+	    	<div class="form-label">
+	            요금제<span class="required">*</span>
+	        </div>
+	        
+	        <div class="cloneitems__outer">
+	            <button type="button" class="btn btn-primary" id="btn-add">추가</button>
+	            <th:block th:each="planList, stat : ${entity?.list}">
+	            <div class="cloneitems">
+	            	<input type="hidden" name="timeDealId" class="main-deal-id" th:value="${planList.id}"/>
+	                <div class="form-control-wrap mb-2">
+	                    <div class="form-check-group">
+	                        <div class="form-check">
+	                            <input class="form-check-input plan-type" type="radio" id="rateplanBest1" th:name="|type[${stat.index}]|" value="BEST" th:checked="${planList?.type eq 'BEST'}">
+	                            <label class="form-check-label" for="rateplanBest1">BEST</label>
+	                        </div>
+	                        <div class="form-check">
+	                            <input class="form-check-input plan-type" type="radio" id="recomm1" th:name="|type[${stat.index}]|" value="RECOM" th:checked="${planList?.type eq 'RECOM'}">
+	                            <label class="form-check-label" for="recomm1">추천</label>
+	                        </div>
+	                    </div>
+	                </div>
+	                <div class="cloneitems__btm">
+	                    <div class="form-control-wrap intCounting mb-2 req-content">
+	                        <input type="text" class="form-control" name="planContent" th:value="${planList?.plan_content}" placeholder="문구를 입력해주세요." style="width:370px;">
+	                        <div class="form-control-counting">(<span class="counting">0</span>/16)</div>
+	                    </div>
+	                    <select class="form-select mb-2 select-company" style="width:150px;" th:name="planMno" th:id="|company-list${stat.index}|" th:attr="data-plan-id=|${planList.plan_id}|">
+	                        <option value="">통신사 선택</option>
+	                        <option th:each="list : ${companyList}" 
+	                			th:value="${list.id}" 
+	                			th:utext="${list.name}"
+	                			th:selected="${planList.plan_mno} == ${list.id}">통신사 선택</option>
+	                    </select>
+	                    <select class="form-select mb-2" th:name="planId" th:id="|plan-list${stat.index}|" style="width:150px;">
+	                        <option value="">요금제 선택</option>
+	                    </select>
+	                    <div class="cloneitems__btnbox">
+	                        <button class="btn btn-dark" style="min-width:50px;">▼</button>
+	                    </div>
+	                    <button type="button" class="btn btn-danger" th:attr="onclick=|planDelete('${planList.id}');|">삭제</button>
+	                </div>
+	                <input type="text" class="form-control" name="linkUrl" value="" placeholder="url을 입력해주세요." style="width:700px;" th:value="${planList?.link_url}">
+	            </div>
+	            </th:block>
+	            <th:block th:if="${entity == null}">
+	         	<div class="cloneitems">
+	         		<input type="hidden" name="timeDealId" class="main-deal-id" value="0"/>
+	                <div class="form-control-wrap mb-2">
+	                    <div class="form-check-group">
+	                        <div class="form-check">
+	                            <input class="form-check-input plan-type" type="radio" id="rateplanBest1" name="type[0]" value="BEST" checked>
+	                            <label class="form-check-label" for="rateplanBest1">BEST</label>
+	                        </div>
+	                        <div class="form-check">
+	                            <input class="form-check-input plan-type" type="radio" id="recomm1" name="type[0]" value="RECOM">
+	                            <label class="form-check-label" for="recomm1">추천</label>
+	                        </div>
+	                    </div>
+	                </div>
+	                <div class="cloneitems__btm">
+	                    <div class="form-control-wrap intCounting mb-2 req-content">
+	                        <input type="text" class="form-control" name="planContent" value="" placeholder="문구를 입력해주세요." style="width:370px;">
+	                        <div class="form-control-counting">(<span class="counting">0</span>/16)</div>
+	                    </div>
+	                    <select class="form-select mb-2 select-company" style="width:150px;" name="planMno">
+	                        <option value="">통신사 선택</option>
+	                        <option th:each="list : ${companyList}" 
+	                			th:value="${list.id}" 
+	                			th:utext="${list.name}">통신사 선택</option>
+	                    </select>
+	                    <select class="form-select mb-2" name="planId" style="width:150px;">
+	                        <option value="">요금제 선택</option>
+	                    </select>
+	                    <div class="cloneitems__btnbox">
+	                        <button class="btn btn-dark" style="min-width:50px;">▼</button>
+	                    </div>
+	                    <button class="btn btn-danger">삭제</button>
+	                </div>
+	                <input type="text" class="form-control" name="linkUrl" value="" placeholder="url을 입력해주세요." style="width:700px;" th:value="${planList?.link_url}">
+	            </div>
+		        </th:block>
+	        </div>
+	    </div>
+	</div>
+	</form>
+	
+	<!-- 버튼 영역 -->
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        <button type="button" class="btn btn-lg btn-secondary px-4 btn-sm" onclick="formClose()">
+            닫기
+        </button>
+        <button type="button" class="btn btn-lg btn-dark px-4 btn-sm btn-proc" onclick="insupdProc()">
+            등록
+        </button>
+    </div>
+    
+</div>

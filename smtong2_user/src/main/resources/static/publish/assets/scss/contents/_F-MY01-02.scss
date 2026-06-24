@@ -1,0 +1,63 @@
+@charset "utf-8";
+/*-------------------------------------------------------------------
+	분류그룹 : 내 계정
+	속성순서 : 레이아웃, 크기간격, 박스모양, 글자모양, 문단모양, 기타모양
+-------------------------------------------------------------------*/
+// s: 내 계정 페이지
+.F-MY01-02-page {
+
+	// 페이시 여백
+	padding-top: 8rem;
+	@include bottom-spacer;
+
+	// s: 내계정 섹션
+	.my-account-sec {
+		.my-account-list {
+			.my-account-item {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 15rem 0;
+				border-top: 1px solid #EFF0F0;
+				vertical-align: middle;
+				min-height: 62rem;
+
+				&:first-child {
+					border-top: 0;
+				}
+
+				.my-account-label {
+					.tit {
+						display: block;
+						font-weight: 500;
+						font-size: 16rem;
+						color: #262626;
+					}
+					.info {
+						margin-top: 4rem;
+						font-weight: 500;
+						font-size: 14rem;
+						color: #555555;
+					}
+					.ui-btn {
+						padding: 4rem 0;
+					}
+				}
+
+				.my-account-con {
+					.txt {
+						display: block;
+						font-size: 16rem;
+						color: #5A5D60;
+						&.primary {
+							font-weight: 700;
+							color: $color-primary;
+						}
+					}
+				}
+			}
+		}
+	}
+	// e: 내계정 섹션
+}
+// e: 내 계정 페이지

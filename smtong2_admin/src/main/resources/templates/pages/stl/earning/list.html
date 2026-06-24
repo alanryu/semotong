@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/default_layout}"
+	  layout:fragment="Content"
+	  th:with="menuIdGroup ='10'">
+	  
+<th:block layout:fragment="css">
+</th:block>
+
+<th:block layout:fragment="script">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script> 
+<script type="text/javascript">
+	
+	$(document).ready(function(){
+		
+		monthChange(3);
+		searchResult();
+		
+		$('.month-btn').on('click', function(){
+			var month = $(this).attr('value');
+			monthChange(month);
+		});
+		
+		$('.period-button').eq(2).trigger('click');
+		
+	})
+	
+	var currentPage = 1;
+	
+	function renderPage(page) {
+		currentPage = page;
+		searchResult();
+	}
+	
+	function searchResult() {
+		
+		var params = {
+			  page : currentPage
+			, recordSize : parseInt($("#recordSize").val())
+			, searchStartDt : $('#searchStartDt').val().replace('-','.')
+			, searchEndDt : $('#searchEndDt').val().replace('-','.')
+			, searchCompanyList : getCheckedCompanies("searchCompanyList")
+		}
+		
+		$.ajax({
+			url 		: '/stl/earning/listProc',
+			type 		: 'post',
+			dataType 	: 'json',
+			contentType : 'application/json',
+			data 		: JSON.stringify(params),
+			async 		: false,
+			success 	: function (data) {
+				
+				$('#listCount').html("총 " + data.totalCnt + "건");
+				
+				$('#list-area').empty();	
+				
+				if(data.totalCnt == 0) {
+					//
+				} else {
+					
+					var totalCnt = data.totalCnt;
+					$.each(data.data, function(idx, obj){
+						var rIdx = totalCnt - ((params.page - 1) * params.recordSize + idx);
+						obj.rIdx = rIdx;
+					});
+					$('#earninglist').tmpl(data.data).appendTo('#list-area');
+				}
+				
+				renderPagination(params.page, data.totalCnt, params.recordSize);
+			},
+			error 		: function(request, status, error){
+				console.log(error);
+				alert(error);
+			},
+			complete 	: function(){
+			}
+		});
+	}
+
+	function selCompany(id) {
+	
+		if(id=="") {
+			$("input[id^='searchCompanyList']").prop("checked", false);
+			$("#searchCompanyListALL").prop("checked", true);
+		} else {
+			$("#searchCompanyListALL").prop("checked", false);
+		}
+		 
+	}
+	
+	function uploadExcel() {
+		
+		if( $('#generateDateInput').val() == '' ) {
+			showAlert("실적 발생 월을 선택 하세요.",$("#generateDateInput"));
+			return;
+		} else {
+			var val = $('#generateDateInput').val().split('-');
+			$('#generateDate').val(val[0] + '.' + val[1]);
+		}
+		
+		if($("#hostId").val() =="") {
+			showAlert("입점사를 선택 하세요.",$("#hostId"));
+			return;
+		}
+		
+		if($("#mapFile").val() =="") {
+			showAlert("업로드 파일을 선택 하세요.");
+			return;
+		}
+		
+		var formData = new FormData($('#uploadform')[0]);
+		
+		/* 해당 데이터 존재여부 판단 */
+		var params = {
+			  searchGenerateDate : $('#generateDate').val()
+			, searchCompanyId : $('#hostId').val()
+		}
+		
+		$.ajax({
+			url 		: '/stl/earning/existence',
+			type 		: 'post',
+			data 		: JSON.stringify(params),
+			async 		: false,
+			contentType : 'application/json',
+			success 	: function (data) {
+				
+				if ( data.data != null ) {
+					showConfirm('해당 월의 입점사 실적 데이터가 이미 등록되어 있습니다. <br><span class=\'c_red\'>새로운 파일로 변경하면 이전 데이터로 복구할 수 없습니다.</span> <br>계속 진행 하시겠습니까?', 
+							function() { exeUploadExcel(formData); }, 
+							function() {  }, 
+					'중복 업로드 안내')
+				} else {
+					exeUploadExcel(formData);
+				}
+			},
+			error 		: function(request, status, error){
+				alert(error);
+			},
+			complete 	: function(){
+			}
+		});
+	}
+	
+	function exeUploadExcel(formData) {
+		
+		$.ajax({
+			url 		: '/stl/earning/uploadExcel',
+			type 		: 'post',
+			enctype 	: 'multipart/form-data',
+			data 		: formData,
+			async 		: false,
+			contentType : false,
+			processData : false,
+			success 	: function (data) {
+				
+				$('#cls-btn').trigger('click');
+				showAlert("실적이 정삭적으로 업로드되었습니다.", searchResult);
+			},
+			error 		: function(request, status, error){
+				alert(error);
+			},
+			complete 	: function(){
+			}
+		});
+	}
+	
+	function changeCombo(){
+		currentPage = 1;
+		searchResult()
+	}
+	
+	function formDownload() {
+		$(location).attr('href', '/files/form.xlsx');
+	}
+	
+	function monthChange(value) {
+		var date = new Date();
+		var month = '' + (date.getMonth() + 1);
+		var year = date.getFullYear();
+		
+		if (month.length < 2) month = '0' + month;
+		
+		$('#searchEndDt').val(year + '-' + month);
+		
+		var bDate = new Date(date)
+		bDate.setMonth(date.getMonth() - value);
+		
+		var bMonth = '' + (bDate.getMonth() + 1);
+		var byear = bDate.getFullYear();
+		
+		if (bMonth.length < 2) bMonth = '0' + bMonth;
+		
+		$('#searchStartDt').val(byear + '-' + bMonth);
+	}
+	
+	function resetSearch() {
+		$('#keyword').val('');
+		selCompany('');
+		$('.period-button').eq(2).trigger('click');
+	}
+</script>
+
+<script id="earninglist" type="text/x-jquery-tmpl">
+	<tr style="cursor:pointer;" onclick="location.href='/stl/earning/detail?id=${id}'">
+		<td>${rIdx}</td>
+		<td>${companyName}</td>
+		<td>${cnt}</td>
+		<td>${createName}</td>
+		<td>${generateDate}</td>
+		<td>{{html getDateStr(createDate)}}</td>
+	</tr>
+</script>
+</th:block>
+
+<div class="main-content">
+	
+	<div class="container-fluid">
+		<!-- 로케이션 & 제목 영역 추가 -->
+	    <div class="page-header mb-4">
+	        <div class="location mb-2">
+	            <small class="text-secondary">
+	                <i class="fas fa-home me-1"></i>
+	                <a href="javascript:;">홈</a>
+	                >
+	                <a href="javascript:;">실적 관리</a>
+	            </small>
+	        </div>
+	        <h2 class="page-title fs-4 mb-4"><span class="title-txt">실적</span> 관리</h2>
+	    </div>
+	    
+	    <!-- 검색 영역 -->
+	    <div class="search-section">
+	    	
+	    	<!-- 검색어 -->
+            <div class="form-row full-width mb-3">
+            	<div class="form-label mb-0">등록자</div>
+              	<div class="form-control-wrap flex-grow-1">
+                	<input type="text" id="keyword" class="form-control" placeholder="등록자를 검색하세요">
+              	</div>
+            </div>
+            <div class="form-row full-width mb-3" th:if="${session.loginUser.allAuthYn == 'Y'}">
+            	<div class="form-label mb-0">입점사</div>
+            	<div class="form-control-wrap">
+            		<div class="form-check-group">
+            			<div class="form-check form-check-inline">
+                             <input class="form-check-input" type="checkbox" id="searchCompanyListALL" value="" onclick="selCompany('');" checked>
+                             <label class="form-check-label" for="searchCompanyListALL">전체</label>
+                         </div>
+                         <th:block th:each="item,index : ${compnyList}">    
+	                         <div class="form-check form-check-inline">
+	                             <input class="form-check-input" type="checkbox" name="searchCompanyList" th:id="${'searchCompanyList' + index.index}"  th:value="${item.id}" th:onclick="|selCompany(${item.id});|">
+	                             <label class="form-check-label" th:for="${'searchCompanyList' + index.index}" th:text="${item.name}"></label>
+	                         </div>
+                       	 </th:block>
+            		</div>
+            	</div>
+            </div>
+	    	
+	    	<div class="row g-3">
+	            <div class="col-12">
+	                <div class="col-12">
+	                    <div class="form-row full-width">
+	                      <div class="form-label mb-0">실적 발생 월</div>
+	                      <div class="form-control-wrap d-flex align-items-center gap-2">
+	                          <div class="d-flex align-items-center gap-2">
+	                              <input type="month" id="searchStartDt" name="searchStartDt" class="form-control" value="" style="min-width: 100px;">
+	                              <span class="text-secondary">-</span>
+	                              <input type="month" id="searchEndDt" name="searchEndDt" class="form-control" value="" style="min-width: 100px;">
+	                          </div>
+	                          <div class="period-buttons">
+	                                <div class="d-flex gap-2">
+	                                 	<button class="period-button month-btn" value="1">최근 1개월</button>
+	                                    <button class="period-button month-btn" value="3">최근 3개월</button>
+	                                    <button class="period-button month-btn" value="6">최근 6개월</button>
+	                                </div>
+	                          </div>
+	                      </div>
+	                  </div>
+	                </div>
+	
+	                <div class="row">
+	                  <div class="col-12 text-end mt-2">
+	                      <button class="btn btn-primary btn-sm me-2" onclick="searchResult()">
+	                          <i class="fas fa-search"></i>
+	                          검색
+	                      </button>
+	                      <button class="btn btn-light btn-sm" onclick="resetSearch()">
+	                          <i class="fas fa-redo"></i>
+	                          초기화
+	                      </button>
+	                  </div>
+	              </div>
+	            </div>
+	        </div>
+	    </div>
+	    
+	    <!-- contents 영역 -->
+	    <div class="table-section">
+		    <div class="d-flex justify-content-between align-items-center mb-4">
+		    	<div class="d-flex align-items-center gap-3">
+					<div class="stats-badge">
+    					<i class="fas fa-calculator me-1"></i>
+    					<span id="listCount"></span>
+					</div>
+					<select class="form-select" style="width: 100px" id="recordSize" onchange="changeCombo()">
+                        <option value="10">10개씩</option>
+						<option value="20">20개씩</option>
+						<option value="30">30개씩</option>
+						<option value="40">40개씩</option>
+						<option value="50">50개씩</option>
+                    </select>
+                </div>
+                <div class="header-actions">
+			    	<button class="btn btn-light btn-sm" onClick="formDownload()">
+	                    <i class="fas fa-download"></i>
+	                    양식 다운로드
+	                </button>
+	                <button data-bs-toggle="modal" data-bs-target="#uploadModal" class="btn btn-primary btn-sm">
+	                    <i class="fas fa-plus"></i>
+	                    실적 업로드
+	                </button>
+                </div>
+		    </div>
+		    
+		    <table class="table custom-table">
+	            <thead>
+	                <tr>
+	                    <th>No</th>
+	                    <th>입점사</th>
+	                    <th>정산 건수</th>
+	                    <th>등록자</th>
+	                    <th>실적 발생 월</th>
+	                    <th>등록일자</th>
+	                </tr>
+	            </thead>
+	            <tbody id="list-area">
+	            </tbody>
+	        </table>
+	        
+	        <div class="d-flex justify-content-left mt-4">
+                <ul class="pagination">
+                    
+                </ul>
+            </div>
+	    </div>
+	</div>
+</div>
+
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="excelUploadModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+	    <div class="modal-content">
+	        <div class="modal-header border-0 pb-0">
+	            <h5 class="modal-title fs-6 fw-bold" id="excelUploadModalLabel">실적 업로드</h5>
+	            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	        </div>
+	        <div class="modal-body">
+	            <div class="mb-4">
+	                <p class="mb-2">
+	                    <i class="fas fa-exclamation-circle text-danger"></i>
+	                    파일 업로드 전 확인하세요!
+	                </p>
+	                <p class="mb-2">파일을 업로드하면 <span class="c_red">이전 데이터로 복구할 수 없습니다.</span>
+	
+	                </p>
+	                <p class="mb-3">
+	                  최종 업로드 전에 반드시 다시 확인해 주세요.
+	                </p>
+	            </div>
+				<form id="uploadform">
+	            <table class="table custom-table">
+	              <tr>
+	                <th>실적 발생 월</th>
+	                <td>
+	                  <input type="month" class="form-control" id="generateDateInput" name="generateDateInput">
+	                  <input type="hidden" id="generateDate" name="generateDate"/>
+	                </td>
+	              </tr>
+	              <tr>
+	                <th>입점사</th>
+	                <td>
+	                  <select name="hostId" id="hostId" class="form-select">
+	                	  <option  value="">입점사 선택</option>
+						  <th:block th:each="item : ${compnyList}">
+	                      	<option th:value="${item.id}" th:text="${item.name}">KG모바일</option>
+	                      </th:block>
+	                  </select>
+	                </td>
+	              </tr>
+	              <tr>
+	                <th>실적파일<br>업로드</th>
+	                <td>
+	                  <input type="file" style="display: none;" id="mapFile" accept=".xls,.xlsx" name="uploadMapData" onchange="BannerUploader.getfilenameExcelEar(this, 'filenameDv')">
+	                  <div class="file-input-wrapper mb-4">
+	                      <span class="file-name" id="filenameDv">파일첨부</span>
+	                      <button type="button" class="btn btn-primary" onclick="BannerUploader.trigger('mapFile')">첨부하기</button>
+	                      </div>
+	                    </td>
+	                  </tr>
+	                </table>
+	            </form>
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="button" class="btn btn-dark px-4" data-bs-dismiss="modal" aria-label="Close" id="cls-btn">취소</button>
+                    <button type="button" class="btn btn-secondary px-4" onclick="uploadExcel();">업로드</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Confirm Modal -->
+<div class="modal fade" id="commonConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-md">
+      <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fs-6 fw-bold">확인</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center pb-4" id="commonConfirmMessage">
+          <!-- 메시지가 여기에 동적으로 들어갑니다 -->
+        </div>
+        <div class="modal-footer border-0 pt-0 justify-content-center">
+            <button type="button" class="btn btn-secondary px-4 btn-sm" id="confirmModalCancelBtn">취소</button>
+            <button type="button" class="btn btn-dark px-4 btn-sm" id="confirmModalConfirmBtn">업로드</button>
+        </div>
+        </div>
+    </div>
+</div>

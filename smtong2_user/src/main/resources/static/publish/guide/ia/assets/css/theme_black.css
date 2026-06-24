@@ -1,0 +1,6 @@
+.ia-content-header {background-color:#333;}
+.ia-content-header .ia-guideLink a,
+.ia-content-header .ia-guideLink button {color:#fff;}
+.ia-content-header .ia-guideLink a.is-current,
+.ia-content-header .ia-guideLink button.is-current {background-color:#fff; color:#000;}
+.ia-content-header .ia-guideLink .ia-top {background-color:#000;}

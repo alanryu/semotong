@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>세모통</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+        <link href="../../css/design.css" rel="stylesheet">
+    </head>
+    <body>
+        <a href="javascript:;" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pointHistoryModal">
+            <span class="log-status__text">포인트내역</span>
+        </a>
+
+        <div class="modal fade" id="pointHistoryModal" tabindex="-1" aria-labelledby="pointHistoryModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title fs-6 fw-bold" id="pointHistoryModalLabel">포인트 내역</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- 포인트 요약 섹션 -->
+                        <div class="point-summary mb-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div>적립 합계</div>
+                                    <div class="text-primary"><b>+15,000</b></div>
+                                </div>
+                                <div>
+                                    <div>차감 합계</div>
+                                    <div class="text-danger"><b>-10,000</b></div>
+                                </div>
+                                <div>
+                                    <div>잔액</div>
+                                    <div><b>5,000</b></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 포인트 내역 테이블 -->
+                        <div class="point-history">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>유형</th>
+                                        <th>적립/차감액</th>
+                                        <th>사유</th>
+                                        <th>일시</th>
+                                        <th>총 캐쉬</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-danger">사용</td>
+                                        <td class="text-danger">-4,000</td>
+                                        <td>유효기간 소멸</td>
+                                        <td>25.01.01</td>
+                                        <td><b>5,000캐쉬</b></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-primary">적립</td>
+                                        <td class="text-primary">+5,000</td>
+                                        <td>친구추천</td>
+                                        <td>24.09.11</td>
+                                        <td><b>9,000캐쉬</b></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-danger">사용</td>
+                                        <td class="text-danger">-3,000</td>
+                                        <td>캐쉬백</td>
+                                        <td>24.06.10</td>
+                                        <td><b>4,000캐쉬</b></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-danger">사용</td>
+                                        <td class="text-danger">-3,000</td>
+                                        <td>네이버포인트 전환</td>
+                                        <td>24.02.09</td>
+                                        <td><b>7,000캐쉬</b></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-primary">적립</td>
+                                        <td class="text-primary">+10,000</td>
+                                        <td>요금제 가입</td>
+                                        <td>24.01.02</td>
+                                        <td><b>10,000캐쉬</b></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- 페이지네이션 -->
+                        <div class="text-center mt-3">
+                            <span>- 1 -</span>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-secondary px-4 m-auto" data-bs-dismiss="modal">닫기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script src="../../js/script.js"></script>
+    </body>
+</html>

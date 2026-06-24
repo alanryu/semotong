@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout/order_layout}"
+	  layout:fragment="Content"
+	  th:with="subPageTitle ='약관동의'">
+
+<!-- index.html 고유 CSS 추가 -->
+<th:block layout:fragment="css">
+    <!--    <link rel="stylesheet" th:href="@{/css/page/home.css}" >-->
+</th:block>
+<!-- index.html 고유 스크립트 추가 -->
+<th:block layout:fragment="script">
+ 
+ <script>
+	
+	
+	$( document ).ready(function() {
+		
+		$("#frmName").val($("#orderNm").val());
+		$("#frmPhoneNum").val($("#orderPhone").val());
+	});
+	
+	function kakaoCert() {
+		$("#identityMethod").val("S");
+		$("#simpleCertSp").val("KAKAO");
+		$("#orderNm").val($("#frmName").val());
+		$("#orderPhone").val($('#frmPhoneNum').val().replaceAll("-",""));
+		kakaoCertInit();
+	}
+	
+	function cardCert(){
+		$("#identityMethod").val("C");
+		window.open("/cardcert/cardcert_popup", "auth_popup", "width=430,height=712,scrollbar=yes");
+	}
+	
+	function cardCertComp(res){
+		if(res =="Y") {
+			$("#custCertYn").val("Y");
+			moveNextOrder('/order/selUsimEntr');
+		}
+	}
+	
+	
+	
+	function kakaoCertInit() {
+		
+		var params = {
+				 
+		    }
+		
+		$.ajax({
+			   url : '/order/gettoken',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+			   beforeSend: function(xhr){
+			       xhr.setRequestHeader(header,token);
+			    },
+				success: function (data) {
+ 					if(data.code =="200" && data.data.resCode == "200") {
+ 						kakaoCertReq();
+ 					}
+					
+			    },
+				error : function(request, status, error){
+					alertModalShow(error,"");
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+			});
+	
+	}
+	
+	
+function kakaoCertReq() {
+		
+		var params = {
+				custnm : $("#orderNm").val(),
+				custhid : $("#userSsn").val(),
+				custphoneNum : $("#orderPhone").val()
+		}
+		
+		$.ajax({
+			   url : '/order/kakaoCert',
+		       type : 'POST',
+		       dataType : "json",
+		       contentType:"application/json",
+			   data : JSON.stringify(params),
+			   beforeSend: function(xhr){
+			       xhr.setRequestHeader(header,token);
+			    },
+				success: function (data) {
+ 					if(data.data.resultBody !=null) {
+ 						var resultStatus = data.data.resultStatus;
+ 						var txId = data.data.resultBody.txId;
+ 						if(resultStatus == "200") {
+ 							$("#custCertTxid").val(txId);
+ 							 moveNextOrder('/order/kakaoCertConfirm');
+ 						} else {
+ 							
+ 							const resultMsg = data.data.resultMsg;
+ 							var jsonString = resultMsg.match(/\"{.*}\"/)[0]; 
+ 						    jsonString = jsonString.slice(1, -1);
+ 						    
+ 						    var parsedData = JSON.parse(jsonString);
+ 						    var errCode = parsedData.rspCode;
+ 						    if(errCode =="E2002") {
+ 						    	alertModalShow("입력하신 가입자 정보를 다시 확인해 주세요.");
+ 						    } else {
+ 						    	alertModalShow("인증 요청이 실패 하였습니다. 다시 시도 바랍니다.");	
+ 						    }
+ 							
+ 						}
+ 					} else {
+ 						alertModalShow("인증 요청이 실패 하였습니다. 다시 시도 바랍니다.");
+ 					}
+					
+			    },
+				error : function(request, status, error){
+					alertModalShow("인증 요청이 실패 하였습니다. 다시 시도 바랍니다.");
+		        },
+		        complete:function(){
+		           // $('#loading').addClass('display-none');
+		        }
+			});
+	
+	}
+	
+	
+	
+	function chkInputValid() {
+		var frmNameLength = $('#frmName').val().length;
+		var frmPhoneNumNoLength = $('#frmPhoneNum').val().length;
+		
+		
+		if(frmNameLength < 2) {
+			return;
+		}
+		if(frmPhoneNumNoLength < 10) {
+			return;
+		}
+		
+
+		$('#btnNext').removeAttr("disabled");		
+		
+
+	}
+ </script>
+</th:block>
+
+<!-- Container -->
+<main role="main" class="container">
+<th:block th:include="pages/order/incOrderForm :: orderFormFragment"></th:block>
+
+<!-- content -->
+			<div class="content F-QU-page F-QU01-06-page">
+				<!-- 간편개통 섹션 -->
+				<section class="simple-open-sec">
+					<div class="sec-inner">
+						<div class="sec-header">
+							<h2 class="sec-tit">입력하신 가입자 정보를<br>다시 확인해 주세요.</h2>
+							<p class="sec-explain">이름과 휴대폰 번호가 일치하지 않으면<br>카카오인증이 어려워요.</p>
+						</div>
+						<div class="sec-body">
+							<!-- 등록폼 -->
+							<div class="basic-frm">
+								<!-- 이름 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmName" class="tit">이름</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="tel" id="frmName" value="김세모" placeholder="홍길동" title="" class="inp"  oninput="chkInputValid();"/>
+										</div>
+									</div>
+								</div>
+								<!-- // 이름 입력 -->
+
+								<!-- 전화번호 입력 -->
+								<div class="frm-field">
+									<div class="frm-title">
+										<label for="frmTitle" class="tit">휴대폰 번호</label>
+									</div>
+									<div class="frm-content">
+										<div class="ui-inp">
+											<input type="tel" id="frmPhoneNum" value="010-1234-1234" placeholder="010-0000-0000" title="" class="inp" oninput="chkInputValid();inputTelNo(this);"/>
+										</div>
+									</div>
+								</div>
+								<!-- // 전화번호 입력 -->
+							</div>
+							<!-- // 등록폼 -->
+						</div>
+					</div>
+				</section>
+				<!-- // 간편개통 섹션 -->
+
+				<!-- 플로팅 섹션 -->
+				<section class="floating-sec">
+					<div class="sec-inner">
+						<button type="button" class="ui-btn btn-action primary" id="btnNext" onclick="kakaoCert()">
+							<span>다시 인증하기</span>
+						</button>
+					</div>
+				</section>
+				<!-- // 플로팅 섹션 -->
+			</div>
+			<!-- // content -->
+</main>
+
+	
+</html>
